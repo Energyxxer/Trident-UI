@@ -52,6 +52,25 @@ public class CaretProfile implements Iterable<Integer> {
         return list.contains(o);
     }
 
+    public boolean contains(int dot, int mark) {
+        for(int i = 0; i < list.size()-1; i += 2) {
+            int min = list.get(i);
+            int max = list.get(i+1);
+            if(min > max) {
+                int oldMin = min;
+                min = max;
+                max = oldMin;
+            }
+
+            if(min <= dot && dot <= max
+            &&
+            min <= mark && mark <= max) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public int indexOf(Integer o) {
         return list.indexOf(o);
     }

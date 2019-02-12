@@ -29,6 +29,7 @@ public class LinePainter
     private Rectangle lastView;
 
     private ArrayList<LinePaintListener> paintListeners = new ArrayList<>();
+    private boolean enabled = true;
 
     /*
      *  The line color will be calculated automatically by attempting
@@ -95,6 +96,7 @@ public class LinePainter
 
     public void paint(Graphics g, int p0, int p1, Shape bounds, JTextComponent c)
     {
+        if(!enabled) return;
         try
         {
             Rectangle r = c.modelToView(c.getCaretPosition());
@@ -171,4 +173,12 @@ public class LinePainter
     }
 
     public void mouseMoved(MouseEvent e) {}
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public boolean getEnabled() {
+        return enabled;
+    }
 }

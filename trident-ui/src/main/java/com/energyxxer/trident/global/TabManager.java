@@ -88,6 +88,7 @@ public class TabManager {
 
 				TridentWindow.tabList.removeTab(tab);
 				openTabs.remove(i);
+				tab.dispose();
 
 				return;
 			}

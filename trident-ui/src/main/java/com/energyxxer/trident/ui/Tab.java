@@ -4,6 +4,7 @@ import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.display.DisplayModule;
 import com.energyxxer.trident.ui.modules.ModuleToken;
 import com.energyxxer.trident.ui.tablist.TabItem;
+import com.energyxxer.util.Disposable;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -115,5 +116,11 @@ public class Tab {
 
 	public void linkTabItem(TabItem tabItem) {
 		this.tabItem = tabItem;
+	}
+
+	public void dispose() {
+		if(module instanceof Disposable) {
+			((Disposable) module).dispose();
+		}
 	}
 }

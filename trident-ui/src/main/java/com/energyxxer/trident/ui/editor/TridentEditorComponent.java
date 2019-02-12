@@ -39,6 +39,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
         super(new DefaultStyledDocument());
         this.parent = parent;
 
+        this.setPaddingEnabled(true);
         sd = this.getStyledDocument();
 
         //if(Lang.getLangForFile(parent.associatedTab.path) != null) this.inspector = new Inspector(this);
@@ -65,8 +66,6 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
 
     private void highlightSyntax() {
         if(parent.syntax == null) return;
-
-        sd.putProperty(DefaultEditorKit.EndOfLineStringProperty, "\n");
 
         Style defaultStyle = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
 

@@ -18,13 +18,11 @@ public class PasteEdit extends Edit {
     public PasteEdit(String value, AdvancedEditor editor) {
         this.values = new String[] {value};
         this.previousProfile = editor.getCaret().getProfile();
-        if(this.values.length == 1) {
-            String[] newValues = new String[previousProfile.size()];
-            for(int i = 0; i < newValues.length; i++) {
-                newValues[i] = value;
-            }
-            this.values = newValues;
+        String[] newValues = new String[previousProfile.size()];
+        for(int i = 0; i < newValues.length; i++) {
+            newValues[i] = value;
         }
+        this.values = newValues;
     }
 
     public PasteEdit(String[] values, AdvancedEditor editor) {

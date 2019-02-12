@@ -112,8 +112,9 @@ public class ToolbarButton extends JButton implements MouseListener, MouseMotion
 		return hintText;
 	}
 
-	public void setHintText(String hintText) {
+	public ToolbarButton setHintText(String hintText) {
 		this.hintText = hintText;
+		return this;
 	}
 
 	public Constant getPreferredHintPos() {
@@ -128,6 +129,11 @@ public class ToolbarButton extends JButton implements MouseListener, MouseMotion
 	public void setText(String text) {
 		super.setText(text);
 		updateSize();
+	}
+
+	public ToolbarButton changeText(String text) {
+		setText(text);
+		return this;
 	}
 
 	private Dimension getBestSize() {
