@@ -3,6 +3,7 @@ package com.energyxxer.trident.main.window.actions;
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.Resources;
 import com.energyxxer.trident.global.TabManager;
+import com.energyxxer.trident.main.window.sections.search_path.SearchPathDialog;
 import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.editor.TridentEditorModule;
 
@@ -53,6 +54,11 @@ public class ActionManager {
                 KeyStroke.getKeyStroke(KeyEvent.VK_T, getPlatformControlMask()),
                 Resources::load)
         );
+        actions.add(new ProgramAction(
+                "Find in Path", "Find all occurrences of a query in a folder or project",
+                KeyStroke.getKeyStroke(KeyEvent.VK_H, getPlatformControlMask()),
+                SearchPathDialog.INSTANCE::reveal)
+        );
     }
 
     public static int getPlatformControlMask() {
@@ -65,7 +71,7 @@ public class ActionManager {
                 if(action.getShortcut() != null) {
                     if(
                             (e.getKeyCode() == action.getShortcut().getKeyCode() || //Check for matching character in keyPressed and keyReleased events
-                                    (Character.toLowerCase(e.getKeyChar()) == Character.toLowerCase(action.getShortcut().getKeyChar())) && e.getID() == KeyEvent.KEY_TYPED)  //Check for matching character in keyTyped events
+                                    (Character.toUpperCase(e.getKeyChar()) == action.getShortcut().getKeyCode() && e.getID() == KeyEvent.KEY_TYPED))  //Check for matching character in keyTyped events
                                     &&
                             (((e.getModifiersEx() | e.getModifiers()) & action.getShortcut().getModifiers()) == action.getShortcut().getModifiers()) //Check for matching modifiers
                     ) {
