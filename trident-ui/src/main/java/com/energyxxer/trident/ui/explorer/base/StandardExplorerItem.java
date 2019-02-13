@@ -1,5 +1,6 @@
 package com.energyxxer.trident.ui.explorer.base;
 
+import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.TabManager;
 import com.energyxxer.trident.ui.explorer.base.elements.ExplorerElement;
 import com.energyxxer.trident.ui.modules.ModuleToken;
@@ -8,6 +9,7 @@ import com.energyxxer.trident.util.ImageUtil;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.ArrayList;
 
 import static com.energyxxer.trident.ui.editor.behavior.AdvancedEditor.isPlatformControlDown;
@@ -23,6 +25,8 @@ public class StandardExplorerItem extends ExplorerElement {
     private Image icon = null;
 
     private int x = 0;
+
+    private boolean detailed = false;
 
     public StandardExplorerItem(ModuleToken token, StandardExplorerItem parent, ArrayList<String> toOpen) {
         this(parent, parent.getMaster(), token, toOpen);
@@ -121,8 +125,8 @@ public class StandardExplorerItem extends ExplorerElement {
         x += 23;
 
         //File Icon
+        int margin = ((master.getRowHeight() - 16) / 2);
         if(icon != null) {
-            int margin = ((master.getRowHeight() - 16) / 2);
             g.drawImage(this.icon,x + 8 - icon.getWidth(null)/2,y + margin + 8 - icon.getHeight(null)/2, null);
         }
         x += 25;
@@ -146,6 +150,24 @@ public class StandardExplorerItem extends ExplorerElement {
 
         g.drawString(token.getTitle(), x, master.getOffsetY() + metrics.getAscent() + ((master.getRowHeight() - metrics.getHeight())/2));
         x += metrics.stringWidth(token.getTitle());
+
+        if(detailed) {
+            File projectRoot = token.getAssociatedProjectRoot();
+            if(projectRoot != null) {
+                String projectName = projectRoot.getName();
+                int projectNameX = master.getWidth() - metrics.stringWidth(projectName) - 24;
+                g.drawImage(Commons.getProjectIcon(), projectNameX - 16 - 8, y + margin + 8 - 8, null);
+                g.drawString(projectName, projectNameX, master.getOffsetY() + metrics.getAscent() + ((master.getRowHeight() - metrics.getHeight())/2));
+            }
+
+            String subTitle = token.getSubTitle();
+            if(subTitle != null) {
+                g.setColor(new Color(g.getColor().getRed(), g.getColor().getGreen(), g.getColor().getBlue(), (int)(g.getColor().getAlpha() * 0.75)));
+                x += 8;
+                g.drawString(subTitle, x, master.getOffsetY() + metrics.getAscent() + ((master.getRowHeight() - metrics.getHeight())/2));
+                x += metrics.stringWidth(subTitle);
+            }
+        }
 
         g2d.setComposite(oldComposite);
 
@@ -171,6 +193,22 @@ public class StandardExplorerItem extends ExplorerElement {
         } else {
             TabManager.openTab(token);
         }
+    }
+
+    private void confirmActivationMenu(MouseEvent e) {
+        if(e.isPopupTrigger()) {
+            if(!this.selected) master.setSelected(this, new MouseEvent(e.getComponent(), e.getID(), e.getWhen(), 0, e.getX(), e.getY(), e.getClickCount(), e.isPopupTrigger(), MouseEvent.BUTTON1));
+            JPopupMenu menu = token.generateMenu();
+            if(menu != null) menu.show(e.getComponent(), e.getX(), e.getY());
+        }
+    }
+
+    public boolean isDetailed() {
+        return detailed;
+    }
+
+    public void setDetailed(boolean detailed) {
+        this.detailed = detailed;
     }
 
     @Override
@@ -202,14 +240,6 @@ public class StandardExplorerItem extends ExplorerElement {
     @Override
     public void mouseReleased(MouseEvent e) {
         confirmActivationMenu(e);
-    }
-
-    private void confirmActivationMenu(MouseEvent e) {
-        if(e.isPopupTrigger()) {
-            if(!this.selected) master.setSelected(this, new MouseEvent(e.getComponent(), e.getID(), e.getWhen(), 0, e.getX(), e.getY(), e.getClickCount(), e.isPopupTrigger(), MouseEvent.BUTTON1));
-            JPopupMenu menu = token.generateMenu();
-            if(menu != null) menu.show(e.getComponent(), e.getX(), e.getY());
-        }
     }
 
     @Override

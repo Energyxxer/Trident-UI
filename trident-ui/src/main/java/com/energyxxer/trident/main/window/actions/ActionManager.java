@@ -11,6 +11,7 @@ import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Collection;
 
 @SuppressWarnings("MagicConstant")
 public class ActionManager {
@@ -64,7 +65,7 @@ public class ActionManager {
                 if(action.getShortcut() != null) {
                     if(
                             (e.getKeyCode() == action.getShortcut().getKeyCode() || //Check for matching character in keyPressed and keyReleased events
-                                    Character.toLowerCase(e.getKeyChar()) == action.getShortcutChar())  //Check for matching character in keyTyped events
+                                    (Character.toLowerCase(e.getKeyChar()) == Character.toLowerCase(action.getShortcut().getKeyChar())) && e.getID() == KeyEvent.KEY_TYPED)  //Check for matching character in keyTyped events
                                     &&
                             (((e.getModifiersEx() | e.getModifiers()) & action.getShortcut().getModifiers()) == action.getShortcut().getModifiers()) //Check for matching modifiers
                     ) {
@@ -78,5 +79,9 @@ public class ActionManager {
             }
             return false;
         });
+    }
+
+    public static Collection<ProgramAction> getAllActions() {
+        return actions;
     }
 }

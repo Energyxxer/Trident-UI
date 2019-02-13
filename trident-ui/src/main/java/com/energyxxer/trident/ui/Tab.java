@@ -5,6 +5,7 @@ import com.energyxxer.trident.ui.display.DisplayModule;
 import com.energyxxer.trident.ui.modules.ModuleToken;
 import com.energyxxer.trident.ui.tablist.TabItem;
 import com.energyxxer.util.Disposable;
+import com.energyxxer.util.logger.Debug;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -35,6 +36,10 @@ public class Tab {
 		this.token = token;
 		//this.linkedProject = ProjectManager.getAssociatedProject(new File(path));
 		module = token.createModule(this);
+		if(module == null) {
+			Debug.log("Cannot create a display module from token: " + token, Debug.MessageType.ERROR);
+			throw new NullPointerException();
+		}
 		savedValue = module.getValue();
 		openedTimeStamp = new Date().getTime();
 		this.name = token.getTitle();

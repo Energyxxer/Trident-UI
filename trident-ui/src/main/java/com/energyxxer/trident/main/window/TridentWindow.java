@@ -6,7 +6,7 @@ import com.energyxxer.trident.main.TridentUI;
 import com.energyxxer.trident.main.window.actions.ActionManager;
 import com.energyxxer.trident.main.window.sections.MenuBar;
 import com.energyxxer.trident.main.window.sections.*;
-import com.energyxxer.trident.main.window.sections.file_search.FileSearchDialog;
+import com.energyxxer.trident.main.window.sections.quick_find.QuickFindDialog;
 import com.energyxxer.trident.main.window.sections.tools.ConsoleBoard;
 import com.energyxxer.trident.main.window.sections.tools.NoticeBoard;
 import com.energyxxer.trident.main.window.sections.tools.ToolBoardMaster;
@@ -32,6 +32,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import static com.energyxxer.xswing.KeyInputUtils.isDoublePress;
+import static com.energyxxer.xswing.KeyInputUtils.markRelease;
 
 /**
  * Literally what it sounds like.
@@ -88,16 +89,13 @@ public class TridentWindow {
 
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher((e) -> {
 			if(e.getID() == KeyEvent.KEY_PRESSED) {
-				/*if((e.getKeyCode() == KeyEvent.VK_X || Character.toLowerCase(e.getKeyChar()) == 'x') && e.getModifiersEx() == InputEvent.SHIFT_DOWN_MASK + InputEvent.ALT_DOWN_MASK) {
-					Commons.compileActive();
-					e.consume();
+				if(e.getKeyCode() == KeyEvent.VK_SHIFT && isDoublePress(e)) {
+					QuickFindDialog.INSTANCE.reveal();
 					return true;
-				} else if((e.getKeyCode() == KeyEvent.VK_W || Character.toLowerCase(e.getKeyChar()) == 'w') && AdvancedEditor.isPlatformControlDown(e)) {
-					TabManager.closeSelectedTab();
-					return true;
-				} else */if(e.getKeyCode() == KeyEvent.VK_SHIFT && isDoublePress(e)) {
-					FileSearchDialog.INSTANCE.reveal();
-					return true;
+				}
+			} else if(e.getID() == KeyEvent.KEY_RELEASED) {
+				if(e.getKeyCode() == KeyEvent.VK_SHIFT) {
+					markRelease(e);
 				}
 			}
             return false;

@@ -32,12 +32,34 @@ public class FileModuleToken implements ModuleToken {
         return file.exists() ? new FileModuleToken(file) : null;
     };
 
+    private static final int MAX_RECENT_FILES = 16;
+    public static final ArrayList<File> recentFiles = new ArrayList<>(MAX_RECENT_FILES);
+
     private final File file;
     private boolean isProjectRoot;
     private String overrideIconName = null;
 
+    private String subTitle;
+    private File associatedProjectRoot;
+
     public FileModuleToken(File file) {
         this.file = file;
+
+        Project associatedProject = ProjectManager.getAssociatedProject(file);
+        if(associatedProject != null) {
+            this.associatedProjectRoot = associatedProject.getRootDirectory();
+            if(file.equals(associatedProjectRoot)) {
+                subTitle = "";
+            } else {
+                subTitle = associatedProjectRoot.toPath().relativize(file.getParentFile().toPath()).toString();
+            }
+            if(subTitle.isEmpty()) subTitle = null;
+            else {
+                subTitle = "(" + subTitle + ")";
+            }
+        } else {
+            subTitle = "(" + file.getParentFile().toPath().toString() + ")";
+        }
 
         this.isProjectRoot = file.isDirectory() && Objects.requireNonNull(file.listFiles(f -> TridentCompiler.PROJECT_FILE_NAME.equals(f.getName()))).length > 0;
     }
@@ -45,6 +67,16 @@ public class FileModuleToken implements ModuleToken {
     @Override
     public String getTitle() {
         return file.getName();
+    }
+
+    @Override
+    public String getSubTitle() {
+        return subTitle;
+    }
+
+    @Override
+    public File getAssociatedProjectRoot() {
+        return associatedProjectRoot;
     }
 
     @Override
@@ -134,14 +166,24 @@ public class FileModuleToken implements ModuleToken {
         if(file.isFile()) {
             String name = file.getName();
             if(name.endsWith(".png")) {
+                addRecentFile(file);
                 return new ImageViewer(file);
             } else if(name.endsWith(".ogg") || name.endsWith(".mp3")) {
 
             } else {
+                addRecentFile(file);
                 return new TridentEditorModule(tab, file);
             }
         }
         return null;
+    }
+
+    private static void addRecentFile(File file) {
+        recentFiles.remove(file);
+        recentFiles.add(0, file);
+        while(recentFiles.size() >= MAX_RECENT_FILES) {
+            recentFiles.remove(MAX_RECENT_FILES-1);
+        }
     }
 
     @Override

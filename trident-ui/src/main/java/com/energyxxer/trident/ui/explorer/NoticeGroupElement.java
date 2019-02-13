@@ -151,7 +151,7 @@ public class NoticeGroupElement extends ExplorerElement {
     }
 
     private void propagateCollapse() {
-        master.getExpandedElements().remove(this.label);
+        master.getExpandedElements().remove(this.getToken());
         for(ExplorerElement element : children) {
             if(element instanceof NoticeGroupElement) ((NoticeGroupElement) element).propagateCollapse();
         }

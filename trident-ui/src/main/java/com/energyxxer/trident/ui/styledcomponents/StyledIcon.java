@@ -19,13 +19,9 @@ public class StyledIcon extends XIcon {
 
     public StyledIcon(String icon, int width, int height, int hints) {
         if(width + height < 0) {
-            tlm.addThemeChangeListener(t -> {
-                this.setImage((BufferedImage) Commons.getIcon(icon).getScaledInstance(width, height, hints));
-            });
+            tlm.addThemeChangeListener(t -> this.setImage((BufferedImage) Commons.getIcon(icon).getScaledInstance(width, height, hints)));
         } else {
-            tlm.addThemeChangeListener(t -> {
-                this.setImage(Commons.getIcon(icon));
-            });
+            tlm.addThemeChangeListener(t -> this.setImage(Commons.getIcon(icon)));
         }
     }
 }

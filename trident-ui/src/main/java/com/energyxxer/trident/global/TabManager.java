@@ -1,6 +1,5 @@
 package com.energyxxer.trident.global;
 
-import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.dialogs.OptionDialog;
@@ -133,8 +132,11 @@ public class TabManager {
 		if (tab != null) {
 			selectedTab = tab;
 			
-			Project linkedProject = null;///tab.getLinkedProject();
-			TridentWindow.setTitle(((linkedProject != null) ? linkedProject.getName() + " - " : "") + tab.getName());
+			String linkedProject = null;
+			if(tab.token.getAssociatedProjectRoot() != null) {
+				linkedProject = tab.token.getAssociatedProjectRoot().getName();
+			}
+			TridentWindow.setTitle(((linkedProject != null) ? linkedProject + " - " : "") + tab.getName());
 			TridentWindow.editArea.setContent(tab.getModuleComponent());
 			tab.onSelect();
 		} else {

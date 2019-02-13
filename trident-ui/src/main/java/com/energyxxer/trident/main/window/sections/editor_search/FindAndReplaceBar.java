@@ -10,10 +10,7 @@ import com.energyxxer.trident.ui.editor.behavior.caret.CaretProfile;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.edits.InsertionEdit;
 import com.energyxxer.trident.ui.scrollbar.OverlayScrollBarUI;
 import com.energyxxer.trident.ui.scrollbar.OverlayScrollPaneLayout;
-import com.energyxxer.trident.ui.styledcomponents.Padding;
-import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
-import com.energyxxer.trident.ui.styledcomponents.StyledMenuItem;
-import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
+import com.energyxxer.trident.ui.styledcomponents.*;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.logger.Debug;
 import com.energyxxer.xswing.TemporaryConfirmation;
@@ -32,6 +29,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import static com.energyxxer.trident.ui.editor.behavior.AdvancedEditor.isPlatformControlDown;
+import static java.awt.Image.SCALE_SMOOTH;
 
 public class FindAndReplaceBar extends JPanel {
 
@@ -86,7 +84,7 @@ public class FindAndReplaceBar extends JPanel {
         JPanel contentPanel = new JPanel(new BorderLayout());
         contentPanel.setOpaque(false);
         this.add(contentPanel);
-        this.add(new Padding(48), BorderLayout.WEST);
+        this.add(new Padding(3), BorderLayout.WEST);
         this.add(new Padding(4), BorderLayout.NORTH);
         this.add(new Padding(4), BorderLayout.SOUTH);
         this.add(new Padding(48), BorderLayout.EAST);
@@ -96,6 +94,7 @@ public class FindAndReplaceBar extends JPanel {
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         topPanel.setOpaque(false);
+        topPanel.add(new StyledIcon("search_28", 23, 23, SCALE_SMOOTH));
         topPanel.add(createInput(false));
         inputPanel.add(topPanel, BorderLayout.NORTH);
         ToolbarButton prevButton = new ToolbarButton("triangle_up", tlm);
@@ -174,6 +173,7 @@ public class FindAndReplaceBar extends JPanel {
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         bottomPanel.setOpaque(false);
+        bottomPanel.add(new Padding(28));
         bottomPanel.add(createInput(true));
         inputPanel.add(bottomPanel, BorderLayout.SOUTH);
 

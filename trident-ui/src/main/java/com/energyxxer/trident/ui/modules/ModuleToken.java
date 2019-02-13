@@ -4,6 +4,7 @@ import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.display.DisplayModule;
 import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -22,6 +23,13 @@ public interface ModuleToken {
     String getIdentifier();
 
     boolean equals(ModuleToken other);
+
+    default String getSubTitle() {
+        return null;
+    }
+    default File getAssociatedProjectRoot() {
+        return null;
+    }
 
     class Static {
         public static List<ModuleTokenFactory> tokenFactories = new ArrayList<>();

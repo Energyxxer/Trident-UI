@@ -77,6 +77,9 @@ public class Project {
 
 	public Project(File rootDirectory) {
 		this.rootDirectory = rootDirectory;
+
+		datapackRoot = rootDirectory.toPath().resolve("datapack").toFile();
+		resourceRoot = rootDirectory.toPath().resolve("resources").toFile();
 		File config = new File(rootDirectory.getAbsolutePath() + File.separator + TridentCompiler.PROJECT_FILE_NAME);
 		this.name = rootDirectory.getName();
 
@@ -222,6 +225,10 @@ public class Project {
     public File getDataPackRoot() {
         return datapackRoot;
     }
+
+	public File getResourcePackRoot() {
+		return resourceRoot;
+	}
 
 	public String getName() {
 		return name;

@@ -127,4 +127,8 @@ public class Commons {
         }
         return null;
     }
+
+    public static Image getProjectIcon() {
+        return Commons.getIcon("project").getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+    }
 }
