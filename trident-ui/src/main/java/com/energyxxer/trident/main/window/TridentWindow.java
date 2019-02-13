@@ -1,15 +1,15 @@
 package com.energyxxer.trident.main.window;
 
-import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.Status;
 import com.energyxxer.trident.global.TabManager;
 import com.energyxxer.trident.main.TridentUI;
-import com.energyxxer.trident.main.window.sections.*;
+import com.energyxxer.trident.main.window.actions.ActionManager;
 import com.energyxxer.trident.main.window.sections.MenuBar;
+import com.energyxxer.trident.main.window.sections.*;
+import com.energyxxer.trident.main.window.sections.file_search.FileSearchDialog;
 import com.energyxxer.trident.main.window.sections.tools.ConsoleBoard;
 import com.energyxxer.trident.main.window.sections.tools.NoticeBoard;
 import com.energyxxer.trident.main.window.sections.tools.ToolBoardMaster;
-import com.energyxxer.trident.ui.editor.behavior.AdvancedEditor;
 import com.energyxxer.trident.ui.explorer.NoticeExplorerMaster;
 import com.energyxxer.trident.ui.explorer.ProjectExplorerMaster;
 import com.energyxxer.trident.ui.tablist.TabListMaster;
@@ -23,7 +23,6 @@ import com.energyxxer.xswing.hints.HintManager;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -31,6 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static com.energyxxer.xswing.KeyInputUtils.isDoublePress;
 
 /**
  * Literally what it sounds like.
@@ -86,19 +87,23 @@ public class TridentWindow {
 		mainContent.add(editArea = new EditArea(), BorderLayout.CENTER);
 
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher((e) -> {
-            if((e.getKeyCode() == KeyEvent.VK_X || Character.toLowerCase(e.getKeyChar()) == 'x') && e.getModifiersEx() == InputEvent.SHIFT_DOWN_MASK + InputEvent.ALT_DOWN_MASK) {
-                if(e.getID() == KeyEvent.KEY_PRESSED) {
-                    Commons.compileActive();
-                }
-                return true;
-            } else if((e.getKeyCode() == KeyEvent.VK_W || Character.toLowerCase(e.getKeyChar()) == 'w') && AdvancedEditor.isPlatformControlDown(e)) {
-                if(e.getID() == KeyEvent.KEY_PRESSED) {
-                    TabManager.closeSelectedTab();
-                }
-                return true;
-            }
+			if(e.getID() == KeyEvent.KEY_PRESSED) {
+				/*if((e.getKeyCode() == KeyEvent.VK_X || Character.toLowerCase(e.getKeyChar()) == 'x') && e.getModifiersEx() == InputEvent.SHIFT_DOWN_MASK + InputEvent.ALT_DOWN_MASK) {
+					Commons.compileActive();
+					e.consume();
+					return true;
+				} else if((e.getKeyCode() == KeyEvent.VK_W || Character.toLowerCase(e.getKeyChar()) == 'w') && AdvancedEditor.isPlatformControlDown(e)) {
+					TabManager.closeSelectedTab();
+					return true;
+				} else */if(e.getKeyCode() == KeyEvent.VK_SHIFT && isDoublePress(e)) {
+					FileSearchDialog.INSTANCE.reveal();
+					return true;
+				}
+			}
             return false;
         });
+
+		ActionManager.setup(mainContent);
 
 		toolBoard = new ToolBoardMaster();
 		mainContent.add(toolBoard, BorderLayout.SOUTH);

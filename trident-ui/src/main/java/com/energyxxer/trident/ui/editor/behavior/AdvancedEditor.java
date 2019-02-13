@@ -119,6 +119,7 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
 
     @Override
     public void keyTyped(KeyEvent e) {
+        if(e.isConsumed()) return;
         e.consume();
         if(!isPlatformControlDown(e) && !Commons.isSpecialCharacter(e.getKeyChar())) {
             editManager.insertEdit(new InsertionEdit("" + e.getKeyChar(), this));

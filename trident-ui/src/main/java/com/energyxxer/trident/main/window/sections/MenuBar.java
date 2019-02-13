@@ -17,6 +17,7 @@ import com.energyxxer.util.FileUtil;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
@@ -75,7 +76,7 @@ public class MenuBar extends JMenuBar {
 
             {
                 StyledMenuItem item = new StyledMenuItem("Save As", "save_as");
-                item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, 3));
+                item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.SHIFT_MASK | InputEvent.CTRL_MASK));
                 menu.add(item);
             }
 
@@ -83,7 +84,7 @@ public class MenuBar extends JMenuBar {
 
             {
                 StyledMenuItem item = new StyledMenuItem("Save All", "save_all");
-                item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, 10));
+                item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK | InputEvent.ALT_MASK));
                 menu.add(item);
             }
 

@@ -1,9 +1,8 @@
 package com.energyxxer.trident.ui.editor;
 
-import com.energyxxer.trident.global.TabManager;
 import com.energyxxer.trident.global.temp.Lang;
 import com.energyxxer.trident.main.TridentUI;
-import com.energyxxer.trident.main.window.sections.find.FindAndReplaceBar;
+import com.energyxxer.trident.main.window.sections.editor_search.FindAndReplaceBar;
 import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.display.DisplayModule;
 import com.energyxxer.trident.ui.scrollbar.OverlayScrollPaneLayout;
@@ -69,31 +68,8 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
 
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
-        KeyStroke saveKeystroke = KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
-
-        KeyStroke reloadKeystroke = KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0);
         KeyStroke findKeystroke = KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
-
-        editorComponent.getInputMap(WHEN_IN_FOCUSED_WINDOW).put(reloadKeystroke, "reloadKeystroke");
-        editorComponent.getInputMap().put(saveKeystroke, "saveKeystroke");
         editorComponent.getInputMap(WHEN_IN_FOCUSED_WINDOW).put(findKeystroke, "findKeystroke");
-
-        editorComponent.getActionMap().put("saveKeystroke", new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Tab st = TabManager.getSelectedTab();
-                if(st != null) st.save();
-            }
-        });
-
-        editorComponent.getActionMap().put("reloadKeystroke", new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setTextToFileContents();
-            }
-        });
 
         editorComponent.getActionMap().put("findKeystroke", new AbstractAction() {
 
@@ -136,7 +112,7 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
 
         addThemeChangeListener();
 
-        setTextToFileContents();
+        reloadFromDisk();
     }
 
     public void showSearchBar() {
@@ -164,7 +140,7 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
         }
     }
 
-    private void setTextToFileContents() {
+    public void reloadFromDisk() {
         byte[] encoded;
         try {
             encoded = Files.readAllBytes(file.toPath());

@@ -1,6 +1,5 @@
 package com.energyxxer.trident.main.window.sections;
 
-import com.energyxxer.trident.global.Resources;
 import com.energyxxer.trident.global.Status;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
@@ -12,8 +11,6 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -64,13 +61,13 @@ public class StatusBar extends JPanel implements MouseListener {
 
         this.addMouseListener(this);
 
-        this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_T, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "reloadResources");
+        /*TODO remove this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_T, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "reloadResources");
         this.getActionMap().put("reloadResources", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Resources.load();
             }
-        });
+        });*/
     }
 
     public void setStatus(String text) {
