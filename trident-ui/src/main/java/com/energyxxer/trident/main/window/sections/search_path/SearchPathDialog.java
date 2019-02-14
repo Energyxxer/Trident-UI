@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 public class SearchPathDialog extends JDialog implements WindowFocusListener, ActionListener {
 
+    private static final int MAX_COUNT = 200;
     private ThemeListenerManager tlm = new ThemeListenerManager();
 
     public static final SearchPathDialog INSTANCE = new SearchPathDialog();
@@ -230,11 +231,13 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
     private int temp = 0;
 
     private void searchInFile(Pattern query, File file) {
+        if(explorer.getCount() >= MAX_COUNT) return;
         if(file.isDirectory()) {
             File[] files = file.listFiles();
             if(files != null) {
                 for(File child : files) {
                     searchInFile(query, child);
+                    if(explorer.getCount() >= MAX_COUNT) return;
                 }
             }
         } else {
@@ -249,6 +252,7 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
                         if(snippetEnd > content.length()) snippetEnd = content.length();
                         int line = content.substring(0, snippetStart).split("\n",-1).length;
                         addFileResult(file, content.substring(snippetStart, snippetEnd), matcher.start() - snippetStart, matcher.start(), matcher.end() - matcher.start(), line);
+                        if(explorer.getCount() >= MAX_COUNT) return;
                     }
                 } catch (IOException x) {
                     x.printStackTrace();

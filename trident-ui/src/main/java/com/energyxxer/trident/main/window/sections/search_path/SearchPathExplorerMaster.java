@@ -52,4 +52,8 @@ public class SearchPathExplorerMaster extends ExplorerMaster {
     void clear() {
         children.clear();
     }
+
+    int getCount() {
+        return children.size();
+    }
 }

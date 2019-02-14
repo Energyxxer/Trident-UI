@@ -32,11 +32,11 @@ public class SearchPathItem extends ExplorerElement {
         this.token = new FileModuleToken(file);
 
         int trimStart = 0;
-        while(trimStart < preview.length() && Character.isWhitespace(preview.charAt(trimStart))) {
+        while(substringOffset > 0 && trimStart < preview.length() && Character.isWhitespace(preview.charAt(trimStart))) {
             trimStart++;
             substringOffset--;
         }
-        preview = preview.trim();
+        preview = preview.substring(trimStart);
 
         this.preview = preview;
 
