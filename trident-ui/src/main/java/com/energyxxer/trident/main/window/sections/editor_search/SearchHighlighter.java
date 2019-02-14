@@ -14,7 +14,6 @@ public class SearchHighlighter implements Highlighter.HighlightPainter {
     private final FindAndReplaceBar finder;
     private final AdvancedEditor editor;
 
-
     private Color highlightColor;
     private Color selectedColor;
     private Color highlightBorderColor;

@@ -8,7 +8,6 @@ import com.energyxxer.trident.main.window.sections.EditArea;
 import com.energyxxer.trident.ui.editor.behavior.AdvancedEditor;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.CharacterDriftHandler;
 import com.energyxxer.trident.ui.editor.inspector.Inspector;
-import com.energyxxer.trident.ui.modules.FileModuleToken;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
@@ -43,7 +42,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
         sd = this.getStyledDocument();
 
         //if(Lang.getLangForFile(parent.associatedTab.path) != null) this.inspector = new Inspector(this);
-        if(Lang.getLangForFile(((FileModuleToken) parent.associatedTab.token).getPath()) == Lang.TRIDENT) {
+        if(Lang.getLangForFile(parent.file.getPath()) == Lang.TRIDENT) {
             this.inspector = new Inspector(this);
         }
 
@@ -133,7 +132,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
 
     @Override
     public void actionPerformed(ActionEvent arg0) {
-        if (lastEdit > -1 && (new Date().getTime()) - lastEdit > 500 && parent.associatedTab.isActive()) {
+        if (lastEdit > -1 && (new Date().getTime()) - lastEdit > 500 && (parent.associatedTab == null || parent.associatedTab.isActive())) {
             lastEdit = -1;
             if(highlightingThread != null) {
                 highlightingThread.stop();

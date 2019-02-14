@@ -38,6 +38,8 @@ import java.util.function.Consumer;
  */
 public class AdvancedEditor extends JTextPane implements KeyListener, CaretListener, Disposable {
 
+    private boolean enabled = true;
+
     private ThemeListenerManager tlm;
 
     private EditorCaret caret;
@@ -119,6 +121,7 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
 
     @Override
     public void keyTyped(KeyEvent e) {
+        if(!enabled) return;
         if(e.isConsumed()) return;
         e.consume();
         if(!isPlatformControlDown(e) && !Commons.isSpecialCharacter(e.getKeyChar())) {
@@ -128,6 +131,7 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
 
     @Override
     public void keyPressed(KeyEvent e) {
+        if(!enabled) return;
         if(e.isConsumed()) return;
         int keyCode = e.getKeyCode();
         if(keyCode == KeyEvent.VK_TAB) {
@@ -357,6 +361,14 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
                 consumer.accept(size);
             }
         }
+    }
+
+    public boolean isEditable() {
+        return enabled;
+    }
+
+    public void setEditable(boolean enabled) {
+        this.enabled = enabled;
     }
 
     //Delegates and deprecated managers

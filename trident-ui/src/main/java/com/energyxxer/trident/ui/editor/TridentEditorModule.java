@@ -113,6 +113,10 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
         addThemeChangeListener();
 
         reloadFromDisk();
+
+        if(tab == null) {
+            editorComponent.setEditable(false);
+        }
     }
 
     public void showSearchBar() {
@@ -147,7 +151,7 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
             String s = new String(encoded, TridentUI.DEFAULT_CHARSET);
             setText(s);
             editorComponent.setCaretPosition(0);
-            associatedTab.updateSavedValue();
+            if(associatedTab != null) associatedTab.updateSavedValue();
             startEditListeners();
         } catch (IOException e) {
             e.printStackTrace();
@@ -230,7 +234,7 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
     public void undoableEditHappened(UndoableEditEvent e) {
         if (!e.getEdit().getPresentationName().equals("style change")) {
             editorComponent.highlight();
-            associatedTab.onEdit();
+            if(associatedTab != null) associatedTab.onEdit();
         }
     }
 

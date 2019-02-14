@@ -5,6 +5,7 @@ import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.main.TridentUI;
 import com.energyxxer.trident.main.window.TridentWindow;
+import com.energyxxer.trident.ui.editor.TridentEditorModule;
 import com.energyxxer.trident.ui.scrollbar.OverlayScrollPane;
 import com.energyxxer.trident.ui.styledcomponents.*;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
@@ -12,6 +13,7 @@ import com.energyxxer.xswing.DragHandler;
 import com.energyxxer.xswing.UnifiedDocumentListener;
 
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -40,6 +42,13 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
     private StyledDropdownMenu<String> rootPicker;
     private StyledCheckBox fileMaskEnabled;
     private StyledTextField fileMask;
+
+    private JPanel previewPanel;
+    private JLabel previewLabel;
+    private TridentEditorModule editorModule;
+    private FixedHighlighter highlighter;
+
+    private ThemeListenerManager tlmHighlighter;
 
     private StyledCheckBox matchCase;
     private StyledCheckBox wordsOnly;
@@ -116,13 +125,6 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
         this.scrollPane = new OverlayScrollPane(this.explorer);
         contentPanel.add(this.scrollPane, BorderLayout.CENTER);
 
-        tlm.addThemeChangeListener(t -> {
-            titleBar.setBackground(t.getColor(new Color(230, 230, 230), "FindInPath.header.background"));
-            int thickness = Math.max(t.getInteger(1,"FindInPath.border.thickness"),0);
-            contentPanel.setBorder(BorderFactory.createMatteBorder(thickness, thickness, thickness, thickness, t.getColor(new Color(200, 200, 200), "FindInPath.border.color")));
-            field.setBorder(BorderFactory.createMatteBorder(0, 28, 0, 0, new ImageIcon(Commons.getIcon("search_28"))));
-        });
-
         //this.addMouseListener(this);
         //this.addMouseMotionListener(this);
         this.addWindowFocusListener(this);
@@ -166,10 +168,26 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
             updateLastEdit();
         });
 
+        previewPanel = new JPanel(new BorderLayout());
+        previewLabel = new StyledLabel("", "FindInPath.preview.header");
+        previewLabel.setPreferredSize(new Dimension(1, 26));
+        previewPanel.add(previewLabel, BorderLayout.NORTH);
+
 
         //this.explorer.addElement(recentFilesCategory);
         //this.explorer.addElement(filesCategory);
         //this.explorer.addElement(actionsCategory);
+
+
+        tlm.addThemeChangeListener(t -> {
+            titleBar.setBackground(t.getColor(new Color(230, 230, 230), "FindInPath.header.background"));
+            int thickness = Math.max(t.getInteger(1,"FindInPath.border.thickness"),0);
+            contentPanel.setBorder(BorderFactory.createMatteBorder(thickness, thickness, thickness, thickness, t.getColor(new Color(200, 200, 200), "FindInPath.border.color")));
+            field.setBorder(BorderFactory.createMatteBorder(0, 28, 0, 0, new ImageIcon(Commons.getIcon("search_28"))));
+            previewPanel.setBackground(t.getColor(new Color(230, 230, 230), "FindInPath.preview.header.background", "FindInPath.header.background"));
+            thickness = Math.max(t.getInteger(1,"FindInPath.preview.header.border.thickness"),0);
+            previewPanel.setBorder(BorderFactory.createMatteBorder(thickness, 0, thickness, 0, t.getColor(new Color(200, 200, 200), "FindInPath.preview.header.border.color", "FindInPath.border.color")));
+        });
 
 
         Timer timer = new Timer(20, this);
@@ -314,5 +332,35 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
             searchThread = new Thread(this::search,"Quick Find");
             searchThread.start();
         }
+    }
+
+    public void showEditor(File file, int start, int length) {
+        if(editorModule != null) {
+            editorModule.dispose();
+            contentPanel.remove(editorModule);
+
+            if(tlmHighlighter != null) tlmHighlighter.dispose();
+        }
+        editorModule = new TridentEditorModule(null, file);
+        editorModule.setPreferredSize(new Dimension(1, 300));
+        highlighter = new FixedHighlighter(editorModule.editorComponent);
+        tlmHighlighter = new ThemeListenerManager();
+        tlm.addThemeChangeListener(t -> {
+            this.highlighter.setHighlightColor(t.getColor(Color.GREEN, "FindInPath.highlight", "Editor.find.highlight"));
+            this.highlighter.setHighlightBorderColor(t.getColor(Color.YELLOW, "FindInPath.highlight.border", "Editor.find.highlight.border"));
+        });
+        highlighter.addRegion(start, start+length);
+        try {
+            editorModule.editorComponent.getHighlighter().addHighlight(0, 0, highlighter);
+        } catch (BadLocationException x) {
+            x.printStackTrace(); //wtf exception
+        }
+
+        previewPanel.add(editorModule, BorderLayout.CENTER);
+        previewLabel.setText("    " + file.getPath());
+        contentPanel.add(previewPanel, BorderLayout.SOUTH);
+        revalidate();
+        repaint();
+        editorModule.scrollToCenter(start);
     }
 }

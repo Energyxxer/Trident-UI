@@ -181,6 +181,7 @@ public class SearchPathItem extends ExplorerElement {
     public void mousePressed(MouseEvent e) {
         if(e.getButton() == MouseEvent.BUTTON1) {
             master.setSelected(this, e);
+            SearchPathDialog.INSTANCE.showEditor(token.getFile(), start, length);
         }
     }
 
