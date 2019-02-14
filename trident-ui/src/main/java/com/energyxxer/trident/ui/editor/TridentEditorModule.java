@@ -372,5 +372,6 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
     @Override
     public void dispose() {
         editorComponent.dispose();
+
     }
 }

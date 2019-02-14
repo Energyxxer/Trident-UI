@@ -32,6 +32,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
 
     private long lastEdit;
 
+    private final Timer timer;
     private Thread highlightingThread = null;
 
     TridentEditorComponent(TridentEditorModule parent) {
@@ -48,7 +49,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
 
         this.addCaretListener(this);
 
-        Timer timer = new Timer(20, this);
+        timer = new Timer(20, this);
         timer.start();
 
         this.setTransferHandler(EditArea.dragToOpenFileHandler);
@@ -169,5 +170,11 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        timer.stop();
     }
 }

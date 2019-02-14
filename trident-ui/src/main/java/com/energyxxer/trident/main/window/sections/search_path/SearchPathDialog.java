@@ -336,10 +336,11 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
 
     public void showEditor(File file, int start, int length) {
         if(editorModule != null) {
-            editorModule.dispose();
-            contentPanel.remove(editorModule);
-
+            previewPanel.remove(editorModule);
             if(tlmHighlighter != null) tlmHighlighter.dispose();
+            editorModule.dispose();
+            editorModule = null;
+            contentPanel.revalidate();
         }
         editorModule = new TridentEditorModule(null, file);
         editorModule.setPreferredSize(new Dimension(1, 300));
