@@ -53,6 +53,8 @@ public class ProjectExplorerMaster extends ExplorerMaster {
 
             assets.put("expand", Commons.getIcon("triangle_right").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
             assets.put("collapse",Commons.getIcon("triangle_down").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
+
+            colors.put("item.find.background",t.getColor(Color.YELLOW.darker(), "Explorer.item.find.background"));
         });
 
         explorerFlags.put(FLATTEN_EMPTY_PACKAGES, Preferences.get("explorer.flatten_empty_packages","true").equals("true"));

@@ -13,20 +13,22 @@ public interface ModuleToken {
     String getTitle();
     java.awt.Image getIcon();
     String getHint();
-    Collection<ModuleToken> getSubTokens();
+    Collection<? extends ModuleToken> getSubTokens();
     boolean isExpandable();
+    boolean isModuleSource();
     DisplayModule createModule(Tab tab);
     void onInteract();
     StyledPopupMenu generateMenu();
+
     default String getSearchTerms() { return null; }
 
     String getIdentifier();
 
     boolean equals(ModuleToken other);
-
     default String getSubTitle() {
         return null;
     }
+
     default File getAssociatedProjectRoot() {
         return null;
     }

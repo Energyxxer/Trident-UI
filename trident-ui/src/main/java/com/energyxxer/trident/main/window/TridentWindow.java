@@ -8,6 +8,7 @@ import com.energyxxer.trident.main.window.sections.MenuBar;
 import com.energyxxer.trident.main.window.sections.*;
 import com.energyxxer.trident.main.window.sections.quick_find.QuickFindDialog;
 import com.energyxxer.trident.main.window.sections.tools.ConsoleBoard;
+import com.energyxxer.trident.main.window.sections.tools.find.FindBoard;
 import com.energyxxer.trident.main.window.sections.tools.NoticeBoard;
 import com.energyxxer.trident.main.window.sections.tools.ToolBoardMaster;
 import com.energyxxer.trident.ui.explorer.NoticeExplorerMaster;
@@ -50,6 +51,7 @@ public class TridentWindow {
 
 	public static NoticeBoard noticeBoard;
 	public static ConsoleBoard consoleBoard;
+	public static FindBoard findBoard;
 
 	public static MenuBar menuBar;
 	public static Toolbar toolbar;
@@ -108,7 +110,8 @@ public class TridentWindow {
 
 		noticeBoard = new NoticeBoard(toolBoard);
 		consoleBoard = new ConsoleBoard(toolBoard);
-		toolBoard.setLastOpenedBoard(noticeBoard);
+		findBoard = new FindBoard(toolBoard);
+		toolBoard.setLastOpenedBoard(consoleBoard);
 
 		jframe.getContentPane().add(statusBar = new StatusBar(), BorderLayout.SOUTH);
 

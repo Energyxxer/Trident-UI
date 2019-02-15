@@ -42,6 +42,8 @@ public class NoticeExplorerMaster extends ExplorerMaster {
             assets.put("info",Commons.getIcon("info").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
             assets.put("warning",Commons.getIcon("warn").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
             assets.put("error",Commons.getIcon("error").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
+
+            colors.put("item.find.background",t.getColor(Color.YELLOW.darker(), "Explorer.item.find.background"));
         });
 
         explorerFlags.put(ExplorerFlag.DYNAMIC_ROW_HEIGHT, true);

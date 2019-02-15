@@ -37,9 +37,7 @@ public class SearchPathExplorerMaster extends ExplorerMaster {
             assets.put("warning",Commons.getIcon("warn").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
             assets.put("error",Commons.getIcon("error").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
 
-
-
-            colors.put("item.find.background",t.getColor(Color.YELLOW.darker(), "FindInPath.item.find.background"));
+            colors.put("item.find.background",t.getColor(Color.YELLOW.darker(), "Explorer.item.find.background"));
         });
 
         explorerFlags.put(ExplorerFlag.DYNAMIC_ROW_HEIGHT, false);

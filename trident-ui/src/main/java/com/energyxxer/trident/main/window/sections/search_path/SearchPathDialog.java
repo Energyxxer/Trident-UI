@@ -3,8 +3,8 @@ package com.energyxxer.trident.main.window.sections.search_path;
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.global.temp.projects.Project;
-import com.energyxxer.trident.main.TridentUI;
 import com.energyxxer.trident.main.window.TridentWindow;
+import com.energyxxer.trident.main.window.sections.tools.find.*;
 import com.energyxxer.trident.ui.editor.TridentEditorModule;
 import com.energyxxer.trident.ui.scrollbar.OverlayScrollPane;
 import com.energyxxer.trident.ui.styledcomponents.*;
@@ -17,11 +17,8 @@ import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SearchPathDialog extends JDialog implements WindowFocusListener, ActionListener {
@@ -44,6 +41,7 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
     private StyledCheckBox fileMaskEnabled;
     private StyledTextField fileMask;
 
+    private JPanel footerPanel;
     private JPanel previewPanel;
     private JLabel previewLabel;
     private TridentEditorModule editorModule;
@@ -174,6 +172,23 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
         previewLabel.setPreferredSize(new Dimension(1, 26));
         previewPanel.add(previewLabel, BorderLayout.NORTH);
 
+        footerPanel = new JPanel(new BorderLayout());
+        StyledButton openInToolButton = new StyledButton("Open in Find Tool", "FindInPath.footer");
+        openInToolButton.addActionListener(e -> {
+            QueryDetails query = new QueryDetails(field.getText(), matchCase.isSelected(), wordsOnly.isSelected(), regex.isSelected(), getRootFile());
+            query.setFileNameFilter(this::shouldRead);
+            query.setMaxResults(MAX_COUNT);
+            FindResults results = query.perform();
+            TridentWindow.toolBoard.open(TridentWindow.findBoard);
+            TridentWindow.findBoard.showResults(results);
+            this.dismiss();
+        });
+        JPanel buttonWrapper = new JPanel();
+        buttonWrapper.setOpaque(false);
+        buttonWrapper.add(openInToolButton);
+        footerPanel.add(buttonWrapper, BorderLayout.EAST);
+        contentPanel.add(footerPanel, BorderLayout.SOUTH);
+
 
         //this.explorer.addElement(recentFilesCategory);
         //this.explorer.addElement(filesCategory);
@@ -186,8 +201,9 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
             contentPanel.setBorder(BorderFactory.createMatteBorder(thickness, thickness, thickness, thickness, t.getColor(new Color(200, 200, 200), "FindInPath.border.color")));
             field.setBorder(BorderFactory.createMatteBorder(0, 28, 0, 0, new ImageIcon(Commons.getIcon("search_28"))));
             previewPanel.setBackground(t.getColor(new Color(230, 230, 230), "FindInPath.preview.header.background", "FindInPath.header.background"));
-            thickness = Math.max(t.getInteger(1,"FindInPath.preview.header.border.thickness"),0);
-            previewPanel.setBorder(BorderFactory.createMatteBorder(thickness, 0, thickness, 0, t.getColor(new Color(200, 200, 200), "FindInPath.preview.header.border.color", "FindInPath.border.color")));
+            footerPanel.setBackground(t.getColor(new Color(230, 230, 230), "FindInPath.preview.footer.background", "FindInPath.footer.background", "FindInPath.preview.header.background", "FindInPath.header.background"));
+            thickness = Math.max(t.getInteger(1,"FindInPath.preview.footer.border.thickness", "FindInPath.preview.header.border.thickness"),0);
+            footerPanel.setBorder(BorderFactory.createMatteBorder(thickness, 0, 0, 0, t.getColor(new Color(200, 200, 200), "FindInPath.preview.header.border.color", "FindInPath.border.color")));
         });
 
 
@@ -197,15 +213,29 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
 
     private void search() {
         explorer.clear();
-        String rawPattern = field.getText();
-        if(rawPattern.isEmpty()) return;
-        if(!regex.isSelected()) {
-            rawPattern = Pattern.quote(rawPattern);
-        }
-        if(wordsOnly.isSelected()) {
-            rawPattern = "\\b" + rawPattern + "\\b";
-        }
-        Pattern pattern = Pattern.compile(rawPattern, matchCase.isSelected() ? 0 : Pattern.CASE_INSENSITIVE);
+        QueryDetails query = new QueryDetails(field.getText(), matchCase.isSelected(), wordsOnly.isSelected(), regex.isSelected(), getRootFile());
+        query.setMaxResults(200);
+        query.setFileNameFilter(this::shouldRead);
+        QueryResult result = query.perform();
+        ArrayList<FileOccurrence> occurrences = new ArrayList<>();
+        result.collectFileOccurrences(occurrences);
+        occurrences.forEach(o -> {
+            FileOccurrenceExplorerItem elem = o.createElement(explorer);
+            elem.setDetailed(true);
+            elem.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    if(e.getButton() == MouseEvent.BUTTON1) {
+                        SearchPathDialog.INSTANCE.showEditor(elem.getToken().getFile(), elem.getToken().getStart(), elem.getToken().getLength());
+                    }
+                }
+            });
+            explorer.addElement(elem);
+        });
+        explorer.repaint();
+    }
+
+    private File getRootFile() {
         File startFile = new File(Preferences.get("workspace_dir"));
         switch(rootPicker.getValueIndex()) {
             case 1: { //"Current Project"
@@ -224,41 +254,7 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
                 break;
             }
         }
-        searchInFile(pattern, startFile);
-        explorer.repaint();
-    }
-
-    private int temp = 0;
-
-    private void searchInFile(Pattern query, File file) {
-        if(explorer.getCount() >= MAX_COUNT) return;
-        if(file.isDirectory()) {
-            File[] files = file.listFiles();
-            if(files != null) {
-                for(File child : files) {
-                    searchInFile(query, child);
-                    if(explorer.getCount() >= MAX_COUNT) return;
-                }
-            }
-        } else {
-            if(shouldRead(file)) {
-                try {
-                    String content = new String(Files.readAllBytes(file.toPath()), TridentUI.DEFAULT_CHARSET);
-                    Matcher matcher = query.matcher(content);
-                    while(matcher.find()) {
-                        int snippetStart = content.lastIndexOf('\n', matcher.start()-1);
-                        if(snippetStart < 0) snippetStart = 0;
-                        int snippetEnd = content.indexOf('\n', matcher.end());
-                        if(snippetEnd > content.length()) snippetEnd = content.length();
-                        int line = content.substring(0, snippetStart).split("\n",-1).length;
-                        addFileResult(file, content.substring(snippetStart, snippetEnd), matcher.start() - snippetStart, matcher.start(), matcher.end() - matcher.start(), line);
-                        if(explorer.getCount() >= MAX_COUNT) return;
-                    }
-                } catch (IOException x) {
-                    x.printStackTrace();
-                }
-            }
-        }
+        return startFile;
     }
 
     private static final String[] fileEndings = new String[] {".tdn", ".mcfunction", ".mcmeta", ".json", ".tdnproj", ".txt", ".md", ".gitignore"};
@@ -274,20 +270,6 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
                 if(file.getName().endsWith(extension)) return true;
             }
             return false;
-        }
-    }
-
-    private void addFileResult(File file, String substring, int substringOffset, int start, int length, int line) {
-        if(substring.length() > 128) {
-            substring = substring.substring(substringOffset, substringOffset + length);
-            substringOffset = 0;
-        }
-        SearchPathItem item = new SearchPathItem(file, substring, substringOffset, start, length, line, explorer, new ArrayList<>());
-        explorer.addElement(item);
-        temp++;
-        if(temp >= 20) {
-            temp = 0;
-            explorer.repaint();
         }
     }
 
@@ -363,7 +345,7 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
 
         previewPanel.add(editorModule, BorderLayout.CENTER);
         previewLabel.setText("    " + file.getPath());
-        contentPanel.add(previewPanel, BorderLayout.SOUTH);
+        footerPanel.add(previewPanel, BorderLayout.NORTH);
         revalidate();
         repaint();
         editorModule.scrollToCenter(start);

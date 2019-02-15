@@ -4,11 +4,13 @@ import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.TabManager;
 import com.energyxxer.trident.ui.explorer.base.elements.ExplorerElement;
 import com.energyxxer.trident.ui.modules.ModuleToken;
+import com.energyxxer.trident.ui.modules.NonStandardModuleToken;
 import com.energyxxer.trident.util.ImageUtil;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.ArrayList;
 
@@ -18,7 +20,7 @@ public class StandardExplorerItem extends ExplorerElement {
     private ExplorerElement parent = null;
 
     private ModuleToken token = null;
-    private int indentation = 0;
+    protected int indentation = 0;
 
     private boolean expanded = false;
 
@@ -27,6 +29,8 @@ public class StandardExplorerItem extends ExplorerElement {
     private int x = 0;
 
     private boolean detailed = false;
+
+    private ArrayList<MouseListener> mouseListeners = new ArrayList<>();
 
     public StandardExplorerItem(ModuleToken token, StandardExplorerItem parent, ArrayList<String> toOpen) {
         this(parent, parent.getMaster(), token, toOpen);
@@ -56,7 +60,14 @@ public class StandardExplorerItem extends ExplorerElement {
 
     private void expand(ArrayList<String> toOpen) {
         for(ModuleToken subToken : token.getSubTokens()) {
-            this.children.add(new StandardExplorerItem(subToken, this, toOpen));
+            ExplorerElement inner;
+            if(subToken instanceof NonStandardModuleToken) {
+                inner = ((NonStandardModuleToken) subToken).createElement(this);
+            } else {
+                inner = new StandardExplorerItem(subToken, this, toOpen);
+                ((StandardExplorerItem) inner).setDetailed(this.detailed);
+            }
+            this.children.add(inner);
         }
         expanded = true;
         master.getExpandedElements().add(this.token);
@@ -144,9 +155,6 @@ public class StandardExplorerItem extends ExplorerElement {
 
         Graphics2D g2d = (Graphics2D) g;
         Composite oldComposite = g2d.getComposite();
-        /*if(translucent) {
-            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
-        }*/
 
         g.drawString(token.getTitle(), x, master.getOffsetY() + metrics.getAscent() + ((master.getRowHeight() - metrics.getHeight())/2));
         x += metrics.stringWidth(token.getTitle());
@@ -190,7 +198,7 @@ public class StandardExplorerItem extends ExplorerElement {
         if(token.isExpandable()) {
             if(expanded) collapse();
             else expand(new ArrayList<>());
-        } else {
+        } else if(token.isModuleSource()) {
             TabManager.openTab(token);
         }
     }
@@ -221,6 +229,7 @@ public class StandardExplorerItem extends ExplorerElement {
         if(e.getButton() == MouseEvent.BUTTON1 && !isPlatformControlDown(e) && e.getClickCount() % 2 == 0 && (!token.isExpandable() || e.getX() < x || e.getX() > x + master.getRowHeight())) {
             this.open();
         }
+        dispatchMouseEvent(e);
     }
 
     @Override
@@ -235,25 +244,61 @@ public class StandardExplorerItem extends ExplorerElement {
             }
         }
         confirmActivationMenu(e);
+        dispatchMouseEvent(e);
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
         confirmActivationMenu(e);
+        dispatchMouseEvent(e);
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
-
+        dispatchMouseEvent(e);
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-
+        dispatchMouseEvent(e);
     }
 
     @Override
     public ModuleToken getToken() {
         return token;
+    }
+
+    public int getIndentation() {
+        return indentation;
+    }
+
+    public void addMouseListener(MouseListener listener) {
+        mouseListeners.add(listener);
+    }
+
+    public void removeMouseListener(MouseListener listener) {
+        mouseListeners.remove(listener);
+    }
+
+    protected void dispatchMouseEvent(MouseEvent e) {
+        for(MouseListener listener : mouseListeners) {
+            switch(e.getID()) {
+                case MouseEvent.MOUSE_CLICKED:
+                    listener.mouseClicked(e);
+                    break;
+                case MouseEvent.MOUSE_PRESSED:
+                    listener.mousePressed(e);
+                    break;
+                case MouseEvent.MOUSE_RELEASED:
+                    listener.mousePressed(e);
+                    break;
+                case MouseEvent.MOUSE_ENTERED:
+                    listener.mouseEntered(e);
+                    break;
+                case MouseEvent.MOUSE_EXITED:
+                    listener.mouseExited(e);
+                    break;
+            }
+        }
     }
 }

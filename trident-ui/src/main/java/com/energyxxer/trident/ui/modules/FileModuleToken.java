@@ -61,7 +61,11 @@ public class FileModuleToken implements ModuleToken {
             subTitle = "(" + file.getParentFile().toPath().toString() + ")";
         }
 
-        this.isProjectRoot = file.isDirectory() && Objects.requireNonNull(file.listFiles(f -> TridentCompiler.PROJECT_FILE_NAME.equals(f.getName()))).length > 0;
+        this.isProjectRoot = isProjectRoot(file);
+    }
+
+    public static boolean isProjectRoot(File file) {
+        return file.isDirectory() && Objects.requireNonNull(file.listFiles(f -> TridentCompiler.PROJECT_FILE_NAME.equals(f.getName()))).length > 0;
     }
 
     @Override
@@ -85,6 +89,9 @@ public class FileModuleToken implements ModuleToken {
         if(file.isDirectory()) {
             if(isProjectRoot) {
                 return Commons.getIcon("project");
+            } else if(isProjectRoot(file.getParentFile())) {
+                if(file.getName().equals("datapack")) return Commons.getIcon("data");
+                if(file.getName().equals("resources")) return Commons.getIcon("resources");
             }
             return Commons.getIcon("folder");
         } else {
@@ -142,7 +149,7 @@ public class FileModuleToken implements ModuleToken {
             for (File subDir : subFiles) {
                 FileModuleToken subToken = new FileModuleToken(subDir);
                 if(this.isProjectRoot) {
-                    subToken.overrideIconName = subDir.getName().equals("datapack") ? "data" : subDir.getName().equals("resources") ? "resources" : null;
+                    //subToken.overrideIconName = subDir.getName().equals("datapack") ? "data" : subDir.getName().equals("resources") ? "resources" : null;
                 }
                 if (subDir.isDirectory()) {
                     children.add(firstFileIndex, subToken);
@@ -176,6 +183,11 @@ public class FileModuleToken implements ModuleToken {
             }
         }
         return null;
+    }
+
+    @Override
+    public boolean isModuleSource() {
+        return file.isFile();
     }
 
     private static void addRecentFile(File file) {

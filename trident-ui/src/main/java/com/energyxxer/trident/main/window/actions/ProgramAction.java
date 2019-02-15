@@ -83,6 +83,11 @@ public class ProgramAction implements ModuleToken {
     }
 
     @Override
+    public boolean isModuleSource() {
+        return false;
+    }
+
+    @Override
     public void onInteract() {
         QuickFindDialog.INSTANCE.dismiss();
         perform();

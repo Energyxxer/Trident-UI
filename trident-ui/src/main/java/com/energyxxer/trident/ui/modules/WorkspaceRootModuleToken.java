@@ -55,6 +55,11 @@ public class WorkspaceRootModuleToken implements ModuleToken {
     }
 
     @Override
+    public boolean isModuleSource() {
+        return false;
+    }
+
+    @Override
     public void onInteract() {
 
     }
