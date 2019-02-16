@@ -20,13 +20,12 @@ public class StandardExplorerItem extends ExplorerElement {
     private ExplorerElement parent = null;
 
     private ModuleToken token = null;
-    protected int indentation = 0;
 
-    private boolean expanded = false;
+    protected boolean expanded = false;
 
     private Image icon = null;
 
-    private int x = 0;
+    protected int x = 0;
 
     private boolean detailed = false;
 
@@ -43,22 +42,18 @@ public class StandardExplorerItem extends ExplorerElement {
     private StandardExplorerItem(StandardExplorerItem parent, ExplorerMaster master, ModuleToken token, ArrayList<String> toOpen) {
         super(master);
         this.parent = parent;
+        if(parent != null) this.setDetailed(parent.detailed);
         this.token = token;
 
         this.icon = token.getIcon();
         if(this.icon != null) this.icon = ImageUtil.fitToSize(this.icon, 16, 16);
-
-        if(parent != null) {
-            this.indentation = parent.indentation + 1;
-            this.x = indentation * master.getIndentPerLevel() + master.getInitialIndent();
-        }
 
         if(toOpen.contains(this.token.getIdentifier())) {
             expand(toOpen);
         }
     }
 
-    private void expand(ArrayList<String> toOpen) {
+    public void expand(ArrayList<String> toOpen) {
         for(ModuleToken subToken : token.getSubTokens()) {
             ExplorerElement inner;
             if(subToken instanceof NonStandardModuleToken) {
@@ -93,7 +88,9 @@ public class StandardExplorerItem extends ExplorerElement {
         int y = master.getOffsetY();
         master.getFlatList().add(this);
 
-        int x = (indentation * master.getIndentPerLevel()) + master.getInitialIndent();
+        this.x = master.getIndentation() * master.getIndentPerLevel() + master.getInitialIndent();
+
+        int x = this.x;
 
         g.setColor((this.rollover || this.selected) ? master.getColorMap().get("item.rollover.background") : master.getColorMap().get("item.background"));
         g.fillRect(0, master.getOffsetY(), master.getWidth(), master.getRowHeight());
@@ -188,9 +185,11 @@ public class StandardExplorerItem extends ExplorerElement {
 
         master.setOffsetY(master.getOffsetY() + master.getRowHeight());
         master.setContentWidth(Math.max(master.getContentWidth(), x));
+        master.pushIndentation();
         for(ExplorerElement i : children) {
             i.render(g);
         }
+        master.popIndentation();
     }
 
     private void open() {
@@ -266,10 +265,6 @@ public class StandardExplorerItem extends ExplorerElement {
     @Override
     public ModuleToken getToken() {
         return token;
-    }
-
-    public int getIndentation() {
-        return indentation;
     }
 
     public void addMouseListener(MouseListener listener) {

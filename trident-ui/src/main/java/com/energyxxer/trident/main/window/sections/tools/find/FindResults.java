@@ -1,8 +1,12 @@
 package com.energyxxer.trident.main.window.sections.tools.find;
 
 import com.energyxxer.trident.global.Commons;
+import com.energyxxer.trident.ui.explorer.base.ExplorerMaster;
+import com.energyxxer.trident.ui.explorer.base.StandardExplorerItem;
+import com.energyxxer.trident.ui.explorer.base.elements.ExplorerElement;
 import com.energyxxer.trident.ui.modules.FileModuleToken;
 import com.energyxxer.trident.ui.modules.ModuleToken;
+import com.energyxxer.trident.ui.modules.NonStandardModuleToken;
 
 import java.awt.*;
 import java.io.File;
@@ -49,7 +53,7 @@ public class FindResults extends QueryResult {
         projectResults.values().forEach(r -> r.collectFileOccurrences(target));
     }
 
-    public static class ProjectResult extends QueryResult {
+    public static class ProjectResult extends QueryResult implements NonStandardModuleToken {
         private File projectRoot;
         private HashMap<String, SubProjectResult> subResults = new HashMap<>();
         private ArrayList<FileOccurrence> loneResults = new ArrayList<>();
@@ -104,9 +108,19 @@ public class FindResults extends QueryResult {
             subResults.values().forEach(r -> r.collectFileOccurrences(target));
             loneResults.forEach(r -> r.collectFileOccurrences(target));
         }
+
+        @Override
+        public ExplorerElement createElement(StandardExplorerItem parent) {
+            return new FindResultExplorerItem(this, parent, FindExplorerFilter::groupByProject);
+        }
+
+        @Override
+        public ExplorerElement createElement(ExplorerMaster parent) {
+            return new FindResultExplorerItem(this, parent, FindExplorerFilter::groupByProject);
+        }
     }
 
-    public static class SubProjectResult extends QueryResult { //Data or resources
+    public static class SubProjectResult extends QueryResult implements NonStandardModuleToken { //Data or resources
         private FileModuleToken subRootFile;
         private String rootName;
 
@@ -151,9 +165,19 @@ public class FindResults extends QueryResult {
         public void collectFileOccurrences(List<FileOccurrence> target) {
             pathResults.values().forEach(r -> r.collectFileOccurrences(target));
         }
+
+        @Override
+        public ExplorerElement createElement(StandardExplorerItem parent) {
+            return new FindResultExplorerItem(this, parent, FindExplorerFilter::groupBySubProject);
+        }
+
+        @Override
+        public ExplorerElement createElement(ExplorerMaster parent) {
+            return new FindResultExplorerItem(this, parent, FindExplorerFilter::groupBySubProject);
+        }
     }
 
-    public static class PathResult extends QueryResult {
+    public static class PathResult extends QueryResult implements NonStandardModuleToken {
         private String path;
         private HashMap<File, FileResult> fileResults = new HashMap<>();
 
@@ -195,9 +219,19 @@ public class FindResults extends QueryResult {
         public void collectFileOccurrences(List<FileOccurrence> target) {
             fileResults.values().forEach(r -> r.collectFileOccurrences(target));
         }
+
+        @Override
+        public ExplorerElement createElement(StandardExplorerItem parent) {
+            return new FindResultExplorerItem(this, parent, FindExplorerFilter::groupByPath);
+        }
+
+        @Override
+        public ExplorerElement createElement(ExplorerMaster parent) {
+            return new FindResultExplorerItem(this, parent, FindExplorerFilter::groupByPath);
+        }
     }
 
-    public static class FileResult extends QueryResult {
+    public static class FileResult extends QueryResult implements NonStandardModuleToken {
         private FileModuleToken file;
         private ArrayList<FileOccurrence> occurrences = new ArrayList<>();
 
@@ -234,6 +268,16 @@ public class FindResults extends QueryResult {
         @Override
         public void collectFileOccurrences(List<FileOccurrence> target) {
             occurrences.forEach(r -> r.collectFileOccurrences(target));
+        }
+
+        @Override
+        public ExplorerElement createElement(StandardExplorerItem parent) {
+            return new FindResultExplorerItem(this, parent, FindExplorerFilter::groupByFile);
+        }
+
+        @Override
+        public ExplorerElement createElement(ExplorerMaster parent) {
+            return new FindResultExplorerItem(this, parent, FindExplorerFilter::groupByFile);
         }
     }
 }

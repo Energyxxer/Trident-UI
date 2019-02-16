@@ -39,6 +39,7 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
     protected int initialIndent = 0;
     protected String selectionStyle = "FULL";
     protected int selectionLineThickness = 2;
+    private int indentation;
 
     public ExplorerMaster() {
         this.addMouseListener(this);
@@ -57,6 +58,7 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
 
         contentWidth = 0;
         offsetY = 0;
+        indentation = 0;
         flatList.clear();
         g.setColor(colors.get("background"));
         g.fillRect(0,0,this.getWidth(), this.getHeight());
@@ -293,5 +295,21 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
 
     public ArrayList<ExplorerElement> getChildren() {
         return children;
+    }
+
+    public int getIndentation() {
+        return indentation;
+    }
+
+    public void setIndentation(int indentation) {
+        this.indentation = indentation;
+    }
+
+    public void pushIndentation() {
+        this.indentation++;
+    }
+
+    public void popIndentation() {
+        this.indentation--;
     }
 }

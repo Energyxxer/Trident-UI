@@ -204,7 +204,7 @@ public class TridentWindow {
 	}
 
 	public static void setTitle(String title) {
-		jframe.setTitle(title + ((title.length() > 0) ? " - " : "") + "Trident UI " + TridentUI.VERSION);
+		jframe.setTitle(title + ((title.length() > 0) ? " - " : "") + "Trident UI " + TridentUI.MIXED_VERSION);
 	}
 
 	public static void clearTitle() {

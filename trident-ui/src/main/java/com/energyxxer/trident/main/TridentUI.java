@@ -1,11 +1,11 @@
 package com.energyxxer.trident.main;
 
+import com.energyxxer.trident.compiler.TridentCompiler;
 import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.global.Resources;
 import com.energyxxer.trident.global.TabManager;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
 import com.energyxxer.trident.main.window.TridentWindow;
-import com.energyxxer.trident.util.Version;
 import com.energyxxer.util.ImageManager;
 import com.energyxxer.util.logger.Debug;
 
@@ -18,7 +18,8 @@ import java.nio.charset.Charset;
 
 public class TridentUI {
 	public static TridentUI trident;
-	public static final Version VERSION = new Version(0,1,0);
+	public static final String UI_VERSION = "0.1.0";
+	public static final String MIXED_VERSION = "u" + UI_VERSION + "c" + TridentCompiler.TRIDENT_LANGUAGE_VERSION;
 	public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
 	public static TridentWindow window;
@@ -52,8 +53,8 @@ public class TridentUI {
 				Graphics2D g2d = (Graphics2D) g;
 				g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 				g.setColor(new Color(187, 187, 187));
-				g.setFont(g.getFont().deriveFont(32f));
-				g.drawString("v." + VERSION.toString(), 512, 320);
+				g.setFont(g.getFont().deriveFont(21f));
+				g.drawString(MIXED_VERSION, 512, 320);
 				g.dispose();
 			}
 		});

@@ -5,16 +5,11 @@ import com.energyxxer.trident.ui.decorationpane.DecorationObject;
 import com.energyxxer.trident.ui.decorationpane.DecorationPane;
 import com.energyxxer.util.ImageManager;
 
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Desktop;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Image;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.net.URI;
 
-import static com.energyxxer.trident.main.TridentUI.VERSION;
+import static com.energyxxer.trident.main.TridentUI.MIXED_VERSION;
 
 public class AboutPane extends DecorationPane {
 
@@ -27,8 +22,8 @@ public class AboutPane extends DecorationPane {
             @Override
             public void paint(Graphics g) {
                 g.setColor(new Color(187, 187, 187));
-                g.setFont(g.getFont().deriveFont(32f));
-                g.drawString("v." + VERSION.toString(), this.x, this.y);
+                g.setFont(g.getFont().deriveFont(21f));
+                g.drawString(MIXED_VERSION, this.x, this.y);
             }
         });
 

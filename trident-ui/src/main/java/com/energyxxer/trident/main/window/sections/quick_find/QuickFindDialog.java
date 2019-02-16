@@ -32,7 +32,7 @@ public class QuickFindDialog extends JDialog implements WindowFocusListener, Act
     private JPanel contentPanel = new JPanel(new BorderLayout());
     private StyledTextField field;
     private JScrollPane scrollPane;
-    private QuickFindExplorerMaster explorer = new QuickFindExplorerMaster();
+    private StyledExplorerMaster explorer = new StyledExplorerMaster();
     private QuickFindCategoryItem recentFilesCategory = new QuickFindCategoryItem(explorer, "Recent Files");
     private QuickFindCategoryItem filesCategory = new QuickFindCategoryItem(explorer, "Files");
     private QuickFindCategoryItem actionsCategory = new QuickFindCategoryItem(explorer, "Actions");

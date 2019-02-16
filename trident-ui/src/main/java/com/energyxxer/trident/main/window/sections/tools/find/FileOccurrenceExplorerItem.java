@@ -38,7 +38,8 @@ public class FileOccurrenceExplorerItem extends StandardExplorerItem {
         int y = master.getOffsetY();
         master.getFlatList().add(this);
 
-        int x = (this.indentation * master.getIndentPerLevel()) + master.getInitialIndent();
+        this.x = (master.getIndentation() * master.getIndentPerLevel()) + master.getInitialIndent();
+        int x = this.x;
 
         g.setColor((this.rollover || this.selected) ? master.getColorMap().get("item.rollover.background") : master.getColorMap().get("item.background"));
         g.fillRect(0, master.getOffsetY(), master.getWidth(), master.getRowHeight());
@@ -110,7 +111,7 @@ public class FileOccurrenceExplorerItem extends StandardExplorerItem {
             g.fillRect(x-2, master.getOffsetY(), 2, master.getRowHeight());
         }
 
-        if(isDetailed()) {
+        if(isDetailed() || (master instanceof FindExplorerFilter && !((FindExplorerFilter) master).groupByFile())) {
             File file = occurrence.file;
             String fileName = file.getName();
             fileName += " " + occurrence.lineNum;
@@ -125,9 +126,11 @@ public class FileOccurrenceExplorerItem extends StandardExplorerItem {
 
         master.setOffsetY(master.getOffsetY() + master.getRowHeight());
         master.setContentWidth(Math.max(master.getContentWidth(), x));
+        master.pushIndentation();
         for(ExplorerElement i : children) {
             i.render(g);
         }
+        master.popIndentation();
     }
 
     @Override

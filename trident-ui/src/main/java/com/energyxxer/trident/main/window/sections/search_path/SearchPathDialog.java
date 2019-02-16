@@ -4,6 +4,7 @@ import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.main.window.TridentWindow;
+import com.energyxxer.trident.main.window.sections.quick_find.StyledExplorerMaster;
 import com.energyxxer.trident.main.window.sections.tools.find.*;
 import com.energyxxer.trident.ui.editor.TridentEditorModule;
 import com.energyxxer.trident.ui.scrollbar.OverlayScrollPane;
@@ -31,7 +32,7 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
     private JPanel contentPanel = new JPanel(new BorderLayout());
     private StyledTextField field;
     private JScrollPane scrollPane;
-    private SearchPathExplorerMaster explorer = new SearchPathExplorerMaster();
+    private StyledExplorerMaster explorer = new StyledExplorerMaster();
 
     private long lastEdit;
     private Thread searchThread;
