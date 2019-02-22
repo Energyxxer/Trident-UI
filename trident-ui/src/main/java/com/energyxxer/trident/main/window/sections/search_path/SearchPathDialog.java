@@ -188,7 +188,7 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
         buttonWrapper.setOpaque(false);
         buttonWrapper.add(openInToolButton);
         footerPanel.add(buttonWrapper, BorderLayout.EAST);
-        contentPanel.add(footerPanel, BorderLayout.SOUTH);
+        contentPanel.add(footerPanel, BorderLayout.CENTER);
 
 
         //this.explorer.addElement(recentFilesCategory);

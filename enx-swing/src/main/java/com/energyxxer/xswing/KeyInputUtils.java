@@ -25,6 +25,12 @@ public class KeyInputUtils {
         return returnValue;
     }
 
+    public static void interruptDoublePresses() {
+        for(ArrayList<KeyEvent> list : timeline.values()) {
+            list.clear();
+        }
+    }
+
     public static void markRelease(KeyEvent ke) {
         addEntry(ke);
     }

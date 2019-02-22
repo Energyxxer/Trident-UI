@@ -32,8 +32,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static com.energyxxer.xswing.KeyInputUtils.isDoublePress;
-import static com.energyxxer.xswing.KeyInputUtils.markRelease;
+import static com.energyxxer.xswing.KeyInputUtils.*;
 
 /**
  * Literally what it sounds like.
@@ -94,6 +93,8 @@ public class TridentWindow {
 				if(e.getKeyCode() == KeyEvent.VK_SHIFT && isDoublePress(e)) {
 					QuickFindDialog.INSTANCE.reveal();
 					return true;
+				} else if(e.getKeyCode() != KeyEvent.VK_SHIFT && e.isShiftDown()) {
+					interruptDoublePresses();
 				}
 			} else if(e.getID() == KeyEvent.KEY_RELEASED) {
 				if(e.getKeyCode() == KeyEvent.VK_SHIFT) {

@@ -11,6 +11,7 @@ import com.energyxxer.enxlex.pattern_matching.TokenMatchResponse;
 import com.energyxxer.enxlex.pattern_matching.matching.GeneralTokenPatternMatch;
 import com.energyxxer.enxlex.pattern_matching.matching.TokenPatternMatch;
 import com.energyxxer.enxlex.pattern_matching.matching.lazy.LazyTokenPatternMatch;
+import com.energyxxer.enxlex.suggestions.SuggestionModule;
 import com.energyxxer.enxlex.report.Notice;
 import com.energyxxer.enxlex.report.NoticeType;
 import com.energyxxer.nbtmapper.parser.NBTTMLexerProfile;
@@ -76,7 +77,7 @@ public enum Lang {
         return null;
     }
 
-    public LangAnalysisResponse analyze(File file, String text) {
+    public LangAnalysisResponse analyze(File file, String text, int suggestionIndex) {
         GeneralTokenPatternMatch patternMatch = (parserProduction != null) ? parserProduction.createInstance() : null;
 
         Lexer lexer;
@@ -86,6 +87,9 @@ public enum Lang {
 
         if(patternMatch instanceof LazyTokenPatternMatch) {
             lexer = new LazyLexer(new TokenStream(true), (LazyTokenPatternMatch) patternMatch);
+            if(suggestionIndex >= 0) {
+                lexer.setSuggestionModule(new SuggestionModule(suggestionIndex));
+            }
             ((LazyLexer)lexer).tokenizeParse(file, text, createProfile());
             notices.addAll(lexer.getNotices());
 
@@ -95,6 +99,9 @@ public enum Lang {
             response = ((LazyLexer) lexer).getMatchResponse();
         } else {
             lexer = new EagerLexer(new TokenStream(true));
+            if(suggestionIndex >= 0) {
+                lexer.setSuggestionModule(new SuggestionModule(suggestionIndex));
+            }
             ((EagerLexer)lexer).tokenize(file, text, createProfile());
             notices.addAll(lexer.getNotices());
 

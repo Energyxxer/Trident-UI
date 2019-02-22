@@ -121,21 +121,22 @@ public class StandardExplorerItem extends ExplorerElement {
             }
         }
 
+        x += token.getDefaultXOffset();
+
+        int margin = ((master.getRowHeight() - 16) / 2);
         //Expand/Collapse button
-        if(token.isExpandable()){
-            int margin = ((master.getRowHeight() - 16) / 2);
-            if(expanded) {
-                g.drawImage(master.getAssetMap().get("collapse"),x,y + margin,16, 16,new Color(0,0,0,0),null);
+        if (token.isExpandable()) {
+            if (expanded) {
+                g.drawImage(master.getAssetMap().get("collapse"), x, y + margin, 16, 16, new Color(0, 0, 0, 0), null);
             } else {
-                g.drawImage(master.getAssetMap().get("expand"),x,y + margin,16, 16,new Color(0,0,0,0),null);
+                g.drawImage(master.getAssetMap().get("expand"), x, y + margin, 16, 16, new Color(0, 0, 0, 0), null);
             }
         }
         x += 23;
 
         //File Icon
-        int margin = ((master.getRowHeight() - 16) / 2);
-        if(icon != null) {
-            g.drawImage(this.icon,x + 8 - icon.getWidth(null)/2,y + margin + 8 - icon.getHeight(null)/2, null);
+        if (icon != null) {
+            g.drawImage(this.icon, x + 8 - icon.getWidth(null) / 2, y + margin + 8 - icon.getHeight(null) / 2, null);
         }
         x += 25;
 

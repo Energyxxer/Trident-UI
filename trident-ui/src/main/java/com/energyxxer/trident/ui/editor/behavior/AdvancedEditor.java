@@ -7,6 +7,7 @@ import com.energyxxer.trident.ui.editor.behavior.caret.EditorCaret;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.CharacterDriftHandler;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.EditManager;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.edits.*;
+import com.energyxxer.trident.ui.editor.completion.SuggestionInterface;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.trident.util.linepainter.LinePainter;
 import com.energyxxer.util.Disposable;
@@ -38,6 +39,12 @@ import java.util.function.Consumer;
  */
 public class AdvancedEditor extends JTextPane implements KeyListener, CaretListener, Disposable {
 
+    private static final float BIAS_POINT = 0.4f;
+
+    private static final String WORD_DELIMITERS = "./\\()\"'-:,.;<>~!@#$%^&*|+=[]{}`~?";
+
+
+
     private boolean enabled = true;
 
     private ThemeListenerManager tlm;
@@ -49,9 +56,7 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
 
     private StringLocationCache lineCache = new StringLocationCache();
 
-    private static final float BIAS_POINT = 0.4f;
-
-    private static final String WORD_DELIMITERS = "./\\()\"'-:,.;<>~!@#$%^&*|+=[]{}`~?";
+    private SuggestionInterface suggestionInterface;
 
     {
         this.addKeyListener(this);
@@ -133,6 +138,7 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
     public void keyPressed(KeyEvent e) {
         if(!enabled) return;
         if(e.isConsumed()) return;
+        Debug.log("Reacting from advanced editor");
         int keyCode = e.getKeyCode();
         if(keyCode == KeyEvent.VK_TAB) {
             e.consume();
@@ -371,14 +377,27 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         this.enabled = enabled;
     }
 
+    public SuggestionInterface getSuggestionInterface() {
+        return suggestionInterface;
+    }
+
+    public void setSuggestionInterface(SuggestionInterface suggestionInterface) {
+        this.suggestionInterface = suggestionInterface;
+    }
+
     //Delegates and deprecated managers
 
     @Override
     public synchronized void addKeyListener(KeyListener l) {
         if(l != this) {
-            super.removeKeyListener(this);
+            KeyListener[] oldListeners = this.getKeyListeners();
+            for(KeyListener listener : oldListeners) {
+                super.removeKeyListener(listener);
+            }
             super.addKeyListener(l);
-            super.addKeyListener(this);
+            for(KeyListener listener : oldListeners) {
+                super.addKeyListener(listener);
+            }
         } else {
             super.addKeyListener(l);
         }

@@ -7,6 +7,7 @@ import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.main.window.sections.EditArea;
 import com.energyxxer.trident.ui.editor.behavior.AdvancedEditor;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.CharacterDriftHandler;
+import com.energyxxer.trident.ui.editor.completion.SuggestionDialog;
 import com.energyxxer.trident.ui.editor.inspector.Inspector;
 
 import javax.swing.*;
@@ -29,6 +30,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
     private StyledDocument sd;
 
     private Inspector inspector = null;
+    private SuggestionDialog suggestionBox = new SuggestionDialog(this);
 
     private long lastEdit;
 
@@ -54,6 +56,8 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
 
         this.setTransferHandler(EditArea.dragToOpenFileHandler);
 
+        this.setSuggestionInterface(suggestionBox);
+
         //this.setOpaque(false);
     }
 
@@ -73,8 +77,10 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
 
         Lang lang = Lang.getLangForFile(parent.file.getPath());
 
-        Lang.LangAnalysisResponse analysis = lang != null ? lang.analyze(parent.file, text) : null;
+        Lang.LangAnalysisResponse analysis = lang != null ? lang.analyze(parent.file, text, this.getCaretPosition()) : null;
         if(analysis == null) return;
+
+        suggestionBox.showSuggestions(analysis.lexer.getSuggestionModule());
 
         for(Token token : analysis.lexer.getStream().tokens) {
             Style style = TridentEditorComponent.this.getStyle(token.type.toString().toLowerCase());

@@ -181,10 +181,10 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
     public void setSelected(ExplorerElement item, MouseEvent e) {
         ExplorerElement lastItem = null;
         if(this.selectedItems.size() > 0) lastItem = this.selectedItems.get(this.selectedItems.size()-1);
-        if(!isPlatformControlDown(e)) {
+        if(e == null || !isPlatformControlDown(e)) {
             clearSelected();
         }
-        if(e.isShiftDown() && lastItem != null) {
+        if(e != null && e.isShiftDown() && lastItem != null) {
             int startIndex = flatList.indexOf(lastItem);
             int endIndex = flatList.indexOf(item);
 

@@ -33,6 +33,10 @@ public interface ModuleToken {
         return null;
     }
 
+    default int getDefaultXOffset() {
+        return 0;
+    }
+
     class Static {
         public static List<ModuleTokenFactory> tokenFactories = new ArrayList<>();
 
