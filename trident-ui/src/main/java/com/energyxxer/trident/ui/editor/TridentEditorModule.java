@@ -109,6 +109,7 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
                 focus();
             }
         });
+        scrollPane.getViewport().addChangeListener(l -> editorComponent.getSuggestionInterface().dismiss());
 
         addThemeChangeListener();
 

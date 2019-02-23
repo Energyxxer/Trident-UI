@@ -49,7 +49,6 @@ public class EditorCaret extends DefaultCaret {
 
     private void handleEvent(KeyEvent e) {
         if(e.isConsumed()) return;
-        Debug.log("Reacting from editor caret");
         boolean actionPerformed = false;
         for(Dot dot : dots) {
             if(dot.handleEvent(e)) actionPerformed = true;

@@ -8,7 +8,6 @@ import com.energyxxer.trident.compiler.lexer.TridentTokens;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.HintStylizer;
 import com.energyxxer.trident.ui.editor.TridentEditorComponent;
-import com.energyxxer.trident.ui.editor.behavior.editmanager.CharacterDriftHandler;
 import com.energyxxer.util.StringBounds;
 import com.energyxxer.util.logger.Debug;
 import com.energyxxer.xswing.hints.TextHint;
@@ -21,6 +20,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+import java.util.function.Function;
 
 /**
  * Created by User on 1/1/2017.
@@ -166,10 +166,10 @@ public class Inspector implements Highlighter.HighlightPainter, MouseMotionListe
         items.add(item);
     }
 
-    public void registerCharacterDrift(CharacterDriftHandler h) {
+    public void registerCharacterDrift(Function<Integer, Integer> h) {
         for(InspectionItem item : items) {
-            item.bounds.start = editor.getLocationForOffset(h.shift(item.bounds.start.index));
-            item.bounds.end = editor.getLocationForOffset(h.shift(item.bounds.end.index));
+            item.bounds.start = editor.getLocationForOffset(h.apply(item.bounds.start.index));
+            item.bounds.end = editor.getLocationForOffset(h.apply(item.bounds.end.index));
         }
     }
 }

@@ -1,8 +1,8 @@
 package com.energyxxer.trident.ui.editor.completion;
 
-import com.energyxxer.enxlex.suggestions.LiteralSuggestion;
 import com.energyxxer.enxlex.suggestions.Suggestion;
 import com.energyxxer.enxlex.suggestions.SuggestionModule;
+import com.energyxxer.trident.compiler.lexer.summaries.TridentSummaryModule;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.main.window.sections.quick_find.StyledExplorerMaster;
 import com.energyxxer.trident.ui.editor.TridentEditorComponent;
@@ -30,6 +30,8 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
 
     private ThemeListenerManager tlm = new ThemeListenerManager();
 
+    private TridentSummaryModule summary = null;
+
     public SuggestionDialog(TridentEditorComponent editor) {
         super(TridentWindow.jframe, false);
         this.setUndecorated(true);
@@ -48,6 +50,12 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         editor.addKeyListener(this);
         editor.addFocusListener(this);
         this.addKeyListener(this);
+
+        editor.addCharacterDriftListener(h -> {
+            if(summary != null) {
+                summary.updateIndices(h);
+            }
+        });
     }
 
     public void showSuggestions(SuggestionModule results) {
@@ -56,8 +64,8 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         boolean any = false;
 
         for(Suggestion suggestion : results.getSuggestions()) {
-            if(suggestion instanceof LiteralSuggestion) {
-                StandardExplorerItem item = new StandardExplorerItem(new SuggestionToken(this, suggestion), explorer, new ArrayList<>());
+            for(SuggestionToken token : SuggestionExpander.expand(suggestion, this, results)) {
+                StandardExplorerItem item = new StandardExplorerItem(token, explorer, new ArrayList<>());
                 explorer.addElement(item);
                 if(!any) {
                     item.setSelected(true);
@@ -86,12 +94,10 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         }
     }
 
-    public void submit(Suggestion suggestion) {
-        Debug.log("Submit suggestion '" + suggestion + "'");
+    public void submit(String text, Suggestion suggestion) {
+        Debug.log("Submit suggestion '" + text + "' from " + suggestion);
         this.setVisible(false);
-        if(suggestion instanceof LiteralSuggestion) {
-            editor.getEditManager().insertEdit(new InsertionEdit(((LiteralSuggestion) suggestion).getLiteral(), editor));
-        }
+        editor.getEditManager().insertEdit(new InsertionEdit(text, editor));
     }
 
     @Override
@@ -144,6 +150,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
 
     @Override
     public void dismiss() {
+        if(this.isVisible()) Debug.log("Told to dismiss");
         this.setVisible(false);
     }
 
@@ -157,5 +164,13 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         if(e.getOppositeComponent() != this) {
             dismiss();
         }
+    }
+
+    public TridentSummaryModule getSummary() {
+        return summary;
+    }
+
+    public void setSummary(TridentSummaryModule summary) {
+        this.summary = summary;
     }
 }

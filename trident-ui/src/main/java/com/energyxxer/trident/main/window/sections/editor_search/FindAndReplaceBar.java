@@ -77,7 +77,7 @@ public class FindAndReplaceBar extends JPanel {
 
         editor.editorComponent.addCharacterDriftListener(h -> {
             for(int i = 0; i < excluded.size(); i++) {
-                excluded.set(i, h.shift(excluded.get(i)));
+                excluded.set(i, h.apply(excluded.get(i)));
             }
         });
 

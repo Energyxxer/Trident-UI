@@ -2,13 +2,14 @@ package com.energyxxer.trident.ui.editor;
 
 import com.energyxxer.enxlex.lexical_analysis.token.Token;
 import com.energyxxer.enxlex.lexical_analysis.token.TokenSection;
+import com.energyxxer.trident.compiler.lexer.summaries.TridentSummaryModule;
 import com.energyxxer.trident.global.temp.Lang;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.main.window.sections.EditArea;
 import com.energyxxer.trident.ui.editor.behavior.AdvancedEditor;
-import com.energyxxer.trident.ui.editor.behavior.editmanager.CharacterDriftHandler;
 import com.energyxxer.trident.ui.editor.completion.SuggestionDialog;
 import com.energyxxer.trident.ui.editor.inspector.Inspector;
+import com.energyxxer.util.logger.Debug;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
@@ -19,6 +20,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyListener;
 import java.util.Date;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Created by User on 1/1/2017.
@@ -77,10 +79,12 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
 
         Lang lang = Lang.getLangForFile(parent.file.getPath());
 
-        Lang.LangAnalysisResponse analysis = lang != null ? lang.analyze(parent.file, text, this.getCaretPosition()) : null;
+        Lang.LangAnalysisResponse analysis = lang != null ? lang.analyze(parent.file, text, this.getCaretPosition(), new TridentSummaryModule()) : null;
         if(analysis == null) return;
 
+        suggestionBox.setSummary(((TridentSummaryModule) analysis.lexer.getSummaryModule()));
         suggestionBox.showSuggestions(analysis.lexer.getSuggestionModule());
+        Debug.log(analysis.lexer.getSummaryModule());
 
         for(Token token : analysis.lexer.getStream().tokens) {
             Style style = TridentEditorComponent.this.getStyle(token.type.toString().toLowerCase());
@@ -150,7 +154,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
     }
 
     @Override
-    public void registerCharacterDrift(CharacterDriftHandler h) {
+    public void registerCharacterDrift(Function<Integer, Integer> h) {
         super.registerCharacterDrift(h);
 
         if(this.inspector != null) this.inspector.registerCharacterDrift(h);

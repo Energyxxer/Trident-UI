@@ -5,15 +5,16 @@ import com.energyxxer.enxlex.lexical_analysis.EagerLexer;
 import com.energyxxer.enxlex.lexical_analysis.LazyLexer;
 import com.energyxxer.enxlex.lexical_analysis.Lexer;
 import com.energyxxer.enxlex.lexical_analysis.profiles.LexerProfile;
+import com.energyxxer.enxlex.lexical_analysis.summary.SummaryModule;
 import com.energyxxer.enxlex.lexical_analysis.token.Token;
 import com.energyxxer.enxlex.lexical_analysis.token.TokenStream;
 import com.energyxxer.enxlex.pattern_matching.TokenMatchResponse;
 import com.energyxxer.enxlex.pattern_matching.matching.GeneralTokenPatternMatch;
 import com.energyxxer.enxlex.pattern_matching.matching.TokenPatternMatch;
 import com.energyxxer.enxlex.pattern_matching.matching.lazy.LazyTokenPatternMatch;
-import com.energyxxer.enxlex.suggestions.SuggestionModule;
 import com.energyxxer.enxlex.report.Notice;
 import com.energyxxer.enxlex.report.NoticeType;
+import com.energyxxer.enxlex.suggestions.SuggestionModule;
 import com.energyxxer.nbtmapper.parser.NBTTMLexerProfile;
 import com.energyxxer.nbtmapper.parser.NBTTMProductions;
 import com.energyxxer.trident.compiler.TridentCompiler;
@@ -77,7 +78,7 @@ public enum Lang {
         return null;
     }
 
-    public LangAnalysisResponse analyze(File file, String text, int suggestionIndex) {
+    public LangAnalysisResponse analyze(File file, String text, int suggestionIndex, SummaryModule summaryModule) {
         GeneralTokenPatternMatch patternMatch = (parserProduction != null) ? parserProduction.createInstance() : null;
 
         Lexer lexer;
@@ -87,6 +88,7 @@ public enum Lang {
 
         if(patternMatch instanceof LazyTokenPatternMatch) {
             lexer = new LazyLexer(new TokenStream(true), (LazyTokenPatternMatch) patternMatch);
+            lexer.setSummaryModule(summaryModule);
             if(suggestionIndex >= 0) {
                 lexer.setSuggestionModule(new SuggestionModule(suggestionIndex));
             }
@@ -99,6 +101,7 @@ public enum Lang {
             response = ((LazyLexer) lexer).getMatchResponse();
         } else {
             lexer = new EagerLexer(new TokenStream(true));
+            lexer.setSummaryModule(summaryModule);
             if(suggestionIndex >= 0) {
                 lexer.setSuggestionModule(new SuggestionModule(suggestionIndex));
             }

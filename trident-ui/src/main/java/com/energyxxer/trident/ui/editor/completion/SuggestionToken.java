@@ -1,7 +1,9 @@
 package com.energyxxer.trident.ui.editor.completion;
 
-import com.energyxxer.enxlex.suggestions.LiteralSuggestion;
+import com.energyxxer.enxlex.suggestions.ComplexSuggestion;
 import com.energyxxer.enxlex.suggestions.Suggestion;
+import com.energyxxer.trident.compiler.lexer.TridentSuggestionTags;
+import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.display.DisplayModule;
 import com.energyxxer.trident.ui.modules.ModuleToken;
@@ -16,13 +18,24 @@ public class SuggestionToken implements ModuleToken {
     private String text;
     private Suggestion suggestion;
 
-    public SuggestionToken(SuggestionDialog parent, Suggestion suggestion) {
+    private String iconKey;
+
+    public SuggestionToken(SuggestionDialog parent, String text, Suggestion suggestion) {
         this.parent = parent;
         this.suggestion = suggestion;
-        text = suggestion.toString();
-        if(suggestion instanceof LiteralSuggestion) {
-            text = ((LiteralSuggestion) suggestion).getLiteral();
+        this.text = text;
+
+        if(suggestion instanceof ComplexSuggestion) {
+            iconKey = getIconKeyForTags(((ComplexSuggestion) suggestion).getTags());
         }
+    }
+
+    public String getIconKey() {
+        return iconKey;
+    }
+
+    public void setIconKey(String iconKey) {
+        this.iconKey = iconKey;
     }
 
     @Override
@@ -32,7 +45,7 @@ public class SuggestionToken implements ModuleToken {
 
     @Override
     public Image getIcon() {
-        return null;
+        return iconKey != null ? Commons.getIcon(iconKey) : null;
     }
 
     @Override
@@ -62,7 +75,7 @@ public class SuggestionToken implements ModuleToken {
 
     @Override
     public void onInteract() {
-        parent.submit(suggestion);
+        parent.submit(text, suggestion);
     }
 
     @Override
@@ -83,5 +96,18 @@ public class SuggestionToken implements ModuleToken {
     @Override
     public boolean equals(ModuleToken other) {
         return other instanceof SuggestionToken && ((SuggestionToken) other).text.equals(this.text);
+    }
+
+    public static String getIconKeyForTags(Collection<String> tags) {
+        if(tags.contains(TridentSuggestionTags.TAG_VARIABLE)) {
+            return "model";
+        } else if(tags.contains(TridentSuggestionTags.TAG_CUSTOM_ENTITY)) {
+            return "entity";
+        } else if(tags.contains(TridentSuggestionTags.TAG_ENTITY_FEATURE)) {
+            return "feature";
+        } else if(tags.contains(TridentSuggestionTags.TAG_CUSTOM_ITEM)) {
+            return "item";
+        }
+        return null;
     }
 }

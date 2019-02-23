@@ -4,7 +4,6 @@ import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.ui.editor.behavior.caret.CaretProfile;
 import com.energyxxer.trident.ui.editor.behavior.caret.Dot;
 import com.energyxxer.trident.ui.editor.behavior.caret.EditorCaret;
-import com.energyxxer.trident.ui.editor.behavior.editmanager.CharacterDriftHandler;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.EditManager;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.edits.*;
 import com.energyxxer.trident.ui.editor.completion.SuggestionInterface;
@@ -33,6 +32,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Created by User on 1/5/2017.
@@ -138,7 +138,6 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
     public void keyPressed(KeyEvent e) {
         if(!enabled) return;
         if(e.isConsumed()) return;
-        Debug.log("Reacting from advanced editor");
         int keyCode = e.getKeyCode();
         if(keyCode == KeyEvent.VK_TAB) {
             e.consume();
@@ -318,19 +317,19 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         return index;
     }
 
-    private ArrayList<Consumer<CharacterDriftHandler>> characterDriftListeners = new ArrayList<>();
+    private ArrayList<Consumer<Function<Integer, Integer>>> characterDriftListeners = new ArrayList<>();
 
-    public void registerCharacterDrift(CharacterDriftHandler h) {
-        for(Consumer<CharacterDriftHandler> listener : characterDriftListeners) {
+    public void registerCharacterDrift(Function<Integer, Integer> h) {
+        for(Consumer<Function<Integer, Integer>> listener : characterDriftListeners) {
             listener.accept(h);
         }
     }
 
-    public void addCharacterDriftListener(Consumer<CharacterDriftHandler> l) {
+    public void addCharacterDriftListener(Consumer<Function<Integer, Integer>> l) {
         characterDriftListeners.add(l);
     }
 
-    public void removeCharacterDriftListener(Consumer<CharacterDriftHandler> l) {
+    public void removeCharacterDriftListener(Consumer<Function<Integer, Integer>> l) {
         characterDriftListeners.remove(l);
     }
 
