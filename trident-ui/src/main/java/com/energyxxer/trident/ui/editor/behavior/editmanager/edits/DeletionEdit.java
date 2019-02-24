@@ -19,7 +19,15 @@ public class DeletionEdit extends Edit {
     private ArrayList<String> previousValues = new ArrayList<>();
     private CaretProfile previousProfile = new CaretProfile();
     private CaretProfile nextProfile = null;
+    private int deletionAmount = -1;
 
+    public DeletionEdit(AdvancedEditor editor, int deletionAmount) {
+        this(editor, deletionAmount, false);
+    }
+    public DeletionEdit(AdvancedEditor editor, int deletionAmount, boolean forwards) {
+        this(editor, false, forwards);
+        this.deletionAmount = deletionAmount;
+    }
     public DeletionEdit(AdvancedEditor editor) {
         this(editor, false, false);
     }
@@ -58,10 +66,18 @@ public class DeletionEdit extends Edit {
                             start = new Dot(start, end, editor).getPositionBeforeWord();
                         }
                     } else {
-                        if(forwards) {
-                            start = new Dot(start, end, editor).getPositionAfter();
+                        if(deletionAmount > -1) {
+                            if(forwards) {
+                                start = Math.max(0, start + deletionAmount);
+                            } else {
+                                start = Math.max(0, start - deletionAmount);
+                            }
                         } else {
-                            start = new Dot(start, end, editor).getPositionBefore();
+                            if(forwards) {
+                                start = new Dot(start, end, editor).getPositionAfter();
+                            } else {
+                                start = new Dot(start, end, editor).getPositionBefore();
+                            }
                         }
                     }
                 }

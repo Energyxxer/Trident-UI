@@ -23,7 +23,7 @@ public class MoreItem extends ExplorerElement {
 
     @Override
     public void render(Graphics g) {
-        master.getFlatList().add(this);
+        master.addToFlatList(this);
 
         int x = master.getInitialIndent();
 

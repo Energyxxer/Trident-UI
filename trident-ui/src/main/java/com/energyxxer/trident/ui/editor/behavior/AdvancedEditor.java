@@ -131,6 +131,7 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         e.consume();
         if(!isPlatformControlDown(e) && !Commons.isSpecialCharacter(e.getKeyChar())) {
             editManager.insertEdit(new InsertionEdit("" + e.getKeyChar(), this));
+            if(suggestionInterface != null) suggestionInterface.lock();
         }
     }
 
@@ -151,6 +152,7 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         } else if(keyCode == KeyEvent.VK_BACK_SPACE || keyCode == KeyEvent.VK_DELETE) {
             e.consume();
             editManager.insertEdit(new DeletionEdit(this, isPlatformControlDown(e), keyCode == KeyEvent.VK_DELETE));
+            if(suggestionInterface != null) suggestionInterface.lock();
         } else if(keyCode == KeyEvent.VK_ENTER) {
             e.consume();
             editManager.insertEdit(new NewlineEdit(this, !isPlatformControlDown(e)));

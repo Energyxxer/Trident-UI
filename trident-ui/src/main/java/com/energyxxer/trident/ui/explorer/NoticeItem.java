@@ -45,7 +45,7 @@ public class NoticeItem extends ExplorerElement {
     public void render(Graphics g) {
         g.setFont(master.getFont());
         int y = master.getOffsetY();
-        master.getFlatList().add(this);
+        master.addToFlatList(this);
 
         int x = this.x + 23;
 

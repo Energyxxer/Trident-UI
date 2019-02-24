@@ -2,7 +2,6 @@ package com.energyxxer.trident.ui.editor.behavior.caret;
 
 import com.energyxxer.trident.compiler.util.Using;
 import com.energyxxer.trident.ui.editor.behavior.AdvancedEditor;
-import com.energyxxer.trident.ui.editor.completion.SuggestionInterface;
 import com.energyxxer.trident.util.Range;
 import com.energyxxer.util.StringLocation;
 import com.energyxxer.util.logger.Debug;
@@ -61,7 +60,7 @@ public class EditorCaret extends DefaultCaret {
 
     private void update() {
         Using.using(editor.getSuggestionInterface()).notIfNull().run(
-                SuggestionInterface::dismiss
+                d -> d.dismiss(false)
         );
         editor.repaint();
         this.setVisible(true);

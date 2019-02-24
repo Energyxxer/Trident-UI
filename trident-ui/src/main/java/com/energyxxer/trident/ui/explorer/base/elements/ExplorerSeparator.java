@@ -17,7 +17,7 @@ public class ExplorerSeparator extends ExplorerElement {
 
     @Override
     public void render(Graphics g) {
-        master.getFlatList().add(this);
+        master.addToFlatList(this);
 
         g.setColor((this.rollover || this.selected) ? master.getColorMap().get("item.rollover.background") : master.getColorMap().get("item.background"));
         g.fillRect(0, master.getOffsetY(), master.getWidth(), this.getHeight());

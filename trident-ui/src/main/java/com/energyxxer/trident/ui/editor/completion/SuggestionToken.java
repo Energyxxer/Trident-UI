@@ -20,6 +20,8 @@ public class SuggestionToken implements ModuleToken {
 
     private String iconKey;
 
+    private boolean enabled = true;
+
     public SuggestionToken(SuggestionDialog parent, String text, Suggestion suggestion) {
         this.parent = parent;
         this.suggestion = suggestion;
@@ -96,6 +98,14 @@ public class SuggestionToken implements ModuleToken {
     @Override
     public boolean equals(ModuleToken other) {
         return other instanceof SuggestionToken && ((SuggestionToken) other).text.equals(this.text);
+    }
+
+    public void setEnabledFilter(String filter) {
+        enabled = filter.isEmpty() || this.text.startsWith(filter);
+    }
+
+    public boolean isEnabled() {
+        return enabled;
     }
 
     public static String getIconKeyForTags(Collection<String> tags) {

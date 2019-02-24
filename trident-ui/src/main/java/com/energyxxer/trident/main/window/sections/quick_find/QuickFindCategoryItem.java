@@ -35,7 +35,7 @@ public class QuickFindCategoryItem extends ExplorerElement {
     public void render(Graphics g) {
         if(children.isEmpty()) return;
         int y = master.getOffsetY();
-        master.getFlatList().add(this);
+        master.addToFlatList(this);
 
         int x = master.getInitialIndent();
 

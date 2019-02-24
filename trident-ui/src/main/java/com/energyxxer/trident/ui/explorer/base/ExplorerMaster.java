@@ -312,4 +312,8 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
     public void popIndentation() {
         this.indentation--;
     }
+
+    public void addToFlatList(ExplorerElement element) {
+        this.flatList.add(element);
+    }
 }

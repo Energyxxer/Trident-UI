@@ -6,11 +6,13 @@ import com.energyxxer.trident.compiler.lexer.summaries.TridentSummaryModule;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.main.window.sections.quick_find.StyledExplorerMaster;
 import com.energyxxer.trident.ui.editor.TridentEditorComponent;
+import com.energyxxer.trident.ui.editor.behavior.editmanager.edits.CompoundEdit;
+import com.energyxxer.trident.ui.editor.behavior.editmanager.edits.DeletionEdit;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.edits.InsertionEdit;
-import com.energyxxer.trident.ui.explorer.base.StandardExplorerItem;
 import com.energyxxer.trident.ui.modules.ModuleToken;
 import com.energyxxer.trident.ui.scrollbar.OverlayScrollPane;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
+import com.energyxxer.util.Lazy;
 import com.energyxxer.util.logger.Debug;
 
 import javax.swing.*;
@@ -32,12 +34,19 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
 
     private TridentSummaryModule summary = null;
 
+    private boolean locked = false;
+
+    private SuggestionModule activeResults = null;
+
+    private ArrayList<SuggestionToken> activeTokens = new ArrayList<>();
+
     public SuggestionDialog(TridentEditorComponent editor) {
         super(TridentWindow.jframe, false);
         this.setUndecorated(true);
         this.editor = editor;
 
         this.explorer = new StyledExplorerMaster("EditorSuggestions");
+        this.explorer.setForceSelect(true);
 
         this.setContentPane(scrollPane = new OverlayScrollPane(explorer));
 
@@ -59,26 +68,31 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
     }
 
     public void showSuggestions(SuggestionModule results) {
+        if(this.isVisible()) return;
+        activeResults = results;
         explorer.clear();
+        activeTokens.clear();
 
         boolean any = false;
 
-        for(Suggestion suggestion : results.getSuggestions()) {
-            for(SuggestionToken token : SuggestionExpander.expand(suggestion, this, results)) {
-                StandardExplorerItem item = new StandardExplorerItem(token, explorer, new ArrayList<>());
-                explorer.addElement(item);
-                if(!any) {
-                    item.setSelected(true);
-                    explorer.setSelected(item, null);
+        if(results != null) {
+            for (Suggestion suggestion : results.getSuggestions()) {
+                for (SuggestionToken token : SuggestionExpander.expand(suggestion, this, results)) {
+                    SuggestionExplorerItem item = new SuggestionExplorerItem(token, explorer);
+                    explorer.addElement(item);
+                    activeTokens.add(token);
+                    if (!any) {
+                        item.setSelected(true);
+                        explorer.setSelected(item, null);
+                    }
+                    any = true;
                 }
-                any = true;
             }
         }
 
         if(any) {
             this.setVisible(true);
-            this.pack();
-            this.setSize(new Dimension(300, 300));
+            filter();
             relocate(results.getFocusedIndex());
             editor.requestFocus();
         } else {
@@ -89,7 +103,10 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
     public void submit(String text, Suggestion suggestion) {
         Debug.log("Submit suggestion '" + text + "' from " + suggestion);
         this.setVisible(false);
-        editor.getEditManager().insertEdit(new InsertionEdit(text, editor));
+        CompoundEdit edit = new CompoundEdit();
+        edit.appendEdit(new Lazy<>(() -> new DeletionEdit(editor, editor.getCaretPosition() - activeResults.getFocusedIndex())));
+        edit.appendEdit(new Lazy<>(() -> new InsertionEdit(text, editor)));
+        editor.getEditManager().insertEdit(edit);
     }
 
     @Override
@@ -109,7 +126,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         if(selectedIndex < 0) selectedIndex = 0;
         if(e.getKeyCode() == KeyEvent.VK_DOWN) {
             selectedIndex++;
-            if(selectedIndex >= explorer.getCount()) {
+            if(selectedIndex >= explorer.getTotalCount()) {
                 selectedIndex = 0;
             }
             explorer.setSelectedIndex(selectedIndex);
@@ -117,7 +134,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         } else if(e.getKeyCode() == KeyEvent.VK_UP) {
             selectedIndex--;
             if(selectedIndex < 0) {
-                selectedIndex = explorer.getCount()-1;
+                selectedIndex = explorer.getTotalCount()-1;
             }
             explorer.setSelectedIndex(selectedIndex);
             e.consume();
@@ -141,20 +158,46 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
     }
 
     @Override
-    public void dismiss() {
-        if(this.isVisible()) {
-            Debug.log("Told to dismiss");
+    public void dismiss(boolean force) {
+        if(force || !locked || (activeResults != null && editor.getCaretWordPosition() != activeResults.getFocusedIndex())) {
+            if(this.isVisible()) {
+                Debug.log("Told to dismiss");
+            }
+            this.setVisible(false);
         }
-        this.setVisible(false);
+        locked = false;
+    }
+
+    public void filter() {
+        if(isVisible() && activeResults != null) {
+            int cwpos = editor.getCaretWordPosition();
+            try {
+                String typed = editor.getDocument().getText(cwpos, editor.getCaretPosition() - cwpos);
+                Debug.log("\"" + typed + "\"");
+
+                for(SuggestionToken token : activeTokens) {
+                    token.setEnabledFilter(typed);
+                }
+
+                explorer.repaint();
+            } catch (BadLocationException ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 
     private void relocate(int index) {
+        this.setSize(new Dimension(300, Math.min(300, explorer.getRowHeight() * activeTokens.size() + 2)));
         try {
             Rectangle rect = editor.modelToView(index);
             if(rect == null) return;
             Point loc = rect.getLocation();
             loc.y += rect.height;
             loc.translate(editor.getLocationOnScreen().x, editor.getLocationOnScreen().y);
+            if(loc.y + this.getHeight() >= TridentWindow.jframe.getLocationOnScreen().y + TridentWindow.jframe.getHeight()) {
+                loc.y -= 17;
+                loc.y -= this.getHeight();
+            }
             this.setLocation(loc);
         } catch (BadLocationException x) {
             x.printStackTrace();
@@ -163,7 +206,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
 
     @Override
     public void relocate() {
-        if(editor != null && editor.isShowing()) relocate(editor.getCaretPosition());
+        if(editor != null && editor.isVisible() && editor.isShowing()) relocate(editor.getCaretWordPosition());
     }
 
     @Override
@@ -174,7 +217,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
     @Override
     public void focusLost(FocusEvent e) {
         if(e.getOppositeComponent() != this) {
-            dismiss();
+            dismiss(true);
         }
     }
 
@@ -184,5 +227,11 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
 
     public void setSummary(TridentSummaryModule summary) {
         this.summary = summary;
+    }
+
+    @Override
+    public void lock() {
+        locked = true;
+        filter();
     }
 }

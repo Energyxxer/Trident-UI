@@ -36,7 +36,7 @@ public class FileOccurrenceExplorerItem extends StandardExplorerItem {
     public void render(Graphics g) {
         g.setFont(master.getFont());
         int y = master.getOffsetY();
-        master.getFlatList().add(this);
+        master.addToFlatList(this);
 
         this.x = (master.getIndentation() * master.getIndentPerLevel()) + master.getInitialIndent();
         int x = this.x;

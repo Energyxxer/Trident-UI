@@ -11,6 +11,9 @@ import java.awt.*;
 public class StyledExplorerMaster extends ExplorerMaster {
 
     private ThemeListenerManager tlm = new ThemeListenerManager();
+    private boolean forceSelect;
+
+    private boolean hasSelected = false;
 
     public StyledExplorerMaster() {
         this(null);
@@ -83,10 +86,15 @@ public class StyledExplorerMaster extends ExplorerMaster {
     public void clear() {
         children.clear();
         this.repaint();
+        hasSelected = false;
     }
 
     public int getCount() {
         return children.size();
+    }
+
+    public int getTotalCount() {
+        return flatList.size();
     }
 
     public int getFirstSelectedIndex() {
@@ -102,7 +110,31 @@ public class StyledExplorerMaster extends ExplorerMaster {
         setSelected(toSelect, null);
     }
 
+    public void clearChildrenSelection() {
+        for(ExplorerElement child : children) {
+            child.setSelected(false);
+            flatList.remove(child);
+        }
+    }
+
     public Rectangle getVisibleRect(int index) {
         return new Rectangle(0, index*this.getRowHeight(), this.getWidth(), this.getRowHeight());
+    }
+
+    public void setForceSelect(boolean forceSelect) {
+        this.forceSelect = forceSelect;
+    }
+
+    public boolean isForceSelect() {
+        return forceSelect;
+    }
+
+    @Override
+    public void addToFlatList(ExplorerElement element) {
+        super.addToFlatList(element);
+        if(forceSelect && !hasSelected && flatList.size() == 1) {
+            setSelectedIndex(0);
+            hasSelected = true;
+        }
     }
 }

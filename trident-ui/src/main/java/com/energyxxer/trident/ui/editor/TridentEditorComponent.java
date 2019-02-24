@@ -70,6 +70,20 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
         parent.ensureVisible(getCaret().getProfile().get(0));
     }
 
+    public int getCaretWordPosition() {
+        int index = this.getCaretPosition();
+        if(index <= 0) return 0;
+        try {
+            while (true) {
+                if (!Character.isJavaIdentifierPart(this.getDocument().getText(index-1, 1).charAt(0)) || --index <= 1)
+                    break;
+            }
+        } catch(BadLocationException ex) {
+            ex.printStackTrace();
+        }
+        return index;
+    }
+
     private void highlightSyntax() {
         if(parent.syntax == null) return;
 
@@ -79,7 +93,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
 
         Lang lang = Lang.getLangForFile(parent.file.getPath());
 
-        Lang.LangAnalysisResponse analysis = lang != null ? lang.analyze(parent.file, text, this.getCaretPosition(), new TridentSummaryModule()) : null;
+        Lang.LangAnalysisResponse analysis = lang != null ? lang.analyze(parent.file, text, this.getCaretWordPosition(), new TridentSummaryModule()) : null;
         if(analysis == null) return;
 
         suggestionBox.setSummary(((TridentSummaryModule) analysis.lexer.getSummaryModule()));

@@ -46,7 +46,7 @@ public class NoticeGroupElement extends ExplorerElement {
     @Override
     public void render(Graphics g) {
         int y = master.getOffsetY();
-        master.getFlatList().add(this);
+        master.addToFlatList(this);
 
         int x = master.getInitialIndent();
 
