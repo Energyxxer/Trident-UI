@@ -79,15 +79,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
             this.setVisible(true);
             this.pack();
             this.setSize(new Dimension(300, 300));
-            try {
-                Rectangle rect = editor.modelToView(results.getFocusedIndex());
-                Point loc = rect.getLocation();
-                loc.y += rect.height;
-                loc.translate(editor.getLocationOnScreen().x, editor.getLocationOnScreen().y);
-                this.setLocation(loc);
-            } catch (BadLocationException x) {
-                x.printStackTrace();
-            }
+            relocate(results.getFocusedIndex());
             editor.requestFocus();
         } else {
             this.setVisible(false);
@@ -150,8 +142,28 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
 
     @Override
     public void dismiss() {
-        if(this.isVisible()) Debug.log("Told to dismiss");
+        if(this.isVisible()) {
+            Debug.log("Told to dismiss");
+        }
         this.setVisible(false);
+    }
+
+    private void relocate(int index) {
+        try {
+            Rectangle rect = editor.modelToView(index);
+            if(rect == null) return;
+            Point loc = rect.getLocation();
+            loc.y += rect.height;
+            loc.translate(editor.getLocationOnScreen().x, editor.getLocationOnScreen().y);
+            this.setLocation(loc);
+        } catch (BadLocationException x) {
+            x.printStackTrace();
+        }
+    }
+
+    @Override
+    public void relocate() {
+        if(editor != null && editor.isShowing()) relocate(editor.getCaretPosition());
     }
 
     @Override

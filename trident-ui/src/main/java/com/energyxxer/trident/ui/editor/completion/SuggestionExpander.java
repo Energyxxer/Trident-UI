@@ -29,6 +29,17 @@ public class SuggestionExpander {
                     }
                     break;
                 }
+                case TridentSuggestionTags
+                        .OBJECTIVE_EXISTING: {
+                    if(parent.getSummary() != null) {
+                        for(SummarySymbol sym : parent.getSummary().getObjectives()) {
+                            SuggestionToken token = new SuggestionToken(parent, sym.getName(), suggestion);
+                            token.setIconKey(SuggestionToken.getIconKeyForTags(sym.getSuggestionTags()));
+                            tokens.add(0, token);
+                        }
+                    }
+                    break;
+                }
             }
             return tokens;
         }

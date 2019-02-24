@@ -99,14 +99,16 @@ public class SuggestionToken implements ModuleToken {
     }
 
     public static String getIconKeyForTags(Collection<String> tags) {
-        if(tags.contains(TridentSuggestionTags.TAG_VARIABLE)) {
-            return "model";
-        } else if(tags.contains(TridentSuggestionTags.TAG_CUSTOM_ENTITY)) {
-            return "entity";
+        if(tags.contains(TridentSuggestionTags.TAG_OBJECTIVE)) {
+            return "objective";
         } else if(tags.contains(TridentSuggestionTags.TAG_ENTITY_FEATURE)) {
             return "feature";
+        } else if(tags.contains(TridentSuggestionTags.TAG_CUSTOM_ENTITY)) {
+            return "entity";
         } else if(tags.contains(TridentSuggestionTags.TAG_CUSTOM_ITEM)) {
             return "item";
+        } else if(tags.contains(TridentSuggestionTags.TAG_VARIABLE)) {
+            return "variable";
         }
         return null;
     }
