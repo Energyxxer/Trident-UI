@@ -78,7 +78,7 @@ public enum Lang {
         return null;
     }
 
-    public LangAnalysisResponse analyze(File file, String text, int suggestionIndex, SummaryModule summaryModule) {
+    public LangAnalysisResponse analyze(File file, String text, SuggestionModule suggestionModule, SummaryModule summaryModule) {
         GeneralTokenPatternMatch patternMatch = (parserProduction != null) ? parserProduction.createInstance() : null;
 
         Lexer lexer;
@@ -89,8 +89,8 @@ public enum Lang {
         if(patternMatch instanceof LazyTokenPatternMatch) {
             lexer = new LazyLexer(new TokenStream(true), (LazyTokenPatternMatch) patternMatch);
             lexer.setSummaryModule(summaryModule);
-            if(suggestionIndex >= 0) {
-                lexer.setSuggestionModule(new SuggestionModule(suggestionIndex));
+            if(suggestionModule != null) {
+                lexer.setSuggestionModule(suggestionModule);
             }
             ((LazyLexer)lexer).tokenizeParse(file, text, createProfile());
             notices.addAll(lexer.getNotices());
@@ -102,8 +102,8 @@ public enum Lang {
         } else {
             lexer = new EagerLexer(new TokenStream(true));
             lexer.setSummaryModule(summaryModule);
-            if(suggestionIndex >= 0) {
-                lexer.setSuggestionModule(new SuggestionModule(suggestionIndex));
+            if(suggestionModule != null) {
+                lexer.setSuggestionModule(suggestionModule);
             }
             ((EagerLexer)lexer).tokenize(file, text, createProfile());
             notices.addAll(lexer.getNotices());

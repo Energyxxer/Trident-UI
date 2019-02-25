@@ -1,6 +1,5 @@
 package com.energyxxer.trident.ui.editor.completion;
 
-import com.energyxxer.enxlex.suggestions.ComplexSuggestion;
 import com.energyxxer.enxlex.suggestions.Suggestion;
 import com.energyxxer.trident.compiler.lexer.TridentSuggestionTags;
 import com.energyxxer.trident.global.Commons;
@@ -27,9 +26,7 @@ public class SuggestionToken implements ModuleToken {
         this.suggestion = suggestion;
         this.text = text;
 
-        if(suggestion instanceof ComplexSuggestion) {
-            iconKey = getIconKeyForTags(((ComplexSuggestion) suggestion).getTags());
-        }
+        iconKey = getIconKeyForTags(suggestion.getTags());
     }
 
     public String getIconKey() {
@@ -119,6 +116,12 @@ public class SuggestionToken implements ModuleToken {
             return "item";
         } else if(tags.contains(TridentSuggestionTags.TAG_VARIABLE)) {
             return "variable";
+        } else if(tags.contains(TridentSuggestionTags.TAG_COMMAND)) {
+            return "command";
+        } else if(tags.contains(TridentSuggestionTags.TAG_MODIFIER)) {
+            return "modifier";
+        } else if(tags.contains(TridentSuggestionTags.TAG_INSTRUCTION)) {
+            return "instruction";
         }
         return null;
     }

@@ -2,6 +2,7 @@ package com.energyxxer.trident.ui.editor;
 
 import com.energyxxer.enxlex.lexical_analysis.token.Token;
 import com.energyxxer.enxlex.lexical_analysis.token.TokenSection;
+import com.energyxxer.enxlex.suggestions.SuggestionModule;
 import com.energyxxer.trident.compiler.lexer.summaries.TridentSummaryModule;
 import com.energyxxer.trident.global.temp.Lang;
 import com.energyxxer.trident.main.window.TridentWindow;
@@ -93,7 +94,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
 
         Lang lang = Lang.getLangForFile(parent.file.getPath());
 
-        Lang.LangAnalysisResponse analysis = lang != null ? lang.analyze(parent.file, text, this.getCaretWordPosition(), new TridentSummaryModule()) : null;
+        Lang.LangAnalysisResponse analysis = lang != null ? lang.analyze(parent.file, text, new SuggestionModule(this.getCaretWordPosition(), this.getCaretPosition()), new TridentSummaryModule()) : null;
         if(analysis == null) return;
 
         suggestionBox.setSummary(((TridentSummaryModule) analysis.lexer.getSummaryModule()));

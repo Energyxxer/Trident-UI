@@ -11,9 +11,7 @@ import java.awt.*;
 public class StyledExplorerMaster extends ExplorerMaster {
 
     private ThemeListenerManager tlm = new ThemeListenerManager();
-    private boolean forceSelect;
-
-    private boolean hasSelected = false;
+    private boolean forceSelectNext;
 
     public StyledExplorerMaster() {
         this(null);
@@ -86,7 +84,6 @@ public class StyledExplorerMaster extends ExplorerMaster {
     public void clear() {
         children.clear();
         this.repaint();
-        hasSelected = false;
     }
 
     public int getCount() {
@@ -121,20 +118,20 @@ public class StyledExplorerMaster extends ExplorerMaster {
         return new Rectangle(0, index*this.getRowHeight(), this.getWidth(), this.getRowHeight());
     }
 
-    public void setForceSelect(boolean forceSelect) {
-        this.forceSelect = forceSelect;
+    public void setForceSelectNext(boolean forceSelectNext) {
+        this.forceSelectNext = forceSelectNext;
     }
 
-    public boolean isForceSelect() {
-        return forceSelect;
+    public boolean isForceSelectNext() {
+        return forceSelectNext;
     }
 
     @Override
     public void addToFlatList(ExplorerElement element) {
         super.addToFlatList(element);
-        if(forceSelect && !hasSelected && flatList.size() == 1) {
+        if(forceSelectNext && flatList.size() == 1) {
             setSelectedIndex(0);
-            hasSelected = true;
+            forceSelectNext = false;
         }
     }
 }

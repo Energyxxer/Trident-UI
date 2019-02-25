@@ -21,7 +21,7 @@ public class SuggestionExpander {
                 case TridentSuggestionTags
                         .IDENTIFIER_EXISTING: {
                     if(parent.getSummary() != null) {
-                        for(SummarySymbol sym : parent.getSummary().getSymbolsVisibleAt(suggestionModule.getFocusedIndex())) {
+                        for(SummarySymbol sym : parent.getSummary().getSymbolsVisibleAt(suggestionModule.getSuggestionIndex())) {
                             SuggestionToken token = new SuggestionToken(parent, sym.getName(), suggestion);
                             token.setIconKey(SuggestionToken.getIconKeyForTags(sym.getSuggestionTags()));
                             tokens.add(0, token);

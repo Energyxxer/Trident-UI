@@ -5,4 +5,5 @@ public interface SuggestionInterface {
     void relocate();
 
     void lock();
+    void setSafeToSuggest(boolean safe);
 }

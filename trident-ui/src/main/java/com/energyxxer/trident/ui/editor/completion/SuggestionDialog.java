@@ -39,6 +39,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
     private SuggestionModule activeResults = null;
 
     private ArrayList<SuggestionToken> activeTokens = new ArrayList<>();
+    private boolean safe = false;
 
     public SuggestionDialog(TridentEditorComponent editor) {
         super(TridentWindow.jframe, false);
@@ -46,7 +47,6 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         this.editor = editor;
 
         this.explorer = new StyledExplorerMaster("EditorSuggestions");
-        this.explorer.setForceSelect(true);
 
         this.setContentPane(scrollPane = new OverlayScrollPane(explorer));
 
@@ -69,6 +69,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
 
     public void showSuggestions(SuggestionModule results) {
         if(this.isVisible()) return;
+        if(!safe) return;
         activeResults = results;
         explorer.clear();
         activeTokens.clear();
@@ -93,7 +94,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         if(any) {
             this.setVisible(true);
             filter();
-            relocate(results.getFocusedIndex());
+            relocate(results.getSuggestionIndex());
             editor.requestFocus();
         } else {
             this.setVisible(false);
@@ -104,7 +105,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         Debug.log("Submit suggestion '" + text + "' from " + suggestion);
         this.setVisible(false);
         CompoundEdit edit = new CompoundEdit();
-        edit.appendEdit(new Lazy<>(() -> new DeletionEdit(editor, editor.getCaretPosition() - activeResults.getFocusedIndex())));
+        edit.appendEdit(new Lazy<>(() -> new DeletionEdit(editor, editor.getCaretPosition() - activeResults.getSuggestionIndex())));
         edit.appendEdit(new Lazy<>(() -> new InsertionEdit(text, editor)));
         editor.getEditManager().insertEdit(edit);
     }
@@ -159,7 +160,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
 
     @Override
     public void dismiss(boolean force) {
-        if(force || !locked || (activeResults != null && editor.getCaretWordPosition() != activeResults.getFocusedIndex())) {
+        if(force || !locked || (activeResults != null && editor.getCaretWordPosition() != activeResults.getSuggestionIndex())) {
             if(this.isVisible()) {
                 Debug.log("Told to dismiss");
             }
@@ -179,6 +180,8 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
                     token.setEnabledFilter(typed);
                 }
 
+                this.explorer.setForceSelectNext(true);
+
                 explorer.repaint();
             } catch (BadLocationException ex) {
                 ex.printStackTrace();
@@ -187,7 +190,11 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
     }
 
     private void relocate(int index) {
-        this.setSize(new Dimension(300, Math.min(300, explorer.getRowHeight() * activeTokens.size() + 2)));
+        int shownTokens = 0;
+        for(SuggestionToken token : activeTokens) {
+            if(token.isEnabled()) shownTokens += 1;
+        }
+        this.setSize(new Dimension(300, Math.min(300, explorer.getRowHeight() * shownTokens + 2)));
         try {
             Rectangle rect = editor.modelToView(index);
             if(rect == null) return;
@@ -233,5 +240,10 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
     public void lock() {
         locked = true;
         filter();
+    }
+
+    @Override
+    public void setSafeToSuggest(boolean safe) {
+        this.safe = safe;
     }
 }
