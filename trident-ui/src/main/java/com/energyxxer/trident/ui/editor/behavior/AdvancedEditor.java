@@ -395,6 +395,23 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         this.suggestionInterface = suggestionInterface;
     }
 
+    public int getIndentationAt(int index) {
+        try {
+            String text = this.getDocument().getText(0, index);
+            int lineStart = Math.max(0, text.lastIndexOf('\n', index - 1)+1);
+
+            int spaces = 0;
+            for(int j = lineStart; j < index; j++) {
+                if(text.charAt(j) == ' ') spaces++;
+                else break;
+            }
+            return spaces / 4;
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
     //Delegates and deprecated managers
 
     @Override

@@ -6,6 +6,8 @@ import com.energyxxer.enxlex.suggestions.Suggestion;
 import com.energyxxer.enxlex.suggestions.SuggestionModule;
 import com.energyxxer.trident.compiler.lexer.TridentSuggestionTags;
 import com.energyxxer.trident.compiler.lexer.summaries.SummarySymbol;
+import com.energyxxer.trident.ui.editor.completion.snippets.SnippetManager;
+import com.energyxxer.util.logger.Debug;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,7 +16,7 @@ import java.util.Collections;
 public class SuggestionExpander {
     public static Collection<SuggestionToken> expand(Suggestion suggestion, SuggestionDialog parent, SuggestionModule suggestionModule) {
         if(suggestion instanceof LiteralSuggestion) {
-            return Collections.singletonList(new SuggestionToken(parent, ((LiteralSuggestion) suggestion).getLiteral(), suggestion));
+            return Collections.singletonList(new SuggestionToken(parent, ((LiteralSuggestion) suggestion).getPreview(), ((LiteralSuggestion) suggestion).getLiteral(), suggestion));
         } else if(suggestion instanceof ComplexSuggestion) {
             ArrayList<SuggestionToken> tokens = new ArrayList<>();
             switch(((ComplexSuggestion) suggestion).getKey()) {
@@ -39,6 +41,18 @@ public class SuggestionExpander {
                         }
                     }
                     break;
+                }
+                case TridentSuggestionTags.CONTEXT_ENTRY:
+                case TridentSuggestionTags.CONTEXT_COMMAND:
+                case TridentSuggestionTags.CONTEXT_MODIFIER:
+                case TridentSuggestionTags.CONTEXT_ENTITY_BODY:
+                case TridentSuggestionTags.CONTEXT_ITEM_BODY:
+                case TridentSuggestionTags.CONTEXT_INTERPOLATION_VALUE: {
+                    suggestionModule.getSuggestions().addAll(SnippetManager.createSuggestionsForTag(((ComplexSuggestion) suggestion).getKey()));
+                    break;
+                }
+                default: {
+                    Debug.log(((ComplexSuggestion) suggestion).getKey());
                 }
             }
             return tokens;

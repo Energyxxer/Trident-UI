@@ -14,7 +14,9 @@ import java.util.Collection;
 public class SuggestionToken implements ModuleToken {
 
     private SuggestionDialog parent;
+    private String preview;
     private String text;
+    private String description;
     private Suggestion suggestion;
 
     private String iconKey;
@@ -22,11 +24,20 @@ public class SuggestionToken implements ModuleToken {
     private boolean enabled = true;
 
     public SuggestionToken(SuggestionDialog parent, String text, Suggestion suggestion) {
+        this(parent, text, text, suggestion);
+    }
+
+    public SuggestionToken(SuggestionDialog parent, String preview, String text, Suggestion suggestion) {
         this.parent = parent;
         this.suggestion = suggestion;
+        this.preview = preview;
         this.text = text;
 
         iconKey = getIconKeyForTags(suggestion.getTags());
+
+        if(suggestion instanceof SnippetSuggestion) {
+            description = "  " + ((SnippetSuggestion) suggestion).getDescription();
+        }
     }
 
     public String getIconKey() {
@@ -39,7 +50,12 @@ public class SuggestionToken implements ModuleToken {
 
     @Override
     public String getTitle() {
-        return text;
+        return preview;
+    }
+
+    @Override
+    public String getSubTitle() {
+        return description;
     }
 
     @Override
@@ -98,7 +114,7 @@ public class SuggestionToken implements ModuleToken {
     }
 
     public void setEnabledFilter(String filter) {
-        enabled = filter.isEmpty() || this.text.startsWith(filter);
+        enabled = filter.isEmpty() || this.preview.startsWith(filter);
     }
 
     public boolean isEnabled() {
@@ -122,6 +138,8 @@ public class SuggestionToken implements ModuleToken {
             return "modifier";
         } else if(tags.contains(TridentSuggestionTags.TAG_INSTRUCTION)) {
             return "instruction";
+        }else if(tags.contains(SnippetSuggestion.TAG_SNIPPET)) {
+            return "snippet";
         }
         return null;
     }
