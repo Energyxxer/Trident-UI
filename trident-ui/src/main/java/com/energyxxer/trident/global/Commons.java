@@ -3,7 +3,6 @@ package com.energyxxer.trident.global;
 import com.energyxxer.commodore.module.CommandModule;
 import com.energyxxer.commodore.standard.StandardDefinitionPacks;
 import com.energyxxer.enxlex.pattern_matching.matching.lazy.LazyTokenPatternMatch;
-import com.energyxxer.trident.compiler.TridentCompiler;
 import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
 import com.energyxxer.trident.main.window.TridentWindow;
@@ -14,7 +13,6 @@ import com.energyxxer.trident.ui.theme.change.ThemeChangeListener;
 import com.energyxxer.util.ImageManager;
 import com.energyxxer.util.Lazy;
 import com.energyxxer.util.logger.Debug;
-import com.energyxxer.util.out.Console;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -98,22 +96,19 @@ public class Commons {
     }
 
     public static void compileActive() {
-        if(Commons.getActiveProject() == null) return;
-        Project project = Commons.getActiveProject();
-        TridentCompiler c = new TridentCompiler(project.getRootDirectory());
-        c.setResourceCache(project.getSourceCache());
-        c.setInResourceCache(project.getResourceCache());
-        c.addProgressListener((message, progress) -> TridentWindow.setStatus(new Status(Status.INFO, message, progress)));
-        c.addCompletionListener(() -> {
-            TridentWindow.noticeExplorer.setNotices(c.getReport().group());
-            if (c.getReport().getTotal() > 0) TridentWindow.noticeBoard.open();
-            c.getReport().getWarnings().forEach(Console.warn::println);
-            c.getReport().getErrors().forEach(Console.err::println);
-            TridentWindow.statusBar.setProgress(null);
-            project.updateSourceCache(c.getSourceCache());
-            project.updateResourceCache(c.getOutResourceCache());
-        });
-        c.compile();
+        compile(Commons.getActiveProject());
+    }
+
+    public static void compile(Project project) {
+        if(project != null) ProcessManager.queueProcess(new TridentCompilerWrapper(project));
+    }
+
+    public static void indexActive() {
+        index(Commons.getActiveProject());
+    }
+
+    public static void index(Project project) {
+        if(project != null) ProcessManager.queueProcess(new IndexingProcess(project));
     }
 
     public static CommandModule getDefaultModule() {

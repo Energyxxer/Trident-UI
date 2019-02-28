@@ -11,8 +11,6 @@ import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
@@ -110,11 +108,7 @@ public class TabManager {
 			if(!tab.visible) {
 				item.setFont(item.getFont().deriveFont(Font.BOLD));
 			}
-			item.addMouseListener(new MouseAdapter() {
-				public void mousePressed(MouseEvent e) {
-					setSelectedTab(tab);
-				}
-			});
+			item.addActionListener(e -> setSelectedTab(tab));
 			menu.add(item);
 		}
 	}

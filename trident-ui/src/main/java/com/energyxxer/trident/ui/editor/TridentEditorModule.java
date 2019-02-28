@@ -1,6 +1,8 @@
 package com.energyxxer.trident.ui.editor;
 
+import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.temp.Lang;
+import com.energyxxer.trident.global.temp.projects.ProjectManager;
 import com.energyxxer.trident.main.TridentUI;
 import com.energyxxer.trident.main.window.sections.editor_search.FindAndReplaceBar;
 import com.energyxxer.trident.ui.Tab;
@@ -358,6 +360,7 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
             }
             writer.print(text);
             writer.close();
+            Commons.index(ProjectManager.getAssociatedProject(file));
             return getValue();
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -371,8 +374,11 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
     }
 
     @Override
+    public void onSelect() {
+    }
+
+    @Override
     public void dispose() {
         editorComponent.dispose();
-
     }
 }

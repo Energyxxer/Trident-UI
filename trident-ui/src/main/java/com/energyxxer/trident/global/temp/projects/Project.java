@@ -6,6 +6,7 @@ import com.energyxxer.enxlex.pattern_matching.ParsingSignature;
 import com.energyxxer.enxlex.pattern_matching.matching.lazy.LazyTokenPatternMatch;
 import com.energyxxer.trident.compiler.TridentCompiler;
 import com.energyxxer.trident.compiler.lexer.TridentProductions;
+import com.energyxxer.trident.compiler.util.ProjectSummary;
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.util.Lazy;
 import com.energyxxer.util.StringUtil;
@@ -46,6 +47,8 @@ public class Project {
 	private HashMap<Integer, Integer> resourceCache = new HashMap<>();
 
 	private HashMap<File, ParsingSignature> sourceCache = new HashMap<>();
+
+	private ProjectSummary summary = null;
 
 	//endregion
 	public Project(String name) {
@@ -208,6 +211,14 @@ public class Project {
 
 	public void updateSourceCache(HashMap<File, ParsingSignature> sourceCache) {
 		this.sourceCache = sourceCache;
+	}
+
+	public void updateSummary(ProjectSummary summary) {
+		this.summary = summary;
+	}
+
+	public ProjectSummary getSummary() {
+		return summary;
 	}
 
 	public HashMap<File, ParsingSignature> getSourceCache() {

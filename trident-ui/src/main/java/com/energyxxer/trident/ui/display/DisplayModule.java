@@ -9,4 +9,5 @@ public interface DisplayModule {
     boolean canSave();
     Object save();
     void focus();
+    default void onSelect() {}
 }

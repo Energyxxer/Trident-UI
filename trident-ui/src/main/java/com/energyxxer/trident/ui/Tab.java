@@ -48,6 +48,7 @@ public class Tab {
 	public void onSelect() {
 		openedTimeStamp = new Date().getTime();
 		module.focus();
+		module.onSelect();
 		module.displayCaretInfo();
 	}
 

@@ -1,16 +1,19 @@
 package com.energyxxer.trident.ui.editor;
 
+import com.energyxxer.enxlex.lexical_analysis.summary.SummaryModule;
 import com.energyxxer.enxlex.lexical_analysis.token.Token;
 import com.energyxxer.enxlex.lexical_analysis.token.TokenSection;
 import com.energyxxer.enxlex.suggestions.SuggestionModule;
 import com.energyxxer.trident.compiler.lexer.summaries.TridentSummaryModule;
+import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.temp.Lang;
+import com.energyxxer.trident.global.temp.projects.Project;
+import com.energyxxer.trident.global.temp.projects.ProjectManager;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.main.window.sections.EditArea;
 import com.energyxxer.trident.ui.editor.behavior.AdvancedEditor;
 import com.energyxxer.trident.ui.editor.completion.SuggestionDialog;
 import com.energyxxer.trident.ui.editor.inspector.Inspector;
-import com.energyxxer.util.logger.Debug;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
@@ -93,13 +96,21 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
         String text = getText();
 
         Lang lang = Lang.getLangForFile(parent.file.getPath());
+        Project project = ProjectManager.getAssociatedProject(parent.file);
 
-        Lang.LangAnalysisResponse analysis = lang != null ? lang.analyze(parent.file, text, new SuggestionModule(this.getCaretWordPosition(), this.getCaretPosition()), new TridentSummaryModule()) : null;
+        SuggestionModule suggestionModule = lang == Lang.TRIDENT && project != null ? new SuggestionModule(this.getCaretWordPosition(), this.getCaretPosition()) : null;
+        SummaryModule summaryModule = lang == Lang.TRIDENT && project != null  ? new TridentSummaryModule() : null;
+
+        Lang.LangAnalysisResponse analysis = lang != null ? lang.analyze(parent.file, text, suggestionModule, summaryModule) : null;
         if(analysis == null) return;
 
         suggestionBox.setSummary(((TridentSummaryModule) analysis.lexer.getSummaryModule()));
-        suggestionBox.showSuggestions(analysis.lexer.getSuggestionModule());
-        Debug.log(analysis.lexer.getSummaryModule());
+        if(analysis.lexer.getSuggestionModule() != null) {
+            if(project != null) {
+                ((TridentSummaryModule) analysis.lexer.getSummaryModule()).setParentSummary(project.getSummary());
+            }
+            suggestionBox.showSuggestions(analysis.lexer.getSuggestionModule());
+        }
 
         for(Token token : analysis.lexer.getStream().tokens) {
             Style style = TridentEditorComponent.this.getStyle(token.type.toString().toLowerCase());
@@ -165,6 +176,11 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
             }
             highlightingThread = new Thread(this::highlightSyntax,"Text Highlighter");
             highlightingThread.start();
+
+            Project project = ProjectManager.getAssociatedProject(parent.file);
+            if(project != null && project.getSummary() == null) {
+                Commons.index(project);
+            }
         }
     }
 

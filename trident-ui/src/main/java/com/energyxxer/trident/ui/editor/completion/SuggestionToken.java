@@ -22,6 +22,7 @@ public class SuggestionToken implements ModuleToken {
     private String iconKey;
 
     private boolean enabled = true;
+    private boolean darkened;
 
     public SuggestionToken(SuggestionDialog parent, String text, Suggestion suggestion) {
         this(parent, text, text, suggestion);
@@ -142,5 +143,13 @@ public class SuggestionToken implements ModuleToken {
             return "snippet";
         }
         return null;
+    }
+
+    public void setDarkened(boolean darkened) {
+        this.darkened = darkened;
+    }
+
+    public boolean isDarkened() {
+        return darkened;
     }
 }

@@ -27,6 +27,9 @@ public class SuggestionExpander {
                             SuggestionToken token = new SuggestionToken(parent, sym.getName(), suggestion);
                             token.setIconKey(SuggestionToken.getIconKeyForTags(sym.getSuggestionTags()));
                             tokens.add(0, token);
+                            if(sym.getParentFileSummary() != parent.getSummary()) {
+                                token.setDarkened(true);
+                            }
                         }
                     }
                     break;
@@ -52,7 +55,7 @@ public class SuggestionExpander {
                     break;
                 }
                 default: {
-                    Debug.log(((ComplexSuggestion) suggestion).getKey());
+                    Debug.log("Missing SuggestionExpander case for: " + ((ComplexSuggestion) suggestion).getKey());
                 }
             }
             return tokens;

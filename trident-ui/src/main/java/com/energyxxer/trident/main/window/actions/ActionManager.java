@@ -1,8 +1,7 @@
 package com.energyxxer.trident.main.window.actions;
 
-import com.energyxxer.trident.global.Commons;
-import com.energyxxer.trident.global.Resources;
-import com.energyxxer.trident.global.TabManager;
+import com.energyxxer.trident.global.*;
+import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.main.window.sections.search_path.SearchPathDialog;
 import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.editor.TridentEditorModule;
@@ -58,6 +57,15 @@ public class ActionManager {
                 "Find in Path", "Find all occurrences of a query in a folder or project",
                 KeyStroke.getKeyStroke(KeyEvent.VK_H, getPlatformControlMask()),
                 SearchPathDialog.INSTANCE::reveal)
+        );
+        actions.add(new ProgramAction(
+                "Temporary Indexing", "Summarize active project",
+                KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.ALT_DOWN_MASK),
+                () -> {
+                    Project project = Commons.getActiveProject();
+                    if(project == null) return;
+                    ProcessManager.queueProcess(new IndexingProcess(project));
+                })
         );
     }
 

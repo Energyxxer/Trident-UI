@@ -7,6 +7,7 @@ import com.energyxxer.trident.ui.explorer.base.elements.ExplorerElement;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 
 import java.awt.*;
+import java.util.function.Predicate;
 
 public class StyledExplorerMaster extends ExplorerMaster {
 
@@ -79,6 +80,14 @@ public class StyledExplorerMaster extends ExplorerMaster {
 
     public void addElement(ExplorerElement elem) {
         children.add(elem);
+    }
+
+    public void removeElement(ExplorerElement elem) {
+        children.remove(elem);
+    }
+
+    public void removeElementIf(Predicate<ExplorerElement> elem) {
+        children.removeIf(elem);
     }
 
     public void clear() {

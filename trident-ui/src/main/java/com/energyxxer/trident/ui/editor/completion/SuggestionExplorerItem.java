@@ -18,7 +18,15 @@ public class SuggestionExplorerItem extends StandardExplorerItem {
     @Override
     public void render(Graphics g) {
         if(token.isEnabled()) {
+            Composite oldComposite = null;
+            if(token.isDarkened()) {
+                oldComposite = ((Graphics2D) g).getComposite();
+                ((Graphics2D) g).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f));
+            }
             super.render(g);
+            if(oldComposite != null) {
+                ((Graphics2D) g).setComposite(oldComposite);
+            }
         }
     }
 }

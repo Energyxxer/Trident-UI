@@ -9,7 +9,6 @@ import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.HintStylizer;
 import com.energyxxer.trident.ui.editor.TridentEditorComponent;
 import com.energyxxer.util.StringBounds;
-import com.energyxxer.util.logger.Debug;
 import com.energyxxer.xswing.hints.TextHint;
 
 import javax.swing.text.BadLocationException;
@@ -162,7 +161,6 @@ public class Inspector implements Highlighter.HighlightPainter, MouseMotionListe
             }
         }
         InspectionItem item = new InspectionItem(type, n.getMessage(), new StringBounds(editor.getLocationForOffset(n.getLocationIndex()), editor.getLocationForOffset(n.getLocationIndex() + n.getLocationLength())));
-        Debug.log("Created item: " + item);
         items.add(item);
     }
 
