@@ -1,6 +1,5 @@
 package com.energyxxer.trident.main.window.sections.tools.process;
 
-import com.energyxxer.trident.global.ProcessManager;
 import com.energyxxer.trident.main.window.sections.quick_find.StyledExplorerMaster;
 import com.energyxxer.trident.main.window.sections.tools.ToolBoard;
 import com.energyxxer.trident.main.window.sections.tools.ToolBoardMaster;
@@ -38,7 +37,7 @@ public class ProcessBoard extends ToolBoard {
 
     @Override
     public String getName() {
-        return "Processes (" + ProcessManager.getCount() + ")";
+        return "Processes";
     }
 
     @Override
