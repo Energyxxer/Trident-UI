@@ -15,6 +15,7 @@ import com.energyxxer.trident.ui.scrollbar.OverlayScrollPane;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.Lazy;
 import com.energyxxer.util.StringUtil;
+import com.energyxxer.util.logger.Debug;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -36,6 +37,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
     private TridentSummaryModule summary = null;
 
     private boolean locked = false;
+    private boolean forceLocked = false;
 
     private SuggestionModule activeResults = null;
 
@@ -100,17 +102,28 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         }
 
         if(any) {
+            Debug.log("Received " + explorer.getTotalCount() + " suggestions");
             this.setVisible(true);
             filter();
+            int shownTokens = 0;
+            for(SuggestionToken token : activeTokens) {
+                if(token.isEnabled()) shownTokens += 1;
+            }
+            Debug.log("After filtering: " + shownTokens);
             relocate(results.getSuggestionIndex());
             editor.requestFocus();
         } else {
+            Debug.log("No suggestions received");
             this.setVisible(false);
         }
     }
 
-    public void submit(String text, Suggestion suggestion) {
-        this.setVisible(false);
+    public void submit(String text, Suggestion suggestion, boolean dismiss) {
+        if(dismiss) {
+            this.setVisible(false);
+        } else {
+            this.forceLocked = true;
+        }
 
         int endIndex = -1;
         if(suggestion instanceof SnippetSuggestion) {
@@ -127,6 +140,11 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         editor.getEditManager().insertEdit(edit);
         if(endIndex > -1) {
             editor.getCaret().moveBy(endIndex - finalText.length());
+        }
+
+        if(!dismiss) {
+            this.forceLocked = false;
+            lock();
         }
     }
 
@@ -180,16 +198,23 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
 
     @Override
     public void dismiss(boolean force) {
-        if(force || !locked || (activeResults != null && editor.getCaretWordPosition() != activeResults.getSuggestionIndex())) {
-            this.setVisible(false);
+        if(!forceLocked) {
+            if (force || !locked || (activeResults != null && editor.getCaretWordPosition() != activeResults.getSuggestionIndex() && editor.getSoftCaretWordPosition() != activeResults.getSuggestionIndex())) {
+                this.setVisible(false);
+            }
         }
         locked = false;
     }
 
+    @Override
+    public void setVisible(boolean b) {
+        super.setVisible(b);
+    }
+
     public void filter() {
         if(isVisible() && activeResults != null) {
-            int cwpos = editor.getCaretWordPosition();
             try {
+                int cwpos = activeResults.getSuggestionIndex();
                 String typed = editor.getDocument().getText(cwpos, editor.getCaretPosition() - cwpos);
 
                 for(SuggestionToken token : activeTokens) {
@@ -236,7 +261,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
 
     @Override
     public void relocate() {
-        if(editor != null && editor.isVisible() && editor.isShowing()) relocate(editor.getCaretWordPosition());
+        if(editor != null && editor.isVisible() && editor.isShowing()) relocate(activeResults != null ? activeResults.getSuggestionIndex() : editor.getCaretWordPosition());
     }
 
     @Override
@@ -267,6 +292,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
 
     @Override
     public void setSafeToSuggest(boolean safe) {
+        //Debug.log("Set safe to suggest: " + safe);
         this.safe = safe;
     }
 }

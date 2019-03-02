@@ -73,8 +73,30 @@ public class ActionManager {
         return Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
     }
 
+    private static long ctrlWasDown = -1L;
+    private static long altWasDown = -1L;
+    private static boolean altGraphCaught = false;
+
     public static void setup(JPanel panel) {
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher((e) -> {
+            if(e.getID() == KeyEvent.KEY_PRESSED) {
+                if(altGraphCaught) {
+                    return true;
+                }
+                if(e.getKeyCode() == KeyEvent.VK_CONTROL) {
+                    ctrlWasDown = e.getWhen();
+                } else if(e.getKeyCode() == KeyEvent.VK_ALT) {
+                    altWasDown = e.getWhen();
+                }
+                if(e.isControlDown() && e.isAltDown() && ctrlWasDown == e.getWhen() && ctrlWasDown == altWasDown && ctrlWasDown > 0) {
+                    altGraphCaught = true;
+                    return true;
+                }
+            } else if(altGraphCaught && e.getID() == KeyEvent.KEY_RELEASED) {
+                if(e.getKeyCode() == KeyEvent.VK_CONTROL || e.getKeyCode() == KeyEvent.VK_ALT) {
+                    altGraphCaught = false;
+                }
+            }
             for(ProgramAction action : actions) {
                 if(action.getShortcut() != null) {
                     if(

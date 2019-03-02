@@ -13,16 +13,20 @@ import java.util.Collection;
 
 public class SuggestionToken implements ModuleToken {
 
-    private SuggestionDialog parent;
-    private String preview;
-    private String text;
-    private String description;
-    private Suggestion suggestion;
+    protected SuggestionDialog parent;
+    protected String preview;
+    protected String text;
+    protected String description;
+    protected Suggestion suggestion;
 
-    private String iconKey;
+    protected String iconKey;
 
-    private boolean enabled = true;
-    private boolean darkened;
+    protected boolean enabled = true;
+    protected boolean darkened;
+
+    protected SuggestionToken() {
+
+    }
 
     public SuggestionToken(SuggestionDialog parent, String text, Suggestion suggestion) {
         this(parent, text, text, suggestion);
@@ -91,7 +95,7 @@ public class SuggestionToken implements ModuleToken {
 
     @Override
     public void onInteract() {
-        parent.submit(text, suggestion);
+        parent.submit(text, suggestion, true);
     }
 
     @Override

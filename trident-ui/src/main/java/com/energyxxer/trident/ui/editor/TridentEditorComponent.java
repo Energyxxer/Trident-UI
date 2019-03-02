@@ -79,7 +79,23 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
         if(index <= 0) return 0;
         try {
             while (true) {
-                if (!Character.isJavaIdentifierPart(this.getDocument().getText(index-1, 1).charAt(0)) || --index <= 1)
+                char c = this.getDocument().getText(index-1, 1).charAt(0);
+                if (!Character.isJavaIdentifierPart(c) || --index <= 1)
+                    break;
+            }
+        } catch(BadLocationException ex) {
+            ex.printStackTrace();
+        }
+        return index;
+    }
+
+    public int getSoftCaretWordPosition() {
+        int index = this.getCaretPosition();
+        if(index <= 0) return 0;
+        try {
+            while (true) {
+                char c = this.getDocument().getText(index-1, 1).charAt(0);
+                if (!(Character.isJavaIdentifierPart(c) || ":/.".contains(c+"")) || --index <= 1)
                     break;
             }
         } catch(BadLocationException ex) {
