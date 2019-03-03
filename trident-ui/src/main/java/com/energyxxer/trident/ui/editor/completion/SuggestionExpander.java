@@ -1,5 +1,9 @@
 package com.energyxxer.trident.ui.editor.completion;
 
+import com.energyxxer.commodore.types.defaults.BlockType;
+import com.energyxxer.commodore.types.defaults.EntityType;
+import com.energyxxer.commodore.types.defaults.FunctionReference;
+import com.energyxxer.commodore.types.defaults.ItemType;
 import com.energyxxer.enxlex.suggestions.ComplexSuggestion;
 import com.energyxxer.enxlex.suggestions.LiteralSuggestion;
 import com.energyxxer.enxlex.suggestions.Suggestion;
@@ -7,6 +11,7 @@ import com.energyxxer.enxlex.suggestions.SuggestionModule;
 import com.energyxxer.trident.compiler.TridentUtil;
 import com.energyxxer.trident.compiler.lexer.TridentSuggestionTags;
 import com.energyxxer.trident.compiler.lexer.summaries.SummarySymbol;
+import com.energyxxer.trident.compiler.util.ProjectSummary;
 import com.energyxxer.trident.ui.editor.completion.paths.ResourcePathExpander;
 import com.energyxxer.trident.ui.editor.completion.paths.ResourcePathNode;
 import com.energyxxer.trident.ui.editor.completion.snippets.SnippetManager;
@@ -15,6 +20,8 @@ import com.energyxxer.util.logger.Debug;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class SuggestionExpander {
     public static Collection<SuggestionToken> expand(Suggestion suggestion, SuggestionDialog parent, SuggestionModule suggestionModule) {
@@ -42,6 +49,7 @@ public class SuggestionExpander {
                     if(parent.getSummary() != null) {
                         for(String objective : parent.getSummary().getAllObjectives()) {
                             SuggestionToken token = new SuggestionToken(parent, objective, suggestion);
+                            token.setIconKey("objective");
                             tokens.add(0, token);
                         }
                     }
@@ -49,31 +57,45 @@ public class SuggestionExpander {
                 }
                 case TridentSuggestionTags.TRIDENT_FUNCTION:
                 case TridentSuggestionTags.FUNCTION:{
-                    if(parent.getSummary() != null && parent.getSummary().getParentSummary() != null) {
-                        ArrayList<String> test = new ArrayList<>();
-                        for(TridentUtil.ResourceLocation loc : parent.getSummary().getParentSummary().getFunctionResources(((ComplexSuggestion) suggestion).getKey().equals(TridentSuggestionTags.FUNCTION))) {
-                            test.add(loc.toString());
-                        }
-                        Collection<ResourcePathNode> nodes = ResourcePathExpander.expand(test, parent, suggestion);
-                        for(ResourcePathNode node : nodes) {
-                            if(node.isLeaf()) node.setIconKey("function");
-                            tokens.add(0, node);
-                        }
-                    }
+                    collectResourceLocationSuggestions(
+                            parent, suggestion, tokens,
+                            s -> s.getFunctionResources(((ComplexSuggestion) suggestion).getKey().equals(TridentSuggestionTags.FUNCTION)),
+                            "function");
                     break;
                 }
                 case TridentSuggestionTags.SOUND_RESOURCE:{
-                    if(parent.getSummary() != null && parent.getSummary().getParentSummary() != null) {
-                        ArrayList<String> test = new ArrayList<>();
-                        for(TridentUtil.ResourceLocation loc : parent.getSummary().getParentSummary().getSoundEvents()) {
-                            test.add(loc.toString());
-                        }
-                        Collection<ResourcePathNode> nodes = ResourcePathExpander.expand(test, parent, suggestion);
-                        for(ResourcePathNode node : nodes) {
-                            if(node.isLeaf()) node.setIconKey("sound");
-                            tokens.add(0, node);
-                        }
-                    }
+                    collectResourceLocationSuggestions(
+                            parent, suggestion, tokens,
+                            ProjectSummary::getSoundEvents,
+                            "sound");
+                    break;
+                }
+                case TridentSuggestionTags.BLOCK_TAG:{
+                    collectResourceLocationSuggestions(
+                            parent, suggestion, tokens,
+                            s -> s.getTags().get(BlockType.CATEGORY),
+                            "block");
+                    break;
+                }
+                case TridentSuggestionTags.ITEM_TAG:{
+                    collectResourceLocationSuggestions(
+                            parent, suggestion, tokens,
+                            s -> s.getTags().get(ItemType.CATEGORY),
+                            "item");
+                    break;
+                }
+                case TridentSuggestionTags.ENTITY_TYPE_TAG:{
+                    collectResourceLocationSuggestions(
+                            parent, suggestion, tokens,
+                            s -> s.getTags().get(EntityType.CATEGORY),
+                            "entity");
+                    break;
+                }
+                case TridentSuggestionTags.FUNCTION_TAG:{
+                    collectResourceLocationSuggestions(
+                            parent, suggestion, tokens,
+                            s -> s.getTags().get(FunctionReference.CATEGORY),
+                            "function");
                     break;
                 }
                 case TridentSuggestionTags.CONTEXT_ENTRY:
@@ -92,5 +114,20 @@ public class SuggestionExpander {
             return tokens;
         }
         throw new IllegalArgumentException();
+    }
+
+    private static void collectResourceLocationSuggestions(SuggestionDialog parent, Suggestion suggestion, ArrayList<SuggestionToken> tokens, Function<ProjectSummary, Collection<TridentUtil.ResourceLocation>> picker, String leafIcon) {
+        if(parent.getSummary() != null && parent.getSummary().getParentSummary() != null) {
+            Collection<TridentUtil.ResourceLocation> locations = picker.apply(parent.getSummary().getParentSummary());
+            if(locations == null) return;
+
+            Collection<ResourcePathNode> nodes = ResourcePathExpander.expand(
+                    locations.stream().map(TridentUtil.ResourceLocation::toString).collect(Collectors.toList()),
+                    parent, suggestion, false);
+            for(ResourcePathNode node : nodes) {
+                if(node.isLeaf()) node.setIconKey(leafIcon);
+                tokens.add(0, node);
+            }
+        }
     }
 }

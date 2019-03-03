@@ -62,6 +62,27 @@ public class ResourcePathNode extends SuggestionToken {
         return sb.toString();
     }
 
+    public void flattenAll() {
+        ArrayList<ResourcePathNode> newList = new ArrayList<>();
+        flattenAndCollectLeaves(newList);
+        this.subPaths = newList;
+    }
+
+    private void flattenAndCollectLeaves(ArrayList<ResourcePathNode> list) {
+        tempNameMap = null;
+        if(this.subPaths.isEmpty()) {
+            this.name = this.parentPath + this.name;
+            this.parentPath = null;
+            this.pathParts.clear();
+            this.pathParts.add(name);
+            list.add(this);
+        } else {
+            for(ResourcePathNode subNode : subPaths) {
+                subNode.flattenAndCollectLeaves(list);
+            }
+        }
+    }
+
     public void flattenEmptyMiddleNodes() {
         tempNameMap = null;
         for(ResourcePathNode subNode : subPaths) {
