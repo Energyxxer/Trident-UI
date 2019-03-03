@@ -1,20 +1,14 @@
 package com.energyxxer.trident.main.window.sections.tools;
 
 import com.energyxxer.trident.ui.ToolbarButton;
-import com.energyxxer.trident.ui.navbar.NavigationItem;
 import com.energyxxer.trident.ui.navbar.NavigatorMaster;
 import com.energyxxer.trident.ui.styledcomponents.Padding;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.xswing.hints.Hint;
 
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagLayout;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
@@ -69,12 +63,6 @@ public class ToolBoardMaster extends JPanel {
         }
         buttonWrapper0.add(buttonWrapper1);
         header.add(buttonWrapper0, BorderLayout.EAST);
-
-        {
-            NavigationItem item = new NavigationItem(navbar,"todo");
-            item.setHintText("TODO");
-            navbar.addElement(item);
-        }
 
         navbar.getHint().setPreferredPos(Hint.RIGHT);
         navbar.getHint().setOutDelay(5);

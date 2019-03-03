@@ -12,6 +12,7 @@ import com.energyxxer.trident.main.window.sections.tools.NoticeBoard;
 import com.energyxxer.trident.main.window.sections.tools.ToolBoardMaster;
 import com.energyxxer.trident.main.window.sections.tools.find.FindBoard;
 import com.energyxxer.trident.main.window.sections.tools.process.ProcessBoard;
+import com.energyxxer.trident.main.window.sections.tools.todo.TodoBoard;
 import com.energyxxer.trident.ui.explorer.NoticeExplorerMaster;
 import com.energyxxer.trident.ui.explorer.ProjectExplorerMaster;
 import com.energyxxer.trident.ui.tablist.TabListMaster;
@@ -49,6 +50,7 @@ public class TridentWindow {
 
 	public static ToolBoardMaster toolBoard;
 
+	public static TodoBoard todoBoard;
 	public static NoticeBoard noticeBoard;
 	public static ConsoleBoard consoleBoard;
 	public static FindBoard findBoard;
@@ -111,6 +113,7 @@ public class TridentWindow {
 		toolBoard = new ToolBoardMaster();
 		mainContent.add(toolBoard, BorderLayout.SOUTH);
 
+		todoBoard = new TodoBoard(toolBoard);
 		noticeBoard = new NoticeBoard(toolBoard);
 		consoleBoard = new ConsoleBoard(toolBoard);
 		findBoard = new FindBoard(toolBoard);

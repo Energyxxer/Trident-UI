@@ -5,4 +5,8 @@ public interface FindExplorerFilter {
     boolean groupBySubProject();
     boolean groupByPath();
     boolean groupByFile();
+
+    default boolean highlightResult() {
+        return true;
+    }
 }

@@ -5,6 +5,7 @@ import com.energyxxer.util.FileUtil;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class ProjectManager {
 	private static ArrayList<Project> loadedProjects = new ArrayList<>();
@@ -140,5 +141,9 @@ blockstates/*.json = blockstate
 
 	public static void setWorkspaceDir(String workspaceDir) {
 		ProjectManager.workspaceDir = workspaceDir;
+	}
+
+	public static Collection<Project> getLoadedProjects() {
+		return loadedProjects;
 	}
 }

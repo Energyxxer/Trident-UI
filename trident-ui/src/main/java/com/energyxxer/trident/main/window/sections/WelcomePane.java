@@ -7,11 +7,11 @@ import com.energyxxer.trident.ui.dialogs.settings.Settings;
 import com.energyxxer.trident.ui.misc.TipScreen;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 
-import javax.swing.JPanel;
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
+import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class WelcomePane extends JPanel {
 
@@ -75,6 +75,13 @@ public class WelcomePane extends JPanel {
             ToolbarButton button = new ToolbarButton("documentation", tlm);
             button.setText("Documentation");
             button.setHintText("Read the language docs");
+            button.addActionListener(e -> {
+                try {
+                    Desktop.getDesktop().browse(new URI("https://docs.google.com/document/d/1w_3ILt8-8s1VG-qv7cLLdIrTJTtbQvj2klh2xTnxQVw/edit?usp=sharing"));
+                } catch (IOException | URISyntaxException ex) {
+                    ex.printStackTrace();
+                }
+            });
             JPanel wrapper = new JPanel(new FlowLayout(FlowLayout.LEFT));
             wrapper.setOpaque(false);
             wrapper.add(button);
