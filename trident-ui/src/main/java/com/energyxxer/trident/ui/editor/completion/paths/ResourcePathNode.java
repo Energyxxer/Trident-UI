@@ -5,6 +5,7 @@ import com.energyxxer.trident.ui.editor.completion.SuggestionDialog;
 import com.energyxxer.trident.ui.editor.completion.SuggestionToken;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import static com.energyxxer.trident.ui.editor.completion.paths.ResourcePathExpander.DELIMITER_REGEX;
@@ -123,6 +124,18 @@ public class ResourcePathNode extends SuggestionToken {
         }
     }
 
+    private boolean skipNamespaces = false;
+
+    public boolean isSkipNamespaces() {
+        return skipNamespaces;
+    }
+
+    public void setSkipNamespaces(boolean skipNamespaces) {
+        this.skipNamespaces = skipNamespaces;
+
+        this.pathParts = new ArrayList<>(Arrays.asList(this.pathParts.get(0).split("(?<=[:])",2)));
+    }
+
     @Override
     public void onInteract() {
         parent.submit(this.text, suggestion, subPaths.isEmpty());
@@ -138,17 +151,21 @@ public class ResourcePathNode extends SuggestionToken {
             for(int i = 0; i < pathParts.size(); i++) {
                 String part = this.pathParts.get(i);
                 if(i < pathParts.size()-1) {
-                    if(!filter.startsWith(part, filterIndex)) {
-                        enabled = false;
-                        break;
+                    if(!filter.startsWith(part, filterIndex) && !(i == 0 && skipNamespaces && part.startsWith(filter.substring(filterIndex)))) {
+                        if(!(i == 0 && skipNamespaces)) {
+                            enabled = false;
+                            break;
+                        }
+                    } else {
+                        filterIndex += part.length();
                     }
                 } else {
-                    if(!part.startsWith(filter.substring(filterIndex)) || part.equals(filter.substring(filterIndex))) {
+                    if(!(skipNamespaces && filterIndex >= filter.length()) && !part.startsWith(filter.substring(filterIndex))) {
                         enabled = false;
                         break;
                     }
+                    filterIndex += part.length();
                 }
-                filterIndex += part.length();
             }
         }
     }

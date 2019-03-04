@@ -70,25 +70,71 @@ public class SuggestionExpander {
                             "sound");
                     break;
                 }
+                case TridentSuggestionTags.BLOCK:{
+                    collectResourceLocationSuggestions(
+                            parent, suggestion, tokens,
+                            s -> s.getTypes().get(BlockType.CATEGORY),
+                            "block", true);
+                    break;
+                }
                 case TridentSuggestionTags.BLOCK_TAG:{
                     collectResourceLocationSuggestions(
                             parent, suggestion, tokens,
                             s -> s.getTags().get(BlockType.CATEGORY),
-                            "block");
+                            "block_tag");
+                    break;
+                }
+                case TridentSuggestionTags.ITEM:{
+                    if(parent.getSummary() != null) {
+                        collectResourceLocationSuggestions(
+                                parent, suggestion, tokens,
+                                s -> s.getTypes().get(ItemType.CATEGORY),
+                                "item", true);
+                        for(SummarySymbol sym : parent.getSummary().getSymbolsVisibleAt(suggestionModule.getSuggestionIndex())) {
+                            if(sym.getSuggestionTags().contains(TridentSuggestionTags.TAG_CUSTOM_ITEM)) {
+                                SuggestionToken token = new SuggestionToken(parent, "$" + sym.getName(), suggestion);
+                                token.setIconKey(SuggestionToken.getIconKeyForTags(sym.getSuggestionTags()));
+                                tokens.add(0, token);
+                                if(sym.getParentFileSummary() != parent.getSummary()) {
+                                    token.setDarkened(true);
+                                }
+                            }
+                        }
+                    }
                     break;
                 }
                 case TridentSuggestionTags.ITEM_TAG:{
                     collectResourceLocationSuggestions(
                             parent, suggestion, tokens,
                             s -> s.getTags().get(ItemType.CATEGORY),
-                            "item");
+                            "item_tag");
+                    break;
+                }
+                case TridentSuggestionTags.ENTITY_TYPE:{
+                    Debug.log(parent.getSummary().getFileLocation());
+                    if(parent.getSummary() != null) {
+                        collectResourceLocationSuggestions(
+                                parent, suggestion, tokens,
+                                s -> s.getTypes().get(EntityType.CATEGORY),
+                                "entity", true);
+                        for(SummarySymbol sym : parent.getSummary().getSymbolsVisibleAt(suggestionModule.getSuggestionIndex())) {
+                            if(sym.getSuggestionTags().contains(TridentSuggestionTags.TAG_CUSTOM_ENTITY) && !sym.getSuggestionTags().contains(TridentSuggestionTags.TAG_ENTITY_FEATURE)) {
+                                SuggestionToken token = new SuggestionToken(parent, "$" + sym.getName(), suggestion);
+                                token.setIconKey(SuggestionToken.getIconKeyForTags(sym.getSuggestionTags()));
+                                tokens.add(0, token);
+                                if(sym.getParentFileSummary() != parent.getSummary()) {
+                                    token.setDarkened(true);
+                                }
+                            }
+                        }
+                    }
                     break;
                 }
                 case TridentSuggestionTags.ENTITY_TYPE_TAG:{
                     collectResourceLocationSuggestions(
                             parent, suggestion, tokens,
                             s -> s.getTags().get(EntityType.CATEGORY),
-                            "entity");
+                            "entity_type_tag");
                     break;
                 }
                 case TridentSuggestionTags.FUNCTION_TAG:{
@@ -117,13 +163,17 @@ public class SuggestionExpander {
     }
 
     private static void collectResourceLocationSuggestions(SuggestionDialog parent, Suggestion suggestion, ArrayList<SuggestionToken> tokens, Function<ProjectSummary, Collection<TridentUtil.ResourceLocation>> picker, String leafIcon) {
+        collectResourceLocationSuggestions(parent, suggestion, tokens, picker, leafIcon, false);
+    }
+
+    private static void collectResourceLocationSuggestions(SuggestionDialog parent, Suggestion suggestion, ArrayList<SuggestionToken> tokens, Function<ProjectSummary, Collection<TridentUtil.ResourceLocation>> picker, String leafIcon, boolean skipNamespace) {
         if(parent.getSummary() != null && parent.getSummary().getParentSummary() != null) {
             Collection<TridentUtil.ResourceLocation> locations = picker.apply(parent.getSummary().getParentSummary());
             if(locations == null) return;
 
             Collection<ResourcePathNode> nodes = ResourcePathExpander.expand(
                     locations.stream().map(TridentUtil.ResourceLocation::toString).collect(Collectors.toList()),
-                    parent, suggestion, false);
+                    parent, suggestion, skipNamespace, skipNamespace);
             for(ResourcePathNode node : nodes) {
                 if(node.isLeaf()) node.setIconKey(leafIcon);
                 tokens.add(0, node);

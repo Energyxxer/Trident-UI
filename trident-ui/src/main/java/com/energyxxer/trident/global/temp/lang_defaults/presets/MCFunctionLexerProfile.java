@@ -17,6 +17,8 @@ import static com.energyxxer.trident.global.temp.lang_defaults.presets.mcfunctio
 
 public class MCFunctionLexerProfile extends LexerProfile {
 
+    private static final Pattern numberRegex = Pattern.compile("([+-]?\\d+(\\.\\d+)?[bdfsL]?)");
+
     public MCFunctionLexerProfile() {
 
         ArrayList<LexerContext> contexts = new ArrayList<>();
@@ -144,11 +146,9 @@ public class MCFunctionLexerProfile extends LexerProfile {
         
         contexts.add(new LexerContext() {
 
-            private Pattern regex = Pattern.compile("([+-]?\\d+(\\.\\d+)?[bdfsL]?)");
-
             @Override
             public ScannerContextResponse analyze(String str, LexerProfile profile) {
-                Matcher matcher = regex.matcher(str);
+                Matcher matcher = numberRegex.matcher(str);
 
                 if(matcher.lookingAt()) {
                     int length = matcher.end();

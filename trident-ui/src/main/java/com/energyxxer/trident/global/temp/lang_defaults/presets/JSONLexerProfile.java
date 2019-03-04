@@ -22,6 +22,8 @@ public class JSONLexerProfile extends LexerProfile {
      * */
     private Token tokenBuffer = null;
 
+    private static final Pattern numberRegex = Pattern.compile("(-?\\d+(\\.\\d+)?)");
+
     private static final TokenType
             BRACE = new TokenType("BRACE"), // (, ), {, }...
             COMMA = new TokenType("COMMA"), // {1[,] 2[,]...}
@@ -82,11 +84,9 @@ public class JSONLexerProfile extends LexerProfile {
         //Numbers
         LexerContext numberContext = new LexerContext() {
 
-            private Pattern regex = Pattern.compile("(-?\\d+(\\.\\d+)?)");
-
             @Override
             public ScannerContextResponse analyze(String str, LexerProfile profile) {
-                Matcher matcher = regex.matcher(str);
+                Matcher matcher = numberRegex.matcher(str);
 
                 if (matcher.lookingAt()) {
                     int length = matcher.end();

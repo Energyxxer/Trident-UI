@@ -110,7 +110,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
                 if(token.isEnabled()) shownTokens += 1;
             }
             Debug.log("After filtering: " + shownTokens);
-            relocate(results.getSuggestionIndex());
+            relocate(Math.min(results.getSuggestionIndex(), editor.getDocument().getLength()));
             editor.requestFocus();
         } else {
             Debug.log("No suggestions received");
@@ -145,6 +145,10 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         if(!dismiss) {
             this.forceLocked = false;
             lock();
+        }
+
+        if(dismiss) {
+            setSafeToSuggest(false);
         }
     }
 
@@ -253,6 +257,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
             }
             this.setLocation(loc);
         } catch (BadLocationException x) {
+            Debug.log("BadLocationException: " + x.getMessage() + "; index " + x.offsetRequested(), Debug.MessageType.ERROR);
             x.printStackTrace();
         } catch(IllegalComponentStateException ignored) {
 
@@ -261,7 +266,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
 
     @Override
     public void relocate() {
-        if(editor != null && editor.isVisible() && editor.isShowing()) relocate(activeResults != null ? activeResults.getSuggestionIndex() : editor.getCaretWordPosition());
+        if(editor != null && editor.isVisible() && editor.isShowing()) relocate(activeResults != null ? Math.min(activeResults.getSuggestionIndex(), editor.getDocument().getLength()) : editor.getCaretWordPosition());
     }
 
     @Override

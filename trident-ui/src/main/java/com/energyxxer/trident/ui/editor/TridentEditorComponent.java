@@ -124,6 +124,9 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
         if(analysis.lexer.getSuggestionModule() != null) {
             if(project != null) {
                 ((TridentSummaryModule) analysis.lexer.getSummaryModule()).setParentSummary(project.getSummary());
+                if(project.getSummary() != null) {
+                    ((TridentSummaryModule) analysis.lexer.getSummaryModule()).setFileLocation(project.getSummary().getLocationForFile(parent.file));
+                }
             }
             suggestionBox.showSuggestions(analysis.lexer.getSuggestionModule());
         }

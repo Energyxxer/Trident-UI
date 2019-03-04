@@ -132,9 +132,15 @@ public class SuggestionToken implements ModuleToken {
         } else if(tags.contains(TridentSuggestionTags.TAG_ENTITY_FEATURE)) {
             return "feature";
         } else if(tags.contains(TridentSuggestionTags.TAG_CUSTOM_ENTITY)) {
-            return "entity";
+            return "custom_entity";
         } else if(tags.contains(TridentSuggestionTags.TAG_CUSTOM_ITEM)) {
+            return "custom_item";
+        } else if(tags.contains(TridentSuggestionTags.TAG_ITEM)) {
             return "item";
+        } else if(tags.contains(TridentSuggestionTags.TAG_ENTITY)) {
+            return "entity";
+        } else if(tags.contains(TridentSuggestionTags.TAG_COORDINATE)) {
+            return "coordinates";
         } else if(tags.contains(TridentSuggestionTags.TAG_VARIABLE)) {
             return "variable";
         } else if(tags.contains(TridentSuggestionTags.TAG_COMMAND)) {
@@ -143,7 +149,7 @@ public class SuggestionToken implements ModuleToken {
             return "modifier";
         } else if(tags.contains(TridentSuggestionTags.TAG_INSTRUCTION)) {
             return "instruction";
-        }else if(tags.contains(SnippetSuggestion.TAG_SNIPPET)) {
+        } else if(tags.contains(SnippetSuggestion.TAG_SNIPPET)) {
             return "snippet";
         }
         return null;

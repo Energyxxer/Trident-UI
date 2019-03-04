@@ -11,7 +11,7 @@ public class ResourcePathExpander {
     public static final String DELIMITERS = ":/.";
     public static final String DELIMITER_REGEX = "(?<=[" + DELIMITERS + "])";
 
-    public static Collection<ResourcePathNode> expand(Collection<String> paths, SuggestionDialog parent, Suggestion suggestion, boolean flattenResults) {
+    public static Collection<ResourcePathNode> expand(Collection<String> paths, SuggestionDialog parent, Suggestion suggestion, boolean flattenResults, boolean skipNamespaces) {
         ResourcePathNode root = new ResourcePathNode();
         for(String rawPath : paths) {
             root.insert(rawPath);
@@ -24,6 +24,9 @@ public class ResourcePathExpander {
         }
         ArrayList<ResourcePathNode> collected = new ArrayList<>();
         root.collectSuggestionTokens(collected, parent, suggestion);
+        if(skipNamespaces) {
+            collected.forEach(n -> n.setSkipNamespaces(true));
+        }
         return collected;
     }
 
