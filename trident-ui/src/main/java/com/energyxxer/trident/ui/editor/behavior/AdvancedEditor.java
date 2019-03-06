@@ -59,10 +59,10 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
     private SuggestionInterface suggestionInterface;
 
     {
-        this.addKeyListener(this);
 
         linePainter = new LinePainter(this);
         this.setCaret(this.caret = new EditorCaret(this));
+        this.addKeyListener(this);
 
         //this.getInputMap().setParent(null);
         this.setInputMap(JComponent.WHEN_FOCUSED,new InputMap());
@@ -416,17 +416,13 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
 
     @Override
     public synchronized void addKeyListener(KeyListener l) {
-        if(l != this) {
-            KeyListener[] oldListeners = this.getKeyListeners();
-            for(KeyListener listener : oldListeners) {
-                super.removeKeyListener(listener);
-            }
-            super.addKeyListener(l);
-            for(KeyListener listener : oldListeners) {
-                super.addKeyListener(listener);
-            }
-        } else {
-            super.addKeyListener(l);
+        KeyListener[] oldListeners = this.getKeyListeners();
+        for(KeyListener listener : oldListeners) {
+            super.removeKeyListener(listener);
+        }
+        super.addKeyListener(l);
+        for(KeyListener listener : oldListeners) {
+            super.addKeyListener(listener);
         }
     }
 
