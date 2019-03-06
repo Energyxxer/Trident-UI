@@ -160,7 +160,7 @@ public class ResourcePathNode extends SuggestionToken {
                         filterIndex += part.length();
                     }
                 } else {
-                    if(!(skipNamespaces && filterIndex >= filter.length()) && !part.startsWith(filter.substring(filterIndex))) {
+                    if(!(skipNamespaces && filterIndex >= filter.length()) && (!part.startsWith(filter.substring(filterIndex)) || (!isLeaf() && part.equals(filter.substring(filterIndex))))) {
                         enabled = false;
                         break;
                     }
