@@ -10,6 +10,7 @@ import com.energyxxer.trident.ui.editor.TridentEditorModule;
 import com.energyxxer.trident.ui.scrollbar.OverlayScrollPane;
 import com.energyxxer.trident.ui.styledcomponents.*;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
+import com.energyxxer.util.logger.Debug;
 import com.energyxxer.xswing.DragHandler;
 import com.energyxxer.xswing.UnifiedDocumentListener;
 
@@ -21,6 +22,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class SearchPathDialog extends JDialog implements WindowFocusListener, ActionListener {
 
@@ -188,7 +190,7 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
         buttonWrapper.setOpaque(false);
         buttonWrapper.add(openInToolButton);
         footerPanel.add(buttonWrapper, BorderLayout.EAST);
-        contentPanel.add(footerPanel, BorderLayout.CENTER);
+        contentPanel.add(footerPanel, BorderLayout.SOUTH);
 
 
         //this.explorer.addElement(recentFilesCategory);
@@ -217,23 +219,28 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
         QueryDetails query = new QueryDetails(field.getText(), matchCase.isSelected(), wordsOnly.isSelected(), regex.isSelected(), getRootFile());
         query.setMaxResults(200);
         query.setFileNameFilter(this::shouldRead);
-        QueryResult result = query.perform();
-        ArrayList<FileOccurrence> occurrences = new ArrayList<>();
-        result.collectFileOccurrences(occurrences);
-        occurrences.forEach(o -> {
-            FileOccurrenceExplorerItem elem = o.createElement(explorer);
-            elem.setDetailed(true);
-            elem.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent e) {
-                    if(e.getButton() == MouseEvent.BUTTON1) {
-                        SearchPathDialog.INSTANCE.showEditor(elem.getToken().getFile(), elem.getToken().getStart(), elem.getToken().getLength());
+        try {
+            QueryResult result = query.perform();
+            Debug.log("Results: " + result.getCount());
+            ArrayList<FileOccurrence> occurrences = new ArrayList<>();
+            result.collectFileOccurrences(occurrences);
+            occurrences.forEach(o -> {
+                FileOccurrenceExplorerItem elem = o.createElement(explorer);
+                elem.setDetailed(true);
+                elem.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        if (e.getButton() == MouseEvent.BUTTON1) {
+                            SearchPathDialog.INSTANCE.showEditor(elem.getToken().getFile(), elem.getToken().getStart(), elem.getToken().getLength());
+                        }
                     }
-                }
+                });
+                explorer.addElement(elem);
             });
-            explorer.addElement(elem);
-        });
-        explorer.repaint();
+            explorer.repaint();
+        } catch(PatternSyntaxException x) {
+            Debug.log(x.getMessage(), Debug.MessageType.ERROR);
+        }
     }
 
     private File getRootFile() {

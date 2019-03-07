@@ -38,7 +38,7 @@ public class QueryDetails {
         results = new FindResults();
         String rawPattern = query;
         if(rawPattern.isEmpty()) return;
-        if(regex) {
+        if(!regex) {
             rawPattern = Pattern.quote(rawPattern);
         }
         if(wordsOnly) {
