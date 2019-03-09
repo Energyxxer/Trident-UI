@@ -15,8 +15,8 @@ public final class SnippetManager {
         snippets.add(new Snippet("scoo", "scoreboard players operation $END$", "scoreboard players operation").setContextEnabled(SnippetContext.COMMAND));
         snippets.add(new Snippet("dheal", "default health $END$", "Sets a custom entity's default health").setContextEnabled(SnippetContext.ENTITY_BODY));
         snippets.add(new Snippet("dname", "default name $END$", "Sets a custom entity/item's default name").setContextEnabled(SnippetContext.ENTITY_BODY).setContextEnabled(SnippetContext.ITEM_BODY));
-        snippets.add(new Snippet("dnbt", "default nbt $END$", "Sets a custom entity/item's default NBT").setContextEnabled(SnippetContext.ENTITY_BODY).setContextEnabled(SnippetContext.ITEM_BODY));
-        snippets.add(new Snippet("dlore", "default lore $END$", "Sets a custom item's default lore").setContextEnabled(SnippetContext.ITEM_BODY));
+        snippets.add(new Snippet("dnbt", "default nbt {$END$}", "Sets a custom entity/item's default NBT").setContextEnabled(SnippetContext.ENTITY_BODY).setContextEnabled(SnippetContext.ITEM_BODY));
+        snippets.add(new Snippet("dlore", "default lore [$END$]", "Sets a custom item's default lore").setContextEnabled(SnippetContext.ITEM_BODY));
         snippets.add(new Snippet("tickf", "ticking function {\n    $END$\n}", "Creates an entity ticking function").setContextEnabled(SnippetContext.ENTITY_BODY));
 
         snippets.add(new Snippet("asat", "as $END$ at @s", "as <entity> at @s").setContextEnabled(SnippetContext.MODIFIER));
