@@ -67,7 +67,11 @@ public class QueryDetails {
                         int snippetStart = content.lastIndexOf('\n', matcher.start()-1);
                         if(snippetStart < 0) snippetStart = 0;
                         int snippetEnd = content.indexOf('\n', matcher.end());
-                        if(snippetEnd > content.length()) snippetEnd = content.length();
+                        if(snippetEnd < 0) snippetEnd = content.length();
+                        if(snippetEnd - snippetStart >= 96) {
+                            snippetStart = matcher.start();
+                            snippetEnd = matcher.end();
+                        }
                         int line = content.substring(0, snippetStart).split("\n",-1).length;
                         results.insertResult(new FileOccurrence(file, matcher.start(), matcher.end() - matcher.start(), line, content.substring(snippetStart, snippetEnd), matcher.start() - snippetStart));
                         if(maxResults > 0 && results.getCount() >= maxResults) return;
