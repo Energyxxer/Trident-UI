@@ -9,7 +9,7 @@ public final class SnippetManager {
 
     static {
         snippets.add(new Snippet("dee", "define entity $END$ {\n}", "Defines a custom entity").setContextEnabled(SnippetContext.ENTRY));
-        snippets.add(new Snippet("deef", "define entity feature $END$ {\n}", "Defines an entity feature").setContextEnabled(SnippetContext.ENTRY));
+        snippets.add(new Snippet("deec", "define entity component $END$ {\n}", "Defines an entity component").setContextEnabled(SnippetContext.ENTRY));
         snippets.add(new Snippet("dei", "define item $END$ {\n}", "Defines a custom item").setContextEnabled(SnippetContext.ENTRY));
         snippets.add(new Snippet("deo", "define objective $END$", "Defines a scoreboard objective").setContextEnabled(SnippetContext.ENTRY));
         snippets.add(new Snippet("scoo", "scoreboard players operation $END$", "scoreboard players operation").setContextEnabled(SnippetContext.COMMAND));
