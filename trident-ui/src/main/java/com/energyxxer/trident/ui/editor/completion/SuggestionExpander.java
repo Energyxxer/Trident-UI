@@ -118,7 +118,7 @@ public class SuggestionExpander {
                                 s -> s.getTypes().get(EntityType.CATEGORY),
                                 "entity", true);
                         for(SummarySymbol sym : parent.getSummary().getSymbolsVisibleAt(suggestionModule.getSuggestionIndex())) {
-                            if(sym.getSuggestionTags().contains(TridentSuggestionTags.TAG_CUSTOM_ENTITY) && !sym.getSuggestionTags().contains(TridentSuggestionTags.TAG_ENTITY_FEATURE)) {
+                            if(sym.getSuggestionTags().contains(TridentSuggestionTags.TAG_CUSTOM_ENTITY) && !sym.getSuggestionTags().contains(TridentSuggestionTags.TAG_ENTITY_COMPONENT)) {
                                 SuggestionToken token = new SuggestionToken(parent, "$" + sym.getName(), suggestion);
                                 token.setIconKey(SuggestionToken.getIconKeyForTags(sym.getSuggestionTags()));
                                 tokens.add(0, token);
