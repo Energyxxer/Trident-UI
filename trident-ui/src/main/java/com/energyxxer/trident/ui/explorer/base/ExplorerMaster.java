@@ -87,7 +87,7 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
         if(getFlag(ExplorerFlag.DYNAMIC_ROW_HEIGHT)) {
             int y = 0;
             for(ExplorerElement element : flatList) {
-                if(e.getY() > y && e.getY() < y + element.getHeight()) return element;
+                if(e.getY() >= y && e.getY() < y + element.getHeight()) return element;
                 y += element.getHeight();
             }
             return null;
