@@ -7,8 +7,12 @@ import com.energyxxer.trident.ui.explorer.base.ExplorerMaster;
 import com.energyxxer.trident.ui.explorer.base.elements.ExplorerElement;
 import com.energyxxer.trident.ui.modules.FileModuleToken;
 import com.energyxxer.trident.ui.modules.ModuleToken;
+import com.energyxxer.trident.ui.styledcomponents.StyledMenuItem;
+import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
 
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseEvent;
 import java.io.File;
 
@@ -146,11 +150,12 @@ public class NoticeItem extends ExplorerElement {
             StyledPopupMenu menu = this.generatePopup();
             menu.show(e.getComponent(), e.getX(), e.getY());*/
         }
+        confirmActivationMenu(e);
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-
+        confirmActivationMenu(e);
     }
 
     @Override
@@ -161,5 +166,22 @@ public class NoticeItem extends ExplorerElement {
     @Override
     public void mouseExited(MouseEvent e) {
 
+    }
+
+    private void confirmActivationMenu(MouseEvent e) {
+        if(e.isPopupTrigger()) {
+            if(!this.selected) master.setSelected(this, new MouseEvent(e.getComponent(), e.getID(), e.getWhen(), 0, e.getX(), e.getY(), e.getClickCount(), e.isPopupTrigger(), MouseEvent.BUTTON1));
+            StyledPopupMenu menu = new StyledPopupMenu();
+            {
+                StyledMenuItem copyItem = new StyledMenuItem("Copy to clipboard");
+                copyItem.setIconName("copy");
+                copyItem.addActionListener(ae -> {
+                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                    clipboard.setContents(new StringSelection(notice.getExtendedMessage()), null);
+                });
+                menu.add(copyItem);
+            }
+            menu.show(e.getComponent(), e.getX(), e.getY());
+        }
     }
 }
