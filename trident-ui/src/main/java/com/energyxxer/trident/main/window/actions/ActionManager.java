@@ -88,7 +88,7 @@ public class ActionManager {
                 } else if(e.getKeyCode() == KeyEvent.VK_ALT) {
                     altWasDown = e.getWhen();
                 }
-                if(e.isControlDown() && e.isAltDown() && ctrlWasDown == e.getWhen() && ctrlWasDown == altWasDown && ctrlWasDown > 0) {
+                if(e.isControlDown() && e.isAltDown() && altWasDown == e.getWhen() && altWasDown - ctrlWasDown >= 0 && altWasDown - ctrlWasDown <= 1 && ctrlWasDown > 0) {
                     altGraphCaught = true;
                     return true;
                 }
