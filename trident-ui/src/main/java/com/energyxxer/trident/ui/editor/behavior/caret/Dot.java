@@ -8,6 +8,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Utilities;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.Objects;
 
 import static com.energyxxer.trident.ui.editor.behavior.AdvancedEditor.isPlatformControlDown;
 
@@ -53,14 +54,14 @@ public class Dot {
         boolean doUpdateX = false;
 
         if(key == KeyEvent.VK_LEFT) {
-            if(index != mark && !e.isShiftDown()) {
+            if(!isPoint() && !e.isShiftDown()) {
                 nextPos = Math.min(index, mark);
                 if(isPlatformControlDown(e)) nextPos = getPositionBeforeWord();
             } else nextPos = (isPlatformControlDown(e)) ? getPositionBeforeWord() : getPositionBefore();
             doUpdateX = true;
             actionPerformed = true;
         } else if(key == KeyEvent.VK_RIGHT) {
-            if(index != mark && !e.isShiftDown()) {
+            if(!isPoint() && !e.isShiftDown()) {
                 nextPos = Math.max(index, mark);
                 if(isPlatformControlDown(e)) nextPos = getPositionAfterWord();
             } else nextPos = (isPlatformControlDown(e)) ? getPositionAfterWord() : getPositionAfter();
@@ -89,8 +90,9 @@ public class Dot {
             }
             actionPerformed = true;
         } else if(key == KeyEvent.VK_HOME) {
-            if(isPlatformControlDown(e)) nextPos = 0;
-            else nextPos = getRowStart();
+            if (!isPlatformControlDown(e)) {
+                nextPos = getRowStart();
+            }
             doUpdateX = true;
             actionPerformed = true;
         } else if(key == KeyEvent.VK_END) {
@@ -141,7 +143,7 @@ public class Dot {
 
     public int getPositionBeforeWord() {
         try {
-            return Math.max(component.getPreviousWord(Math.min(index,mark)), Math.max(0,getRowStart()-1));
+            return Math.max(component.getPreviousWord(index), Math.max(0,getRowStart()-1));
         } catch(BadLocationException ble) {
             Debug.log(ble.getMessage(), Debug.MessageType.ERROR);
         }
@@ -150,9 +152,29 @@ public class Dot {
 
     public int getPositionAfterWord() {
         try {
-            int pos = component.getNextWord(Math.max(index,mark));
+            int pos = component.getNextWord(index);
             int rowEnd = getRowEnd();
-            return (Math.max(index, mark) == rowEnd) ? pos : Math.min(pos, rowEnd);
+            return (index == rowEnd) ? pos : Math.min(pos, rowEnd);
+        } catch(BadLocationException ble) {
+            Debug.log(ble.getMessage(), Debug.MessageType.ERROR);
+        }
+        return component.getDocument().getLength();
+    }
+
+    public int getWordStart() {
+        try {
+            return Math.max(component.getWordStart(index), Math.max(0,getRowStart()-1));
+        } catch(BadLocationException ble) {
+            Debug.log(ble.getMessage(), Debug.MessageType.ERROR);
+        }
+        return 0;
+    }
+
+    public int getWordEnd() {
+        try {
+            int pos = component.getWordEnd(index);
+            int rowEnd = getRowEnd();
+            return (index == rowEnd) ? pos : Math.min(pos, rowEnd);
         } catch(BadLocationException ble) {
             Debug.log(ble.getMessage(), Debug.MessageType.ERROR);
         }
@@ -185,10 +207,14 @@ public class Dot {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Dot dot = (Dot) o;
+        return index == dot.index &&
+                mark == dot.mark;
+    }
 
-        return index == dot.index;
+    @Override
+    public int hashCode() {
+        return Objects.hash(index, mark);
     }
 
     @Override
@@ -198,5 +224,39 @@ public class Dot {
                 ", mark=" + mark +
                 ", x=" + x +
                 '}';
+    }
+
+    public int getMin() {
+        return Math.min(this.index, this.mark);
+    }
+
+    public int getMax() {
+        return Math.max(this.index, this.mark);
+    }
+
+    public boolean isPoint() {
+        return this.index == this.mark;
+    }
+
+    public boolean intersects(Dot other) {
+        if(other.getMin() < this.getMin()) {
+            return other.intersects(this);
+        }
+        if(this.mark == other.mark && (this.isPoint() != other.isPoint())) return false;
+        return (other.getMin() <= this.getMax());
+    }
+
+    public void absorb(Dot other) {
+        int newMin = Math.min(this.getMin(), other.getMin());
+        int newMax = Math.max(this.getMax(), other.getMax());
+
+        if(other.mark <= newMin || this.mark <= newMin) {
+            this.mark = newMin;
+            this.index = newMax;
+        } else/* if(other.mark >= newMax || this.mark >= newMax)*/ {
+            this.mark = newMax;
+            this.index = newMin;
+        }
+        Debug.log("* The dot absorbs the artifact");
     }
 }

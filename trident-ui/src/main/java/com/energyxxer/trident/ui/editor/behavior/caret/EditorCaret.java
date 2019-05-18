@@ -1,6 +1,9 @@
 package com.energyxxer.trident.ui.editor.behavior.caret;
 
 import com.energyxxer.trident.compiler.util.Using;
+import com.energyxxer.trident.testing.LiveTestCase;
+import com.energyxxer.trident.testing.LiveTestManager;
+import com.energyxxer.trident.testing.LiveTestResult;
 import com.energyxxer.trident.ui.editor.behavior.AdvancedEditor;
 import com.energyxxer.trident.util.Range;
 import com.energyxxer.util.StringLocation;
@@ -10,16 +13,27 @@ import javax.swing.plaf.TextUI;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.Highlighter;
+import javax.swing.text.Utilities;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Created by User on 1/3/2017.
  */
 public class EditorCaret extends DefaultCaret {
+
+    static {
+        LiveTestManager.registerTestCase(new LiveTestCase(
+                "caret_duplication",
+                EditorCaret.class,
+                "Editor Caret Duplication",
+                "Tests whether running the method EditorCaret#removeDuplicates is ever needed." +
+                        " If this test never receives any positive results, that method will be removed."));
+    }
 
     private ArrayList<Dot> dots = new ArrayList<>();
     private AdvancedEditor editor;
@@ -53,6 +67,7 @@ public class EditorCaret extends DefaultCaret {
             if(dot.handleEvent(e)) actionPerformed = true;
         }
         if(actionPerformed) {
+            mergeDots();
             removeDuplicates();
             update();
         }
@@ -70,7 +85,8 @@ public class EditorCaret extends DefaultCaret {
 
     public void setPosition(int pos) {
         dots.clear();
-        addDot(new Dot(pos, editor));
+        bufferedDot = new Dot(pos, editor);
+        addDot(bufferedDot);
         update();
     }
 
@@ -83,7 +99,38 @@ public class EditorCaret extends DefaultCaret {
 
     public void addDot(Dot... newDots) {
         for(Dot dot : newDots) {
-            if(!dots.contains(dot)) dots.add(dot);
+            dots.add(dot);
+            mergeDots(dot);
+        }
+    }
+
+    public void mergeDots(Dot newDot) {
+        boolean hasMerged = true;
+        while(hasMerged) {
+            hasMerged = false;
+            Iterator<Dot> it = dots.iterator();
+            while(it.hasNext()) {
+                Dot dot = it.next();
+                if(dot != newDot && dot.intersects(newDot)) {
+                    newDot.absorb(dot);
+                    hasMerged = true;
+                    it.remove();
+                }
+            }
+        }
+    }
+
+    private void mergeDots() {
+        for(int i = 0; i < dots.size(); i++) {
+            Dot dot = dots.get(i);
+            for(int j = i+1; j < dots.size(); j++) {
+                Dot otherDot = dots.get(j);
+                if(dot.intersects(otherDot)) {
+                    dot.absorb(otherDot);
+                    dots.remove(j);
+                    j--;
+                }
+            }
         }
     }
 
@@ -97,7 +144,10 @@ public class EditorCaret extends DefaultCaret {
                 stateChanged = true;
             }
         }
-        if(stateChanged) this.fireStateChanged();
+        if(stateChanged) {
+            this.fireStateChanged();
+            LiveTestManager.getTestCase("caret_duplication").submitResult(new LiveTestResult(LiveTestResult.ResultType.POSITIVE));
+        }
     }
 
     @Override
@@ -213,6 +263,7 @@ public class EditorCaret extends DefaultCaret {
     }
 
     public CaretProfile getProfile() {
+        if(bufferedDot != null) mergeDots(bufferedDot);
         CaretProfile profile = new CaretProfile();
         profile.addAllDots(dots);
         profile.sort();
@@ -228,7 +279,9 @@ public class EditorCaret extends DefaultCaret {
         this.dots.clear();
         Range r = new Range(0,editor.getDocument().getLength());
         for(int i = 0; i < profile.size()-1; i += 2) {
-            addDot(new Dot(r.clamp(profile.get(i)),r.clamp(profile.get(i+1)), editor));
+            Dot newDot = new Dot(r.clamp(profile.get(i)),r.clamp(profile.get(i+1)), editor);
+            if(i == 0) bufferedDot = newDot;
+            addDot(newDot);
         }
         removeDuplicates();
         update();
@@ -240,6 +293,7 @@ public class EditorCaret extends DefaultCaret {
     //Handle mouse selection
 
     private Dot bufferedDot = null;
+    private DragSelectMode dragSelectMode = DragSelectMode.CHAR;
 
     @Override
     public void mousePressed(MouseEvent e) {
@@ -250,21 +304,27 @@ public class EditorCaret extends DefaultCaret {
         int index = editor.viewToModel(e.getPoint());
 
         bufferedDot = new Dot(index, index, editor);
+        dragSelectMode = DragSelectMode.CHAR;
         if (e.getClickCount() == 2 && !e.isConsumed() && e.getButton() == MouseEvent.BUTTON1) {
-            bufferedDot.mark = bufferedDot.getPositionBeforeWord();
-            bufferedDot.index = bufferedDot.getPositionAfterWord();
+            bufferedDot.mark = bufferedDot.getWordStart();
+            bufferedDot.index = bufferedDot.getWordEnd();
+            dragSelectMode = DragSelectMode.WORD;
         } else if(e.getClickCount() >= 3 && !e.isConsumed() && e.getButton() == MouseEvent.BUTTON1) {
             bufferedDot.mark = bufferedDot.getRowStart();
             bufferedDot.index = bufferedDot.getRowEnd();
+            dragSelectMode = DragSelectMode.LINE;
         }
         addDot(bufferedDot);
         e.consume();
         update();
-        //super.mousePressed(e);
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
+        if(bufferedDot != null) {
+            mergeDots(bufferedDot);
+            bufferedDot = null;
+        }
         editor.repaint();
         this.setVisible(true);
         readjustRect();
@@ -290,9 +350,31 @@ public class EditorCaret extends DefaultCaret {
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        if(bufferedDot != null) bufferedDot.index = editor.viewToModel(e.getPoint());
+        if(bufferedDot != null) {
+            bufferedDot.index = editor.viewToModel(e.getPoint());
+            try {
+                if(dragSelectMode == DragSelectMode.WORD) {
+                    if(bufferedDot.index <= bufferedDot.mark) {
+                        bufferedDot.index = bufferedDot.getWordStart();
+                        bufferedDot.mark = editor.getWordEnd(bufferedDot.mark);
+                    } else {
+                        bufferedDot.index = bufferedDot.getWordEnd();
+                        bufferedDot.mark = editor.getWordStart(bufferedDot.mark);
+                    }
+                } else if(dragSelectMode == DragSelectMode.LINE) {
+                    if(bufferedDot.index <= bufferedDot.mark) {
+                        bufferedDot.index = bufferedDot.getRowStart();
+                        bufferedDot.mark = Utilities.getRowEnd(editor, bufferedDot.mark);
+                    } else {
+                        bufferedDot.index = Utilities.getRowEnd(editor, bufferedDot.index);
+                        bufferedDot.mark = Utilities.getRowStart(editor, bufferedDot.mark);
+                    }
+                }
+            } catch (BadLocationException ex) {
+                ex.printStackTrace();
+            }
+        }
         update();
-        //super.mouseDragged(e);
     }
 
     @Override
