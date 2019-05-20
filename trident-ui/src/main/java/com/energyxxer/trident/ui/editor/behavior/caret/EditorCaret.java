@@ -51,7 +51,8 @@ public class EditorCaret extends DefaultCaret {
             }
         });
 
-        addDot(new Dot(0, 0, editor));
+        bufferedDot = new Dot(0, 0, editor);
+        addDot(bufferedDot);
 
         try {
             c.getHighlighter().addHighlight(0,0,new EditorSelectionPainter(this));
@@ -101,6 +102,7 @@ public class EditorCaret extends DefaultCaret {
         for(Dot dot : newDots) {
             dots.add(dot);
             mergeDots(dot);
+            if(dot == bufferedDot) bufferedDotAdded = true;
         }
     }
 
@@ -263,7 +265,7 @@ public class EditorCaret extends DefaultCaret {
     }
 
     public CaretProfile getProfile() {
-        if(bufferedDot != null) mergeDots(bufferedDot);
+        if(bufferedDot != null && bufferedDotAdded) mergeDots(bufferedDot);
         CaretProfile profile = new CaretProfile();
         profile.addAllDots(dots);
         profile.sort();
@@ -282,6 +284,7 @@ public class EditorCaret extends DefaultCaret {
             Dot newDot = new Dot(r.clamp(profile.get(i)),r.clamp(profile.get(i+1)), editor);
             if(i == 0) bufferedDot = newDot;
             addDot(newDot);
+            bufferedDotAdded = true;
         }
         removeDuplicates();
         update();
@@ -293,7 +296,10 @@ public class EditorCaret extends DefaultCaret {
     //Handle mouse selection
 
     private Dot bufferedDot = null;
+    private boolean bufferedDotAdded = false;
     private DragSelectMode dragSelectMode = DragSelectMode.CHAR;
+    private int columnDotsStartIndex = 0;
+    private Point columnStartPoint = null;
 
     @Override
     public void mousePressed(MouseEvent e) {
@@ -305,7 +311,11 @@ public class EditorCaret extends DefaultCaret {
 
         bufferedDot = new Dot(index, index, editor);
         dragSelectMode = DragSelectMode.CHAR;
-        if (e.getClickCount() == 2 && !e.isConsumed() && e.getButton() == MouseEvent.BUTTON1) {
+        if(e.getButton() == MouseEvent.BUTTON2 || (e.getButton() == MouseEvent.BUTTON1 && e.isAltDown())) {
+            dragSelectMode = DragSelectMode.COLUMN;
+            columnDotsStartIndex = dots.size();
+            columnStartPoint = e.getPoint();
+        } else if(e.getClickCount() == 2 && !e.isConsumed() && e.getButton() == MouseEvent.BUTTON1) {
             bufferedDot.mark = bufferedDot.getWordStart();
             bufferedDot.index = bufferedDot.getWordEnd();
             dragSelectMode = DragSelectMode.WORD;
@@ -315,6 +325,7 @@ public class EditorCaret extends DefaultCaret {
             dragSelectMode = DragSelectMode.LINE;
         }
         addDot(bufferedDot);
+        bufferedDotAdded = true;
         e.consume();
         update();
     }
@@ -322,8 +333,9 @@ public class EditorCaret extends DefaultCaret {
     @Override
     public void mouseReleased(MouseEvent e) {
         if(bufferedDot != null) {
-            mergeDots(bufferedDot);
+            if(bufferedDotAdded) mergeDots(bufferedDot);
             bufferedDot = null;
+            bufferedDotAdded = false;
         }
         editor.repaint();
         this.setVisible(true);
@@ -353,21 +365,75 @@ public class EditorCaret extends DefaultCaret {
         if(bufferedDot != null) {
             bufferedDot.index = editor.viewToModel(e.getPoint());
             try {
-                if(dragSelectMode == DragSelectMode.WORD) {
-                    if(bufferedDot.index <= bufferedDot.mark) {
-                        bufferedDot.index = bufferedDot.getWordStart();
-                        bufferedDot.mark = editor.getWordEnd(bufferedDot.mark);
-                    } else {
-                        bufferedDot.index = bufferedDot.getWordEnd();
-                        bufferedDot.mark = editor.getWordStart(bufferedDot.mark);
+                switch(dragSelectMode) {
+                    case WORD: {
+                        if(bufferedDot.index <= bufferedDot.mark) {
+                            bufferedDot.index = bufferedDot.getWordStart();
+                            bufferedDot.mark = editor.getWordEnd(bufferedDot.mark);
+                        } else {
+                            bufferedDot.index = bufferedDot.getWordEnd();
+                            bufferedDot.mark = editor.getWordStart(bufferedDot.mark);
+                        }
+                        bufferedDot.updateX();
+                        break;
                     }
-                } else if(dragSelectMode == DragSelectMode.LINE) {
-                    if(bufferedDot.index <= bufferedDot.mark) {
-                        bufferedDot.index = bufferedDot.getRowStart();
-                        bufferedDot.mark = Utilities.getRowEnd(editor, bufferedDot.mark);
-                    } else {
-                        bufferedDot.index = Utilities.getRowEnd(editor, bufferedDot.index);
-                        bufferedDot.mark = Utilities.getRowStart(editor, bufferedDot.mark);
+                    case LINE: {
+                        if(bufferedDot.index <= bufferedDot.mark) {
+                            bufferedDot.index = bufferedDot.getRowStart();
+                            bufferedDot.mark = Utilities.getRowEnd(editor, bufferedDot.mark);
+                        } else {
+                            bufferedDot.index = Utilities.getRowEnd(editor, bufferedDot.index);
+                            bufferedDot.mark = Utilities.getRowStart(editor, bufferedDot.mark);
+                        }
+                        bufferedDot.updateX();
+                        break;
+                    }
+                    case COLUMN: {
+                        bufferedDotAdded = false;
+                        while(dots.size() > columnDotsStartIndex) {
+                            dots.remove(columnDotsStartIndex);
+                        }
+                        int rowHeight = editor.modelToView(bufferedDot.index).height;
+                        int leftX = Math.min(e.getPoint().x, columnStartPoint.x);
+                        int rightX = Math.max(e.getPoint().x, columnStartPoint.x);
+
+                        int topY = (Math.min(e.getPoint().y, columnStartPoint.y) / rowHeight) * rowHeight;
+                        int bottomY = (Math.max(e.getPoint().y, columnStartPoint.y) / rowHeight) * rowHeight;
+
+                        boolean rtl = e.getPoint().x < columnStartPoint.x;
+
+                        boolean hasUnselectedChars = false;
+                        int selectedCharListIndex = -1;
+
+                        for(int y = topY; y <= bottomY; y += rowHeight) {
+                            int rowStartIndex = editor.viewToModel(new Point(leftX, y));
+                            int rowEndIndex = editor.viewToModel(new Point(rightX, y));
+
+                            if(rowStartIndex != rowEndIndex) {
+                                if(selectedCharListIndex < 0) {
+                                    selectedCharListIndex = dots.size();
+                                }
+                            } else if(selectedCharListIndex < 0) {
+                                hasUnselectedChars = true;
+                            }
+
+                            if(selectedCharListIndex < 0 || rowStartIndex != rowEndIndex) dots.add(new Dot(rtl ? rowStartIndex : rowEndIndex, rtl ? rowEndIndex : rowStartIndex, editor));
+                        }
+
+                        if(hasUnselectedChars && selectedCharListIndex >= 0) {
+                            for(int i = columnDotsStartIndex; i < selectedCharListIndex; i++) {
+                                if(dots.get(i).isPoint()) {
+                                    dots.remove(i);
+                                    i--;
+                                    selectedCharListIndex--;
+                                }
+                            }
+                        }
+                        break;
+                    }
+                    case CHAR: {
+                        bufferedDot.updateX();
+                        break;
                     }
                 }
             } catch (BadLocationException ex) {

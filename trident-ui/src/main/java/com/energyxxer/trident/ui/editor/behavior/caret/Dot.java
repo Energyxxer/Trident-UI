@@ -37,7 +37,7 @@ public class Dot {
         updateX();
     }
 
-    private void updateX() {
+    void updateX() {
         try {
             Rectangle view = component.modelToView(index);
             if(view != null) this.x = view.x;
