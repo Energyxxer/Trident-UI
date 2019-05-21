@@ -1,35 +1,46 @@
 package com.energyxxer.trident.files;
 
+import com.energyxxer.commodore.functionlogic.functions.Function;
 import com.energyxxer.trident.ui.dialogs.file_dialogs.*;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenuItem;
 
 import java.io.File;
+import java.util.function.Predicate;
 
 /**
  * Created by User on 2/9/2017.
  */
 public enum FileType {
-    PROJECT(0, "Project", "project", ProjectDialog::create, (pr, pth) -> true),
-    TDN(1, "Trident Function", "trident_file", UnitDialog::create, (pr, pth) -> pr != null && pth.startsWith(pr + "datapack" + File.separator)),
-    MODEL(1, "Model", "model", ModelDialog::create, (pr, pth) -> pr != null && pth.startsWith(pr + "resources" + File.separator)),
-    LANG(1, "Language File", "lang", ResourceDialog::create, (pr, pth) -> pr != null && pth.startsWith(pr + "resources" + File.separator)),
-    FUNCTION(1, "Function", "function", MCMETADialog::create, (pr, pth) -> pr != null && pth.startsWith(pr + "datapack" + File.separator)),
-    META(2, "Meta File", "meta", MCMETADialog::create, (pr, pth) -> pr != null && pth.startsWith(pr + "resources" + File.separator)),
-    JSON(2, "JSON File", "json", MCMETADialog::create, (pr, pth) -> true),
-    PACKAGE(3, "Folder", "folder", PackageDialog::create, (pr, pth) -> true);
+    TDN(0, "Trident Function", "trident_file", ".tdn", FileDialog::create, (pr, pth) -> pr != null && pth.startsWith(pr + "datapack" + File.separator), str -> str.matches(Function.ALLOWED_PATH_REGEX)),
+    MODEL(0, "Model", "model", ".json", FileDialog::create, (pr, pth) -> pr != null && pth.startsWith(pr + "resources" + File.separator)),
+    LANG(0, "Language File", "lang", ".json", FileDialog::create, (pr, pth) -> pr != null && pth.startsWith(pr + "resources" + File.separator)),
+    FUNCTION(0, "Function", "function", ".mcfunction", FileDialog::create, (pr, pth) -> pr != null && pth.startsWith(pr + "datapack" + File.separator), str -> str.matches(Function.ALLOWED_PATH_REGEX)),
+    META(1, "Meta File", "meta", ".mcmeta", FileDialog::create, (pr, pth) -> pr != null && pth.startsWith(pr + "resources" + File.separator)),
+    JSON(1, "JSON File", "json", ".json", FileDialog::create, (pr, pth) -> true),
+    FILE(2, "File", "file", "", FileDialog::create, (pr, pth) -> true),
+    PACKAGE(2, "Folder", "folder", null, FolderDialog::create, (pr, pth) -> true),
+    PROJECT(3, "Project", "project", null, ProjectDialog::create, (pr, pth) -> true);
 
     public final int group;
     public final String name;
     public final String icon;
+    public final String extension;
     public final FileTypeDialog dialog;
     public final DirectoryValidator validator;
+    public final Predicate<String> fileNameValidator;
 
-    FileType(int group, String name, String icon, FileTypeDialog dialog, DirectoryValidator validator) {
+    FileType(int group, String name, String icon, String extension, FileTypeDialog dialog, DirectoryValidator validator) {
+        this(group, name, icon, extension, dialog, validator, s -> true);
+    }
+
+    FileType(int group, String name, String icon, String extension, FileTypeDialog dialog, DirectoryValidator validator, Predicate<String> fileNameValidator) {
         this.group = group;
         this.name = name;
         this.icon = icon;
+        this.extension = extension;
         this.dialog = dialog;
         this.validator = validator;
+        this.fileNameValidator = fileNameValidator;
     }
 
     public void create(String destination) {

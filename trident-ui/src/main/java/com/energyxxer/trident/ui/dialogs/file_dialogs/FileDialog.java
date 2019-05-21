@@ -1,13 +1,16 @@
 package com.energyxxer.trident.ui.dialogs.file_dialogs;
 
 import com.energyxxer.trident.files.FileType;
+import com.energyxxer.trident.global.TabManager;
 import com.energyxxer.trident.main.window.TridentWindow;
+import com.energyxxer.trident.ui.modules.FileModuleToken;
 import com.energyxxer.trident.ui.styledcomponents.StyledButton;
 import com.energyxxer.trident.ui.styledcomponents.StyledIcon;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.styledcomponents.StyledTextField;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.FileUtil;
+import com.energyxxer.util.logger.Debug;
 import com.energyxxer.xswing.Padding;
 
 import javax.swing.*;
@@ -16,37 +19,39 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.IOException;
 
-/**
- * Created by User on 2/10/2017.
- */
-public class PackageDialog {
+public class FileDialog {
 
     private static final int WIDTH = 400;
     private static final int HEIGHT = 115;
-    private static final int HEIGHT_ERR = 140;
+    private static final int HEIGHT_ERR = 150;
 
     private static JDialog dialog = new JDialog(TridentWindow.jframe);
     private static JPanel pane;
+    private static StyledIcon icon;
+    private static StyledLabel nameLabel;
 
     private static StyledTextField nameField;
 
     private static JPanel errorPanel;
     private static StyledLabel errorLabel;
+    private static StyledLabel warningLabel;
 
     private static StyledButton okButton;
 
     private static boolean valid = false;
 
+    private static FileType type;
     private static String destination;
 
     private static ThemeListenerManager tlm = new ThemeListenerManager();
 
     static {
         pane = new JPanel(new BorderLayout());
-        pane.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        pane.setPreferredSize(new Dimension(WIDTH,HEIGHT));
         tlm.addThemeChangeListener(t ->
-                pane.setBackground(t.getColor(new Color(235, 235, 235), "NewPackageDialog.background"))
+                pane.setBackground(t.getColor(new Color(235, 235, 235), "NewFileDialog.background"))
         );
 
         //<editor-fold desc="Icon">
@@ -55,12 +60,12 @@ public class PackageDialog {
         iconPanel.setPreferredSize(new Dimension(73, 48));
         iconPanel.add(new Padding(25), BorderLayout.WEST);
         iconPanel.setBorder(new EmptyBorder(0, 0, 0, 2));
-        iconPanel.add(new StyledIcon("folder", 48, 48, Image.SCALE_SMOOTH));
+        iconPanel.add(icon = new StyledIcon("file", 48, 48, Image.SCALE_SMOOTH));
         pane.add(iconPanel, BorderLayout.WEST);
         //</editor-fold>
 
         //<editor-fold desc="Inner Margin">
-        pane.add(new Padding(10), BorderLayout.NORTH);
+        pane.add(new Padding(15), BorderLayout.NORTH);
         pane.add(new Padding(25), BorderLayout.EAST);
         //</editor-fold>
 
@@ -71,15 +76,16 @@ public class PackageDialog {
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
 
         {
+
             JPanel entry = new JPanel(new BorderLayout());
             entry.setOpaque(false);
             entry.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
 
-            StyledLabel instructionsLabel = new StyledLabel("Enter new package name:", "NewPackageDialog");
-            instructionsLabel.setStyle(Font.PLAIN);
-            instructionsLabel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-            instructionsLabel.setHorizontalTextPosition(JLabel.LEFT);
-            entry.add(instructionsLabel, BorderLayout.CENTER);
+            nameLabel = new StyledLabel("Enter new file name:", "NewFileDialog");
+            nameLabel.setStyle(Font.PLAIN);
+            nameLabel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+            nameLabel.setHorizontalTextPosition(JLabel.LEFT);
+            entry.add(nameLabel, BorderLayout.CENTER);
 
             content.add(entry);
         }
@@ -88,7 +94,7 @@ public class PackageDialog {
             entry.setOpaque(false);
             entry.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
 
-            nameField = new StyledTextField("", "NewPackageDialog");
+            nameField = new StyledTextField("", "NewFileDialog");
             nameField.getDocument().addUndoableEditListener(e -> validateInput());
 
             entry.add(nameField, BorderLayout.CENTER);
@@ -101,10 +107,15 @@ public class PackageDialog {
             errorPanel.setOpaque(false);
             errorPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 0));
 
-            errorLabel = new StyledLabel("", "NewPackageDialog.error");
+            errorLabel = new StyledLabel("", "NewFileDialog.error");
             errorLabel.setStyle(Font.BOLD);
             errorLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, errorLabel.getPreferredSize().height));
             errorPanel.add(errorLabel);
+
+            warningLabel = new StyledLabel("", "NewFileDialog.warning");
+            warningLabel.setStyle(Font.BOLD);
+            warningLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, warningLabel.getPreferredSize().height));
+            errorPanel.add(warningLabel);
 
             content.add(errorPanel);
         }
@@ -127,7 +138,6 @@ public class PackageDialog {
         }
 
         pane.add(content, BorderLayout.CENTER);
-
         //</editor-fold>
 
         //<editor-fold desc="Enter key event">
@@ -141,30 +151,48 @@ public class PackageDialog {
         //</editor-fold>
 
         dialog.setContentPane(pane);
+        displayError(null);
+        displayWarning(null);
         dialog.pack();
         dialog.setResizable(false);
 
-        dialog.setTitle("Create New Package");
+        dialog.setTitle("Create New File");
 
         dialog.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
+
     }
 
     private static void submit() {
         if(!valid) return;
-        String name = nameField.getText().trim();
+        String filename;
+        filename = nameField.getText().trim();
+        String path = destination + File.separator + filename;
+        if(!path.endsWith(type.extension)) path += type.extension;
 
-        String path = destination + File.separator + name;
+        File newFile = new File(path);
+        try {
+            boolean successful = newFile.createNewFile();
 
-        new File(path.replace('.',File.separatorChar)).mkdirs();
-        TridentWindow.projectExplorer.refresh();
+            if (!successful) {
+                Debug.log("File creation unsuccessful", Debug.MessageType.WARN);
+                return;
+            }
 
+            if(newFile.exists()) TabManager.openTab(new FileModuleToken(newFile), 0);
+            TridentWindow.projectExplorer.refresh();
+        } catch (IOException x) {
+            x.printStackTrace();
+        }
         dialog.setVisible(false);
     }
 
     public static void create(FileType type, String destination) {
-        PackageDialog.destination = destination;
+        FileDialog.type = type;
+        FileDialog.destination = destination;
         nameField.setText("");
-        validateInput();
+        icon.setIconName(type.icon);
+        dialog.setTitle("Create New " + type.name);
+        nameLabel.setText("Enter new " + type.name + " name:");
 
         Point center = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
         center.x -= dialog.getWidth()/2;
@@ -173,6 +201,8 @@ public class PackageDialog {
         dialog.setLocation(center);
 
         dialog.setVisible(true);
+        displayError(null);
+        displayWarning(null);
     }
 
     private static void validateInput() {
@@ -182,29 +212,34 @@ public class PackageDialog {
             valid = false;
             okButton.setEnabled(false);
             displayError(null);
+            displayWarning(null);
             return;
         }
 
-        //Check if package exists
-        valid = !new File(destination + File.separator + str).exists();
-        if(!valid) displayError("Error: Package '" + str + "' already exists at the destination");
+        if(!str.endsWith(type.extension)) str += type.extension;
 
-        //Check if package name is a valid identifier
+        //Check if file exists
+        valid = !new File(destination + File.separator + str).exists();
+        if(!valid) displayError("Error: File '" + str + "' already exists at the destination");
+
+        //Check if filename is a valid identifier
         if(valid) {
-            valid = true;
+            valid = type.fileNameValidator.test(str);
             if(!valid) {
-                displayError("Error: Not a valid identifier");
+                displayError("Error: Not a valid name for this file type");
             }
         }
 
-        //Check if package name is a valid filename
+        //Check if filename is a valid filename
         if(valid) {
             valid = FileUtil.validateFilename(str);
             if(!valid) {
-                displayError((str.length() > 0) ?  "Error: Not a valid file name" : null);
+                displayError("Error: Not a valid file name");
             }
         }
-        if(valid) displayError(null);
+        if(valid) {
+            displayError(null);
+        }
         okButton.setEnabled(valid);
     }
 
@@ -218,7 +253,20 @@ public class PackageDialog {
             pane.setPreferredSize(new Dimension(WIDTH, HEIGHT_ERR));
             errorPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
             errorLabel.setText(message);
-            errorLabel.revalidate();
+            dialog.pack();
+        }
+    }
+
+    private static void displayWarning(String message) {
+        if(message == null) {
+            pane.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+            errorPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 0));
+            warningLabel.setText("");
+            dialog.pack();
+        } else {
+            pane.setPreferredSize(new Dimension(WIDTH, HEIGHT_ERR));
+            errorPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+            warningLabel.setText(message);
             dialog.pack();
         }
     }

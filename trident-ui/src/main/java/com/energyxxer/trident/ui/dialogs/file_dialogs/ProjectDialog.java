@@ -60,7 +60,7 @@ public class ProjectDialog {
         //</editor-fold>
 
         //<editor-fold desc="Inner Margin">
-        pane.add(new Padding(10), BorderLayout.NORTH);
+        pane.add(new Padding(15), BorderLayout.NORTH);
         pane.add(new Padding(25), BorderLayout.EAST);
         //</editor-fold>
 

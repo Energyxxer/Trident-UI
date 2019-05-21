@@ -1,16 +1,16 @@
 package com.energyxxer.trident.ui.dialogs.file_dialogs;
 
+import com.energyxxer.commodore.functionlogic.functions.Function;
 import com.energyxxer.trident.files.FileType;
-import com.energyxxer.trident.global.TabManager;
+import com.energyxxer.trident.global.temp.projects.Project;
+import com.energyxxer.trident.global.temp.projects.ProjectManager;
 import com.energyxxer.trident.main.window.TridentWindow;
-import com.energyxxer.trident.ui.modules.FileModuleToken;
 import com.energyxxer.trident.ui.styledcomponents.StyledButton;
 import com.energyxxer.trident.ui.styledcomponents.StyledIcon;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.styledcomponents.StyledTextField;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.FileUtil;
-import com.energyxxer.util.logger.Debug;
 import com.energyxxer.xswing.Padding;
 
 import javax.swing.*;
@@ -19,16 +19,16 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.IOException;
+import java.nio.file.Paths;
 
 /**
  * Created by User on 2/10/2017.
  */
-public class UnitDialog {
+public class FolderDialog {
 
     private static final int WIDTH = 400;
     private static final int HEIGHT = 115;
-    private static final int HEIGHT_ERR = 150;
+    private static final int HEIGHT_ERR = 140;
 
     private static JDialog dialog = new JDialog(TridentWindow.jframe);
     private static JPanel pane;
@@ -48,9 +48,9 @@ public class UnitDialog {
 
     static {
         pane = new JPanel(new BorderLayout());
-        pane.setPreferredSize(new Dimension(WIDTH,HEIGHT));
+        pane.setPreferredSize(new Dimension(WIDTH, HEIGHT));
         tlm.addThemeChangeListener(t ->
-            pane.setBackground(t.getColor(new Color(235, 235, 235), "NewUnitDialog.background"))
+                pane.setBackground(t.getColor(new Color(235, 235, 235), "NewPackageDialog.background"))
         );
 
         //<editor-fold desc="Icon">
@@ -59,12 +59,12 @@ public class UnitDialog {
         iconPanel.setPreferredSize(new Dimension(73, 48));
         iconPanel.add(new Padding(25), BorderLayout.WEST);
         iconPanel.setBorder(new EmptyBorder(0, 0, 0, 2));
-        iconPanel.add(new StyledIcon("trident_file", 48, 48, Image.SCALE_SMOOTH));
+        iconPanel.add(new StyledIcon("folder", 48, 48, Image.SCALE_SMOOTH));
         pane.add(iconPanel, BorderLayout.WEST);
         //</editor-fold>
 
         //<editor-fold desc="Inner Margin">
-        pane.add(new Padding(10), BorderLayout.NORTH);
+        pane.add(new Padding(15), BorderLayout.NORTH);
         pane.add(new Padding(25), BorderLayout.EAST);
         //</editor-fold>
 
@@ -75,16 +75,15 @@ public class UnitDialog {
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
 
         {
-
             JPanel entry = new JPanel(new BorderLayout());
             entry.setOpaque(false);
             entry.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
 
-            StyledLabel nameLabel = new StyledLabel("Enter new Trident Function name:", "NewUnitDialog");
-            nameLabel.setStyle(Font.PLAIN);
-            nameLabel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-            nameLabel.setHorizontalTextPosition(JLabel.LEFT);
-            entry.add(nameLabel, BorderLayout.CENTER);
+            StyledLabel instructionsLabel = new StyledLabel("Enter new folder name:", "NewPackageDialog");
+            instructionsLabel.setStyle(Font.PLAIN);
+            instructionsLabel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+            instructionsLabel.setHorizontalTextPosition(JLabel.LEFT);
+            entry.add(instructionsLabel, BorderLayout.CENTER);
 
             content.add(entry);
         }
@@ -93,7 +92,7 @@ public class UnitDialog {
             entry.setOpaque(false);
             entry.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
 
-            nameField = new StyledTextField("", "NewUnitDialog");
+            nameField = new StyledTextField("", "NewPackageDialog");
             nameField.getDocument().addUndoableEditListener(e -> validateInput());
 
             entry.add(nameField, BorderLayout.CENTER);
@@ -106,7 +105,7 @@ public class UnitDialog {
             errorPanel.setOpaque(false);
             errorPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 0));
 
-            errorLabel = new StyledLabel("", "NewUnitDialog.error");
+            errorLabel = new StyledLabel("", "NewPackageDialog.error");
             errorLabel.setStyle(Font.BOLD);
             errorLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, errorLabel.getPreferredSize().height));
             errorPanel.add(errorLabel);
@@ -132,6 +131,7 @@ public class UnitDialog {
         }
 
         pane.add(content, BorderLayout.CENTER);
+
         //</editor-fold>
 
         //<editor-fold desc="Enter key event">
@@ -148,38 +148,27 @@ public class UnitDialog {
         dialog.pack();
         dialog.setResizable(false);
 
-        dialog.setTitle("Create New Unit");
+        dialog.setTitle("Create New Folder");
 
         dialog.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
     }
 
     private static void submit() {
         if(!valid) return;
-        String filename;
-        filename = nameField.getText().trim();
-        String path = destination + File.separator + filename;
-        if(!path.endsWith(".tdn")) path += ".tdn";
+        String name = nameField.getText().trim();
 
-        File newFile = new File(path);
-        try {
-            boolean successful = newFile.createNewFile();
+        String path = destination + File.separator + name;
 
-            if (!successful) {
-                Debug.log("File creation unsuccessful", Debug.MessageType.WARN);
-                return;
-            }
+        new File(path.replace('/',File.separatorChar)).mkdirs();
+        TridentWindow.projectExplorer.refresh();
 
-            if(newFile.exists()) TabManager.openTab(new FileModuleToken(newFile), 0);
-            TridentWindow.projectExplorer.refresh();
-        } catch (IOException x) {
-            x.printStackTrace();
-        }
         dialog.setVisible(false);
     }
 
     public static void create(FileType type, String destination) {
-        UnitDialog.destination = destination;
+        FolderDialog.destination = destination;
         nameField.setText("");
+        validateInput();
 
         Point center = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
         center.x -= dialog.getWidth()/2;
@@ -200,25 +189,34 @@ public class UnitDialog {
             return;
         }
 
-        //Check if file exists
-        valid = !new File(destination + File.separator + str + ".tdn").exists();
-        if(!valid) displayError("Error: File '" + str + ".tdn" + "' already exists at the destination");
+        //Check if package name is a valid filename
+        valid = FileUtil.validatePath(str);
+        if(!valid) {
+            displayError("Error: Not a valid file name");
+        }
 
-        //Check if filename is a valid identifier
+        File file = new File(destination + File.separator + str);
+
+        //Check if package exists
         if(valid) {
-            valid = true; //TODO: check valid function name
+            valid = !file.exists();
+            if (!valid) displayError("Error: Folder '" + str + "' already exists at the destination");
+        }
+
+        //Check if folder name is suited for data packs
+        if(valid) {
+            Project project = ProjectManager.getAssociatedProject(file);
+            String projectDir = (project != null) ? project.getRootDirectory().getPath() + File.separator : null;
+
+            if(projectDir != null && file.toPath().startsWith(Paths.get(projectDir).resolve("datapack"))) {
+                valid = str.replace(File.separator,"/").matches(Function.ALLOWED_PATH_REGEX);
+            }
+
             if(!valid) {
-                displayError("Error: Not a valid identifier");
+                displayError("Error: Not a valid path in data pack");
             }
         }
 
-        //Check if filename is a valid filename
-        if(valid) {
-            valid = FileUtil.validateFilename(str);
-            if(!valid) {
-                displayError("Error: Not a valid file name");
-            }
-        }
         if(valid) displayError(null);
         okButton.setEnabled(valid);
     }
@@ -233,6 +231,7 @@ public class UnitDialog {
             pane.setPreferredSize(new Dimension(WIDTH, HEIGHT_ERR));
             errorPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
             errorLabel.setText(message);
+            errorLabel.revalidate();
             dialog.pack();
         }
     }

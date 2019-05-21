@@ -11,6 +11,9 @@ import java.awt.image.BufferedImage;
  */
 public class StyledIcon extends XIcon {
 
+    private String iconName;
+    private int width, height, hints;
+
     private ThemeListenerManager tlm = new ThemeListenerManager();
 
     public StyledIcon(String icon) {
@@ -18,10 +21,27 @@ public class StyledIcon extends XIcon {
     }
 
     public StyledIcon(String icon, int width, int height, int hints) {
+        this.iconName = icon;
+        this.width = width;
+        this.height = height;
+        this.hints = hints;
+        tlm.addThemeChangeListener(t -> updateIcon());
+    }
+
+    public String getIconName() {
+        return iconName;
+    }
+
+    public void setIconName(String iconName) {
+        this.iconName = iconName;
+        updateIcon();
+    }
+
+    private void updateIcon() {
         if(width + height < 0) {
-            tlm.addThemeChangeListener(t -> this.setImage((BufferedImage) Commons.getIcon(icon).getScaledInstance(width, height, hints)));
+            this.setImage((BufferedImage) Commons.getIcon(iconName).getScaledInstance(width, height, hints));
         } else {
-            tlm.addThemeChangeListener(t -> this.setImage(Commons.getIcon(icon)));
+            this.setImage(Commons.getIcon(iconName));
         }
     }
 }
