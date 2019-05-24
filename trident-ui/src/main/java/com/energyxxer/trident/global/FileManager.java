@@ -17,7 +17,7 @@ public class FileManager {
 
     public static void delete(List<String> files) {
         if(files.size() <= 0) return;
-        StringBuilder subject = new StringBuilder("");
+        StringBuilder subject = new StringBuilder();
 
         if(files.size() > 1) {
 
@@ -59,7 +59,7 @@ public class FileManager {
             for (String key : contents.keySet()) {
                 int count = contents.get(key);
                 if (count == 0) continue;
-                StringBuilder enumeration = new StringBuilder("");
+                StringBuilder enumeration = new StringBuilder();
                 enumeration.append(count);
                 enumeration.append(' ');
                 enumeration.append(key);
