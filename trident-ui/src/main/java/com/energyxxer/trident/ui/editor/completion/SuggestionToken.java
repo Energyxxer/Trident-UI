@@ -129,7 +129,7 @@ public class SuggestionToken implements ModuleToken {
     public static String getIconKeyForTags(Collection<String> tags) {
         if(tags.contains(TridentSuggestionTags.TAG_OBJECTIVE)) {
             return "objective";
-        } else if(tags.contains(TridentSuggestionTags.TAG_ENTITY_FEATURE)) {
+        } else if(tags.contains(TridentSuggestionTags.TAG_ENTITY_COMPONENT)) {
             return "feature";
         } else if(tags.contains(TridentSuggestionTags.TAG_CUSTOM_ENTITY)) {
             return "custom_entity";

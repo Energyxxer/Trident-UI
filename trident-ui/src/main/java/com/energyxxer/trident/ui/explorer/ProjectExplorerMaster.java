@@ -81,7 +81,9 @@ public class ProjectExplorerMaster extends StyledExplorerMaster {
 
     public void openExplorerTree() {
         String openTree = Preferences.get("open_tree",null);
-        Debug.log("Opening: " + openTree);
-        refresh(new ArrayList<>(Arrays.asList(openTree.split(Pattern.quote(File.pathSeparator)))));
+        if(openTree != null) {
+            Debug.log("Opening: " + openTree);
+            refresh(new ArrayList<>(Arrays.asList(openTree.split(Pattern.quote(File.pathSeparator)))));
+        }
     }
 }
