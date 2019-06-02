@@ -11,21 +11,19 @@ import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenuItem;
 import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
+import com.energyxxer.util.logger.Debug;
+import com.energyxxer.xswing.ComponentResizer;
+import com.energyxxer.xswing.OverlayBorderPanel;
 
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+import javax.swing.*;
+import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagLayout;
+import java.awt.*;
 
 /**
  * Created by User on 12/15/2016.
  */
-public class Sidebar extends JPanel {
+public class Sidebar extends OverlayBorderPanel {
 
     private ThemeListenerManager tlm = new ThemeListenerManager();
 
@@ -33,14 +31,19 @@ public class Sidebar extends JPanel {
     private JPanel collapsed = new JPanel(new BorderLayout());
 
     public Sidebar() {
-        super(new BorderLayout());
+        super(new BorderLayout(), new Insets(0, 0, 0, ComponentResizer.DIST));
+        this.setOpaque(false);
     }
 
     {
         expanded.setPreferredSize(new Dimension(350, 5));
+        expanded.setMinimumSize(new Dimension(50, 0));
+        expanded.setMaximumSize(new Dimension(700, 0));
         tlm.addThemeChangeListener(t -> {
             expanded.setBackground(t.getColor(Color.WHITE, "Explorer.background"));
-            expanded.setBorder(BorderFactory.createMatteBorder(0, 0, 0, Math.max(t.getInteger(1, "Explorer.border.thickness"), 0), t.getColor(new Color(200, 200, 200), "Explorer.border.color")));
+            expanded.setBorder(new CompoundBorder(BorderFactory.createEmptyBorder(0, 0, 0, ComponentResizer.DIST), BorderFactory.createMatteBorder(0, 0, 0, Math.max(t.getInteger(1, "Explorer.border.thickness"), 0), t.getColor(new Color(200, 200, 200), "Explorer.border.color"))));
+            expanded.setOpaque(false);
+            Debug.log(expanded.getLayout());
         });
 
         JPanel header = new JPanel(new BorderLayout());
@@ -171,6 +174,9 @@ public class Sidebar extends JPanel {
         } else {
             collapse();
         }
+
+        ComponentResizer sidebarResizer = new ComponentResizer(expanded);
+        sidebarResizer.setResizable(false, false, false, true);
     }
 
     public void expand() {

@@ -13,10 +13,14 @@ import com.energyxxer.trident.ui.styledcomponents.StyledDropdownMenu;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.styledcomponents.StyledTextField;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
+import com.energyxxer.xswing.ComponentResizer;
 import com.energyxxer.xswing.DragHandler;
+import com.energyxxer.xswing.OverlayBorderPanel;
 import com.energyxxer.xswing.UnifiedDocumentListener;
 
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -29,7 +33,7 @@ public class QuickFindDialog extends JDialog implements WindowFocusListener, Act
 
     public static final QuickFindDialog INSTANCE = new QuickFindDialog();
 
-    private JPanel contentPanel = new JPanel(new BorderLayout());
+    private JPanel contentPanel = new OverlayBorderPanel(new BorderLayout(), new Insets(8, 8, 8, 8));
     private StyledTextField field;
     private JScrollPane scrollPane;
     private StyledExplorerMaster explorer = new StyledExplorerMaster();
@@ -50,9 +54,11 @@ public class QuickFindDialog extends JDialog implements WindowFocusListener, Act
 
     private void setup() {
         this.setUndecorated(true);
+        this.setBackground(new Color(0,0,0,1));
 
         this.setContentPane(contentPanel);
-
+        contentPanel.setOpaque(false);
+        contentPanel.setMinimumSize(new Dimension(400, 150));
         contentPanel.setPreferredSize(new Dimension(800, 600));
         JPanel header = new JPanel(new BorderLayout());
 
@@ -98,7 +104,7 @@ public class QuickFindDialog extends JDialog implements WindowFocusListener, Act
         tlm.addThemeChangeListener(t -> {
             titleBar.setBackground(t.getColor(new Color(230, 230, 230), "QuickAccess.header.background"));
             int thickness = Math.max(t.getInteger(1,"QuickAccess.border.thickness"),0);
-            contentPanel.setBorder(BorderFactory.createMatteBorder(thickness, thickness, thickness, thickness, t.getColor(new Color(200, 200, 200), "QuickAccess.border.color")));
+            contentPanel.setBorder(new CompoundBorder(new EmptyBorder(ComponentResizer.DIST, ComponentResizer.DIST, ComponentResizer.DIST, ComponentResizer.DIST), BorderFactory.createMatteBorder(thickness, thickness, thickness, thickness, t.getColor(new Color(200, 200, 200), "QuickAccess.border.color"))));
             field.setBorder(BorderFactory.createMatteBorder(0, 28, 0, 0, new ImageIcon(Commons.getIcon("search_28"))));
         });
 
@@ -122,6 +128,10 @@ public class QuickFindDialog extends JDialog implements WindowFocusListener, Act
 
         Timer timer = new Timer(20, this);
         timer.start();
+
+
+        ComponentResizer resizer = new ComponentResizer(contentPanel, this);
+        resizer.setResizable(true, true, true, true);
     }
 
     private void search() {

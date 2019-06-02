@@ -22,6 +22,7 @@ import com.energyxxer.trident.ui.theme.change.ThemeChangeListener;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.ImageManager;
 import com.energyxxer.util.logger.Debug;
+import com.energyxxer.xswing.OverlayBorderLayout;
 import com.energyxxer.xswing.hints.HintManager;
 
 import javax.swing.*;
@@ -87,10 +88,8 @@ public class TridentWindow {
 
 		jframe.getContentPane().add(toolbar = new Toolbar(), BorderLayout.NORTH);
 
-		JPanel mainContent = new JPanel(new BorderLayout());
+		JPanel mainContent = new JPanel(new OverlayBorderLayout());
 		jframe.getContentPane().add(mainContent, BorderLayout.CENTER);
-		mainContent.add(sidebar = new Sidebar(), BorderLayout.WEST);
-		mainContent.add(editArea = new EditArea(), BorderLayout.CENTER);
 
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher((e) -> {
 			if(e.getID() == KeyEvent.KEY_PRESSED) {
@@ -112,6 +111,7 @@ public class TridentWindow {
 
 		toolBoard = new ToolBoardMaster();
 		mainContent.add(toolBoard, BorderLayout.SOUTH);
+		mainContent.add(sidebar = new Sidebar(), BorderLayout.WEST);
 
 		todoBoard = new TodoBoard(toolBoard);
 		noticeBoard = new NoticeBoard(toolBoard);
@@ -119,6 +119,8 @@ public class TridentWindow {
 		findBoard = new FindBoard(toolBoard);
 		processBoard = new ProcessBoard(toolBoard);
 		toolBoard.setLastOpenedBoard(consoleBoard);
+
+		mainContent.add(editArea = new EditArea(), BorderLayout.CENTER);
 
 		jframe.getContentPane().add(statusBar = new StatusBar(), BorderLayout.SOUTH);
 

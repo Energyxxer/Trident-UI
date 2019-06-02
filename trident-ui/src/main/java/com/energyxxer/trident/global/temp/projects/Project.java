@@ -263,14 +263,4 @@ public class Project {
 	public void setName(String name) {
 		this.name = name;
 	}
-
-    @Deprecated
-	public void setPrefix(String prefix) {
-
-	}
-
-	@Deprecated
-	public void setWorld(String world) {
-
-	}
 }

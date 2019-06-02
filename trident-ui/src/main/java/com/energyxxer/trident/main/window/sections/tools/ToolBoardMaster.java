@@ -5,15 +5,18 @@ import com.energyxxer.trident.ui.navbar.NavigatorMaster;
 import com.energyxxer.trident.ui.styledcomponents.Padding;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
+import com.energyxxer.xswing.ComponentResizer;
+import com.energyxxer.xswing.OverlayBorderPanel;
 import com.energyxxer.xswing.hints.Hint;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
 
-public class ToolBoardMaster extends JPanel {
+public class ToolBoardMaster extends OverlayBorderPanel {
 
     private ThemeListenerManager tlm = new ThemeListenerManager();
 
@@ -25,8 +28,12 @@ public class ToolBoardMaster extends JPanel {
     private ToolBoard lastOpenedBoard = null;
     private boolean open = false;
 
+    private ComponentResizer resizer;
+
     public ToolBoardMaster() {
-        super(new BorderLayout());
+        super(new BorderLayout(), new Insets(ComponentResizer.DIST, 0, 0, 0));
+        this.setOpaque(false);
+        this.setBorder(new EmptyBorder(ComponentResizer.DIST, 0, 0, 0));
 
         tlm.addThemeChangeListener(t -> {
             header.setPreferredSize(new Dimension(0, Math.max(5, t.getInteger(29, "ToolBoard.header.height"))));
@@ -80,6 +87,10 @@ public class ToolBoardMaster extends JPanel {
             navbar.setSelectionLineThickness(Math.max(t.getInteger(2,"ToolBoard.navbar.item.selectionLineThickness","Navigator.item.selectionLineThickness"), 0));
             navbar.repaint();
         });
+
+        resizer = new ComponentResizer(this);
+        resizer.setResizable(true, false, false, false);
+        resizer.setEnabled(false);
     }
 
     public void toggle() {
@@ -104,6 +115,7 @@ public class ToolBoardMaster extends JPanel {
         navbar.revalidate();
         navbar.repaint();
         open = true;
+        resizer.setEnabled(true);
     }
 
     public void close() {
@@ -111,6 +123,7 @@ public class ToolBoardMaster extends JPanel {
         this.revalidate();
         this.repaint();
         open = false;
+        resizer.setEnabled(false);
     }
 
     public ToolBoard getLastOpenedBoard() {

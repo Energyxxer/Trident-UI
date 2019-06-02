@@ -11,10 +11,13 @@ import com.energyxxer.trident.ui.scrollbar.OverlayScrollPane;
 import com.energyxxer.trident.ui.styledcomponents.*;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.logger.Debug;
+import com.energyxxer.xswing.ComponentResizer;
 import com.energyxxer.xswing.DragHandler;
 import com.energyxxer.xswing.UnifiedDocumentListener;
 
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.*;
@@ -64,9 +67,11 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
 
     private void setup() {
         this.setUndecorated(true);
+        this.setBackground(new Color(0,0,0,1));
 
         this.setContentPane(contentPanel);
-
+        contentPanel.setMinimumSize(new Dimension(600, 200));
+        contentPanel.setOpaque(false);
         contentPanel.setPreferredSize(new Dimension(800, 600));
         JPanel header = new JPanel(new BorderLayout());
 
@@ -200,7 +205,7 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
         tlm.addThemeChangeListener(t -> {
             titleBar.setBackground(t.getColor(new Color(230, 230, 230), "FindInPath.header.background"));
             int thickness = Math.max(t.getInteger(1,"FindInPath.border.thickness"),0);
-            contentPanel.setBorder(BorderFactory.createMatteBorder(thickness, thickness, thickness, thickness, t.getColor(new Color(200, 200, 200), "FindInPath.border.color")));
+            contentPanel.setBorder(new CompoundBorder(new EmptyBorder(ComponentResizer.DIST, ComponentResizer.DIST, ComponentResizer.DIST, ComponentResizer.DIST), BorderFactory.createMatteBorder(thickness, thickness, thickness, thickness, t.getColor(new Color(200, 200, 200), "FindInPath.border.color"))));
             field.setBorder(BorderFactory.createMatteBorder(0, 28, 0, 0, new ImageIcon(Commons.getIcon("search_28"))));
             previewPanel.setBackground(t.getColor(new Color(230, 230, 230), "FindInPath.preview.header.background", "FindInPath.header.background"));
             footerPanel.setBackground(t.getColor(new Color(230, 230, 230), "FindInPath.preview.footer.background", "FindInPath.footer.background", "FindInPath.preview.header.background", "FindInPath.header.background"));
@@ -211,6 +216,9 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
 
         Timer timer = new Timer(20, this);
         timer.start();
+
+        ComponentResizer resizer = new ComponentResizer(contentPanel, this);
+        resizer.setResizable(true, true, true, true);
     }
 
     private void search() {

@@ -9,15 +9,17 @@ import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.ImageManager;
 import com.energyxxer.util.StringUtil;
 import com.energyxxer.xswing.ComponentResizer;
+import com.energyxxer.xswing.OverlayBorderLayout;
+import com.energyxxer.xswing.OverlayBorderPanel;
 import com.energyxxer.xswing.XFileField;
 
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.io.File;
 
 public class ProjectProperties {
-	
-	//private static final Font FIELD_FONT = new Font("Consolas", 0, 12);
 
 	private static Theme t;
 
@@ -32,7 +34,7 @@ public class ProjectProperties {
 		StyledTextField cPrefix;
 		StyledFileField cWorld;
 		
-		JPanel pane = new JPanel(new BorderLayout());
+		JPanel pane = new JPanel(new OverlayBorderLayout());
 		//JButton okay = new JButton("OK");
 		//JButton cancel = new JButton("Cancel");
 		
@@ -40,23 +42,26 @@ public class ProjectProperties {
 		pane.setBackground(t.getColor(new Color(235, 235, 235), "ProjectProperties.background"));
 		
 		{
-			JPanel sidebar = new JPanel(new BorderLayout());
+			JPanel sidebar = new OverlayBorderPanel(new BorderLayout(), new Insets(0, 0, 0, ComponentResizer.DIST));
 
-			ComponentResizer sidebarResizer = new ComponentResizer(sidebar);
-			sidebarResizer.setResizable(false, false, false, true);
+			ComponentResizer resizer = new ComponentResizer(sidebar);
+			sidebar.setMinimumSize(new Dimension(25, 1));
+			sidebar.setMaximumSize(new Dimension(400, 1));
+			resizer.setResizable(false, false, false, true);
 
 			String[] sections = new String[] { "General", "TridentCompiler", "TridentEditorModule", "Code Style", "Resources" };
 
 			StyledList<String> navigator = new StyledList<>(sections, "ProjectProperties");
 			sidebar.setBackground(navigator.getBackground());
-			sidebar.setBorder(BorderFactory.createMatteBorder(0, 0, 0, Math.max(t.getInteger(1,"ProjectProperties.content.border.thickness"),0), t.getColor(new Color(200, 200, 200), "ProjectProperties.content.border.color")));
+			sidebar.setOpaque(false);
+			sidebar.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 0, ComponentResizer.DIST), BorderFactory.createMatteBorder(0, 0, 0, Math.max(t.getInteger(1,"ProjectProperties.content.border.thickness"),0), t.getColor(new Color(200, 200, 200), "ProjectProperties.content.border.color"))));
 			navigator.setPreferredSize(new Dimension(200,500));
 
 			sidebar.add(navigator, BorderLayout.CENTER);
 			
 			pane.add(sidebar, BorderLayout.WEST);
 		}
-		
+
 		JPanel contentPane = new JPanel(new BorderLayout());
 		contentPane.setBackground(t.getColor(new Color(235, 235, 235), "ProjectProperties.content.background"));
 		pane.add(contentPane, BorderLayout.CENTER);
@@ -168,7 +173,7 @@ public class ProjectProperties {
 					{
 						JLabel label = new JLabel("World Output:");
 						label.setForeground(t.getColor(Color.BLACK, "ProjectProperties.content.label.foreground"));
-						label.setFont(new Font(t.getString("ProjectProperties.content.label.font","General.font","default:Tahoma"),1,12));
+						label.setFont(new Font(t.getString("ProjectProperties.content.label.font","General.font","default:Tahoma"), Font.BOLD,12));
 						content.add(label);
 					}
 					File file = new File(MinecraftUtils.getMinecraftDir() + File.separator + "saves");
@@ -204,8 +209,8 @@ public class ProjectProperties {
 				buttons.add(okay);
 
 				okay.addActionListener(e -> {
-					project.setPrefix(cPrefix.getText());
-					project.setWorld(cWorld.getFile().getAbsolutePath());
+					//project.setPrefix(cPrefix.getText());
+					//project.setWorld(cWorld.getFile().getAbsolutePath());
 					project.updateConfig();
 
 					dialog.setVisible(false);

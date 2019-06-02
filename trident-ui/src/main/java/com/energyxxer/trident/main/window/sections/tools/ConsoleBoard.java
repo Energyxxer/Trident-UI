@@ -7,17 +7,11 @@ import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.logger.Debug;
 import com.energyxxer.util.out.ConsoleOutputStream;
 
-import javax.swing.BorderFactory;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
+import javax.swing.*;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -35,7 +29,6 @@ public class ConsoleBoard extends ToolBoard {
         super(parent);
         this.setLayout(new BorderLayout());
         this.setPreferredSize(new Dimension(0, CONSOLE_HEIGHT));
-        tlm.addThemeChangeListener(t -> this.setBorder(BorderFactory.createMatteBorder(Math.max(t.getInteger(1, "Console.header.border.thickness"),0), 0, 0, 0, t.getColor(new Color(200, 200, 200), "Console.header.border.color"))));
 
         //JPanel consoleHeader = new JPanel(new BorderLayout());
         //tlm.addThemeChangeListener(t -> consoleHeader.setBackground(t.getColor(new Color(235, 235, 235), "Console.header.background")));
