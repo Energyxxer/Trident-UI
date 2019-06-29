@@ -12,7 +12,6 @@ public class ProgressBar extends JPanel implements ThemeChangeListener {
     private int height = 5;
 
     private float scrollingProgress = 0.0f;
-    private float scrollingDelta = 0.006f;
 
     public ProgressBar() {
         this.setOpaque(false);
@@ -39,8 +38,7 @@ public class ProgressBar extends JPanel implements ThemeChangeListener {
         g.setColor(this.getForeground());
 
         if(progress == -1) {
-            scrollingProgress += scrollingDelta;
-            if(scrollingProgress >= 1) scrollingProgress -= 1.5;
+            scrollingProgress = ((float)(System.currentTimeMillis()%1000)/500)-0.5f;
             g.fillRect((int)(width * scrollingProgress), y, width / 2, height);
             repaint();
         } else {
