@@ -124,6 +124,7 @@ public class ToolBoardMaster extends OverlayBorderPanel {
         this.repaint();
         open = false;
         resizer.setEnabled(false);
+        this.setPreferredSize(null);
     }
 
     public ToolBoard getLastOpenedBoard() {
