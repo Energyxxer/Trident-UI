@@ -26,7 +26,11 @@ public class ProjectManager {
 		for(File file : fileList) {
 			if (file.isDirectory() && new File(file.getAbsolutePath() + File.separator + TridentCompiler.PROJECT_FILE_NAME).exists()) {
 				//files.add(file);
-				loadedProjects.add(new Project(new File(file.getAbsolutePath())));
+				try {
+					loadedProjects.add(new Project(new File(file.getAbsolutePath())));
+				} catch(RuntimeException x) {
+					x.printStackTrace();
+				}
 			}
 		}
 	}

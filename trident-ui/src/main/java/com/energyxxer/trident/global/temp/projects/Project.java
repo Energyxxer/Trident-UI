@@ -108,7 +108,7 @@ public class Project {
             try {
                 this.config = new Gson().fromJson(new FileReader(config), JsonObject.class);
                 return;
-            } catch (FileNotFoundException x) {
+            } catch (FileNotFoundException | JsonParseException x) {
                 //I literally *just* checked if the file exists beforehand. Damn Java and its trust issues
                 x.printStackTrace();
             }
