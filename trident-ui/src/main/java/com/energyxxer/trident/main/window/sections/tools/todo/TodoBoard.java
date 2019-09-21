@@ -1,9 +1,13 @@
 package com.energyxxer.trident.main.window.sections.tools.todo;
 
+import com.energyxxer.crossbow.compiler.util.CrossbowProjectSummary;
+import com.energyxxer.enxlex.lexical_analysis.summary.Todo;
 import com.energyxxer.enxlex.lexical_analysis.token.TokenSection;
-import com.energyxxer.trident.compiler.util.Todo;
+import com.energyxxer.trident.compiler.util.TridentProjectSummary;
+import com.energyxxer.trident.global.temp.projects.CrossbowProject;
 import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
+import com.energyxxer.trident.global.temp.projects.TridentProject;
 import com.energyxxer.trident.main.window.sections.quick_find.StyledExplorerMaster;
 import com.energyxxer.trident.main.window.sections.tools.ToolBoard;
 import com.energyxxer.trident.main.window.sections.tools.ToolBoardMaster;
@@ -22,6 +26,7 @@ import com.energyxxer.xswing.hints.Hint;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class TodoBoard extends ToolBoard {
@@ -89,10 +94,16 @@ public class TodoBoard extends ToolBoard {
     public void refresh() {
         explorer.clear();
         for(Project project : ProjectManager.getLoadedProjects()) {
-            if(project.getSummary() != null && !project.getSummary().getTodos().isEmpty()) {
+            if(project.getSummary() != null) {
+                ArrayList<Todo> todos = null;
+                if(project instanceof TridentProject) todos = ((TridentProjectSummary) project.getSummary()).getTodos();
+                else if(project instanceof CrossbowProject) todos = ((CrossbowProjectSummary) project.getSummary()).getTodos();
+
+                if(todos == null || todos.isEmpty()) return;
+
                 FindResults.ProjectResult projectResult = new FindResults.ProjectResult(project.getRootDirectory());
 
-                for(Todo todo : project.getSummary().getTodos()) {
+                for(Todo todo : todos) {
                     StringBounds bounds = todo.getToken().getStringBounds();
                     TokenSection section = null;
                     for(Map.Entry<TokenSection, String> entry : todo.getToken().getSubSections().entrySet()) {
@@ -102,10 +113,10 @@ public class TodoBoard extends ToolBoard {
                         }
                     }
                     FileOccurrence occurrence = new FileOccurrence(
-                            new File(todo.getToken().file), //correct
-                            bounds.start.index + section.start, //correct
-                            section.length, //correct
-                            bounds.start.line, //correct
+                            new File(todo.getToken().file),
+                            bounds.start.index + section.start,
+                            section.length,
+                            bounds.start.line,
                             todo.getText(),
                             0);
                     projectResult.insertResult(occurrence);

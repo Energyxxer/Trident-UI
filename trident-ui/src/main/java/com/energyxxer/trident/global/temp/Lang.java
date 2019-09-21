@@ -1,6 +1,8 @@
 package com.energyxxer.trident.global.temp;
 
 import com.energyxxer.commodore.standard.StandardDefinitionPacks;
+import com.energyxxer.crossbow.compiler.CrossbowCompiler;
+import com.energyxxer.crossbow.compiler.lexer.CrossbowLexerProfile;
 import com.energyxxer.enxlex.lexical_analysis.EagerLexer;
 import com.energyxxer.enxlex.lexical_analysis.LazyLexer;
 import com.energyxxer.enxlex.lexical_analysis.Lexer;
@@ -35,10 +37,11 @@ import java.util.List;
  * Created by User on 2/9/2017.
  */
 public enum Lang {
-    JSON(JSONLexerProfile::new, "json", "mcmeta", TridentCompiler.PROJECT_FILE_NAME.substring(1)),
+    JSON(JSONLexerProfile::new, "json", "mcmeta", TridentCompiler.PROJECT_FILE_NAME.substring(1), CrossbowCompiler.PROJECT_FILE_NAME.substring(1)),
     PROPERTIES(PropertiesLexerProfile::new, "properties", "lang"),
     MCFUNCTION(MCFunctionLexerProfile::new, () -> MCFunctionProductions.FILE, "mcfunction"),
     TRIDENT(TridentLexerProfile.INSTANCE::getValue, Commons::getActiveTridentProductions, "tdn"),
+    CROSSBOW(CrossbowLexerProfile.INSTANCE::getValue, Commons::getActiveCrossbowProductions, "cbw"),
     NBTTM(() -> new NBTTMLexerProfile(StandardDefinitionPacks.MINECRAFT_JAVA_LATEST_SNAPSHOT), () -> NBTTMProductions.FILE, "nbttm");
 
     Factory<LexerProfile> factory;

@@ -1,19 +1,25 @@
 package com.energyxxer.trident.ui.editor;
 
+import com.energyxxer.crossbow.compiler.lexer.summaries.CrossbowSummaryModule;
+import com.energyxxer.crossbow.compiler.util.CrossbowProjectSummary;
 import com.energyxxer.enxlex.lexical_analysis.summary.SummaryModule;
 import com.energyxxer.enxlex.lexical_analysis.token.Token;
 import com.energyxxer.enxlex.lexical_analysis.token.TokenSection;
 import com.energyxxer.enxlex.suggestions.SuggestionModule;
 import com.energyxxer.trident.compiler.lexer.summaries.TridentSummaryModule;
+import com.energyxxer.trident.compiler.util.TridentProjectSummary;
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.temp.Lang;
+import com.energyxxer.trident.global.temp.projects.CrossbowProject;
 import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
+import com.energyxxer.trident.global.temp.projects.TridentProject;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.main.window.sections.EditArea;
 import com.energyxxer.trident.ui.editor.behavior.AdvancedEditor;
 import com.energyxxer.trident.ui.editor.completion.SuggestionDialog;
 import com.energyxxer.trident.ui.editor.inspector.Inspector;
+import com.energyxxer.util.logger.Debug;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
@@ -105,27 +111,39 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
     }
 
     private void highlightSyntax() {
+        Debug.log("is parent syntax null?");
         if(parent.syntax == null) return;
+        Debug.log("parent syntax is not null");
 
         Style defaultStyle = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
 
         String text = getText();
 
         Lang lang = Lang.getLangForFile(parent.file.getPath());
+        Debug.log(lang);
         Project project = ProjectManager.getAssociatedProject(parent.file);
+        Debug.log(project);
 
-        SuggestionModule suggestionModule = lang == Lang.TRIDENT && project != null ? new SuggestionModule(this.getCaretWordPosition(), this.getCaretPosition()) : null;
-        SummaryModule summaryModule = lang == Lang.TRIDENT && project != null  ? new TridentSummaryModule() : null;
+        SuggestionModule suggestionModule = (lang == Lang.TRIDENT || lang == Lang.CROSSBOW) && project != null ? new SuggestionModule(this.getCaretWordPosition(), this.getCaretPosition()) : null;
+        SummaryModule summaryModule = project != null ? (lang == Lang.TRIDENT ? new TridentSummaryModule() : (lang == Lang.CROSSBOW ? new CrossbowSummaryModule() : null)) : null;
 
         Lang.LangAnalysisResponse analysis = lang != null ? lang.analyze(parent.file, text, suggestionModule, summaryModule) : null;
         if(analysis == null) return;
+        Debug.log("analysis running");
 
-        suggestionBox.setSummary(((TridentSummaryModule) analysis.lexer.getSummaryModule()));
+        suggestionBox.setSummary(analysis.lexer.getSummaryModule());
         if(analysis.lexer.getSuggestionModule() != null) {
             if(project != null) {
-                ((TridentSummaryModule) analysis.lexer.getSummaryModule()).setParentSummary(project.getSummary());
-                if(project.getSummary() != null) {
-                    ((TridentSummaryModule) analysis.lexer.getSummaryModule()).setFileLocation(project.getSummary().getLocationForFile(parent.file));
+                if(project instanceof TridentProject) {
+                    ((TridentSummaryModule) analysis.lexer.getSummaryModule()).setParentSummary((TridentProjectSummary) project.getSummary());
+                    if(project.getSummary() != null) {
+                        ((TridentSummaryModule) analysis.lexer.getSummaryModule()).setFileLocation(((TridentProject)project).getSummary().getLocationForFile(parent.file));
+                    }
+                } else if(project instanceof CrossbowProject) {
+                    ((CrossbowSummaryModule) analysis.lexer.getSummaryModule()).setParentSummary((CrossbowProjectSummary) project.getSummary());
+                    if(project.getSummary() != null) {
+                        ((CrossbowSummaryModule) analysis.lexer.getSummaryModule()).setFileLocation(((CrossbowProject)project).getSummary().getLocationForFile(parent.file));
+                    }
                 }
             }
             suggestionBox.showSuggestions(analysis.lexer.getSuggestionModule());

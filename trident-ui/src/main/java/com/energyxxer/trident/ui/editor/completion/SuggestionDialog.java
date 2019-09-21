@@ -1,8 +1,8 @@
 package com.energyxxer.trident.ui.editor.completion;
 
+import com.energyxxer.enxlex.lexical_analysis.summary.SummaryModule;
 import com.energyxxer.enxlex.suggestions.Suggestion;
 import com.energyxxer.enxlex.suggestions.SuggestionModule;
-import com.energyxxer.trident.compiler.lexer.summaries.TridentSummaryModule;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.main.window.sections.quick_find.StyledExplorerMaster;
 import com.energyxxer.trident.ui.editor.TridentEditorComponent;
@@ -34,7 +34,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
 
     private ThemeListenerManager tlm = new ThemeListenerManager();
 
-    private TridentSummaryModule summary = null;
+    private SummaryModule summary = null;
 
     private boolean locked = false;
     private boolean forceLocked = false;
@@ -281,11 +281,11 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         }
     }
 
-    public TridentSummaryModule getSummary() {
+    public SummaryModule getSummary() {
         return summary;
     }
 
-    public void setSummary(TridentSummaryModule summary) {
+    public void setSummary(SummaryModule summary) {
         this.summary = summary;
     }
 

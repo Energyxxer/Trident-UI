@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Objects;
 
 public class FileModuleToken implements ModuleToken {
     public static ModuleTokenFactory<FileModuleToken> factory = str -> {
@@ -65,7 +64,10 @@ public class FileModuleToken implements ModuleToken {
     }
 
     public static boolean isProjectRoot(File file) {
-        return file.isDirectory() && Objects.requireNonNull(file.listFiles(f -> TridentCompiler.PROJECT_FILE_NAME.equals(f.getName()))).length > 0;
+        if(!file.isDirectory()) return false;
+        if(file.toPath().resolve(".tdnproj").toFile().exists()) return true;
+        if(file.toPath().resolve(".cbwproj").toFile().exists()) return true;
+        return false;
     }
 
     @Override
@@ -88,7 +90,11 @@ public class FileModuleToken implements ModuleToken {
         if(overrideIconName != null) return Commons.getIcon(overrideIconName);
         if(file.isDirectory()) {
             if(isProjectRoot) {
-                return Commons.getIcon("project");
+                if(file.toPath().resolve(".cbwproj").toFile().exists()) {
+                    return Commons.getIcon("project_cbw");
+                } else {
+                    return Commons.getIcon("project");
+                }
             } else if(isProjectRoot(file.getParentFile())) {
                 if(file.getName().equals("datapack")) return Commons.getIcon("data");
                 if(file.getName().equals("resources")) return Commons.getIcon("resources");
@@ -110,6 +116,8 @@ public class FileModuleToken implements ModuleToken {
             switch(extension) {
                 case ".tdn":
                     return Commons.getIcon("trident_file");
+                case ".cbw":
+                    return Commons.getIcon("crossbow_file");
                 case ".mcfunction":
                     return Commons.getIcon("function");
                 case ".mp3":

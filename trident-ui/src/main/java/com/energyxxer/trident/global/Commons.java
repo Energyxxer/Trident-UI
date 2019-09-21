@@ -123,7 +123,15 @@ public class Commons {
         return null;
     }
 
+    public static LazyTokenPatternMatch getActiveCrossbowProductions() {
+        Project activeProject = getActiveProject();
+        if(activeProject != null) {
+            return activeProject.getFileStructure();
+        }
+        return null;
+    }
+
     public static Image getProjectIcon() {
-        return Commons.getIcon("project").getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+        return Commons.getIcon("project_cbw").getScaledInstance(16, 16, Image.SCALE_SMOOTH);
     }
 }

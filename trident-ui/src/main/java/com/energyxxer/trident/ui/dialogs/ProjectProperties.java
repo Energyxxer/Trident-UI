@@ -131,7 +131,7 @@ public class ProjectProperties {
 					prefixFields.setOpaque(false);
 					prefixFields.setAlignmentX(Component.LEFT_ALIGNMENT);
 					{
-						cPrefix = new StyledTextField(project.getPrefix(),"ProjectProperties.content");
+						cPrefix = new StyledTextField("null","ProjectProperties.content");
 						cPrefix.setPreferredSize(new Dimension(150,25));
 						//cPrefix.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -177,7 +177,7 @@ public class ProjectProperties {
 						content.add(label);
 					}
 					File file = new File(MinecraftUtils.getMinecraftDir() + File.separator + "saves");
-					if(project.getWorld() != null) file = new File(project.getWorld());
+					//if(project.getWorld() != null) file = new File(project.getWorld());
 					cWorld = new StyledFileField(file,"ProjectProperties.content");
 					cWorld.setDialogTitle("Open world...");
 					cWorld.setOperation(XFileField.OPEN_DIRECTORY);

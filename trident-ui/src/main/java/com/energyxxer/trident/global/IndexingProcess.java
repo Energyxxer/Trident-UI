@@ -1,7 +1,11 @@
 package com.energyxxer.trident.global;
 
-import com.energyxxer.trident.compiler.util.ProjectSummarizer;
+import com.energyxxer.crossbow.compiler.util.CrossbowProjectSummarizer;
+import com.energyxxer.enxlex.lexical_analysis.summary.ProjectSummarizer;
+import com.energyxxer.trident.compiler.util.TridentProjectSummarizer;
+import com.energyxxer.trident.global.temp.projects.CrossbowProject;
 import com.energyxxer.trident.global.temp.projects.Project;
+import com.energyxxer.trident.global.temp.projects.TridentProject;
 import com.energyxxer.util.logger.Debug;
 import com.energyxxer.util.processes.AbstractProcess;
 
@@ -14,16 +18,29 @@ public class IndexingProcess extends AbstractProcess {
     public IndexingProcess(Project project) {
         super("Indexing");
         this.project = project;
-        summarizer = new ProjectSummarizer(project.getRootDirectory());
-        summarizer.setSourceCache(project.getSourceCache());
-        summarizer.addCompletionListener(() -> {
-            Debug.log("Finished indexing project: " + project.getName());
-            project.updateSourceCache(summarizer.getSourceCache());
-            project.updateSummary(summarizer.getSummary());
-            this.updateStatus("");
-            this.finalizeProcess(true);
-        });
-        initializeThread(this::startSummarizer);
+        if(project instanceof TridentProject) {
+            summarizer = new TridentProjectSummarizer(project.getRootDirectory());
+            summarizer.setSourceCache(project.getSourceCache());
+            summarizer.addCompletionListener(() -> {
+                Debug.log("Finished indexing project: " + project.getName());
+                project.updateServerDataCache(summarizer.getSourceCache());
+                project.updateSummary(summarizer.getSummary());
+                this.updateStatus("");
+                this.finalizeProcess(true);
+            });
+            initializeThread(this::startSummarizer);
+        } else if(project instanceof CrossbowProject) {
+            summarizer = new CrossbowProjectSummarizer(project.getRootDirectory());
+            summarizer.setSourceCache(project.getSourceCache());
+            summarizer.addCompletionListener(() -> {
+                Debug.log("Finished indexing project: " + project.getName());
+                project.updateServerDataCache(summarizer.getSourceCache());
+                project.updateSummary(summarizer.getSummary());
+                this.updateStatus("");
+                this.finalizeProcess(true);
+            });
+            initializeThread(this::startSummarizer);
+        }
     }
 
     private void startSummarizer() {

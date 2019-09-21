@@ -24,8 +24,8 @@ public class TridentCompilerWrapper extends AbstractProcess {
             if (compiler.getReport().getTotal() > 0) TridentWindow.noticeBoard.open();
             compiler.getReport().getWarnings().forEach(Console.warn::println);
             compiler.getReport().getErrors().forEach(Console.err::println);
-            project.updateSourceCache(compiler.getSourceCache());
-            project.updateResourceCache(compiler.getOutResourceCache());
+            project.updateServerDataCache(compiler.getSourceCache());
+            project.updateClientDataCache(compiler.getOutResourceCache());
         });
     }
 

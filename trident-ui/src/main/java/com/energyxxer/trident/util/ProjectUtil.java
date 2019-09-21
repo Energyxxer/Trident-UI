@@ -19,7 +19,7 @@ public class ProjectUtil {
                         FileUtil.stripExtension(
                                 FileUtil.getRelativePath(
                                         file,
-                                        associatedProject.getDataPackRoot()
+                                        associatedProject.getServerDataRoot()
                                 )
                         ) : "src"
         ).replace(File.separator,".");

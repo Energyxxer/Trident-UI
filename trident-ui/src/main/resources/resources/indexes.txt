@@ -10,4 +10,5 @@ Syntax Themes:
 -Properties Syntax Light
 -MCFunction Syntax Dark
 -Trident Syntax Dark
+-Crossbow Syntax Dark
 -NBTTM Syntax Dark

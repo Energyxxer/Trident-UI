@@ -153,14 +153,14 @@ public class QuickFindDialog extends JDialog implements WindowFocusListener, Act
                     if(project != null) startFile = project.getRootDirectory();
                     break;
                 }
-                case 2: { //"Project Data"
+                case 2: { //"Project Server Data"
                     Project project = Commons.getActiveProject();
-                    if(project != null) startFile = project.getDataPackRoot();
+                    if(project != null) startFile = project.getServerDataRoot();
                     break;
                 }
-                case 3: { //"Project Resources"
+                case 3: { //"Project Client Data"
                     Project project = Commons.getActiveProject();
-                    if(project != null) startFile = project.getResourcePackRoot();
+                    if(project != null) startFile = project.getClientDataRoot();
                     break;
                 }
             }

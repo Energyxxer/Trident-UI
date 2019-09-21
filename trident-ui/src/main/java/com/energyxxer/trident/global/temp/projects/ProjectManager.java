@@ -1,5 +1,6 @@
 package com.energyxxer.trident.global.temp.projects;
 
+import com.energyxxer.crossbow.compiler.CrossbowCompiler;
 import com.energyxxer.trident.compiler.TridentCompiler;
 import com.energyxxer.util.FileUtil;
 
@@ -22,14 +23,20 @@ public class ProjectManager {
 			return;
 		}
 
-		//ArrayList<File> files = new ArrayList<>();
 		for(File file : fileList) {
-			if (file.isDirectory() && new File(file.getAbsolutePath() + File.separator + TridentCompiler.PROJECT_FILE_NAME).exists()) {
-				//files.add(file);
-				try {
-					loadedProjects.add(new Project(new File(file.getAbsolutePath())));
-				} catch(RuntimeException x) {
-					x.printStackTrace();
+			if(file.isDirectory()) {
+				if(file.toPath().resolve(TridentCompiler.PROJECT_FILE_NAME).toFile().exists()) {
+					try {
+						loadedProjects.add(new TridentProject(new File(file.getAbsolutePath())));
+					} catch(RuntimeException x) {
+						x.printStackTrace();
+					}
+				} else if(file.toPath().resolve(CrossbowCompiler.PROJECT_FILE_NAME).toFile().exists()) {
+					try {
+						loadedProjects.add(new CrossbowProject(new File(file.getAbsolutePath())));
+					} catch(RuntimeException x) {
+						x.printStackTrace();
+					}
 				}
 			}
 		}
@@ -44,18 +51,8 @@ public class ProjectManager {
 		return null;
 	}
 	
-	public static void setIconFor(File file, String value) {
-		for(Project project : loadedProjects) {
-			project.setIconFor(file, value);
-		}
-	}
-	
 	public static String getIconFor(File file) {
 		Project project = getAssociatedProject(file);
-		if(project != null) {
-			String icon = project.getIconFor(file);
-			if(icon != null) return icon;
-		}
 		String filename = file.getName();
 		if(file.isFile()) {
 			if(filename.endsWith(".json")) {
@@ -105,7 +102,7 @@ blockstates/*.json = blockstate
 	}
 	
 	public static void create(String name) {
-		Project p = new Project(name);
+		Project p = new TridentProject(name);
 		p.createNew();
 		loadedProjects.add(p);
 	}
@@ -120,22 +117,7 @@ blockstates/*.json = blockstate
 		File newFile = new File(pathToParent + newName + extension);
 		
 		boolean renamed = file.renameTo(newFile);
-		
-		
-		if(renamed) {
-			for(Project project : loadedProjects) {
 
-				String oldRPath = project.getRelativePath(new File(path));
-				String newRPath = project.getRelativePath(newFile);
-				
-				if(oldRPath != null && project.icons.containsKey(oldRPath.intern())) {
-					project.icons.put(newRPath.intern(), project.icons.get(oldRPath.intern()));
-					project.icons.remove(oldRPath.intern());
-					project.updateConfig();
-				}
-			}
-		}
-		
 		return renamed;
 	}
 
