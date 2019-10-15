@@ -2,7 +2,9 @@ package com.energyxxer.trident.ui.editor;
 
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.temp.Lang;
+import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
+import com.energyxxer.trident.global.temp.projects.TridentProject;
 import com.energyxxer.trident.main.TridentUI;
 import com.energyxxer.trident.main.window.sections.editor_search.FindAndReplaceBar;
 import com.energyxxer.trident.ui.Tab;
@@ -49,6 +51,8 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
 
     private Lazy<FindAndReplaceBar> searchBar = new Lazy<>(() -> new FindAndReplaceBar(this));
     private boolean searchBarVisible = false;
+
+    long highlightTime = 0;
 
     //public long lastToolTip = new Date().getTime();
 
@@ -382,6 +386,12 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
 
     @Override
     public void onSelect() {
+        Project project = ProjectManager.getAssociatedProject(file);
+        if(project instanceof TridentProject) {
+            if(((TridentProject) project).instantiationTime >= highlightTime) {
+                editorComponent.highlight();
+            }
+        }
     }
 
     @Override

@@ -25,7 +25,7 @@ import java.util.Map;
 public class TridentProject implements Project {
 
     private File rootDirectory;
-
+    public final long instantiationTime;
     private File datapackRoot;
     private File resourceRoot;
     private String name;
@@ -50,6 +50,7 @@ public class TridentProject implements Project {
     private TridentProjectSummary summary = null;
 
     public TridentProject(String name) {
+        instantiationTime = System.currentTimeMillis();
         Path rootPath = Paths.get(ProjectManager.getWorkspaceDir()).resolve(name);
         this.rootDirectory = rootPath.toFile();
 
@@ -77,6 +78,7 @@ public class TridentProject implements Project {
     }
 
     public TridentProject(File rootDirectory) {
+        instantiationTime = System.currentTimeMillis();
         this.rootDirectory = rootDirectory;
 
         datapackRoot = rootDirectory.toPath().resolve("datapack").toFile();

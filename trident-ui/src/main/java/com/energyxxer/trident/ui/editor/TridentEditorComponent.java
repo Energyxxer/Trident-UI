@@ -201,6 +201,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
     }
 
     void highlight() {
+        parent.highlightTime = System.currentTimeMillis();
         lastEdit = new Date().getTime();
     }
 

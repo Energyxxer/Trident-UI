@@ -18,9 +18,9 @@ public class VersionFeatureResources {
         if(files != null) {
             for(File file : files) {
                 if(file.isFile() && file.getName().endsWith(".json")) {
-                    try {
-                        VersionFeatureManager.loadFeatureMap(new FileReader(file));
-                    } catch(Exception e) {
+                    try (FileReader fr = new FileReader(file)) {
+                        VersionFeatureManager.loadFeatureMap(fr);
+                    } catch (Exception e) {
                         Debug.log(e.getMessage(), Debug.MessageType.ERROR);
                     }
                 }

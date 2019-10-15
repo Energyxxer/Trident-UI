@@ -5,6 +5,7 @@ import com.energyxxer.trident.global.Resources;
 import com.energyxxer.trident.global.TabManager;
 import com.energyxxer.trident.main.window.sections.search_path.SearchPathDialog;
 import com.energyxxer.trident.ui.Tab;
+import com.energyxxer.trident.ui.commodoreresources.DefinitionUpdateProcess;
 import com.energyxxer.trident.ui.editor.TridentEditorModule;
 
 import javax.swing.*;
@@ -63,6 +64,11 @@ public class ActionManager {
                 "Temporary Indexing", "Summarize active project",
                 KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.ALT_DOWN_MASK),
                 Commons::indexActive)
+        );
+        actions.add(new ProgramAction(
+                "Check for updates", "Check for definition updates",
+                KeyStroke.getKeyStroke(KeyEvent.VK_U, getPlatformControlMask()),
+                DefinitionUpdateProcess::tryUpdate)
         );
     }
 

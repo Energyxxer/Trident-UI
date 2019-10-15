@@ -1,5 +1,6 @@
 package com.energyxxer.trident.main.window;
 
+import com.energyxxer.trident.global.Resources;
 import com.energyxxer.trident.global.Status;
 import com.energyxxer.trident.global.TabManager;
 import com.energyxxer.trident.main.TridentUI;
@@ -232,6 +233,7 @@ public class TridentWindow {
 		Debug.log("Terminating...");
 		TabManager.saveOpenTabs();
 		projectExplorer.saveExplorerTree();
+		Resources.saveAll();
 		jframe.dispose();
 		System.exit(0);
 	}
