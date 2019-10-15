@@ -1,7 +1,7 @@
 package com.energyxxer.trident.global.temp.projects;
 
 import com.energyxxer.commodore.module.CommandModule;
-import com.energyxxer.commodore.standard.StandardDefinitionPacks;
+import com.energyxxer.commodore.versioning.JavaEditionVersion;
 import com.energyxxer.enxlex.lexical_analysis.summary.ProjectSummary;
 import com.energyxxer.enxlex.pattern_matching.ParsingSignature;
 import com.energyxxer.enxlex.pattern_matching.matching.lazy.LazyTokenPatternMatch;
@@ -9,6 +9,7 @@ import com.energyxxer.trident.compiler.TridentCompiler;
 import com.energyxxer.trident.compiler.lexer.TridentProductions;
 import com.energyxxer.trident.compiler.util.TridentProjectSummary;
 import com.energyxxer.trident.global.Commons;
+import com.energyxxer.trident.ui.commodoreresources.DefinitionPacks;
 import com.energyxxer.util.Lazy;
 import com.energyxxer.util.StringUtil;
 import com.energyxxer.util.logger.Debug;
@@ -31,7 +32,7 @@ public class TridentProject implements Project {
 
     public final Lazy<CommandModule> module = new Lazy<>(() -> {
         try {
-            return TridentCompiler.createModuleForProject(getName(), rootDirectory, StandardDefinitionPacks.MINECRAFT_JAVA_LATEST_SNAPSHOT);
+            return TridentCompiler.createModuleForProject(getName(), rootDirectory, DefinitionPacks.pickPacksForVersion(getTargetVersion()), DefinitionPacks.getAliasMap());
         } catch(IOException x) {
             Debug.log("Exception while creating module: " + x.toString(), Debug.MessageType.ERROR);
         }
@@ -41,6 +42,7 @@ public class TridentProject implements Project {
     private final Lazy<TridentProductions> productions = new Lazy<>(() -> new TridentProductions(module.getValue()));
 
     private JsonObject config;
+    private JavaEditionVersion targetVersion = null;
     private HashMap<String, ParsingSignature> resourceCache = new HashMap<>();
 
     private HashMap<String, ParsingSignature> sourceCache = new HashMap<>();
@@ -103,6 +105,38 @@ public class TridentProject implements Project {
         if(config.exists() && config.isFile()) {
             try {
                 this.config = new Gson().fromJson(new FileReader(config), JsonObject.class);
+
+                if(this.config.has("target-version") && this.config.get("target-version").isJsonArray()) {
+                    JsonArray arr = this.config.getAsJsonArray("target-version");
+
+                    int major = 1;
+                    int minor = 14;
+                    int patch = 0;
+
+                    if(arr.size() >= 1) {
+                        JsonElement rawMajor = arr.get(0);
+                        if(rawMajor.isJsonPrimitive() && rawMajor.getAsJsonPrimitive().isNumber()) {
+                            major = rawMajor.getAsInt();
+                        }
+
+                        if(arr.size() >= 2) {
+                            JsonElement rawMinor = arr.get(1);
+                            if(rawMinor.isJsonPrimitive() && rawMinor.getAsJsonPrimitive().isNumber()) {
+                                minor = rawMinor.getAsInt();
+                            }
+
+                            if(arr.size() >= 3) {
+                                JsonElement rawPatch = arr.get(1);
+                                if(rawPatch.isJsonPrimitive() && rawPatch.getAsJsonPrimitive().isNumber()) {
+                                    patch = rawPatch.getAsInt();
+                                }
+                            }
+                        }
+                    }
+
+                    targetVersion = new JavaEditionVersion(major, minor, patch);
+                }
+
                 return;
             } catch (FileNotFoundException | JsonParseException x) {
                 //I literally *just* checked if the file exists beforehand. Damn Java and its trust issues
@@ -223,6 +257,11 @@ public class TridentProject implements Project {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public JavaEditionVersion getTargetVersion() {
+        return targetVersion;
     }
 
     @Deprecated

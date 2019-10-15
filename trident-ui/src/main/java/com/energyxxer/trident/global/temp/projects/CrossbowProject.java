@@ -2,6 +2,8 @@ package com.energyxxer.trident.global.temp.projects;
 
 import com.energyxxer.commodore.module.CommandModule;
 import com.energyxxer.commodore.standard.StandardDefinitionPacks;
+import com.energyxxer.commodore.versioning.BedrockEditionVersion;
+import com.energyxxer.commodore.versioning.Version;
 import com.energyxxer.crossbow.compiler.CrossbowCompiler;
 import com.energyxxer.crossbow.compiler.lexer.CrossbowProductions;
 import com.energyxxer.crossbow.compiler.util.CrossbowProjectSummary;
@@ -187,6 +189,11 @@ public class CrossbowProject implements Project {
         } catch (IOException x) {
             Debug.log(x.getMessage());
         }
+    }
+
+    @Override
+    public Version getTargetVersion() {
+        return new BedrockEditionVersion(1, 13, 0);
     }
 
     public void updateServerDataCache(HashMap<String, ParsingSignature> sourceCache) {

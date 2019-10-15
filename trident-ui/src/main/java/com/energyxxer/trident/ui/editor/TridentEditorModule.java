@@ -7,6 +7,7 @@ import com.energyxxer.trident.main.TridentUI;
 import com.energyxxer.trident.main.window.sections.editor_search.FindAndReplaceBar;
 import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.display.DisplayModule;
+import com.energyxxer.trident.ui.modules.FileModuleToken;
 import com.energyxxer.trident.ui.scrollbar.OverlayScrollPaneLayout;
 import com.energyxxer.trident.ui.theme.Theme;
 import com.energyxxer.trident.ui.theme.ThemeManager;
@@ -360,7 +361,13 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
             }
             writer.print(text);
             writer.close();
+
+            if(new File(((FileModuleToken) associatedTab.token).getPath()).getName().equals(".tdnproj")) {
+                ProjectManager.loadWorkspace();
+            }
+
             Commons.index(ProjectManager.getAssociatedProject(file));
+
             return getValue();
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
             e.printStackTrace();

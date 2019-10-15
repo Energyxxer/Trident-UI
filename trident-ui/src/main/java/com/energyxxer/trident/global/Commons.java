@@ -5,6 +5,7 @@ import com.energyxxer.commodore.standard.StandardDefinitionPacks;
 import com.energyxxer.enxlex.pattern_matching.matching.lazy.LazyTokenPatternMatch;
 import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
+import com.energyxxer.trident.global.temp.projects.TridentProject;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.modules.FileModuleToken;
@@ -100,7 +101,7 @@ public class Commons {
     }
 
     public static void compile(Project project) {
-        if(project != null) ProcessManager.queueProcess(new TridentCompilerWrapper(project));
+        if(project instanceof TridentProject) ProcessManager.queueProcess(new TridentCompilerWrapper((TridentProject) project));
     }
 
     public static void indexActive() {
@@ -132,6 +133,6 @@ public class Commons {
     }
 
     public static Image getProjectIcon() {
-        return Commons.getIcon("project_cbw").getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+        return Commons.getIcon("project").getScaledInstance(16, 16, Image.SCALE_SMOOTH);
     }
 }

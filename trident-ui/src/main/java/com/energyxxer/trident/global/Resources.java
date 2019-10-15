@@ -1,10 +1,11 @@
 package com.energyxxer.trident.global;
 
 import com.energyxxer.trident.files.FileDefaults;
+import com.energyxxer.trident.ui.commodoreresources.DefinitionPacks;
+import com.energyxxer.trident.ui.commodoreresources.VersionFeatureResources;
 import com.energyxxer.trident.ui.theme.ThemeManager;
 import com.energyxxer.trident.util.LineReader;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,8 +16,6 @@ import java.util.HashMap;
 public class Resources {
     public static final HashMap<String, ArrayList<String>> indexes = new HashMap<>();
     public static final ArrayList<String> tips = new ArrayList<>();
-
-    //public static CraftrLibrary nativeLib = null;
 
     public static void load() {
         indexes.clear();
@@ -51,9 +50,7 @@ public class Resources {
 
         ThemeManager.loadAll();
         FileDefaults.loadAll();
-
-        File nativesFolder = new File(Preferences.get("nativelib", System.getProperty("user.home") + File.separator + "Trident" + File.separator + "natives"));
-        /*if(!nativesFolder.exists()) nativesFolder.mkdirs();
-        else nativeLib = new CraftrLibrary(nativesFolder, "Trident Native Library", "cnl");*/
+        DefinitionPacks.loadAll();
+        VersionFeatureResources.loadAll();
     }
 }

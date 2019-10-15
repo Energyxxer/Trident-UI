@@ -1,22 +1,31 @@
 package com.energyxxer.trident.global;
 
+import com.energyxxer.commodore.versioning.compatibility.VersionFeatureManager;
 import com.energyxxer.trident.compiler.TridentCompiler;
-import com.energyxxer.trident.global.temp.projects.Project;
+import com.energyxxer.trident.global.temp.projects.TridentProject;
 import com.energyxxer.trident.main.window.TridentWindow;
+import com.energyxxer.trident.ui.commodoreresources.DefinitionPacks;
 import com.energyxxer.util.out.Console;
 import com.energyxxer.util.processes.AbstractProcess;
 import com.energyxxer.util.processes.CompletionListener;
 import com.energyxxer.util.processes.ProgressListener;
 
 public class TridentCompilerWrapper extends AbstractProcess {
-    private Project project;
+    private TridentProject project;
     private TridentCompiler compiler;
 
-    public TridentCompilerWrapper(Project project) {
+    public TridentCompilerWrapper(TridentProject project) {
         super("Trident-Compiler[" + project.getRootDirectory().getName() + "]");
         this.project = project;
 
-        compiler = new TridentCompiler(project.getRootDirectory());
+        compiler = new TridentCompiler(
+                project.getRootDirectory(),
+                DefinitionPacks.pickPacksForVersion(project.getTargetVersion()),
+                project.getTargetVersion() != null ?
+                        VersionFeatureManager.getFeaturesForVersion(project.getTargetVersion()) :
+                        null
+        );
+        compiler.setDefinitionPackAliases(DefinitionPacks.getAliasMap());
         compiler.setSourceCache(project.getSourceCache());
         compiler.setInResourceCache(project.getResourceCache());
         compiler.addCompletionListener((process, success) -> {

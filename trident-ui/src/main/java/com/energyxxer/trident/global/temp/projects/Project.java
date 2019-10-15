@@ -1,5 +1,6 @@
 package com.energyxxer.trident.global.temp.projects;
 
+import com.energyxxer.commodore.versioning.Version;
 import com.energyxxer.enxlex.lexical_analysis.summary.ProjectSummary;
 import com.energyxxer.enxlex.pattern_matching.ParsingSignature;
 import com.energyxxer.enxlex.pattern_matching.matching.lazy.LazyTokenPatternMatch;
@@ -22,4 +23,6 @@ public interface Project {
 	void updateConfig();
 
 	void createNew();
+
+    Version getTargetVersion();
 }

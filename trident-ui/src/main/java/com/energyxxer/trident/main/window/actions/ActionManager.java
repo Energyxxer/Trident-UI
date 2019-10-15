@@ -50,7 +50,7 @@ public class ActionManager {
                 })
         );
         actions.add(new ProgramAction(
-                "Reload GUI Resources", "Reload GUI and syntax themes from disk",
+                "Reload UI Resources", "Reload themes, definition packs and feature maps from disk",
                 KeyStroke.getKeyStroke(KeyEvent.VK_T, getPlatformControlMask()),
                 Resources::load)
         );
