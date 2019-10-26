@@ -56,20 +56,28 @@ public class DefinitionUpdateProcess extends AbstractProcess {
             String featMapCommitsURL = "https://api.github.com/repos/Energyxxer/Minecraft-Definitions/commits?path=featuremaps/";
             if(lastCheckedDefCommit != null) featMapCommitsURL += "&since=" + lastCheckedDefCommit;
 
+            String typeMapCommitsURL = "https://api.github.com/repos/Energyxxer/Minecraft-Definitions/commits?path=typemaps/zipped/";
+            if(lastCheckedDefCommit != null) typeMapCommitsURL += "&since=" + lastCheckedDefCommit;
+
             HashSet<String> defPackChanges = new HashSet<>();
             HashSet<String> featMapChanges = new HashSet<>();
+            HashSet<String> typeMapChanges = new HashSet<>();
 
             scanCommitOverview(defPackCommitsURL, defPackChanges, "defpacks/zipped/", ".zip");
             scanCommitOverview(featMapCommitsURL, featMapChanges, "featuremaps/", ".json");
+            scanCommitOverview(typeMapCommitsURL, typeMapChanges, "typemaps/zipped/", ".zip");
 
             updateStatus("Updating definition packs");
             syncChanges(defPackChanges, "defpacks/zipped/*.zip", "resources" + File.separator + "defpacks" + File.separator + "*.zip");
             updateStatus("Updating feature maps");
             syncChanges(featMapChanges, "featuremaps/*.json", "resources" + File.separator + "featmaps" + File.separator + "*.json");
+            updateStatus("Updating type maps");
+            syncChanges(typeMapChanges, "typemaps/zipped/*.zip", "resources" + File.separator + "typemaps" + File.separator + "*.zip");
 
             if(promptedUpdate) {
                 DefinitionPacks.loadAll();
                 VersionFeatureResources.loadAll();
+                TypeMaps.loadAll();
                 ProjectManager.loadWorkspace();
 
                 Resources.resources.addProperty("last-checked-definition-commit", ISO8601Utils.format(latestCommitDate));
@@ -96,7 +104,7 @@ public class DefinitionUpdateProcess extends AbstractProcess {
 
             String commitDateRaw = commitOverview.getAsJsonObject("commit").getAsJsonObject("committer").get("date").getAsString();
             if(Objects.equals(commitDateRaw, lastCheckedDefCommit)) continue;
-            Date commitDate = ISO8601Utils.parse(commitDateRaw,  new ParsePosition(0));
+            Date commitDate = ISO8601Utils.parse(commitDateRaw, new ParsePosition(0));
             if(latestCommitDate == null) {
                 latestCommitDate = commitDate;
             } else if(commitDate.after(latestCommitDate)) {
@@ -111,7 +119,7 @@ public class DefinitionUpdateProcess extends AbstractProcess {
                 boolean valid = false;
                 String filename = file.getAsJsonObject().get("filename").getAsString();
 
-                if(filename.contains("_j") && filename.startsWith(expectedPrefix) && filename.endsWith(expectedSuffix)) {
+                if(filename.contains("j_") && filename.startsWith(expectedPrefix) && filename.endsWith(expectedSuffix)) {
                     Debug.log("CHANGED:" + filename);
                     filename = filename.substring(expectedPrefix.length(), filename.length() - expectedSuffix.length());
                     changeSet.add(filename);
@@ -121,7 +129,7 @@ public class DefinitionUpdateProcess extends AbstractProcess {
                 if("renamed".equals(status)) {
                     String previousFilename = file.getAsJsonObject().get("previous_filename").getAsString();
 
-                    if(previousFilename.contains("_j") && previousFilename.startsWith(expectedPrefix) && previousFilename.startsWith(expectedSuffix)) {
+                    if(previousFilename.contains("j_") && previousFilename.startsWith(expectedPrefix) && previousFilename.startsWith(expectedSuffix)) {
                         previousFilename = previousFilename.substring(expectedPrefix.length(), previousFilename.length() - expectedSuffix.length());
                         changeSet.add(previousFilename);
                         valid = true;

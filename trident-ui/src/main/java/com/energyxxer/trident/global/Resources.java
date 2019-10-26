@@ -2,6 +2,7 @@ package com.energyxxer.trident.global;
 
 import com.energyxxer.trident.files.FileDefaults;
 import com.energyxxer.trident.ui.commodoreresources.DefinitionPacks;
+import com.energyxxer.trident.ui.commodoreresources.TypeMaps;
 import com.energyxxer.trident.ui.commodoreresources.VersionFeatureResources;
 import com.energyxxer.trident.ui.theme.ThemeManager;
 import com.energyxxer.trident.util.LineReader;
@@ -79,6 +80,7 @@ public class Resources {
         FileDefaults.loadAll();
         DefinitionPacks.loadAll();
         VersionFeatureResources.loadAll();
+        TypeMaps.loadAll();
     }
 
     public static void saveAll() {
