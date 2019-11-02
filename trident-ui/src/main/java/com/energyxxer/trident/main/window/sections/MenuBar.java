@@ -5,9 +5,10 @@ import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.global.Status;
 import com.energyxxer.trident.global.TabManager;
 import com.energyxxer.trident.global.temp.projects.Project;
+import com.energyxxer.trident.global.temp.projects.TridentProject;
 import com.energyxxer.trident.main.TridentUI;
 import com.energyxxer.trident.main.window.TridentWindow;
-import com.energyxxer.trident.ui.dialogs.ProjectProperties;
+import com.energyxxer.trident.ui.dialogs.project_properties.ProjectProperties;
 import com.energyxxer.trident.ui.dialogs.settings.Settings;
 import com.energyxxer.trident.ui.modules.FileModuleToken;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenu;
@@ -239,7 +240,7 @@ public class MenuBar extends JMenuBar {
                 StyledMenuItem item = new StyledMenuItem("Properties");
                 item.addActionListener(e -> {
                     Project selectedProject = Commons.getActiveProject();
-                    if(selectedProject != null) ProjectProperties.show(selectedProject);
+                    if(selectedProject instanceof TridentProject) ProjectProperties.show((TridentProject) selectedProject);
                 });
                 menu.add(item);
             }

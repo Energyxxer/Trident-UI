@@ -4,11 +4,8 @@ import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.ui.theme.Theme;
 import com.energyxxer.trident.ui.theme.change.ThemeChangeListener;
 
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import java.awt.Color;
-import java.awt.Image;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Created by User on 12/15/2016.
@@ -139,11 +136,15 @@ public class StyledLabel extends JLabel implements ThemeChangeListener {
 
         if (this.namespace != null) {
             setForeground(t.getColor(Color.BLACK, this.namespace + ".label.foreground","General.label.foreground","General.foreground"));
-            setFont(t.getFont(this.namespace+".label","General.label","General"));
+            Font font = t.getFont(this.namespace+".label","General.label","General");
+            font = font.deriveFont(font.getStyle() | style);
+            setFont(font);
             if(changeable) this.setText(t.getString(this.namespace + ".label.text","default:" + getText()));
         } else {
             setForeground(t.getColor(Color.BLACK, "General.label.foreground","General.foreground"));
-            setFont(t.getFont("General.label","General").deriveFont(style));
+            Font font = t.getFont("General.label","General");
+            font = font.deriveFont(font.getStyle() | style);
+            setFont(font);
         }
         if (icon != null) {
             this.setIcon(new ImageIcon(Commons.getIcon(icon).getScaledInstance(16, 16, Image.SCALE_SMOOTH)));

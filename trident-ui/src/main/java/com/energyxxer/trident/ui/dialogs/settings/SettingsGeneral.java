@@ -14,9 +14,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 
-/**
- * Created by User on 1/21/2017.
- */
 class SettingsGeneral extends JPanel {
 
     private ThemeListenerManager tlm = new ThemeListenerManager();

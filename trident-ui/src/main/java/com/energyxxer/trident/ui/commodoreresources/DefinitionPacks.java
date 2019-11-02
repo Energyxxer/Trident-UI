@@ -7,15 +7,16 @@ import com.energyxxer.commodore.versioning.JavaEditionVersion;
 import com.energyxxer.util.logger.Debug;
 
 import java.io.File;
-import java.util.AbstractMap;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DefinitionPacks {
     private static HashMap<String, DefinitionPack> loadedDefinitionPacks = new HashMap<>();
-    private static final Pattern vanillaKey = Pattern.compile("minecraft_j_(\\d+)_(\\d+)");
+    private static final Pattern vanillaKey = Pattern.compile("minecraft_j_1_(\\d+)");
+
+    private static JavaEditionVersion latestKnownVersion = new JavaEditionVersion(1, 13, 0);
+    private static JavaEditionVersion[] knownVersionList = null;
 
     public static void loadAll() {
         loadedDefinitionPacks.clear();
@@ -30,10 +31,14 @@ public class DefinitionPacks {
                 DefinitionPack defPack = null;
                 if(file.isDirectory()) {
                     defPack = new DefinitionPack(new DirectoryCompoundInput(file));
-                    loadedDefinitionPacks.put(file.getName(), defPack);
+                    String packName = file.getName();
+                    loadedDefinitionPacks.put(packName, defPack);
+                    updateLatestKnownVersion(packName);
                 } else if(file.isFile() && file.getName().endsWith(".zip")) {
                     defPack = new DefinitionPack(new ZipCompoundInput(file));
-                    loadedDefinitionPacks.put(file.getName().substring(0, file.getName().length() - ".zip".length()), defPack);
+                    String packName = file.getName().substring(0, file.getName().length() - ".zip".length());
+                    loadedDefinitionPacks.put(packName, defPack);
+                    updateLatestKnownVersion(packName);
                 }
                 try {
                     if(defPack != null) defPack.load();
@@ -42,6 +47,26 @@ public class DefinitionPacks {
                 }
             }
         }
+    }
+
+    private static void updateLatestKnownVersion(String packName) {
+        Matcher match = vanillaKey.matcher(packName);
+        if(match.matches()) {
+            JavaEditionVersion thisVersion = new JavaEditionVersion(1, Integer.parseInt(match.group(1)), 0);
+            if(latestKnownVersion.compare(thisVersion) < 0) {
+                latestKnownVersion = thisVersion;
+                knownVersionList = null;
+            }
+        }
+    }
+
+    public static JavaEditionVersion[] getKnownVersions() {
+        if(knownVersionList != null) return knownVersionList;
+        knownVersionList = new JavaEditionVersion[Math.max(0, latestKnownVersion.getMinor() - 13 + 1)];
+        for(int i = 13; i <= latestKnownVersion.getMinor(); i++) {
+            knownVersionList[i-13] = new JavaEditionVersion(1, i, 0);
+        }
+        return knownVersionList;
     }
 
     public static DefinitionPack[] pickPacksForVersion(JavaEditionVersion targetVersion) {
@@ -58,7 +83,7 @@ public class DefinitionPacks {
         for(Map.Entry<String, DefinitionPack> entry : loadedDefinitionPacks.entrySet()) {
             Matcher match = vanillaKey.matcher(entry.getKey());
             if(match.matches()) {
-                JavaEditionVersion version = new JavaEditionVersion(Integer.parseInt(match.group(1)), Integer.parseInt(match.group(2)), 0);
+                JavaEditionVersion version = new JavaEditionVersion(1, Integer.parseInt(match.group(1)), 0);
                 if(version.compare(targetVersion) <= 0) {
                     if(latestMatch == null || version.compare(latestMatch.getKey()) > 0) {
                         latestMatch = new AbstractMap.SimpleEntry<>(version, entry.getValue());

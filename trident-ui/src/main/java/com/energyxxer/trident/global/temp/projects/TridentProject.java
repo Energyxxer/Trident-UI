@@ -1,6 +1,7 @@
 package com.energyxxer.trident.global.temp.projects;
 
 import com.energyxxer.commodore.module.CommandModule;
+import com.energyxxer.commodore.module.Namespace;
 import com.energyxxer.commodore.versioning.JavaEditionVersion;
 import com.energyxxer.enxlex.lexical_analysis.summary.ProjectSummary;
 import com.energyxxer.enxlex.pattern_matching.ParsingSignature;
@@ -14,6 +15,7 @@ import com.energyxxer.util.Lazy;
 import com.energyxxer.util.StringUtil;
 import com.energyxxer.util.logger.Debug;
 import com.google.gson.*;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -68,6 +70,7 @@ public class TridentProject implements Project {
         config.addProperty("datapack-output", outFolder.resolve(name).toString());
         config.addProperty("resources-output", outFolder.resolve(name + "-resources.zip").toString());
         config.addProperty("export-comments", true);
+        config.addProperty("strict-nbt", false);
         config.addProperty("strict-text-components", false);
         JsonObject loggerObj = new JsonObject();
         loggerObj.addProperty("compact", false);
@@ -128,7 +131,7 @@ public class TridentProject implements Project {
                             }
 
                             if(arr.size() >= 3) {
-                                JsonElement rawPatch = arr.get(1);
+                                JsonElement rawPatch = arr.get(2);
                                 if(rawPatch.isJsonPrimitive() && rawPatch.getAsJsonPrimitive().isNumber()) {
                                     patch = rawPatch.getAsInt();
                                 }
@@ -266,14 +269,73 @@ public class TridentProject implements Project {
         return targetVersion;
     }
 
-    @Deprecated
-    public String getPrefix() {
-        return "";
+    public void setTargetVersion(@Nullable JavaEditionVersion version) {
+        targetVersion = version;
+        if(version != null) {
+            JsonArray versionArr = new JsonArray(3);
+            versionArr.add(version.getMajor());
+            versionArr.add(version.getMinor());
+            versionArr.add(version.getPatch());
+            config.add("target-version", versionArr);
+        } else {
+            config.remove("target-version");
+        }
     }
 
-    @Deprecated
-    public String getWorld() {
-        return "";
+    public int getLanguageLevel() {
+        if(config.has("language-level") && config.get("language-level").isJsonPrimitive() && config.get("language-level").getAsJsonPrimitive().isNumber()) {
+            int level = Math.max(1, Math.min(3, config.get("language-level").getAsInt()));
+            config.addProperty("language-level", level);
+            return level;
+        }
+        config.addProperty("language-level", 1);
+        return 1;
+    }
+
+    public void setLanguageLevel(int level) {
+        config.addProperty("language-level", Math.max(1, Math.min(3, level)));
+    }
+
+    public String getDefaultNamespace() {
+        if(config.has("default-namespace") && config.get("default-namespace").isJsonPrimitive() && config.get("default-namespace").getAsJsonPrimitive().isString()) {
+            String namespace = config.get("default-namespace").getAsString();
+            if(namespace.matches(Namespace.ALLOWED_NAMESPACE_REGEX)) {
+                return namespace;
+            }
+        }
+        String namespace = StringUtil.getInitials(this.getName()).toLowerCase();
+        config.addProperty("default-namespace", namespace);
+        return namespace;
+    }
+
+    public void setDefaultNamespace(String namespace) {
+        if(namespace.matches(Namespace.ALLOWED_NAMESPACE_REGEX)) {
+            config.addProperty("default-namespace", namespace);
+        }
+    }
+
+    public boolean isStrictNBT() {
+        if(config.has("strict-nbt") && config.get("strict-nbt").isJsonPrimitive() && config.get("strict-nbt").getAsJsonPrimitive().isBoolean()) {
+            return config.get("strict-nbt").getAsBoolean();
+        }
+        config.addProperty("strict-nbt", false);
+        return false;
+    }
+
+    public void setStrictNBT(boolean strict) {
+        config.addProperty("strict-nbt", strict);
+    }
+
+    public boolean isStrictTextComponents() {
+        if(config.has("strict-text-components") && config.get("strict-text-components").isJsonPrimitive() && config.get("strict-text-components").getAsJsonPrimitive().isBoolean()) {
+            return config.get("strict-text-components").getAsBoolean();
+        }
+        config.addProperty("strict-text-components", false);
+        return false;
+    }
+
+    public void setStrictTextComponents(boolean strict) {
+        config.addProperty("strict-text-components", strict);
     }
 
     @Override

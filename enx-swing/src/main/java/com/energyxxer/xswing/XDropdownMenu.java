@@ -127,6 +127,7 @@ public class XDropdownMenu<T> extends XButton {
         JPopupMenu pm = popupFactory.createInstance();
 
         int height = 2;
+        int width = 10;
 
         for(int i = 0; i < options.size(); i++) {
             T option = options.get(i);
@@ -137,9 +138,10 @@ public class XDropdownMenu<T> extends XButton {
             item.addActionListener(arg0 -> registerChoice(choice));
             pm.add(item);
             height += item.getPreferredSize().getHeight();
+            width = Math.max(width, item.getPreferredSize().width);
         }
 
-        pm.setPreferredSize(new Dimension(this.getWidth(),height));
+        pm.setPreferredSize(new Dimension(Math.max(this.getWidth(), width),height));
         pm.show(this,0 ,this.getHeight()-1);
     }
 }

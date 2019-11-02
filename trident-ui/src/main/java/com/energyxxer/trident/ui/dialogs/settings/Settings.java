@@ -77,13 +77,10 @@ public class Settings {
 
 		SettingsGeneral contentGeneral = new SettingsGeneral();
 		sectionPanes.put("General", contentGeneral);
-
-		SettingsAppearance contentAppearance = new SettingsAppearance();
-		sectionPanes.put("Appearance", contentAppearance);
-
+		sectionPanes.put("Appearance", new SettingsAppearance());
 		sectionPanes.put("Editor", new JPanel());
 		sectionPanes.put("Resources", new JPanel());
-		sectionPanes.put("In-game TridentCompiler", new JPanel());
+		sectionPanes.put("In-game Compiler", new JPanel());
 
 		contentPane.add(contentGeneral, BorderLayout.CENTER);
 		currentSection = contentGeneral;
