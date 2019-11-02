@@ -51,7 +51,9 @@ public class SuggestionExpander {
                 case TridentSuggestionTags
                         .IDENTIFIER_MEMBER: {
                     if(parent.getSummary() != null) {
-                        for(SummarySymbol sym : ((TridentSummaryModule) parent.getSummary()).getSymbolsVisibleAtIndexForPath(suggestionModule.getSuggestionIndex(), suggestionModule.getLookingAtMemberPath())) {
+                        Collection<SummarySymbol> membersVisible = ((TridentSummaryModule) parent.getSummary()).getSymbolsVisibleAtIndexForPath(suggestionModule.getSuggestionIndex(), suggestionModule.getLookingAtMemberPath());
+                        ArrayList<SuggestionToken> newTokens = new ArrayList<>(membersVisible.size());
+                        for(SummarySymbol sym : membersVisible) {
                             String text = sym.getName();
                             int backspaces = 0;
                             if(!TridentLexerProfile.isValidIdentifier(text)) {
@@ -61,8 +63,9 @@ public class SuggestionExpander {
                             SuggestionToken token = new SuggestionToken(parent, sym.getName(), text, suggestion);
                             token.setBackspaces(backspaces);
                             token.setIconKey(SuggestionToken.getIconKeyForTags(sym.getSuggestionTags()));
-                            tokens.add(0, token);
+                            newTokens.add(token);
                         }
+                        tokens.addAll(0, newTokens);
                     }
                     break;
                 }
@@ -195,10 +198,9 @@ public class SuggestionExpander {
             Collection<ResourcePathNode> nodes = ResourcePathExpander.expand(
                     locations.stream().map(TridentUtil.ResourceLocation::toString).collect(Collectors.toList()),
                     parent, suggestion, skipNamespace, skipNamespace);
-            for(ResourcePathNode node : nodes) {
-                if(node.isLeaf()) node.setIconKey(leafIcon);
-                tokens.add(0, node);
-            }
+
+            nodes.forEach(n -> {if(n.isLeaf()) n.setIconKey(leafIcon);});
+            tokens.addAll(0, nodes);
         }
     }
 }
