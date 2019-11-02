@@ -1,5 +1,6 @@
 package com.energyxxer.trident.ui.editor.completion;
 
+import com.energyxxer.commodore.CommandUtils;
 import com.energyxxer.commodore.types.defaults.BlockType;
 import com.energyxxer.commodore.types.defaults.EntityType;
 import com.energyxxer.commodore.types.defaults.FunctionReference;
@@ -10,6 +11,7 @@ import com.energyxxer.enxlex.suggestions.LiteralSuggestion;
 import com.energyxxer.enxlex.suggestions.Suggestion;
 import com.energyxxer.enxlex.suggestions.SuggestionModule;
 import com.energyxxer.trident.compiler.TridentUtil;
+import com.energyxxer.trident.compiler.lexer.TridentLexerProfile;
 import com.energyxxer.trident.compiler.lexer.TridentSuggestionTags;
 import com.energyxxer.trident.compiler.lexer.summaries.SummarySymbol;
 import com.energyxxer.trident.compiler.lexer.summaries.TridentSummaryModule;
@@ -42,6 +44,24 @@ public class SuggestionExpander {
                             if(sym.getParentFileSummary() != parent.getSummary()) {
                                 token.setDarkened(true);
                             }
+                        }
+                    }
+                    break;
+                }
+                case TridentSuggestionTags
+                        .IDENTIFIER_MEMBER: {
+                    if(parent.getSummary() != null) {
+                        for(SummarySymbol sym : ((TridentSummaryModule) parent.getSummary()).getSymbolsVisibleAtIndexForPath(suggestionModule.getSuggestionIndex(), suggestionModule.getLookingAtMemberPath())) {
+                            String text = sym.getName();
+                            int backspaces = 0;
+                            if(!TridentLexerProfile.isValidIdentifier(text)) {
+                                text = "[" + CommandUtils.quote(text) + "]";
+                                backspaces = 1;
+                            }
+                            SuggestionToken token = new SuggestionToken(parent, sym.getName(), text, suggestion);
+                            token.setBackspaces(backspaces);
+                            token.setIconKey(SuggestionToken.getIconKeyForTags(sym.getSuggestionTags()));
+                            tokens.add(0, token);
                         }
                     }
                     break;

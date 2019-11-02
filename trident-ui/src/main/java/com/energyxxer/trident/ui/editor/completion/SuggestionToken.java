@@ -7,6 +7,7 @@ import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.display.DisplayModule;
 import com.energyxxer.trident.ui.modules.ModuleToken;
 import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
+import com.energyxxer.util.StringUtil;
 
 import java.awt.*;
 import java.util.Collection;
@@ -23,6 +24,7 @@ public class SuggestionToken implements ModuleToken {
 
     protected boolean enabled = true;
     protected boolean darkened;
+    protected int backspaces = 0;
 
     protected SuggestionToken() {
 
@@ -95,7 +97,7 @@ public class SuggestionToken implements ModuleToken {
 
     @Override
     public void onInteract() {
-        parent.submit(text, suggestion, true);
+        parent.submit(StringUtil.repeat("\b", backspaces) + text, suggestion, true);
     }
 
     @Override
@@ -161,5 +163,13 @@ public class SuggestionToken implements ModuleToken {
 
     public boolean isDarkened() {
         return darkened;
+    }
+
+    public void setBackspaces(int backspaces) {
+        this.backspaces = backspaces;
+    }
+
+    public int getBackspaces() {
+        return backspaces;
     }
 }

@@ -131,11 +131,11 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
             endIndex = text.indexOf("$END$");
             text = text.replaceFirst("\\$END\\$", "");
         }
-        String finalText = text;
-
+        int deletions = StringUtil.getSequenceCount(text, "\b");
+        String finalText = text.substring(deletions);
 
         CompoundEdit edit = new CompoundEdit();
-        edit.appendEdit(new Lazy<>(() -> new DeletionEdit(editor, editor.getCaretPosition() - activeResults.getSuggestionIndex())));
+        edit.appendEdit(new Lazy<>(() -> new DeletionEdit(editor, editor.getCaretPosition() - activeResults.getSuggestionIndex() + deletions)));
         edit.appendEdit(new Lazy<>(() -> new InsertionEdit(finalText, editor)));
         editor.getEditManager().insertEdit(edit);
         if(endIndex > -1) {
@@ -159,7 +159,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if(!this.isVisible()) return;
+        if(!this.isVisible() || !anyEnabled) return;
         if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
             this.setVisible(false);
             e.consume();
@@ -215,14 +215,18 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         super.setVisible(b);
     }
 
+    private boolean anyEnabled = true;
+
     public void filter() {
         if(isVisible() && activeResults != null) {
             try {
                 int cwpos = activeResults.getSuggestionIndex();
                 String typed = editor.getDocument().getText(cwpos, editor.getCaretPosition() - cwpos);
 
+                anyEnabled = false;
                 for(SuggestionToken token : activeTokens) {
                     token.setEnabledFilter(typed);
+                    if(token.isEnabled()) anyEnabled = true;
                 }
 
                 this.explorer.setForceSelectNext(true);
