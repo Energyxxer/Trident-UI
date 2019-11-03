@@ -81,7 +81,7 @@ public class ProjectProperties {
 		JPanel contentGeneral = new ProjectPropertiesGeneral();
 
 		sectionPanes.put("General", contentGeneral);
-		sectionPanes.put("Output", new JPanel());
+		sectionPanes.put("Output", new ProjectPropertiesOutput());
 		sectionPanes.put("Definitions", new JPanel());
 		sectionPanes.put("Dependencies", new JPanel());
 		sectionPanes.put("Game Logger", new JPanel());

@@ -6,10 +6,12 @@ import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.FileManager;
 import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
+import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.common.MenuItems;
 import com.energyxxer.trident.ui.display.DisplayModule;
 import com.energyxxer.trident.ui.editor.TridentEditorModule;
+import com.energyxxer.trident.ui.explorer.ProjectExplorerMaster;
 import com.energyxxer.trident.ui.imageviewer.ImageViewer;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenu;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenuItem;
@@ -154,17 +156,19 @@ public class FileModuleToken implements ModuleToken {
         int firstFileIndex = 0;
         File[] subFiles = file.listFiles();
         if(subFiles != null) {
-            for (File subDir : subFiles) {
-                FileModuleToken subToken = new FileModuleToken(subDir);
+            for (File subFile : subFiles) {
+                FileModuleToken subToken = new FileModuleToken(subFile);
                 if(this.isProjectRoot) {
-                    //subToken.overrideIconName = subDir.getName().equals("datapack") ? "data" : subDir.getName().equals("resources") ? "resources" : null;
+                    //subToken.overrideIconName = subFile.getName().equals("datapack") ? "data" : subFile.getName().equals("resources") ? "resources" : null;
                 }
-                if (subDir.isDirectory()) {
+                if (subFile.isDirectory()) {
                     children.add(firstFileIndex, subToken);
                     firstFileIndex++;
                 }
                 else {
-                    children.add(subToken);
+                    if(!this.isProjectRoot || !subFile.getName().equals(".tdnproj") || TridentWindow.projectExplorer.getFlag(ProjectExplorerMaster.SHOW_PROJECT_FILES)) {
+                        children.add(subToken);
+                    }
                 }
             }
         }

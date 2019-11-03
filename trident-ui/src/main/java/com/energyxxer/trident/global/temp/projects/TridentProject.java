@@ -338,6 +338,52 @@ public class TridentProject implements Project {
         config.addProperty("strict-text-components", strict);
     }
 
+    public File getDataOut() {
+        if(config.has("datapack-output") && config.get("datapack-output").isJsonPrimitive() && config.get("datapack-output").getAsJsonPrimitive().isString()) {
+            String path = config.get("datapack-output").getAsString();
+            return new File(path);
+        }
+        config.remove("datapack-output");
+        return null;
+    }
+
+    public void setDataOut(File file) {
+        if(file != null) {
+            config.addProperty("datapack-output", file.getPath());
+        } else {
+            config.remove("datapack-output");
+        }
+    }
+
+    public File getResourcesOut() {
+        if(config.has("resources-output") && config.get("resources-output").isJsonPrimitive() && config.get("resources-output").getAsJsonPrimitive().isString()) {
+            String path = config.get("resources-output").getAsString();
+            return new File(path);
+        }
+        config.remove("resources-output");
+        return null;
+    }
+
+    public void setResourcesOut(File file) {
+        if(file != null) {
+            config.addProperty("resources-output", file.getPath());
+        } else {
+            config.remove("resources-output");
+        }
+    }
+
+    public boolean isExportComments() {
+        if(config.has("export-comments") && config.get("export-comments").isJsonPrimitive() && config.get("export-comments").getAsJsonPrimitive().isBoolean()) {
+            return config.get("export-comments").getAsBoolean();
+        }
+        config.addProperty("export-comments", true);
+        return true;
+    }
+
+    public void setExportComments(boolean strict) {
+        config.addProperty("export-comments", strict);
+    }
+
     @Override
     public String toString() {
         return "Project [" + name + "]";

@@ -3,6 +3,7 @@ package com.energyxxer.trident.ui.explorer.base;
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.TabManager;
 import com.energyxxer.trident.ui.explorer.base.elements.ExplorerElement;
+import com.energyxxer.trident.ui.modules.FileModuleToken;
 import com.energyxxer.trident.ui.modules.ModuleToken;
 import com.energyxxer.trident.ui.modules.NonStandardModuleToken;
 import com.energyxxer.trident.util.ImageUtil;
@@ -28,6 +29,7 @@ public class StandardExplorerItem extends ExplorerElement {
     protected int x = 0;
 
     private boolean detailed = false;
+    private boolean translucent = false;
 
     private ArrayList<MouseListener> mouseListeners = new ArrayList<>();
 
@@ -44,6 +46,8 @@ public class StandardExplorerItem extends ExplorerElement {
         this.parent = parent;
         if(parent != null) this.setDetailed(parent.detailed);
         this.token = token;
+
+        this.translucent = ((token instanceof FileModuleToken) && ((FileModuleToken) token).getFile().getName().equals(".tdnproj") && FileModuleToken.isProjectRoot(((FileModuleToken) token).getFile().getParentFile()));
 
         this.icon = token.getIcon();
         if(this.icon != null) this.icon = ImageUtil.fitToSize(this.icon, 16, 16);
@@ -153,6 +157,10 @@ public class StandardExplorerItem extends ExplorerElement {
 
         Graphics2D g2d = (Graphics2D) g;
         Composite oldComposite = g2d.getComposite();
+
+        if(translucent) {
+            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+        }
 
         g.drawString(token.getTitle(), x, master.getOffsetY() + metrics.getAscent() + ((master.getRowHeight() - metrics.getHeight())/2));
         x += metrics.stringWidth(token.getTitle());

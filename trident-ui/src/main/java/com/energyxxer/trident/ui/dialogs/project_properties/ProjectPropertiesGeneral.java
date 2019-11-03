@@ -69,8 +69,8 @@ class ProjectPropertiesGeneral extends JPanel {
                 StyledLabel label = new StyledLabel("Target Version:", "ProjectProperties.content");
                 label.setStyle(Font.BOLD);
                 content.add(label);
-                content.add(new StyledLabel("Determines which type definitions to use by default", "ProjectProperties.content"));
-                content.add(new StyledLabel("as well as which commands are allowed", "ProjectProperties.content"));
+                content.add(new StyledLabel("Determines which type definitions to use by default,", "ProjectProperties.content"));
+                content.add(new StyledLabel("as well as which commands are allowed.", "ProjectProperties.content"));
             }
             {
                 JavaEditionVersion[] knownVersions = DefinitionPacks.getKnownVersions();
@@ -113,7 +113,7 @@ class ProjectPropertiesGeneral extends JPanel {
                 content.add(label);
             }
             {
-                StyledLabel label = new StyledLabel("The default level of abstraction allowed for this project", "ProjectProperties.content");
+                StyledLabel label = new StyledLabel("The default level of abstraction allowed for this project.", "ProjectProperties.content");
                 content.add(label);
             }
             {
@@ -151,7 +151,7 @@ class ProjectPropertiesGeneral extends JPanel {
                 content.add(label);
             }
             {
-                StyledLabel label = new StyledLabel("Used for Trident-generated functions", "ProjectProperties.content");
+                StyledLabel label = new StyledLabel("Used for Trident-generated functions.", "ProjectProperties.content");
                 content.add(label);
             }
             {
@@ -184,7 +184,7 @@ class ProjectPropertiesGeneral extends JPanel {
                 ProjectProperties.addApplyEvent(p -> p.setStrictNBT(strictNBT.isSelected()));
 
                 content.add(strictNBT);
-                content.add(new StyledLabel("         If enabled, type errors in NBT tags will prevent compilation", "ProjectProperties.content"));
+                content.add(new StyledLabel("         If enabled, type errors in NBT tags will prevent compilation.", "ProjectProperties.content"));
             }
 
             {
@@ -206,7 +206,7 @@ class ProjectPropertiesGeneral extends JPanel {
                 ProjectProperties.addApplyEvent(p -> p.setStrictTextComponents(strictTextComponents.isSelected()));
 
                 content.add(strictTextComponents);
-                content.add(new StyledLabel("         If enabled, malformed text components will prevent compilation", "ProjectProperties.content"));
+                content.add(new StyledLabel("         If enabled, malformed text components will prevent compilation.", "ProjectProperties.content"));
             }
 
             {
@@ -219,61 +219,6 @@ class ProjectPropertiesGeneral extends JPanel {
                 content.add(margin);
             }
             //endregion
-/*
-            //region Default Namespace
-            {
-                StyledLabel label = new StyledLabel("Default Namespace:", "ProjectProperties.content");
-                label.setStyle(Font.BOLD);
-                content.add(label);
-            }
-            {
-                JPanel namespaceFields = new JPanel();
-
-                namespaceFields.setLayout(new FlowLayout(FlowLayout.LEFT, 2, 2));
-                namespaceFields.setOpaque(false);
-                namespaceFields.setAlignmentX(Component.LEFT_ALIGNMENT);
-                {
-                    cNamespace = new StyledTextField("null","ProjectProperties.content");
-                    cNamespace.setPreferredSize(new Dimension(150,25));
-                    //cPrefix.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-                    namespaceFields.add(cNamespace);
-                }
-
-                namespaceFields.setMaximumSize(new Dimension(namespaceFields.getMaximumSize().width, 30));
-
-                content.add(namespaceFields);
-            }
-
-            {
-                JPanel margin = new JPanel();
-                margin.setMinimumSize(new Dimension(200,15));
-                margin.setMaximumSize(new Dimension(200,15));
-                margin.setOpaque(false);
-                margin.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-                content.add(margin);
-            }
-            //endregion
-
-            {
-                {
-                    JLabel label = new JLabel("World Output:");
-                    label.setForeground(t.getColor(Color.BLACK, "ProjectProperties.content.label.foreground"));
-                    label.setFont(new Font(t.getString("ProjectProperties.content.label.font","General.font","default:Tahoma"), Font.BOLD,12));
-                    content.add(label);
-                }
-                File file = new File(MinecraftUtils.getMinecraftDir() + File.separator + "saves");
-                //if(project.getWorld() != null) file = new File(project.getWorld());
-                cWorld = new StyledFileField(file,"ProjectProperties.content");
-                cWorld.setDialogTitle("Open world...");
-                cWorld.setOperation(XFileField.OPEN_DIRECTORY);
-                cWorld.setMaximumSize(new Dimension(cWorld.getMaximumSize().width,25));
-                cWorld.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-                content.add(cWorld);
-            }*/
-
         }
 
     }
