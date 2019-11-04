@@ -34,6 +34,8 @@ public class TabListMaster extends JComponent implements MouseListener, MouseMot
 
     private ThemeListenerManager tlm = new ThemeListenerManager();
 
+    private boolean mayRearrange = true;
+
     public TabListMaster() {
         tlm.addThemeChangeListener(t -> {
             colors.put("background",t.getColor(Color.WHITE, "TabList.background"));
@@ -95,8 +97,8 @@ public class TabListMaster extends JComponent implements MouseListener, MouseMot
         }
     }
 
-    public void addTab(Tab tab) {
-        this.children.add(new TabItem(this, tab));
+    public void addTab(TabItem item) {
+        this.children.add(item);
     }
 
     int getOffsetX() {
@@ -138,7 +140,7 @@ public class TabListMaster extends JComponent implements MouseListener, MouseMot
     public void mousePressed(MouseEvent e) {
         TabListElement element = getElementAtMousePos(e);
 
-        if(e.getButton() == MouseEvent.BUTTON1) {
+        if(mayRearrange && e.getButton() == MouseEvent.BUTTON1) {
             dragPoint = e.getPoint();
             draggedElement = element;
             dragPivot = -1;
@@ -243,6 +245,20 @@ public class TabListMaster extends JComponent implements MouseListener, MouseMot
         repaint();
     }
 
+    public void removeTab(TabItem tabItem) {
+        children.remove(tabItem);
+        if(selectedElement == tabItem) selectedElement = null;
+        if(rolloverElement == tabItem) rolloverElement = null;
+        repaint();
+    }
+
+    public void removeAllTabs() {
+        children.clear();
+        selectedElement = null;
+        rolloverElement = null;
+        repaint();
+    }
+
     public void selectTab(Tab tab) {
         if(tab != null) selectTab(tab.getLinkedTabItem());
         else selectTab((TabListElement) null);
@@ -262,7 +278,7 @@ public class TabListMaster extends JComponent implements MouseListener, MouseMot
     public Tab getFallbackTab(Tab tab) {
         ArrayList<Tab> allTabs = new ArrayList<>();
         for(TabListElement element : children) {
-            if(element instanceof TabItem) allTabs.add(((TabItem) element).getAssociatedTab());
+            if(element instanceof TabItem && ((TabItem) element).getAssociatedTab() != null) allTabs.add(((TabItem) element).getAssociatedTab());
         }
         int index = allTabs.indexOf(tab);
         if(index == -1) return null;
@@ -275,5 +291,13 @@ public class TabListMaster extends JComponent implements MouseListener, MouseMot
         if(right == null) return left;
 
         return (left.openedTimeStamp > right.openedTimeStamp) ? left : right;
+    }
+
+    public boolean mayRearrange() {
+        return mayRearrange;
+    }
+
+    public void setMayRearrange(boolean mayRearrange) {
+        this.mayRearrange = mayRearrange;
     }
 }

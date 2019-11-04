@@ -384,6 +384,10 @@ public class TridentProject implements Project {
         config.addProperty("export-comments", strict);
     }
 
+    public JsonObject getConfig() {
+        return config;
+    }
+
     @Override
     public String toString() {
         return "Project [" + name + "]";

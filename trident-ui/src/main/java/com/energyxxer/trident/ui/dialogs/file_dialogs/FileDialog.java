@@ -1,7 +1,6 @@
 package com.energyxxer.trident.ui.dialogs.file_dialogs;
 
 import com.energyxxer.trident.files.FileType;
-import com.energyxxer.trident.global.TabManager;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.modules.FileModuleToken;
 import com.energyxxer.trident.ui.styledcomponents.StyledButton;
@@ -178,7 +177,7 @@ public class FileDialog {
                 return;
             }
 
-            if(newFile.exists()) TabManager.openTab(new FileModuleToken(newFile), 0);
+            if(newFile.exists()) TridentWindow.tabManager.openTab(new FileModuleToken(newFile), 0);
             TridentWindow.projectExplorer.refresh();
         } catch (IOException x) {
             x.printStackTrace();

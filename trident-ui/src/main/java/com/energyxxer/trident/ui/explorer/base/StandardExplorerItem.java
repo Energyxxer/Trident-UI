@@ -1,7 +1,7 @@
 package com.energyxxer.trident.ui.explorer.base;
 
 import com.energyxxer.trident.global.Commons;
-import com.energyxxer.trident.global.TabManager;
+import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.explorer.base.elements.ExplorerElement;
 import com.energyxxer.trident.ui.modules.FileModuleToken;
 import com.energyxxer.trident.ui.modules.ModuleToken;
@@ -142,7 +142,6 @@ public class StandardExplorerItem extends ExplorerElement {
         if (icon != null) {
             g.drawImage(this.icon, x + 8 - icon.getWidth(null) / 2, y + margin + 8 - icon.getHeight(null) / 2, null);
         }
-        x += 25;
 
         //File Name
 
@@ -162,8 +161,11 @@ public class StandardExplorerItem extends ExplorerElement {
             g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
         }
 
-        g.drawString(token.getTitle(), x, master.getOffsetY() + metrics.getAscent() + ((master.getRowHeight() - metrics.getHeight())/2));
-        x += metrics.stringWidth(token.getTitle());
+        if(token.getTitle() != null) {
+            x += 25;
+            g.drawString(token.getTitle(), x, master.getOffsetY() + metrics.getAscent() + ((master.getRowHeight() - metrics.getHeight())/2));
+            x += metrics.stringWidth(token.getTitle());
+        }
 
         if(detailed) {
             File projectRoot = token.getAssociatedProjectRoot();
@@ -207,7 +209,7 @@ public class StandardExplorerItem extends ExplorerElement {
             if(expanded) collapse();
             else expand(new ArrayList<>());
         } else if(token.isModuleSource()) {
-            TabManager.openTab(token);
+            TridentWindow.tabManager.openTab(token);
         }
     }
 

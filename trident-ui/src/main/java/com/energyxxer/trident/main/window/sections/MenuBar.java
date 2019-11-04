@@ -3,7 +3,6 @@ package com.energyxxer.trident.main.window.sections;
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.global.Status;
-import com.energyxxer.trident.global.TabManager;
 import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.global.temp.projects.TridentProject;
 import com.energyxxer.trident.main.TridentUI;
@@ -274,7 +273,7 @@ public class MenuBar extends JMenuBar {
             {
                 StyledMenuItem item = new StyledMenuItem("Edit Electron Theme");
                 item.addActionListener(e -> {
-                    TabManager.openTab(new FileModuleToken(new File(System.getProperty("user.home") + File.separator + "Trident" + File.separator + "resources" + File.separator + "themes" + File.separator + "gui" + File.separator + "Electron Dark.properties")));
+                    TridentWindow.tabManager.openTab(new FileModuleToken(new File(System.getProperty("user.home") + File.separator + "Trident" + File.separator + "resources" + File.separator + "themes" + File.separator + "gui" + File.separator + "Electron Dark.properties")));
                 });
                 menu.add(item);
             }

@@ -43,6 +43,7 @@ public class ProjectManager {
 	}
 	
 	public static Project getAssociatedProject(File file) {
+		if(file == null) return null;
 		for(Project project : loadedProjects) {
 			if((file.getPath() + File.separator).startsWith((project.getRootDirectory().getPath() + File.separator))) {
 				return project;

@@ -80,7 +80,7 @@ public class Commons {
     public static Project getActiveProject() {
         Project selected = null;
 
-        Tab selectedTab = TabManager.getSelectedTab();
+        Tab selectedTab = TridentWindow.tabManager.getSelectedTab();
 
         List<ModuleToken> selectedTokens = TridentWindow.projectExplorer.getSelectedTokens();
         ArrayList<FileModuleToken> selectedFiles = new ArrayList<>();

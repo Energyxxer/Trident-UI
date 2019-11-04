@@ -344,6 +344,7 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
             contentPanel.revalidate();
         }
         editorModule = new TridentEditorModule(null, file);
+        editorModule.setEditable(false);
         editorModule.setPreferredSize(new Dimension(1, 300));
         highlighter = new FixedHighlighter(editorModule.editorComponent);
         tlmHighlighter = new ThemeListenerManager();

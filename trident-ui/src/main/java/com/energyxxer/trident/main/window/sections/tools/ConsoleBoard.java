@@ -1,6 +1,6 @@
 package com.energyxxer.trident.main.window.sections.tools;
 
-import com.energyxxer.trident.global.TabManager;
+import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.modules.FileModuleToken;
 import com.energyxxer.trident.ui.scrollbar.OverlayScrollBarUI;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
@@ -103,7 +103,7 @@ public class ConsoleBoard extends ToolBoard {
                     int location = Integer.parseInt((String) hyperlink.getAttribute("LOCATION"));
                     int length = Integer.parseInt((String) hyperlink.getAttribute("LENGTH"));
 
-                    TabManager.openTab(new FileModuleToken(new File(path)), location, length);
+                    TridentWindow.tabManager.openTab(new FileModuleToken(new File(path)), location, length);
                 }
             }
         });

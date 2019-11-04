@@ -2,16 +2,24 @@ package com.energyxxer.trident.ui.tablist;
 
 import com.energyxxer.trident.global.TabManager;
 import com.energyxxer.trident.ui.Tab;
+import com.energyxxer.trident.ui.modules.ModuleToken;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenuItem;
 import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
 import com.energyxxer.trident.ui.theme.Theme;
 import com.energyxxer.trident.util.ImageUtil;
 import com.energyxxer.util.StringUtil;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
 
 public class TabItem extends TabListElement {
+    @NotNull
+    private final TabManager manager;
+    @NotNull
+    private final ModuleToken token;
+    @Nullable
     private final Tab associatedTab;
 
     private Image icon = null;
@@ -22,8 +30,10 @@ public class TabItem extends TabListElement {
 
     private boolean closeRollover = false;
 
-    public TabItem(TabListMaster master, Tab associatedTab) {
-        super(master);
+    public TabItem(TabManager manager, Tab associatedTab) {
+        super(manager.getTabList());
+        this.manager = manager;
+        this.token = associatedTab.token;
         this.associatedTab = associatedTab;
 
         this.updateName();
@@ -32,8 +42,17 @@ public class TabItem extends TabListElement {
         associatedTab.linkTabItem(this);
     }
 
+    public TabItem(TabManager manager, @NotNull ModuleToken token) {
+        super(manager.getTabList());
+        this.manager = manager;
+        this.token = token;
+        this.associatedTab = null;
+        this.updateName();
+        this.updateIcon();
+    }
+
     void updateIcon() {
-        this.icon = associatedTab.token.getIcon();
+        this.icon = token.getIcon();
         if(this.icon != null) {
             this.icon = ImageUtil.fitToSize(this.icon, 16, 16);
         }
@@ -70,11 +89,24 @@ public class TabItem extends TabListElement {
         g.setFont(master.getFont());
         FontMetrics fm = g.getFontMetrics();
 
+        boolean iconOnly = this.name == null;
+
         this.x = master.getOffsetX();
         this.lastRecordedOffset = x;
-        int w = 8 + 16 + 2 + fm.stringWidth(this.name) + 10 + 6 + 15;
-        this.width = w;
         int h = master.getHeight();
+        int w = iconOnly ? (Math.max(32, h)) + (token.isTabCloseable() ? 16 : 0) : 8 + 16 + 2 + fm.stringWidth(this.name) + 10 + 6 + 15;
+
+        /*
+            // 8px margin
+            // + 16px icon
+            // + 5px
+            // + name px
+            // + 10px
+            // + 6px close button
+            // + 12px margin
+        }*/
+
+        this.width = w;
 
         int offsetX = x;
         if(master.draggedElement == this) offsetX = (int) (master.dragPoint.x - (w * master.dragPivot));
@@ -109,44 +141,52 @@ public class TabItem extends TabListElement {
             }
         }
 
-        if(icon != null) g.drawImage(icon, offsetX + 16 - icon.getWidth(null)/2, (h-16)/2 + 8 - icon.getHeight(null)/2, null);
-        offsetX += 26;
-
-        if(this.selected) {
-            g.setColor(master.getColors().get("tab.selected.foreground"));
-        } else if(this.rollover) {
-            g.setColor(master.getColors().get("tab.rollover.foreground"));
+        if(icon != null) g.drawImage(icon, offsetX + (iconOnly ? h/2 : 16) - icon.getWidth(null)/2, (h-16)/2 + 8 - icon.getHeight(null)/2, null);
+        if(iconOnly) {
+            offsetX += 24;
         } else {
-            g.setColor(master.getColors().get("tab.foreground"));
+            offsetX += 29;
+
+            if(this.selected) {
+                g.setColor(master.getColors().get("tab.selected.foreground"));
+            } else if(this.rollover) {
+                g.setColor(master.getColors().get("tab.rollover.foreground"));
+            } else {
+                g.setColor(master.getColors().get("tab.foreground"));
+            }
+
+            g.drawString(this.name, offsetX, (h+fm.getAscent()-fm.getDescent())/2);
+
+            offsetX += fm.stringWidth(this.name) + 10;
         }
 
-        g.drawString(this.name, offsetX + 3, (h+fm.getAscent()-fm.getDescent())/2);
 
-        offsetX += fm.stringWidth(this.name) + 13;
-
-        if(this.closeRollover) {
-            g.setColor(master.getColors().get("tab.close.rollover.color"));
-        } else {
-            g.setColor(master.getColors().get("tab.close.color"));
-        }
-        if(associatedTab.isSaved()) {
-            g.drawLine(offsetX, (h - 6) / 2, offsetX + 6, (h + 6) / 2);
-            g.drawLine(offsetX, (h + 6) / 2, offsetX + 6, (h - 6) / 2);
-        } else {
-            ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g.fillOval(offsetX, (h - 6) / 2, 6, 6);
+        if(token.isTabCloseable()) {
+            if(this.closeRollover) {
+                g.setColor(master.getColors().get("tab.close.rollover.color"));
+            } else {
+                g.setColor(master.getColors().get("tab.close.color"));
+            }
+            if(associatedTab == null || associatedTab.isSaved()) {
+                g.drawLine(offsetX, (h - 6) / 2, offsetX + 6, (h + 6) / 2);
+                g.drawLine(offsetX, (h + 6) / 2, offsetX + 6, (h - 6) / 2);
+            } else {
+                ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g.fillOval(offsetX, (h - 6) / 2, 6, 6);
+            }
         }
         g.dispose();
     }
 
     private boolean isOverCloseButton(MouseEvent e) {
+        if(!token.isTabCloseable()) return false;
         int padding = 5;
         return (e.getX() >= this.x + this.width - 12 - 6 - padding && e.getX() <= this.x + this.width - 12 + padding);
     }
 
     @Override
     public boolean select(MouseEvent e) {
-        return !isOverCloseButton(e);
+        return associatedTab != null && !isOverCloseButton(e);
     }
 
     @Override
@@ -156,27 +196,36 @@ public class TabItem extends TabListElement {
 
     @Override
     public String getToolTipText() {
-        return associatedTab.token.getHint();
+        return token.getHint();
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if(isOverCloseButton(e) || e.getButton() == MouseEvent.BUTTON2) {
-            TabManager.closeTab(this.associatedTab);
+        if(token.isTabCloseable() && (isOverCloseButton(e) || e.getButton() == MouseEvent.BUTTON2)) {
+            manager.closeTab(this.associatedTab);
         }
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
         if(!isOverCloseButton(e)) {
-            if(e.getButton() == MouseEvent.BUTTON1) {
-                TabManager.setSelectedTab(this.associatedTab);
+            if(this.associatedTab != null) {
+                if(e.getButton() == MouseEvent.BUTTON1) {
+                    manager.setSelectedTab(this.associatedTab);
+                }
+            } else {
+                selected = true;
+                master.repaint();
             }
         }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
+        if(this.associatedTab == null && e.getButton() == MouseEvent.BUTTON1) {
+            selected = false;
+            token.onInteract();
+        }
         if(e.isPopupTrigger()) {
             StyledPopupMenu menu = this.generatePopup();
             menu.show(e.getComponent(), e.getX(), e.getY());
@@ -208,7 +257,8 @@ public class TabItem extends TabListElement {
     }
 
     public void updateName() {
-        this.name = StringUtil.ellipsis(associatedTab.getName(),32);
+        this.name = token.getTitle();
+        if(this.name != null) this.name = StringUtil.ellipsis(this.name,32);
     }
 
     private StyledPopupMenu generatePopup() {
@@ -216,16 +266,16 @@ public class TabItem extends TabListElement {
 
         {
             StyledMenuItem item = new StyledMenuItem("Close");
-            item.addActionListener(e -> TabManager.closeTab(associatedTab));
+            item.addActionListener(e -> manager.closeTab(associatedTab));
             menu.add(item);
         }
         {
             StyledMenuItem item = new StyledMenuItem("Close Others");
             item.addActionListener(e -> {
-                for(int i = 0; i < TabManager.openTabs.size();) {
-                    Tab tab = TabManager.openTabs.get(i);
+                for(int i = 0; i < manager.openTabs.size();) {
+                    Tab tab = manager.openTabs.get(i);
                     if(tab != associatedTab) {
-                        TabManager.closeTab(tab);
+                        manager.closeTab(tab);
                     } else {
                         i++;
                     }
@@ -241,7 +291,7 @@ public class TabItem extends TabListElement {
                     if(tabListElement instanceof TabItem) {
                         Tab tab = ((TabItem) tabListElement).associatedTab;
                         if(tab != associatedTab) {
-                            TabManager.closeTab(tab);
+                            manager.closeTab(tab);
                         } else {
                             break;
                         }
@@ -259,7 +309,7 @@ public class TabItem extends TabListElement {
                     if(tabListElement instanceof TabItem) {
                         Tab tab = ((TabItem) tabListElement).associatedTab;
                         if(tab != associatedTab) {
-                            if(doClose) TabManager.closeTab(tab);
+                            if(doClose) manager.closeTab(tab);
                             else i++;
                         } else {
                             doClose = true;
@@ -274,8 +324,8 @@ public class TabItem extends TabListElement {
         {
             StyledMenuItem item = new StyledMenuItem("Close All");
             item.addActionListener(e -> {
-                while(!TabManager.openTabs.isEmpty()) {
-                    TabManager.closeTab(TabManager.openTabs.get(0));
+                while(!manager.openTabs.isEmpty()) {
+                    manager.closeTab(manager.openTabs.get(0));
                 }
             });
             menu.add(item);
@@ -283,6 +333,7 @@ public class TabItem extends TabListElement {
         return menu;
     }
 
+    @Nullable
     public Tab getAssociatedTab() {
         return associatedTab;
     }

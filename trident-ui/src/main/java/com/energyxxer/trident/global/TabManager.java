@@ -8,6 +8,9 @@ import com.energyxxer.trident.ui.editor.behavior.caret.CaretProfile;
 import com.energyxxer.trident.ui.modules.ModuleToken;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenuItem;
 import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
+import com.energyxxer.trident.ui.tablist.TabItem;
+import com.energyxxer.trident.ui.tablist.TabListMaster;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,24 +23,35 @@ import java.util.regex.Pattern;
  * list.
  */
 public class TabManager {
+	@NotNull
+	private final TabListMaster tabList;
+	@NotNull
+	private final ContentSwapper moduleComponent;
+	private boolean changeWindowInfo = false;
+	private String openTabSaveKey = null;
 
-	public static ArrayList<Tab> openTabs = new ArrayList<>();
+	public ArrayList<Tab> openTabs = new ArrayList<>();
 
-	private static Tab selectedTab = null;
+	private Tab selectedTab = null;
 	
-	private static StyledPopupMenu menu;
+	private StyledPopupMenu menu;
 
-	public static void openTab(ModuleToken token, int index) {
+	public TabManager(@NotNull TabListMaster tabList, @NotNull ContentSwapper moduleComponent) {
+		this.tabList = tabList;
+		this.moduleComponent = moduleComponent;
+	}
+
+	public void openTab(ModuleToken token, int index) {
 		openTab(token);
 		selectLocation(selectedTab, index, 0);
 	}
 
-	public static void openTab(ModuleToken token, int index, int length) {
+	public void openTab(ModuleToken token, int index, int length) {
 		openTab(token);
 		selectLocation(selectedTab, index, length);
 	}
 
-	public static void openTab(ModuleToken token) {
+	public void openTab(ModuleToken token) {
 		for (int i = 0; i < openTabs.size(); i++) {
 			if (openTabs.get(i).token.equals(token)) {
 				setSelectedTab(openTabs.get(i));
@@ -46,29 +60,29 @@ public class TabManager {
 		}
 		Tab nt = new Tab(token);
 		openTabs.add(nt);
-		TridentWindow.tabList.addTab(nt);
+		tabList.addTab(new TabItem(this, nt));
 		setSelectedTab(nt);
 	}
 
-	private static void selectLocation(Tab tab, int index, int length) {
+	private void selectLocation(Tab tab, int index, int length) {
 		if(tab.module instanceof TridentEditorModule) {
 			((TridentEditorModule) tab.module).editorComponent.getCaret().setProfile(new CaretProfile(index + length, index));
 		}
 	}
 
-	public static void closeSelectedTab() {
+	public void closeSelectedTab() {
 		closeSelectedTab(false);
 	}
 
-	public static void closeSelectedTab(boolean force) {
+	public void closeSelectedTab(boolean force) {
 		closeTab(getSelectedTab(), force);
 	}
 
-	public static void closeTab(Tab tab) {
+	public void closeTab(Tab tab) {
 		closeTab(tab, false);
 	}
 
-	public static void closeTab(Tab tab, boolean force) {
+	public void closeTab(Tab tab, boolean force) {
 		if(tab == null) return;
 		if(!force) {
 			if(!tab.isSaved()) {
@@ -81,9 +95,9 @@ public class TabManager {
 		}
 		for (int i = 0; i < openTabs.size(); i++) {
 			if (openTabs.get(i) == tab) {
-				if (selectedTab == openTabs.get(i)) setSelectedTab(TridentWindow.tabList.getFallbackTab(tab));
+				if (selectedTab == openTabs.get(i)) setSelectedTab(tabList.getFallbackTab(tab));
 
-				TridentWindow.tabList.removeTab(tab);
+				tabList.removeTab(tab);
 				openTabs.remove(i);
 				tab.dispose();
 
@@ -91,18 +105,24 @@ public class TabManager {
 			}
 		}
 	}
-	
-	private static void updateMenu() {
+
+	public void closeAllTabs(boolean force) {
+		while(openTabs.size() > 0) {
+			closeTab(openTabs.get(0), force);
+		}
+	}
+
+	private void updateMenu() {
 		menu = new StyledPopupMenu();
-		if(TabManager.openTabs.size() <= 0) {
+		if(openTabs.size() <= 0) {
 			StyledMenuItem item = new StyledMenuItem("No tabs open!");
 			item.setFont(item.getFont().deriveFont(Font.ITALIC));
 			item.setIcon(new ImageIcon(Commons.getIcon("info").getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
 			menu.add(item);
 			return;
 		}
-		for(int i = 0; i < TabManager.openTabs.size(); i++) {
-			Tab tab = TabManager.openTabs.get(i);
+		for(int i = 0; i < openTabs.size(); i++) {
+			Tab tab = openTabs.get(i);
 			StyledMenuItem item = new StyledMenuItem(((!tab.isSaved()) ? "*" : "") + tab.getName());
 			item.setIcon(new ImageIcon(tab.getLinkedTabItem().getIcon()));
 			if(!tab.visible) {
@@ -112,43 +132,45 @@ public class TabManager {
 			menu.add(item);
 		}
 	}
-	
-	public static StyledPopupMenu getMenu() {
+
+	public StyledPopupMenu getMenu() {
 		updateMenu();
 		return menu;
 	}
 
-	public static void setSelectedTab(Tab tab) {
-		TridentWindow.tabList.selectTab(tab);
+	public void setSelectedTab(Tab tab) {
+		tabList.selectTab(tab);
 		if (selectedTab != null) {
 			selectedTab = null;
 		}
 		if (tab != null) {
 			selectedTab = tab;
-			
+
 			String linkedProject = null;
 			if(tab.token.getAssociatedProjectRoot() != null) {
 				linkedProject = tab.token.getAssociatedProjectRoot().getName();
 			}
-			TridentWindow.setTitle(((linkedProject != null) ? linkedProject + " - " : "") + tab.getName());
-			TridentWindow.editArea.setContent(tab.getModuleComponent());
+			if(changeWindowInfo) TridentWindow.setTitle(((linkedProject != null) ? linkedProject + " - " : "") + tab.getName());
+			moduleComponent.setContent(tab.getModuleComponent());
 			tab.onSelect();
 		} else {
-			TridentWindow.statusBar.setCaretInfo(Commons.DEFAULT_CARET_DISPLAY_TEXT);
-			TridentWindow.statusBar.setSelectionInfo(" ");
-            TridentWindow.clearTitle();
-            TridentWindow.editArea.setContent(null);
+			if(changeWindowInfo) {
+				TridentWindow.statusBar.setCaretInfo(Commons.DEFAULT_CARET_DISPLAY_TEXT);
+				TridentWindow.statusBar.setSelectionInfo(" ");
+				TridentWindow.clearTitle();
+			}
+            moduleComponent.setContent(null);
 		}
 
 		Commons.updateActiveProject();
 		saveOpenTabs();
 	}
 
-	public static Tab getSelectedTab() {
+	public Tab getSelectedTab() {
 		return selectedTab;
 	}
 
-	/*public static void renameTab(String oldPath, String newPath) {
+	/*public void renameTab(String oldPath, String newPath) {
 		File newFile = new File(newPath);
 		if (newFile.isFile()) {
 			for(Tab tab : openTabs) {
@@ -167,7 +189,8 @@ public class TabManager {
 		}
 	}*/
 
-	public static void saveOpenTabs() {
+	public void saveOpenTabs() {
+		if(openTabSaveKey == null) return;
 		StringBuilder sb = new StringBuilder();
 		for(Tab tab : openTabs) {
 			if(selectedTab != tab) {
@@ -179,11 +202,12 @@ public class TabManager {
 			sb.append(selectedTab.token.getIdentifier());
 			sb.append(File.pathSeparator);
 		}
-		Preferences.put("open_tabs",sb.toString());
+		Preferences.put(openTabSaveKey, sb.toString());
 	}
 
-	public static void openSavedTabs() {
-		String savedTabs = Preferences.get("open_tabs",null);
+	public void openSavedTabs() {
+		if(openTabSaveKey == null) return;
+		String savedTabs = Preferences.get(openTabSaveKey,null);
 		if(savedTabs != null) {
 			String[] identifiers = savedTabs.split(Pattern.quote(File.pathSeparator));
 			for(String identifier : identifiers) {
@@ -191,5 +215,28 @@ public class TabManager {
 				if(created != null) openTab(created);
 			}
 		}
+	}
+
+	public void setChangeWindowInfo(boolean changeWindowInfo) {
+		this.changeWindowInfo = changeWindowInfo;
+	}
+
+	public TabListMaster getTabList() {
+		return tabList;
+	}
+
+	public String getOpenTabSaveKey() {
+		return openTabSaveKey;
+	}
+
+	public void setOpenTabSaveKey(String openTabSaveKey) {
+		this.openTabSaveKey = openTabSaveKey;
+	}
+
+	public Tab getTabForToken(ModuleToken token) {
+		for(Tab tab : openTabs) {
+			if(tab.token.equals(token)) return tab;
+		}
+		return null;
 	}
 }

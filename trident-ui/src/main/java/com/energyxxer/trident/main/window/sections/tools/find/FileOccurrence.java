@@ -1,8 +1,8 @@
 package com.energyxxer.trident.main.window.sections.tools.find;
 
-import com.energyxxer.trident.global.TabManager;
 import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
+import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.explorer.base.ExplorerMaster;
 import com.energyxxer.trident.ui.explorer.base.StandardExplorerItem;
 import com.energyxxer.trident.ui.modules.FileModuleToken;
@@ -99,7 +99,7 @@ public class FileOccurrence extends QueryResult implements NonStandardModuleToke
 
     @Override
     public void onInteract() {
-        TabManager.openTab(new FileModuleToken(file), start, length);
+        TridentWindow.tabManager.openTab(new FileModuleToken(file), start, length);
     }
 
     @Override

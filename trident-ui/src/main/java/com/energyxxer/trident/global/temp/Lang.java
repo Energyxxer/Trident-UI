@@ -71,6 +71,7 @@ public enum Lang {
     }
 
     public static Lang getLangForFile(String path) {
+        if(path == null) return null;
         for(Lang lang : Lang.values()) {
             for(String extension : lang.extensions) {
                 if(path.endsWith("." + extension)) {

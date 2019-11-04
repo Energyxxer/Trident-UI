@@ -1,11 +1,13 @@
 package com.energyxxer.trident.ui.editor;
 
 import com.energyxxer.trident.global.Commons;
+import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.global.temp.Lang;
 import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
 import com.energyxxer.trident.global.temp.projects.TridentProject;
 import com.energyxxer.trident.main.TridentUI;
+import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.main.window.sections.editor_search.FindAndReplaceBar;
 import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.display.DisplayModule;
@@ -41,6 +43,7 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
 
     File file;
     Tab associatedTab;
+    Lang forcedLang = null;
 
     public TridentEditorComponent editorComponent;
     private TextLineNumber tln;
@@ -120,11 +123,9 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
 
         addThemeChangeListener();
 
-        reloadFromDisk();
+        startEditListeners();
 
-        if(tab == null) {
-            editorComponent.setEditable(false);
-        }
+        reloadFromDisk();
     }
 
     public void showSearchBar() {
@@ -153,6 +154,7 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
     }
 
     public void reloadFromDisk() {
+        if(file == null) return;
         byte[] encoded;
         try {
             encoded = Files.readAllBytes(file.toPath());
@@ -160,7 +162,6 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
             setText(s);
             editorComponent.setCaretPosition(0);
             if(associatedTab != null) associatedTab.updateSavedValue();
-            startEditListeners();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -326,7 +327,15 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
         );
         tln.setFont(new Font(t.getString("TridentEditorModule.lineNumber.font","default:monospaced"),0,12));
 
-        Lang lang = Lang.getLangForFile(file.getPath());
+        updateSyntax(t);
+    }
+
+    public void updateSyntax() {
+        updateSyntax(TridentWindow.getTheme());
+    }
+
+    public void updateSyntax(Theme t) {
+        Lang lang = getLanguage();
         if(lang != null) {
             setSyntax(ThemeManager.getSyntaxForGUITheme(lang, t));
             editorComponent.highlight();
@@ -350,6 +359,7 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
 
     @Override
     public Object save() {
+        if(file == null) return null;
         PrintWriter writer;
         try {
             writer = new PrintWriter(file, "UTF-8");
@@ -397,5 +407,23 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
     @Override
     public void dispose() {
         editorComponent.dispose();
+    }
+
+    public void setEditable(boolean editable) {
+        editorComponent.setEditable(editable);
+    }
+
+    public Lang getLanguage() {
+        return forcedLang != null ? forcedLang : file != null ? Lang.getLangForFile(file.getPath()) : null;
+    }
+
+    public void setForcedLanguage(Lang forcedLang) {
+        this.forcedLang = forcedLang;
+    }
+
+    public File getFileForAnalyzer() {
+        if(file != null) return file;
+        if(forcedLang != null) return new File(Preferences.get("workspace_dir"));
+        return null;
     }
 }

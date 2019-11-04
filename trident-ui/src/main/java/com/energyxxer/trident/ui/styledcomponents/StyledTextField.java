@@ -57,7 +57,7 @@ public class StyledTextField extends XTextField {
                 setForeground       (t.getColor(Color.BLACK, "General.textfield.foreground","General.foreground"));
                 setSelectionColor   (t.getColor(new Color(50, 100, 175), "General.textfield.selection.background"));
                 setSelectedTextColor(t.getColor(getForeground(), "General.textfield.selection.foreground"));
-                setBorder(t.getColor(new Color(200, 200, 200), "General.textfield.border.color"),Math.max(t.getInteger(1,"General.textfield.border.borderThickness"),0));
+                setBorder(t.getColor(new Color(200, 200, 200), "General.textfield.border.color"),Math.max(t.getInteger(1,"General.textfield.border.thickness"),0));
                 setFont(t.getFont("General.textfield","General"));
 
                 setDisabledTextColor(t.getColor(getForeground(), "General.textfield.disabled.foreground"));

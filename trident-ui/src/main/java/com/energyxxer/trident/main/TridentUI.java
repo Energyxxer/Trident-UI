@@ -3,7 +3,6 @@ package com.energyxxer.trident.main;
 import com.energyxxer.trident.compiler.TridentCompiler;
 import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.global.Resources;
-import com.energyxxer.trident.global.TabManager;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.commodoreresources.DefinitionUpdateProcess;
@@ -78,7 +77,7 @@ public class TridentUI {
         ProjectManager.loadWorkspace();
 
 		TridentWindow.welcomePane.tipScreen.start(1000);
-		TabManager.openSavedTabs();
+		TridentWindow.tabManager.openSavedTabs();
 		TridentWindow.projectExplorer.openExplorerTree();
 
 		DefinitionUpdateProcess.tryUpdate();

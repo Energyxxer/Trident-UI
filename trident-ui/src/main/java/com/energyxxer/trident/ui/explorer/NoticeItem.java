@@ -1,7 +1,7 @@
 package com.energyxxer.trident.ui.explorer;
 
 import com.energyxxer.enxlex.report.Notice;
-import com.energyxxer.trident.global.TabManager;
+import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.explorer.base.ExplorerFlag;
 import com.energyxxer.trident.ui.explorer.base.ExplorerMaster;
 import com.energyxxer.trident.ui.explorer.base.elements.ExplorerElement;
@@ -137,7 +137,7 @@ public class NoticeItem extends ExplorerElement {
     @Override
     public void mouseClicked(MouseEvent e) {
         if(e.getButton() == MouseEvent.BUTTON1 && !isPlatformControlDown(e) && e.getClickCount() % 2 == 0 && notice.getFilePath() != null) {
-            TabManager.openTab(new FileModuleToken(new File(notice.getFilePath())), notice.getLocationIndex(), notice.getLocationLength());
+            TridentWindow.tabManager.openTab(new FileModuleToken(new File(notice.getFilePath())), notice.getLocationIndex(), notice.getLocationLength());
         }
     }
 

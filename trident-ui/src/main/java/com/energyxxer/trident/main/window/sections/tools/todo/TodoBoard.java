@@ -26,7 +26,7 @@ import com.energyxxer.xswing.hints.Hint;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 public class TodoBoard extends ToolBoard {
@@ -95,7 +95,7 @@ public class TodoBoard extends ToolBoard {
         explorer.clear();
         for(Project project : ProjectManager.getLoadedProjects()) {
             if(project.getSummary() != null) {
-                ArrayList<Todo> todos = null;
+                Collection<Todo> todos = null;
                 if(project instanceof TridentProject) todos = ((TridentProjectSummary) project.getSummary()).getTodos();
                 else if(project instanceof CrossbowProject) todos = ((CrossbowProjectSummary) project.getSummary()).getTodos();
 

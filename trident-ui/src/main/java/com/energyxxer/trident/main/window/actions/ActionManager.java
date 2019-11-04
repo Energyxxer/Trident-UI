@@ -2,7 +2,7 @@ package com.energyxxer.trident.main.window.actions;
 
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.Resources;
-import com.energyxxer.trident.global.TabManager;
+import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.main.window.sections.search_path.SearchPathDialog;
 import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.commodoreresources.DefinitionUpdateProcess;
@@ -28,13 +28,13 @@ public class ActionManager {
         actions.add(new ProgramAction(
                 "Close Active Tab", "Close the tab currently visible",
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, getPlatformControlMask()),
-                TabManager::closeSelectedTab)
+                TridentWindow.tabManager::closeSelectedTab)
         );
         actions.add(new ProgramAction(
                 "Save Active Tab", "Save the tab currently visible",
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, getPlatformControlMask()),
                 () -> {
-                    Tab st = TabManager.getSelectedTab();
+                    Tab st = TridentWindow.tabManager.getSelectedTab();
                     if(st != null) st.save();
                 })
         );
@@ -42,7 +42,7 @@ public class ActionManager {
                 "Reload from Disk", "Reload the current file from disk",
                 KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0),
                 () -> {
-                    Tab st = TabManager.getSelectedTab();
+                    Tab st = TridentWindow.tabManager.getSelectedTab();
                     if(st != null) {
                         if(st.module instanceof TridentEditorModule) {
                             ((TridentEditorModule) st.module).reloadFromDisk();

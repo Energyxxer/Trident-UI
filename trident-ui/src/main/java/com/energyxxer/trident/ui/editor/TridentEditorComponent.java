@@ -28,6 +28,7 @@ import javax.swing.text.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyListener;
+import java.io.File;
 import java.util.Date;
 import java.util.Map;
 import java.util.function.Function;
@@ -57,7 +58,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
         sd = this.getStyledDocument();
 
         //if(Lang.getLangForFile(parent.associatedTab.path) != null) this.inspector = new Inspector(this);
-        if(Lang.getLangForFile(parent.file.getPath()) == Lang.TRIDENT) {
+        if(parent.file != null && parent.getLanguage() == Lang.TRIDENT) {
             this.inspector = new Inspector(this);
         }
 
@@ -119,15 +120,17 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
 
         String text = getText();
 
-        Lang lang = Lang.getLangForFile(parent.file.getPath());
+        Lang lang = parent.getLanguage();
         Debug.log(lang);
-        Project project = ProjectManager.getAssociatedProject(parent.file);
+        if(lang == null) return;
+        Project project = parent.file != null ? ProjectManager.getAssociatedProject(parent.file) : null;
         Debug.log(project);
 
         SuggestionModule suggestionModule = (lang == Lang.TRIDENT || lang == Lang.CROSSBOW) && project != null ? new SuggestionModule(this.getCaretWordPosition(), this.getCaretPosition()) : null;
         SummaryModule summaryModule = project != null ? (lang == Lang.TRIDENT ? new TridentSummaryModule() : (lang == Lang.CROSSBOW ? new CrossbowSummaryModule() : null)) : null;
 
-        Lang.LangAnalysisResponse analysis = lang != null ? lang.analyze(parent.file, text, suggestionModule, summaryModule) : null;
+        File file = parent.getFileForAnalyzer();
+        Lang.LangAnalysisResponse analysis = file != null ? lang.analyze(file, text, suggestionModule, summaryModule) : null;
         if(analysis == null) return;
         Debug.log("analysis running");
 
@@ -208,6 +211,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
     @Override
     public void actionPerformed(ActionEvent arg0) {
         if (lastEdit > -1 && (new Date().getTime()) - lastEdit > 500 && (parent.associatedTab == null || parent.associatedTab.isActive())) {
+            Debug.log("Action performed, tryna highlight");
             lastEdit = -1;
             if(highlightingThread != null) {
                 highlightingThread.stop();

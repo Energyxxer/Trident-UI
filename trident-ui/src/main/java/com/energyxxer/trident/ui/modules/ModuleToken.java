@@ -20,6 +20,10 @@ public interface ModuleToken {
     void onInteract();
     StyledPopupMenu generateMenu();
 
+    default boolean isTabCloseable() {
+        return true;
+    }
+
     default String getSearchTerms() { return null; }
 
     String getIdentifier();

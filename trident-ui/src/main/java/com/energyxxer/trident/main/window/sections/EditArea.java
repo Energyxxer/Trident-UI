@@ -1,7 +1,6 @@
 package com.energyxxer.trident.main.window.sections;
 
 import com.energyxxer.trident.global.Commons;
-import com.energyxxer.trident.global.TabManager;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.ToolbarButton;
 import com.energyxxer.trident.ui.modules.FileModuleToken;
@@ -63,7 +62,7 @@ public class EditArea extends JPanel {
 
             for(File file : files) {
                 if(file.isFile() && file.exists()) {
-                    TabManager.openTab(new FileModuleToken(file));
+                    TridentWindow.tabManager.openTab(new FileModuleToken(file));
                 }
             }
 
@@ -93,7 +92,7 @@ public class EditArea extends JPanel {
             more.setPreferredSize(new Dimension(25,25));
             tabActionPanel.add(more);
 
-            more.addActionListener(e -> TabManager.getMenu().show(more, more.getWidth()/2, more.getHeight()));
+            more.addActionListener(e -> TridentWindow.tabManager.getMenu().show(more, more.getWidth()/2, more.getHeight()));
         }
         tabActionPanel.add(new Padding(5));
 

@@ -68,6 +68,7 @@ public class TridentWindow {
 
 	public static HintManager hintManager = new HintManager(jframe);
 
+	public static TabManager tabManager;
 	public static TabListMaster tabList;
 
 	private ThemeListenerManager tlm = new ThemeListenerManager();
@@ -84,6 +85,9 @@ public class TridentWindow {
 		jframe.setLayout(new BorderLayout());
 
 		tabList = new TabListMaster();
+		tabManager = new TabManager(tabList, c -> editArea.setContent(c));
+		tabManager.setChangeWindowInfo(true);
+		tabManager.setOpenTabSaveKey("open_tabs");
 
 		welcomePane = new WelcomePane();
 
@@ -231,7 +235,7 @@ public class TridentWindow {
 
 	private static void terminate() {
 		Debug.log("Terminating...");
-		TabManager.saveOpenTabs();
+		tabManager.saveOpenTabs();
 		projectExplorer.saveExplorerTree();
 		Resources.saveAll();
 		jframe.dispose();
