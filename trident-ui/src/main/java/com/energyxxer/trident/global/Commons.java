@@ -57,6 +57,21 @@ public class Commons {
                 Desktop desktop = Desktop.getDesktop();
                 desktop.open(new File(path).getParentFile());
             } else {
+                Debug.log("Couldn't show file '" + path + "': Desktop is not supported", Debug.MessageType.ERROR);
+            }
+        } catch (IOException x) {
+            x.printStackTrace();
+        }
+    }
+
+    public static void openInExplorer(String path) {
+        try {
+            if(System.getProperty("os.name").startsWith("Windows")) {
+                Runtime.getRuntime().exec("Explorer.exe \"" + path + "\""); //can't believe you don't have to escape it
+            } else if(Desktop.isDesktopSupported()) {
+                Desktop desktop = Desktop.getDesktop();
+                desktop.open(new File(path));
+            } else {
                 Debug.log("Couldn't open file '" + path + "': Desktop is not supported", Debug.MessageType.ERROR);
             }
         } catch (IOException x) {

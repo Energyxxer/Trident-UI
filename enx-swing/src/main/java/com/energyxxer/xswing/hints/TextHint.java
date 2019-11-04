@@ -28,6 +28,10 @@ public class TextHint extends Hint {
         this.update();
     }
 
+    public String getText() {
+        return textPane.getText();
+    }
+
     public Color getForeground() {
         return textPane.getForeground();
     }

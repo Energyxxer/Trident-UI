@@ -82,7 +82,7 @@ public class ProjectProperties {
 
 		sectionPanes.put("General", contentGeneral);
 		sectionPanes.put("Output", new ProjectPropertiesOutput());
-		sectionPanes.put("Definitions", new JPanel());
+		sectionPanes.put("Definitions", new ProjectPropertiesDefinitions());
 		sectionPanes.put("Type Aliases", new ProjectPropertiesAliases());
 		sectionPanes.put("Dependencies", new JPanel());
 		sectionPanes.put("Game Logger", new JPanel());

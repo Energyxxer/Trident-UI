@@ -13,8 +13,12 @@ public class Padding extends JPanel {
     }
 
     public Padding(int size) {
+        this(size, size);
+    }
+
+    public Padding(int width, int height) {
         this();
-        Dimension dim = new Dimension(size, size);
+        Dimension dim = new Dimension(width, height);
         this.setPreferredSize(dim);
         this.setMaximumSize(dim);
     }

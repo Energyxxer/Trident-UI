@@ -12,18 +12,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DefinitionPacks {
-    private static HashMap<String, DefinitionPack> loadedDefinitionPacks = new HashMap<>();
+    private static HashMap<String, DefinitionPack> loadedDefinitionPacks = new LinkedHashMap<>();
     private static final Pattern vanillaKey = Pattern.compile("minecraft_j_1_(\\d+)");
 
     private static JavaEditionVersion latestKnownVersion = new JavaEditionVersion(1, 13, 0);
     private static JavaEditionVersion[] knownVersionList = null;
+    public static final String DEF_PACK_DIR_PATH = System.getProperty("user.home") + File.separator + "Trident" + File.separator + "resources" + File.separator + "defpacks" + File.separator;
 
     public static void loadAll() {
         loadedDefinitionPacks.clear();
 
-        String defPackDirPath = System.getProperty("user.home") + File.separator + "Trident" + File.separator + "resources" + File.separator + "defpacks" + File.separator;
-
-        File defPackDir = new File(defPackDirPath);
+        File defPackDir = new File(DEF_PACK_DIR_PATH);
         defPackDir.mkdirs();
         File[] files = defPackDir.listFiles();
         if(files != null) {

@@ -51,37 +51,16 @@ public class TabItem extends TabListElement {
         this.updateIcon();
     }
 
+    public void updateName() {
+        this.name = token.getTitle();
+        if(this.name != null) this.name = StringUtil.ellipsis(this.name,32);
+    }
+
     void updateIcon() {
         this.icon = token.getIcon();
         if(this.icon != null) {
             this.icon = ImageUtil.fitToSize(this.icon, 16, 16);
         }
-        /*if(associatedTab.path.endsWith(".png")) {
-            try {
-                BufferedImage img = ImageIO.read(new File(associatedTab.path));
-                Dimension size = new Dimension(img.getWidth(), img.getHeight());
-                if(img.getWidth() < img.getHeight()) {
-                    size.height = 16;
-                    size.width = Math.max(1,(int) Math.round(16 * (double) img.getWidth() / img.getHeight()));
-                } else {
-                    size.width = 16;
-                    size.height = Math.max(1,(int) Math.round(16 * (double) img.getHeight() / img.getWidth()));
-                }
-                this.icon = img.getScaledInstance(size.width,size.height, Image.SCALE_SMOOTH);
-            } catch(IOException x) {
-                this.icon = Commons.getIcon("file").getScaledInstance(16,16, Image.SCALE_SMOOTH);
-            }
-            return;
-        }
-
-        String icon = ProjectManager.getIconFor(new File(associatedTab.path));
-        if(icon != null) {
-            this.icon = Commons.getIcon(icon).getScaledInstance(16,16, Image.SCALE_SMOOTH);
-        } else if(name.endsWith(".trident")) {
-            this.icon = Commons.getIcon("entity").getScaledInstance(16, 16,java.awt.Image.SCALE_SMOOTH);
-        } else {
-            this.icon = Commons.getIcon("file").getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
-        }*/
     }
 
     @Override
@@ -254,11 +233,6 @@ public class TabItem extends TabListElement {
 
     public Image getIcon() {
         return icon;
-    }
-
-    public void updateName() {
-        this.name = token.getTitle();
-        if(this.name != null) this.name = StringUtil.ellipsis(this.name,32);
     }
 
     private StyledPopupMenu generatePopup() {
