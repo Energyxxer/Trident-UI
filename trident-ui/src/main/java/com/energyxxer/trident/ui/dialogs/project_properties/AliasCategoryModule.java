@@ -37,7 +37,7 @@ public class AliasCategoryModule extends JPanel implements DisplayModule {
                 for(Map.Entry<String, JsonElement> entry : aliases.getAsJsonObject(category).entrySet()) {
                     if(entry.getValue().isJsonPrimitive() && entry.getValue().getAsJsonPrimitive().isString()) {
                         editorText.append(entry.getKey());
-                        editorText.append('=');
+                        editorText.append(" = ");
                         editorText.append(entry.getValue().getAsString());
                         editorText.append('\n');
                     }

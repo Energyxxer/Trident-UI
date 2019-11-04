@@ -76,9 +76,6 @@ class ProjectPropertiesAliases extends JPanel {
 
                 preContent.add(new Padding(20));
 
-                StyledLabel label = new StyledLabel("Aliases:", "ProjectProperties.content");
-                label.setStyle(Font.BOLD);
-                preContent.add(label);
                 preContent.add(new StyledLabel("Type key-value pairs, separated by equals (=) signs to create a type alias for the corresponding type category.", "ProjectProperties.content"));
                 preContent.add(new StyledLabel("Aliases will allow you to automatically replace appearances of an alias type with its real name.", "ProjectProperties.content"));
                 preContent.add(new Padding(11));
