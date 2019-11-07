@@ -11,8 +11,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 public class OrderListMaster extends JComponent implements MouseListener, MouseMotionListener {
@@ -22,12 +22,10 @@ public class OrderListMaster extends JComponent implements MouseListener, MouseM
     private OrderListElement rolloverElement = null;
     private OrderListElement selectedElement = null;
 
+    private HashMap<String, Integer> styleNumbers = new HashMap<>();
     private HashMap<String, Color> colors = new HashMap<>();
     private String selectionStyle = "FULL";
     private int selectionLineThickness = 2;
-    private int buttonBorderThickness = 1;
-    private int rolloverButtonBorderThickness = 1;
-    private int pressedButtonBorderThickness = 1;
     private int rowHeight = 20;
 
     Point dragPoint = null;
@@ -54,19 +52,30 @@ public class OrderListMaster extends JComponent implements MouseListener, MouseM
 
             selectionStyle = t.getString("OrderList.item.selectionStyle", "default:FULL");
             selectionLineThickness = Math.max(t.getInteger(2, "OrderList.item.selectionLineThickness"), 0);
-            buttonBorderThickness = Math.max(t.getInteger(1,"OrderList.button.border.thickness"),1);
-            rolloverButtonBorderThickness = Math.max(t.getInteger(1,"OrderList.button.hover.border.thickness", "OrderList.button.border.thickness"),1);
-            pressedButtonBorderThickness = Math.max(t.getInteger(1,"OrderList.button.pressed.border.thickness", "OrderList.button.hover.border.thickness", "OrderList.button.border.thickness"),1);
+
+            styleNumbers.put("button.border.thickness", Math.max(t.getInteger(1,"OrderList.button.border.thickness"),1));
+            styleNumbers.put("button.rollover.border.thickness", Math.max(t.getInteger(1,"OrderList.button.hover.border.thickness", "OrderList.button.border.thickness"),1));
+            styleNumbers.put("button.pressed.border.thickness", Math.max(t.getInteger(1,"OrderList.button.pressed.border.thickness", "OrderList.button.hover.border.thickness", "OrderList.button.border.thickness"),1));
+
+            styleNumbers.put("checkbox.border.thickness", Math.max(t.getInteger(1,"OrderList.checkbox.border.thickness"),1));
+            styleNumbers.put("checkbox.rollover.border.thickness", Math.max(t.getInteger(1,"OrderList.checkbox.hover.border.thickness", "OrderList.checkbox.border.thickness"),1));
+            styleNumbers.put("checkbox.pressed.border.thickness", Math.max(t.getInteger(1,"OrderList.checkbox.pressed.border.thickness", "OrderList.checkbox.hover.border.thickness", "OrderList.checkbox.border.thickness"),1));
 
             this.setFont(t.getFont("OrderList.item", "General"));
-
-
+            
             colors.put("button.background", t.getColor(Color.GRAY, "OrderList.button.background"));
             colors.put("button.rollover.background", t.getColor(Color.GRAY, "OrderList.button.hover.background", "OrderList.button.background"));
             colors.put("button.pressed.background", t.getColor(Color.GRAY, "OrderList.button.pressed.background","OrderList.button.hover.background", "OrderList.button.background"));
             colors.put("button.border.color", t.getColor(Color.BLACK, "OrderList.button.border.color"));
             colors.put("button.rollover.border.color", t.getColor(Color.BLACK, "OrderList.button.hover.border.color", "OrderList.button.border.color"));
             colors.put("button.pressed.border.color", t.getColor(Color.BLACK, "OrderList.button.pressed.border.color", "OrderList.button.hover.border.color", "OrderList.button.border.color"));
+
+            colors.put("checkbox.background", t.getColor(Color.GRAY, "OrderList.checkbox.background"));
+            colors.put("checkbox.rollover.background", t.getColor(Color.GRAY, "OrderList.checkbox.hover.background", "OrderList.checkbox.background"));
+            colors.put("checkbox.pressed.background", t.getColor(Color.GRAY, "OrderList.checkbox.pressed.background","OrderList.checkbox.hover.background", "OrderList.checkbox.background"));
+            colors.put("checkbox.border.color", t.getColor(Color.BLACK, "OrderList.checkbox.border.color"));
+            colors.put("checkbox.rollover.border.color", t.getColor(Color.BLACK, "OrderList.checkbox.hover.border.color", "OrderList.checkbox.border.color"));
+            colors.put("checkbox.pressed.border.color", t.getColor(Color.BLACK, "OrderList.checkbox.pressed.border.color", "OrderList.checkbox.hover.border.color", "OrderList.checkbox.border.color"));
 
             children.forEach(e -> e.themeChanged(t));
         });
@@ -137,6 +146,10 @@ public class OrderListMaster extends JComponent implements MouseListener, MouseM
 
     HashMap<String, Color> getColors() {
         return colors;
+    }
+
+    HashMap<String, Integer> getStyleNumbers() {
+        return styleNumbers;
     }
 
     private OrderListElement getElementAtMousePos(MouseEvent e) {
@@ -292,18 +305,6 @@ public class OrderListMaster extends JComponent implements MouseListener, MouseM
         return rowHeight;
     }
 
-    public int getButtonBorderThickness() {
-        return buttonBorderThickness;
-    }
-
-    public int getRolloverButtonBorderThickness() {
-        return rolloverButtonBorderThickness;
-    }
-
-    public int getPressedButtonBorderThickness() {
-        return pressedButtonBorderThickness;
-    }
-
     public void moveUp(OrderListElement element) {
         int index = children.indexOf(element);
         if(index <= 0) return;
@@ -321,7 +322,7 @@ public class OrderListMaster extends JComponent implements MouseListener, MouseM
         selectElement(element);
     }
 
-    public Collection<OrderListElement> getAllElements() {
+    public List<OrderListElement> getAllElements() {
         return children;
     }
 }

@@ -11,6 +11,7 @@ import java.util.List;
 
 public interface ModuleToken {
     String getTitle();
+    default boolean ellipsisFromLeft() {return false;}
     java.awt.Image getIcon();
     String getHint();
     Collection<? extends ModuleToken> getSubTokens();

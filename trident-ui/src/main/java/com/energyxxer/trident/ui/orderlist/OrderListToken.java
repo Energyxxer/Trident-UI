@@ -36,7 +36,6 @@ public interface OrderListToken extends ModuleToken {
 
     @Override
     default void onInteract() {
-
     }
 
     @Override

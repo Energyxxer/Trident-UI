@@ -22,6 +22,7 @@ public class StandardOrderListItem extends OrderListElement {
     private int height = 20;
 
     private int actionRolloverIndex = -1;
+    private int pressedStart = -1;
     private Point toolTipLocation = new Point();
 
     private List<OrderListAction> actions;
@@ -92,8 +93,32 @@ public class StandardOrderListItem extends OrderListElement {
             }
         }
 
+        int leftX = 6;
+        int rightX = master.getWidth() - 6;
+        {
+
+            if(master.getSelectionStyle().equals("LINE_LEFT")) {
+                leftX += master.getSelectionLineThickness();
+            } else if(master.getSelectionStyle().equals("LINE_RIGHT")) {
+                rightX -= master.getSelectionLineThickness();
+            }
+
+            int actionIndex = 0;
+            for(OrderListAction action : actions) {
+                action.render(g, master, (action.isLeftAligned() ? leftX : rightX), offsetY, w, h, (actionIndex == actionRolloverIndex) ? (pressedStart == actionIndex ? 2 : 1) : 0, isActionEnabled(actionIndex));
+                int actionOffset = action.getRenderedWidth();
+
+                if(action.isLeftAligned()) leftX += actionOffset;
+                else rightX -= actionOffset;
+
+                actionIndex++;
+            }
+
+            x = leftX;
+        }
+
         int margin = ((h - 16) / 2);
-        x += 16;
+        x += 10;
 
         //File Icon
         if (icon != null) {
@@ -112,48 +137,71 @@ public class StandardOrderListItem extends OrderListElement {
         }
 
         if(name != null) {
-            g.drawString(name, x, offsetY + fm.getAscent() + ((h - fm.getHeight())/2));
-        }
+            int stringWidth = fm.stringWidth(name);
+            if(x + stringWidth > rightX) {
+                float estimatedCharacterWidth = (float)stringWidth/name.length();
+                int overlap = x + stringWidth - rightX;
 
-
-        int buttonHGap = 6;
-        int buttonSize = 20;
-        int buttonVGap = (h - buttonSize) / 2;
-        int iconMargin = (buttonSize - 16) / 2;
-        x = master.getWidth() - buttonHGap - buttonSize;
-
-        int actionIndex = 0;
-        for(OrderListAction action : actions) {
-            int buttonBorderThickness = actionIndex == actionRolloverIndex ? master.getRolloverButtonBorderThickness() : master.getButtonBorderThickness();
-            g.setColor(master.getColors().get("button" + (actionRolloverIndex == actionIndex ? ".rollover" : "") + ".border.color"));
-            g.fillRect(x - buttonBorderThickness, offsetY + buttonVGap - buttonBorderThickness, buttonSize + 2*buttonBorderThickness, buttonSize + 2*buttonBorderThickness);
-
-            g.setColor(master.getColors().get("button" + (actionRolloverIndex == actionIndex ? ".rollover" : "") + ".background"));
-            g.fillRect(x, offsetY + buttonVGap, buttonSize, buttonSize);
-
-            g.drawImage(action.getIcon(), x + iconMargin, offsetY + buttonVGap + iconMargin, null);
-
-            x -= buttonHGap + buttonSize;
-            actionIndex++;
+                int stripAmount = (int) Math.ceil((overlap / estimatedCharacterWidth) + 6);
+                String stripped;
+                if(stripAmount >= name.length()) {
+                    stripped = "";
+                } else if(token.ellipsisFromLeft()) {
+                    stripped = "..." + name.substring(stripAmount);
+                } else {
+                    stripped = name.substring(0, name.length() - stripAmount) + "...";
+                }
+                g.drawString(stripped, x, offsetY + fm.getAscent() + ((h - fm.getHeight())/2));
+            } else {
+                g.drawString(name, x, offsetY + fm.getAscent() + ((h - fm.getHeight())/2));
+            }
         }
 
         g.dispose();
     }
 
-    private int getActionRolloverIndex(MouseEvent e) {
-        int buttonHGap = 6;
-        int buttonSize = 20;
-        int buttonVGap = (height - buttonSize) / 2;
+    private boolean isActionEnabled(int index) {
+        OrderListAction action = actions.get(index);
+        if(action.getActionCode() == 1 && master.getAllElements().indexOf(this) == master.getAllElements().size()-1) return false;
+        if(action.getActionCode() == 2 && master.getAllElements().indexOf(this) == 0) return false;
+        return true;
+    }
 
-        int x = master.getWidth() - buttonHGap - buttonSize;
+    private int getActionRolloverIndex(MouseEvent e) {
+        return getActionRolloverIndex(e, false);
+    }
+
+    private int getActionRolloverIndex(MouseEvent e, boolean update) {
+        if(update) {
+            toolTipLocation.x = master.getWidth() / 2;
+            actionRolloverIndex = -1;
+        }
+
+        int leftX = 6;
+        int rightX = master.getWidth() - 6;
+
+        if(master.getSelectionStyle().equals("LINE_LEFT")) {
+            leftX += master.getSelectionLineThickness();
+        } else if(master.getSelectionStyle().equals("LINE_RIGHT")) {
+            rightX -= master.getSelectionLineThickness();
+        }
 
         for(int i = 0; i < actions.size(); i++) {
-            if(e.getY() >= lastRecordedOffset + buttonVGap && e.getY() < lastRecordedOffset + buttonVGap + buttonSize) {
-                if(e.getX() >= x && e.getX() < x + buttonSize) {
+            OrderListAction action = actions.get(i);
+            if(action.intersects(new Point(action.isLeftAligned() ? (e.getX() - leftX) : (rightX - e.getX()), e.getY() - lastRecordedOffset), master.getWidth(), getHeight())) {
+                if(isActionEnabled(i)) {
+                    if(update) {
+                        actionRolloverIndex = i;
+                        toolTipLocation.x = (action.isLeftAligned() ? leftX : (rightX - action.getRenderedWidth())) + action.getHintOffset();
+                    }
                     return i;
+                } else {
+                    return -1;
                 }
             }
-            x -= buttonHGap + buttonSize;
+            int actionOffset = action.getRenderedWidth();
+            if(action.isLeftAligned()) leftX += actionOffset;
+            else rightX -= actionOffset;
         }
 
         return -1;
@@ -172,7 +220,7 @@ public class StandardOrderListItem extends OrderListElement {
     @Override
     public String getToolTipText() {
         if(actionRolloverIndex < 0) return token.getHint();
-        return actions.get(actionRolloverIndex).getDescription();
+        return actions.get(actionRolloverIndex).getHint();
     }
 
     @Override
@@ -182,38 +230,57 @@ public class StandardOrderListItem extends OrderListElement {
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        OrderListAction action = getActionForMouseEvent(e);
+        if(action != null) action.mouseClicked(e, this);
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
         if(select(e)) master.selectElement(this);
+        int index = getActionRolloverIndex(e);
+        if(index >= 0) {
+            pressedStart = index;
+            actions.get(index).mousePressed(e, this);
+        } else {
+            pressedStart = -1;
+        }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        if(e.getButton() == MouseEvent.BUTTON1 && getActionRolloverIndex(e) >= 0) {
-            OrderListAction action = actions.get(getActionRolloverIndex(e));
-            int code = action.perform();
-            switch(code) {
-                case 0: {
-                    //Remove
-                    master.removeElement(this);
-                    break;
-                }
-                case 1: {
-                    //Move down
-                    master.moveDown(this);
-                    break;
-                }
-                case 2: {
-                    //Move up
-                    master.moveUp(this);
-                    break;
-                }
-            }
-        } else if(e.isPopupTrigger()) {
+        int index = getActionRolloverIndex(e);
+        if(pressedStart >= 0 && pressedStart == index) {
+            actions.get(pressedStart).mouseReleased(e, this);
+        }
+        pressedStart = -1;
+        if(!e.isConsumed() && e.isPopupTrigger()) {
             JPopupMenu menu = this.generatePopup();
             if(menu != null) menu.show(e.getComponent(), e.getX(), e.getY());
+        }
+    }
+
+    private OrderListAction getActionForMouseEvent(MouseEvent e) {
+        int index = getActionRolloverIndex(e);
+        return index >= 0 ? actions.get(index) : null;
+    }
+
+    public void performOperation(int code) {
+        switch(code) {
+            case 0: {
+                //Remove
+                master.removeElement(this);
+                break;
+            }
+            case 1: {
+                //Move down
+                master.moveDown(this);
+                break;
+            }
+            case 2: {
+                //Move up
+                master.moveUp(this);
+                break;
+            }
         }
     }
 
@@ -225,6 +292,7 @@ public class StandardOrderListItem extends OrderListElement {
     @Override
     public void mouseExited(MouseEvent e) {
         actionRolloverIndex = -1;
+        pressedStart = -1;
     }
 
     @Override
@@ -233,13 +301,14 @@ public class StandardOrderListItem extends OrderListElement {
     }
 
     @Override
+    public void setSelected(boolean selected) {
+        super.setSelected(selected);
+        token.onInteract();
+    }
+
+    @Override
     public void mouseMoved(MouseEvent e) {
-        actionRolloverIndex = getActionRolloverIndex(e);
-        if(actionRolloverIndex >= 0) {
-            toolTipLocation.x = master.getWidth() - 16 - 26 * (actionRolloverIndex);
-        } else {
-            toolTipLocation.x = master.getWidth() / 2;
-        }
+        getActionRolloverIndex(e, true);
     }
 
     public Image getIcon() {

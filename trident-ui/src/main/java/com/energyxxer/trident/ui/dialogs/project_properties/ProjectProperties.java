@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 
 public class ProjectProperties {
 
-	private static JDialog dialog = new JDialog(TridentWindow.jframe);
+	public static final JDialog dialog = new JDialog(TridentWindow.jframe);
 
 	private static Theme t;
 	static TridentProject project;
@@ -84,7 +84,7 @@ public class ProjectProperties {
 		sectionPanes.put("Output", new ProjectPropertiesOutput());
 		sectionPanes.put("Definitions", new ProjectPropertiesDefinitions());
 		sectionPanes.put("Type Aliases", new ProjectPropertiesAliases());
-		sectionPanes.put("Dependencies", new JPanel());
+		sectionPanes.put("Dependencies", new ProjectPropertiesDependencies());
 		sectionPanes.put("Game Logger", new JPanel());
 
 		contentPane.add(contentGeneral, BorderLayout.CENTER);

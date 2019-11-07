@@ -8,13 +8,12 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 @SuppressWarnings("unused")
 public class XDropdownMenu<T> extends XButton {
 
     private ArrayList<T> options = new ArrayList<>();
-    private HashMap<T, ImageIcon> icons = new HashMap<>();
+    private ArrayList<ImageIcon> icons = new ArrayList<>();
 
     protected int selected = -1;
 
@@ -47,13 +46,8 @@ public class XDropdownMenu<T> extends XButton {
     }
 
     public void setOptions(T[] options) {
-        this.options.clear();
+        clear();
         addOptions(options);
-    }
-
-    public void addOption(T option) {
-        this.options.add(option);
-        updateOptions();
     }
 
     public void addOptions(T[] options) {
@@ -62,14 +56,20 @@ public class XDropdownMenu<T> extends XButton {
         }
     }
 
+    public void addOption(T option) {
+        this.options.add(option);
+        this.icons.add(null);
+        updateOptions();
+    }
+
     private void updateOptions() {
         if(selected == -1 && options.size() > 0) {
             selected = 0;
             this.setText(options.get(0).toString());
-            this.setIcon(icons.get(options.get(0)));
+            this.setIcon(icons.get(0));
         } else {
             this.setText(options.get(selected).toString());
-            this.setIcon(icons.get(options.get(selected)));
+            this.setIcon(icons.get(selected));
         }
     }
 
@@ -111,8 +111,8 @@ public class XDropdownMenu<T> extends XButton {
         if(index >= 0 && index < options.size()) registerChoice(index);
     }
 
-    public void setIcon(T option, Image img) {
-        this.icons.put(option, new ImageIcon(img.getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
+    public void setIcon(int index, Image img) {
+        this.icons.set(index, new ImageIcon(img.getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
         updateOptions();
     }
 
@@ -133,7 +133,7 @@ public class XDropdownMenu<T> extends XButton {
             T option = options.get(i);
             JMenuItem item = itemFactory.createInstance();
             item.setText(option.toString());
-            item.setIcon(icons.get(option));
+            item.setIcon(icons.get(i));
             int choice = i;
             item.addActionListener(arg0 -> registerChoice(choice));
             pm.add(item);
