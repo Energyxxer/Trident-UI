@@ -85,7 +85,7 @@ public class ProjectProperties {
 		sectionPanes.put("Definitions", new ProjectPropertiesDefinitions());
 		sectionPanes.put("Type Aliases", new ProjectPropertiesAliases());
 		sectionPanes.put("Dependencies", new ProjectPropertiesDependencies());
-		sectionPanes.put("Game Logger", new JPanel());
+		sectionPanes.put("Game Logger", new ProjectPropertiesGameLogger());
 
 		contentPane.add(contentGeneral, BorderLayout.CENTER);
 		currentSection = contentGeneral;

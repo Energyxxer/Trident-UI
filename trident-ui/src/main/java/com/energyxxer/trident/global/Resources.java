@@ -6,10 +6,13 @@ import com.energyxxer.trident.ui.commodoreresources.TypeMaps;
 import com.energyxxer.trident.ui.commodoreresources.VersionFeatureResources;
 import com.energyxxer.trident.ui.theme.ThemeManager;
 import com.energyxxer.trident.util.LineReader;
+import com.energyxxer.util.logger.Debug;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -28,6 +31,20 @@ public class Resources {
     private static final File resourceInfoPath = new File(System.getProperty("user.home") + File.separator + "Trident" + File.separator + "resources.json");
 
     public static final Pattern ISO_8601_REGEX = Pattern.compile("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z");
+
+    public static final Font MINECRAFT_FONT;
+
+    static {
+        Font mcfont = new JLabel().getFont();
+        try {
+            mcfont = Font.createFont(Font.TRUETYPE_FONT, Resources.class.getResourceAsStream("/assets/fonts/minecraft.ttf"));
+            boolean success = GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(mcfont);
+            Debug.log(success);
+        } catch(FontFormatException | IOException x) {
+            x.printStackTrace();
+        }
+        MINECRAFT_FONT = mcfont;
+    }
 
     public static void load() {
         indexes.clear();
