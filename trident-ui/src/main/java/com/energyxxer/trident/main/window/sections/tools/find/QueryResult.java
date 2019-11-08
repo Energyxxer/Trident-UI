@@ -4,6 +4,7 @@ import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.display.DisplayModule;
 import com.energyxxer.trident.ui.modules.ModuleToken;
 import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.List;
@@ -63,7 +64,7 @@ public abstract class QueryResult implements ModuleToken {
     }
 
     @Override
-    public StyledPopupMenu generateMenu() {
+    public StyledPopupMenu generateMenu(@NotNull MenuContext context) {
         return null;
     }
 

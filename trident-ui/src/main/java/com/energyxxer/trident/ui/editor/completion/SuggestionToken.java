@@ -8,6 +8,7 @@ import com.energyxxer.trident.ui.display.DisplayModule;
 import com.energyxxer.trident.ui.modules.ModuleToken;
 import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
 import com.energyxxer.util.StringUtil;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.util.Collection;
@@ -106,7 +107,7 @@ public class SuggestionToken implements ModuleToken {
     }
 
     @Override
-    public StyledPopupMenu generateMenu() {
+    public StyledPopupMenu generateMenu(@NotNull MenuContext context) {
         return null;
     }
 

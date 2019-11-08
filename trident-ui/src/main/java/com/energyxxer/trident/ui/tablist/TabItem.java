@@ -18,7 +18,7 @@ public class TabItem extends TabListElement {
     @NotNull
     private final TabManager manager;
     @NotNull
-    private final ModuleToken token;
+    private ModuleToken token;
     @Nullable
     private final Tab associatedTab;
 
@@ -315,5 +315,11 @@ public class TabItem extends TabListElement {
     @Override
     public void themeChanged(Theme t) {
         this.updateIcon();
+    }
+
+    public void transform(ModuleToken newToken) {
+        this.token = newToken;
+        updateName();
+        updateIcon();
     }
 }

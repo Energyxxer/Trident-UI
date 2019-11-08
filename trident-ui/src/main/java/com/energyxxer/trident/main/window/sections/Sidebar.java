@@ -11,7 +11,6 @@ import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenuItem;
 import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
-import com.energyxxer.util.logger.Debug;
 import com.energyxxer.xswing.ComponentResizer;
 import com.energyxxer.xswing.OverlayBorderPanel;
 
@@ -43,7 +42,6 @@ public class Sidebar extends OverlayBorderPanel {
             expanded.setBackground(t.getColor(Color.WHITE, "Explorer.background"));
             expanded.setBorder(new CompoundBorder(BorderFactory.createEmptyBorder(0, 0, 0, ComponentResizer.DIST), BorderFactory.createMatteBorder(0, 0, 0, Math.max(t.getInteger(1, "Explorer.border.thickness"), 0), t.getColor(new Color(200, 200, 200), "Explorer.border.color"))));
             expanded.setOpaque(false);
-            Debug.log(expanded.getLayout());
         });
 
         JPanel header = new JPanel(new BorderLayout());

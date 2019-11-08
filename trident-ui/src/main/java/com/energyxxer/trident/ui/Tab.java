@@ -129,4 +129,19 @@ public class Tab {
 			((Disposable) module).dispose();
 		}
 	}
+
+	public boolean transform(ModuleToken newToken) {
+		if(module != null) {
+			if(!module.transform(newToken)) {
+				return false;
+			}
+		}
+
+		token = newToken;
+
+		name = newToken.getTitle();
+		tabItem.transform(newToken);
+
+		return true;
+	}
 }

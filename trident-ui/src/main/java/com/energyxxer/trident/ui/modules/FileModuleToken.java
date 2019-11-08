@@ -9,6 +9,7 @@ import com.energyxxer.trident.global.temp.projects.ProjectManager;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.common.MenuItems;
+import com.energyxxer.trident.ui.dialogs.PromptDialog;
 import com.energyxxer.trident.ui.display.DisplayModule;
 import com.energyxxer.trident.ui.editor.TridentEditorModule;
 import com.energyxxer.trident.ui.explorer.ProjectExplorerMaster;
@@ -16,14 +17,18 @@ import com.energyxxer.trident.ui.imageviewer.ImageViewer;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenu;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenuItem;
 import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
+import com.energyxxer.util.FileUtil;
 import com.energyxxer.util.logger.Debug;
+import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class FileModuleToken implements ModuleToken {
     public static ModuleTokenFactory<FileModuleToken> factory = str -> {
@@ -216,7 +221,7 @@ public class FileModuleToken implements ModuleToken {
     }
 
     @Override
-    public StyledPopupMenu generateMenu() {
+    public StyledPopupMenu generateMenu(@NotNull MenuContext context) {
         StyledPopupMenu menu = new StyledPopupMenu();
 
         String path = getPath();
@@ -225,14 +230,7 @@ public class FileModuleToken implements ModuleToken {
         if(file.isDirectory()) newPath = path;
         else newPath = file.getParent();
 
-        //List<ModuleToken> selectedTokens = master.getSelectedTokens();
-        ArrayList<FileModuleToken> selectedFiles = new ArrayList<>();
-        selectedFiles.add(this);
-        /*for(ModuleToken token : selectedTokens) {
-            if(token instanceof FileModuleToken) selectedFiles.add((FileModuleToken) token);
-        }*/
-
-        {
+        if(context == MenuContext.EXPLORER) {
             StyledMenu newMenu = new StyledMenu("New");
 
             menu.add(newMenu);
@@ -258,65 +256,78 @@ public class FileModuleToken implements ModuleToken {
         menu.addSeparator();
 
 
-        menu.add(MenuItems.fileItem(MenuItems.FileMenuItem.COPY));
-        menu.add(MenuItems.fileItem(MenuItems.FileMenuItem.PASTE));
+        if(context == MenuContext.EXPLORER) {
+            List<ModuleToken> selectedTokens = TridentWindow.projectExplorer.getSelectedTokens();
+            ArrayList<FileModuleToken> selectedFiles = new ArrayList<>();
+            selectedFiles.add(this);
+            for(ModuleToken token : selectedTokens) {
+                if(token instanceof FileModuleToken && token != this) selectedFiles.add((FileModuleToken) token);
+            }
 
-        StyledMenuItem deleteItem = MenuItems.fileItem(MenuItems.FileMenuItem.DELETE);
-        deleteItem.setEnabled(selectedFiles.size() >= 1);
-        ArrayList<String> selectedPaths = new ArrayList<>();
-        for(FileModuleToken file : selectedFiles) {
-            selectedPaths.add(file.getPath());
-        }
-        deleteItem.addActionListener(e -> FileManager.delete(selectedPaths));
-        menu.add(deleteItem);
 
-        menu.addSeparator();
-        StyledMenu refactorMenu = new StyledMenu("Refactor");
-        menu.add(refactorMenu);
+            menu.add(MenuItems.fileItem(MenuItems.FileMenuItem.COPY));
+            menu.add(MenuItems.fileItem(MenuItems.FileMenuItem.PASTE));
 
-        StyledMenuItem renameItem = MenuItems.fileItem(MenuItems.FileMenuItem.RENAME);
-        /*renameItem.addActionListener(e -> {
-            if(ExplorerMaster.selectedLabels.size() != 1) return;
 
-            String path = ExplorerMaster.selectedLabels.get(0).parent.path;
-            String name = new File(path).getName();
-            String rawName = StringUtil.stripExtension(name);
-            final String extension = name.replaceAll(rawName, "");
-            final String pathToParent = path.substring(0, path.lastIndexOf(name));
+            menu.addSeparator();
 
-            String newName = StringPrompt.prompt("Rename", "Enter a new name for the file:", rawName,
-                    new StringValidator() {
-                        @Override
-                        public boolean validate(String str) {
-                            return str.trim().length() > 0 && FileUtil.validateFilename(str)
-                                    && !new File(pathToParent + str + extension).exists();
-                        }
-                    });
+            StyledMenuItem renameItem = MenuItems.fileItem(MenuItems.FileMenuItem.RENAME);
+            renameItem.addActionListener(e -> {
+                if(selectedFiles.size() != 1) return;
 
-            if (newName != null) {
-                if (ProjectManager.renameFile(new File(path), newName)) {
-                    com.energyxxer.trident.ui.projectExplorer.ProjectExplorerItem parentItem = ExplorerMaster.selectedLabels.get(0).parent;
-                    parentItem.path = pathToParent + newName + extension;
-                    if (parentItem.parent != null) {
-                        parentItem.parent.collapse();
-                        parentItem.parent.refresh();
-                    } else {
-                        TridentWindow.projectExplorer.refresh();
+                String pathToRename = selectedFiles.get(0).getPath();
+                String name = new File(pathToRename).getName();
+                String rawName = name.substring(0, name.contains(".") ? name.lastIndexOf(".") : name.length());
+                final String pathToParent = pathToRename.substring(0, pathToRename.lastIndexOf(name));
+
+                String newName = new PromptDialog("Rename", "Enter a new name for the file:", name) {
+                    @Override
+                    protected boolean validate(String str) {
+                        return str.trim().length() > 0 && FileUtil.validateFilename(str)
+                                && !new File(pathToParent + str).exists();
                     }
 
-                    TabManager.renameTab(path, pathToParent + newName + extension);
+                    @Override
+                    protected int getSelectionEnd() {
+                        return rawName.length();
+                    }
+                }.result;
 
-                } else {
-                    JOptionPane.showMessageDialog(null,
-                            "<html>The action can't be completed because the folder or file is open in another program.<br>Close the folder and try again.</html>",
-                            "An error occurred.", JOptionPane.ERROR_MESSAGE);
+                if (newName != null) {
+                    if (ProjectManager.renameFile(new File(pathToRename), newName)) {
+                        TridentWindow.projectExplorer.refresh();
+                        TridentWindow.tabManager.openTabs.forEach(
+                                tab -> {
+                                    if(tab.token instanceof FileModuleToken && ((FileModuleToken) tab.token).getFile().equals(this.getFile())) {
+                                        tab.transform(new FileModuleToken(new File(pathToParent + newName)));
+                                    }
+                                }
+                        );
+                        TridentWindow.tabManager.saveOpenTabs();
+                        TridentWindow.tabList.repaint();
+                    } else {
+                        JOptionPane.showMessageDialog(null,
+                                "<html>The action can't be completed because the folder or file is open in another program.<br>Close the folder and try again.</html>",
+                                "An error occurred.", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
-            }
-        });*/
-        refactorMenu.add(renameItem);
-        refactorMenu.add(MenuItems.fileItem(MenuItems.FileMenuItem.MOVE));
+            });
+            menu.add(renameItem);
 
-        menu.addSeparator();
+
+
+            StyledMenuItem deleteItem = MenuItems.fileItem(MenuItems.FileMenuItem.DELETE);
+            deleteItem.setEnabled(selectedFiles.size() >= 1);
+            ArrayList<String> selectedPaths = new ArrayList<>();
+            for(FileModuleToken file : selectedFiles) {
+                selectedPaths.add(file.getPath());
+            }
+            deleteItem.addActionListener(e -> FileManager.delete(selectedPaths));
+            menu.add(deleteItem);
+
+            menu.addSeparator();
+        }
+
 
         StyledMenuItem openInSystemItem = new StyledMenuItem("Show in System Explorer", "explorer");
         openInSystemItem.addActionListener(e -> Commons.showInExplorer(path));

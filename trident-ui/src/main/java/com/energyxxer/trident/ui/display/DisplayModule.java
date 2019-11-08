@@ -1,5 +1,7 @@
 package com.energyxxer.trident.ui.display;
 
+import com.energyxxer.trident.ui.modules.ModuleToken;
+
 /**
  * Created by User on 2/8/2017.
  */
@@ -10,4 +12,6 @@ public interface DisplayModule {
     Object save();
     void focus();
     default void onSelect() {}
+
+    boolean transform(ModuleToken newToken);
 }

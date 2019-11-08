@@ -17,13 +17,21 @@ public class PromptDialog {
     private static final int WIDTH = 400;
     private static final int HEIGHT = 110;
 
+    private final JDialog dialog;
     private final StyledTextField field;
+    private final StyledButton okButton;
+
     public String result = null;
+    private boolean valid = true;
 
     private ThemeListenerManager tlm = new ThemeListenerManager();
 
     public PromptDialog(String title, String query) {
-        JDialog dialog = new JDialog(TridentWindow.jframe);
+        this(title, query, "");
+    }
+
+    public PromptDialog(String title, String query, String defaultText) {
+        dialog = new JDialog(TridentWindow.jframe);
 
         JPanel pane = new JPanel(new BorderLayout());
         pane.setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -46,9 +54,12 @@ public class PromptDialog {
 
             StyledLabel label = new StyledLabel(query, "PromptDialog");
             subContent.add(label, BorderLayout.CENTER);
+            label.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            field = new StyledTextField();
+            field = new StyledTextField(defaultText);
             field.setMaximumSize(new Dimension(Integer.MAX_VALUE,30));
+            field.setAlignmentX(Component.LEFT_ALIGNMENT);
+            field.getDocument().addUndoableEditListener(l -> revalidate(field.getText()));
 
             subContent.add(field);
 
@@ -57,17 +68,15 @@ public class PromptDialog {
                 buttons.setOpaque(false);
                 buttons.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
 
-                StyledButton okButton = new StyledButton("OK");
+                okButton = new StyledButton("OK");
                 okButton.addActionListener(e -> {
-                    result = field.getText();
-                    dialog.setVisible(false);
+                    submit();
                 });
                 buttons.add(okButton);
 
                 StyledButton cancelButton = new StyledButton("Cancel");
                 cancelButton.addActionListener(e -> {
-                    result = null;
-                    dialog.setVisible(false);
+                    cancel();
                 });
 
                 buttons.add(cancelButton);
@@ -82,19 +91,13 @@ public class PromptDialog {
         pane.getActionMap().put("submit", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                result = field.getText();
-                dialog.setVisible(false);
-                tlm.dispose();
-                dialog.dispose();
+                submit();
             }
         });
         pane.getActionMap().put("cancel", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                result = null;
-                dialog.setVisible(false);
-                tlm.dispose();
-                dialog.dispose();
+                cancel();
             }
         });
 
@@ -112,6 +115,41 @@ public class PromptDialog {
         dialog.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
 
         field.requestFocus();
+        field.setSelectionStart(getSelectionStart());
+        field.setSelectionEnd(getSelectionEnd());
         dialog.setVisible(true);
+    }
+
+    private void revalidate(String str) {
+        this.valid = validate(str);
+        okButton.setEnabled(valid);
+    }
+
+    private void submit() {
+        revalidate(field.getText());
+        if(valid) {
+            result = field.getText();
+            dialog.setVisible(false);
+            tlm.dispose();
+            dialog.dispose();
+        }
+    }
+
+    private void cancel() {
+        result = null;
+        dialog.setVisible(false);
+        tlm.dispose();
+        dialog.dispose();
+    }
+
+    protected boolean validate(String str) {
+        return true;
+    }
+
+    protected int getSelectionStart() {
+        return 0;
+    }
+    protected int getSelectionEnd() {
+        return field.getText().length();
     }
 }

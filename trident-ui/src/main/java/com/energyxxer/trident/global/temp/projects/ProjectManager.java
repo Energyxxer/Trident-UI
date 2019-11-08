@@ -2,7 +2,6 @@ package com.energyxxer.trident.global.temp.projects;
 
 import com.energyxxer.crossbow.compiler.CrossbowCompiler;
 import com.energyxxer.trident.compiler.TridentCompiler;
-import com.energyxxer.util.FileUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -111,11 +110,9 @@ blockstates/*.json = blockstate
 	public static boolean renameFile(File file, String newName) {
 		String path = file.getAbsolutePath();
 		String name = file.getName();
-		String rawName = FileUtil.stripExtension(name);
-		String extension = name.replaceAll(rawName, "");
 		String pathToParent = path.substring(0, path.lastIndexOf(name));
 		
-		File newFile = new File(pathToParent + newName + extension);
+		File newFile = new File(pathToParent + newName);
 		
 		boolean renamed = file.renameTo(newFile);
 

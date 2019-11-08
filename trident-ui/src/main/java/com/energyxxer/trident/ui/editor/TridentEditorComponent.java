@@ -112,9 +112,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
     }
 
     private void highlightSyntax() {
-        Debug.log("is parent syntax null?");
         if(parent.syntax == null) return;
-        Debug.log("parent syntax is not null");
 
         Style defaultStyle = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
 
@@ -132,17 +130,16 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
         File file = parent.getFileForAnalyzer();
         Lang.LangAnalysisResponse analysis = file != null ? lang.analyze(file, text, suggestionModule, summaryModule) : null;
         if(analysis == null) return;
-        Debug.log("analysis running");
 
         suggestionBox.setSummary(analysis.lexer.getSummaryModule());
         if(analysis.lexer.getSuggestionModule() != null) {
             if(project != null) {
-                if(project instanceof TridentProject) {
+                if(project instanceof TridentProject && analysis.lexer.getSummaryModule() instanceof TridentSummaryModule) {
                     ((TridentSummaryModule) analysis.lexer.getSummaryModule()).setParentSummary((TridentProjectSummary) project.getSummary());
                     if(project.getSummary() != null) {
                         ((TridentSummaryModule) analysis.lexer.getSummaryModule()).setFileLocation(((TridentProject)project).getSummary().getLocationForFile(parent.file));
                     }
-                } else if(project instanceof CrossbowProject) {
+                } else if(project instanceof CrossbowProject && analysis.lexer.getSummaryModule() instanceof CrossbowSummaryModule) {
                     ((CrossbowSummaryModule) analysis.lexer.getSummaryModule()).setParentSummary((CrossbowProjectSummary) project.getSummary());
                     if(project.getSummary() != null) {
                         ((CrossbowSummaryModule) analysis.lexer.getSummaryModule()).setFileLocation(((CrossbowProject)project).getSummary().getLocationForFile(parent.file));
@@ -211,7 +208,6 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
     @Override
     public void actionPerformed(ActionEvent arg0) {
         if (lastEdit > -1 && (new Date().getTime()) - lastEdit > 500 && (parent.associatedTab == null || parent.associatedTab.isActive())) {
-            Debug.log("Action performed, tryna highlight");
             lastEdit = -1;
             if(highlightingThread != null) {
                 highlightingThread.stop();

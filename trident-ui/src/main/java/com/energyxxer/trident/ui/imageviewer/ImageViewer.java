@@ -2,6 +2,8 @@ package com.energyxxer.trident.ui.imageviewer;
 
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.display.DisplayModule;
+import com.energyxxer.trident.ui.modules.FileModuleToken;
+import com.energyxxer.trident.ui.modules.ModuleToken;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.trident.util.MathUtil;
 import com.energyxxer.util.ImageManager;
@@ -27,7 +29,7 @@ public class ImageViewer extends JPanel implements DisplayModule, MouseWheelList
     private static final double MAX_SCALE = 50;
     private static final int CHECK_PATTERN_SIZE = 5;
 
-    private final File file;
+    private File file;
 
     private BufferedImage img;
     private double scale = 1;
@@ -48,11 +50,7 @@ public class ImageViewer extends JPanel implements DisplayModule, MouseWheelList
 
     public ImageViewer(File file) {
         this.file = file;
-        try {
-            this.img = ImageIO.read(file);
-        } catch(IOException x) {
-            this.img = ImageManager.load("null");
-        }
+        updateImage();
         this.imgSize = new Dimension(img.getWidth(), img.getHeight());
         this.addMouseWheelListener(this);
         this.addMouseMotionListener(this);
@@ -61,6 +59,14 @@ public class ImageViewer extends JPanel implements DisplayModule, MouseWheelList
             this.setBackground(t.getColor(Color.WHITE, "ImageViewer.background"));
             this.crosshairColor = t.getColor(new Color(0,0,0,64), "ImageViewer.crosshair");
         });
+    }
+
+    private void updateImage() {
+        try {
+            this.img = ImageIO.read(file);
+        } catch(IOException x) {
+            this.img = ImageManager.load("null");
+        }
     }
 
     @Override
@@ -293,5 +299,11 @@ public class ImageViewer extends JPanel implements DisplayModule, MouseWheelList
         return new Dimension(new_width, new_height);
     }
 
-
+    @Override
+    public boolean transform(ModuleToken newToken) {
+        if(newToken instanceof FileModuleToken) {
+            this.file = ((FileModuleToken) newToken).getFile();
+        }
+        return true;
+    }
 }

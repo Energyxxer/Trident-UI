@@ -6,18 +6,13 @@ import com.energyxxer.trident.ui.styledcomponents.StyledList;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.ImageManager;
 import com.energyxxer.xswing.ComponentResizer;
+import com.energyxxer.xswing.OverlayBorderLayout;
+import com.energyxxer.xswing.OverlayBorderPanel;
 import com.energyxxer.xswing.Padding;
 
-import javax.swing.BorderFactory;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dialog;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GraphicsEnvironment;
-import java.awt.Point;
+import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -34,7 +29,7 @@ public class Settings {
 	private static ThemeListenerManager tlm = new ThemeListenerManager();
 
 	static {
-		JPanel pane = new JPanel(new BorderLayout());
+		JPanel pane = new JPanel(new OverlayBorderLayout());
 		pane.setPreferredSize(new Dimension(900,600));
 		tlm.addThemeChangeListener(t ->
 				pane.setBackground(t.getColor(new Color(235, 235, 235), "Settings.background"))
@@ -44,9 +39,11 @@ public class Settings {
 		HashMap<String, JPanel> sectionPanes = new HashMap<>();
 
 		{
-			JPanel sidebar = new JPanel(new BorderLayout());
+			JPanel sidebar = new OverlayBorderPanel(new BorderLayout(), new Insets(0, 0, 0, ComponentResizer.DIST));
 
 			ComponentResizer sidebarResizer = new ComponentResizer(sidebar);
+			sidebar.setMinimumSize(new Dimension(25, 1));
+			sidebar.setMaximumSize(new Dimension(400, 1));
 			sidebarResizer.setResizable(false, false, false, true);
 
 			String[] sections = new String[] { "General", "Appearance", "Editor", "Resources", "In-game TridentCompiler" };
@@ -54,8 +51,9 @@ public class Settings {
 			StyledList<String> navigator = new StyledList<>(sections, "Settings");
 			sidebar.setBackground(navigator.getBackground());
 			tlm.addThemeChangeListener(t ->
-					sidebar.setBorder(BorderFactory.createMatteBorder(0, 0, 0, Math.max(t.getInteger(1,"Settings.content.border.thickness"),0), t.getColor(new Color(200, 200, 200), "Settings.content.border.color")))
+					sidebar.setBorder(new CompoundBorder(BorderFactory.createEmptyBorder(0, 0, 0, ComponentResizer.DIST), BorderFactory.createMatteBorder(0, 0, 0, Math.max(t.getInteger(1,"Settings.content.border.thickness"),0), t.getColor(new Color(200, 200, 200), "Settings.content.border.color"))))
 			);
+			sidebar.setOpaque(false);
 			navigator.setPreferredSize(new Dimension(200,500));
 
 			navigator.addListSelectionListener(o -> {

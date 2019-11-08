@@ -5,6 +5,7 @@ import com.energyxxer.commodore.module.Namespace;
 import com.energyxxer.trident.global.temp.Lang;
 import com.energyxxer.trident.ui.display.DisplayModule;
 import com.energyxxer.trident.ui.editor.TridentEditorModule;
+import com.energyxxer.trident.ui.modules.ModuleToken;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -102,5 +103,10 @@ public class AliasCategoryModule extends JPanel implements DisplayModule {
     @Override
     public void focus() {
 
+    }
+
+    @Override
+    public boolean transform(ModuleToken newToken) {
+        return false;
     }
 }

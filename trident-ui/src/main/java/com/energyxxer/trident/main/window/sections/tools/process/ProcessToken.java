@@ -6,6 +6,7 @@ import com.energyxxer.trident.ui.modules.ModuleToken;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenuItem;
 import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
 import com.energyxxer.util.processes.AbstractProcess;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.util.Collection;
@@ -68,7 +69,7 @@ public class ProcessToken implements ModuleToken {
     }
 
     @Override
-    public StyledPopupMenu generateMenu() {
+    public StyledPopupMenu generateMenu(@NotNull MenuContext context) {
         StyledPopupMenu menu = new StyledPopupMenu();
         StyledMenuItem stopItem = new StyledMenuItem("Kill Process");
         stopItem.addActionListener(e -> process.terminate());

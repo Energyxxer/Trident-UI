@@ -60,7 +60,7 @@ public class AliasTabToken implements ModuleToken {
     }
 
     @Override
-    public StyledPopupMenu generateMenu() {
+    public StyledPopupMenu generateMenu(@NotNull MenuContext context) {
         return null;
     }
 

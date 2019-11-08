@@ -4,7 +4,6 @@ import com.energyxxer.trident.global.temp.projects.TridentProject;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.styledcomponents.StyledButton;
 import com.energyxxer.trident.ui.styledcomponents.StyledList;
-import com.energyxxer.trident.ui.theme.Theme;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.ImageManager;
 import com.energyxxer.xswing.ComponentResizer;
@@ -24,7 +23,6 @@ public class ProjectProperties {
 
 	public static final JDialog dialog = new JDialog(TridentWindow.jframe);
 
-	private static Theme t;
 	static TridentProject project;
 
 	private static ArrayList<Consumer<TridentProject>> openEvents = new ArrayList<>();
@@ -35,20 +33,15 @@ public class ProjectProperties {
 	private static ThemeListenerManager tlm = new ThemeListenerManager();
 
 	static {
-
-		tlm.addThemeChangeListener(th -> t = th);
 		
 		JPanel pane = new JPanel(new OverlayBorderLayout());
 		//JButton okay = new JButton("OK");
 		//JButton cancel = new JButton("Cancel");
 		
 		pane.setPreferredSize(new Dimension(900,600));
-		pane.setBackground(t.getColor(new Color(235, 235, 235), "ProjectProperties.background"));
 
 		JPanel contentPane = new JPanel(new BorderLayout());
-		contentPane.setBackground(t.getColor(new Color(235, 235, 235), "ProjectProperties.content.background"));
 		HashMap<String, JPanel> sectionPanes = new HashMap<>();
-		pane.add(contentPane, BorderLayout.CENTER);
 
 		{
 			JPanel sidebar = new OverlayBorderPanel(new BorderLayout(), new Insets(0, 0, 0, ComponentResizer.DIST));
@@ -63,7 +56,6 @@ public class ProjectProperties {
 			StyledList<String> navigator = new StyledList<>(sections, "ProjectProperties");
 			sidebar.setBackground(navigator.getBackground());
 			sidebar.setOpaque(false);
-			sidebar.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 0, ComponentResizer.DIST), BorderFactory.createMatteBorder(0, 0, 0, Math.max(t.getInteger(1,"ProjectProperties.content.border.thickness"),0), t.getColor(new Color(200, 200, 200), "ProjectProperties.content.border.color"))));
 			navigator.setPreferredSize(new Dimension(200,500));
 
 			navigator.addListSelectionListener(o -> {
@@ -76,7 +68,15 @@ public class ProjectProperties {
 			sidebar.add(navigator, BorderLayout.CENTER);
 
 			pane.add(sidebar, BorderLayout.WEST);
+
+			tlm.addThemeChangeListener(t -> {
+				pane.setBackground(t.getColor(new Color(235, 235, 235), "ProjectProperties.background"));
+				contentPane.setBackground(t.getColor(new Color(235, 235, 235), "ProjectProperties.content.background"));
+				sidebar.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 0, ComponentResizer.DIST), BorderFactory.createMatteBorder(0, 0, 0, Math.max(t.getInteger(1,"ProjectProperties.content.border.thickness"),0), t.getColor(new Color(200, 200, 200), "ProjectProperties.content.border.color"))));
+			});
 		}
+
+		pane.add(contentPane, BorderLayout.CENTER);
 
 		JPanel contentGeneral = new ProjectPropertiesGeneral();
 

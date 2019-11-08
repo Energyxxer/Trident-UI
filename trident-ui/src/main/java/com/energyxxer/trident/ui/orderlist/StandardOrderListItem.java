@@ -1,5 +1,6 @@
 package com.energyxxer.trident.ui.orderlist;
 
+import com.energyxxer.trident.ui.modules.ModuleToken;
 import com.energyxxer.trident.ui.theme.Theme;
 import com.energyxxer.trident.util.ImageUtil;
 import com.energyxxer.util.StringUtil;
@@ -316,7 +317,7 @@ public class StandardOrderListItem extends OrderListElement {
     }
 
     private JPopupMenu generatePopup() {
-        JPopupMenu menu = token.generateMenu();
+        JPopupMenu menu = token.generateMenu(ModuleToken.MenuContext.EXPLORER);
         //TODO: add "move up/down" options
         return menu;
     }

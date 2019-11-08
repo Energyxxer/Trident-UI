@@ -133,7 +133,7 @@ public class DefinitionKeyToken implements OrderListToken {
     }
 
     @Override
-    public StyledPopupMenu generateMenu() {
+    public StyledPopupMenu generateMenu(@NotNull MenuContext context) {
         return null;
     }
 

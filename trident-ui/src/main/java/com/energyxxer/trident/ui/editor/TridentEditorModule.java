@@ -12,6 +12,7 @@ import com.energyxxer.trident.main.window.sections.editor_search.FindAndReplaceB
 import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.display.DisplayModule;
 import com.energyxxer.trident.ui.modules.FileModuleToken;
+import com.energyxxer.trident.ui.modules.ModuleToken;
 import com.energyxxer.trident.ui.scrollbar.OverlayScrollPaneLayout;
 import com.energyxxer.trident.ui.theme.Theme;
 import com.energyxxer.trident.ui.theme.ThemeManager;
@@ -27,6 +28,7 @@ import javax.swing.event.UndoableEditListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -425,5 +427,16 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
         if(file != null) return file;
         if(forcedLang != null) return new File(Preferences.get("workspace_dir"));
         return null;
+    }
+
+    @Override
+    public boolean transform(ModuleToken newToken) {
+        if(newToken instanceof FileModuleToken) {
+            file = ((FileModuleToken) newToken).getFile();
+            updateSyntax();
+            editorComponent.getStyledDocument().setCharacterAttributes(0, editorComponent.getStyledDocument().getLength(), StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE), true);
+            editorComponent.highlight();
+        }
+        return true;
     }
 }

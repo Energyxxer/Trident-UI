@@ -3,6 +3,7 @@ package com.energyxxer.trident.ui.modules;
 import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.display.DisplayModule;
 import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -10,6 +11,10 @@ import java.util.Collection;
 import java.util.List;
 
 public interface ModuleToken {
+    enum MenuContext {
+        EXPLORER, TAB
+    }
+
     String getTitle();
     default boolean ellipsisFromLeft() {return false;}
     java.awt.Image getIcon();
@@ -19,7 +24,7 @@ public interface ModuleToken {
     boolean isModuleSource();
     DisplayModule createModule(Tab tab);
     void onInteract();
-    StyledPopupMenu generateMenu();
+    StyledPopupMenu generateMenu(@NotNull MenuContext context);
 
     default boolean isTabCloseable() {
         return true;
