@@ -87,16 +87,20 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
         } else super.repaint();
     }
 
-    private ExplorerElement getElementAtMousePos(MouseEvent e) {
+    protected ExplorerElement getElementAtMousePos(MouseEvent e) {
+        return getElementAtMousePos(e.getPoint());
+    }
+
+    protected ExplorerElement getElementAtMousePos(Point e) {
         if(getFlag(ExplorerFlag.DYNAMIC_ROW_HEIGHT)) {
             int y = 0;
             for(ExplorerElement element : flatList) {
-                if(e.getY() >= y && e.getY() < y + element.getHeight()) return element;
+                if(e.y >= y && e.y < y + element.getHeight()) return element;
                 y += element.getHeight();
             }
             return null;
         } else {
-            int index = e.getY() / rowHeight;
+            int index = e.y / rowHeight;
             if(index >= 0 && index < flatList.size()) {
                 return flatList.get(index);
             }
@@ -189,7 +193,7 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
         selectionUpdated();
     }
 
-    private void ensureLast(ExplorerElement item) {
+    protected void ensureLast(ExplorerElement item) {
         if(selectedItems.contains(item)) {
             selectedItems.remove(item);
             selectedItems.add(item);
@@ -248,7 +252,7 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
         transferStarted = true;
         TransferHandler th = this.getTransferHandler();
         if(th != null) {
-            th.exportAsDrag(this, e, TransferHandler.COPY);
+            th.exportAsDrag(this, e, TransferHandler.MOVE);
         }
     }
 

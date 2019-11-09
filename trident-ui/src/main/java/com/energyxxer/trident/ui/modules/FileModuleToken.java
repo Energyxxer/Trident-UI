@@ -361,13 +361,13 @@ public class FileModuleToken implements ModuleToken, DraggableExplorerModuleToke
         return "[FileModuleToken: " + getPath() + "]";
     }
 
-    private File getDragDestination() {
+    public File getDragDestination() {
         File destination = getFile().isDirectory() ? getFile() : getFile().getParentFile();
         return destination.exists() ? destination : null;
     }
 
     @Override
-    public boolean canAccept(DraggableExplorerModuleToken[] draggables) {
+    public boolean canAcceptMove(DraggableExplorerModuleToken[] draggables) {
         File destination = getDragDestination();
         if(destination == null) return false;
         for(DraggableExplorerModuleToken draggable : draggables) {
@@ -379,12 +379,23 @@ public class FileModuleToken implements ModuleToken, DraggableExplorerModuleToke
     }
 
     @Override
+    public boolean canAcceptCopy(DraggableExplorerModuleToken[] draggables) {
+        File destination = getDragDestination();
+        if(destination == null) return false;
+        for(DraggableExplorerModuleToken draggable : draggables) {
+            if(!(draggable instanceof FileModuleToken)) return false;
+            if(destination.toPath().startsWith(((FileModuleToken) draggable).file.toPath())) return false;
+        }
+        return true;
+    }
+
+    @Override
     public DataFlavor getDataFlavor() {
         return DataFlavor.javaFileListFlavor;
     }
 
     @Override
-    public Object getTransferData() {
+    public File getTransferData() {
         return file;
     }
 }

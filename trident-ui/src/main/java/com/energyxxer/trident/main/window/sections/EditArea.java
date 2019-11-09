@@ -30,7 +30,6 @@ public class EditArea extends JPanel {
     public static final TransferHandler dragToOpenFileHandler = new TransferHandler("filepath") {
         @Override
         public Image getDragImage() {
-            Debug.log("Retrieving drag image");
             return Commons.getIcon("file");
         }
 

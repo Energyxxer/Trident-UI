@@ -1,5 +1,9 @@
 package com.energyxxer.trident.main;
 
+import com.energyxxer.trident.util.FileCommons;
+
+import java.io.File;
+
 public class TestEntry {
 
     private static int getJavaVersion() {
@@ -24,5 +28,7 @@ public class TestEntry {
     public static void main(String[] args) {
         System.out.println(System.getProperty("java.version"));
         System.out.println(getJavaVersion() == 8);
+
+        System.out.println(FileCommons.createCopyFileName(new File("C:\\Users\\PC\\AppData\\Local\\Packages\\Microsoft.MinecraftUWP_8wekyb3d8bbwe\\LocalState\\games\\com.mojang\\minecraftWorlds\\Project KS\\behavior_packs\\ksBP\\functions\\health_interface\\")));
     }
 }
