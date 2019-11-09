@@ -96,7 +96,6 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         this.setTransferHandler(this.editorTransferHandler = new TransferHandler() {
             @Override
             public boolean canImport(TransferSupport support) {
-                Debug.log("called canImport");
                 return support.isDataFlavorSupported(DataFlavor.stringFlavor) || support.isDataFlavorSupported(DataFlavor.getTextPlainUnicodeFlavor());
             }
 
@@ -109,14 +108,7 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
             @NotNull
             @Override
             protected Transferable createTransferable(JComponent c) {
-                Debug.log("called createTransferable");
                 return AdvancedEditor.this.createTransferable();
-            }
-
-            @Override
-            protected void exportDone(JComponent source, Transferable data, int action) {
-                Debug.log("Export done btw");
-                super.exportDone(source, data, action);
             }
 
             @Override

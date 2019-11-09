@@ -84,20 +84,12 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
 
             @Override
             public boolean canImport(TransferSupport support) {
-                Debug.log("called canImport");
-                return support.isDrop() && (getEditorTransferHandler().canImport(support) || TridentWindow.editArea.dragToOpenFileHandler.canImport(support));
-            }
-
-            @Override
-            protected void exportDone(JComponent source, Transferable data, int action) {
-                Debug.log("Export done btw");
-                super.exportDone(source, data, action);
+                return getEditorTransferHandler().canImport(support) || TridentWindow.editArea.dragToOpenFileHandler.canImport(support);
             }
 
             @Nullable
             @Override
             protected Transferable createTransferable(JComponent c) {
-                Debug.log("called createTransferable");
                 return TridentEditorComponent.this.createTransferable();
             }
 

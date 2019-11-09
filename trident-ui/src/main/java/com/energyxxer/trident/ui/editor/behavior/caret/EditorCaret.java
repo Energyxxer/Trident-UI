@@ -546,7 +546,7 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
             editor.repaint();
         } else {
             dropLocation = -1;
-            if(editor.getTransferHandler() != null && !editor.getTransferHandler().canImport(new TransferHandler.TransferSupport(editor, e.getTransferable()))) {
+            if(editor.getTransferHandler() == null || !editor.getTransferHandler().canImport(new TransferHandler.TransferSupport(editor, e.getTransferable()))) {
                 e.rejectDrag();
             }
         }
