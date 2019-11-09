@@ -259,4 +259,8 @@ public class Dot {
         }
         Debug.log("* The dot absorbs the artifact");
     }
+
+    public boolean contains(int index) {
+        return this.getMin() <= index && index < this.getMax();
+    }
 }

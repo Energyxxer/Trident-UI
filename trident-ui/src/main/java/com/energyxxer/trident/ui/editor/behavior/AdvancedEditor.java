@@ -14,6 +14,7 @@ import com.energyxxer.util.StringLocation;
 import com.energyxxer.util.StringLocationCache;
 import com.energyxxer.util.logger.Debug;
 import com.energyxxer.xswing.UnifiedDocumentListener;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
@@ -26,6 +27,8 @@ import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -43,7 +46,7 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
 
     private static final String WORD_DELIMITERS = "./\\()\"'-:,.;<>~!@#$%^&*|+=[]{}`~?";
 
-
+    private final TransferHandler editorTransferHandler;
 
     private boolean enabled = true;
 
@@ -54,11 +57,12 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
     private EditManager editManager = new EditManager(this);
     private LinePainter linePainter;
 
-    private StringLocationCache lineCache = new StringLocationCache();
+    private final StringLocationCache lineCache = new StringLocationCache();
 
     private SuggestionInterface suggestionInterface;
 
     {
+        this.getDocument().putProperty(DefaultEditorKit.EndOfLineStringProperty, "\n");
 
         linePainter = new LinePainter(this);
         this.setCaret(this.caret = new EditorCaret(this));
@@ -89,6 +93,38 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
 
         this.getDocument().addDocumentListener((UnifiedDocumentListener) e -> updateDefaultSize());
 
+        this.setTransferHandler(this.editorTransferHandler = new TransferHandler() {
+            @Override
+            public boolean canImport(TransferSupport support) {
+                Debug.log("called canImport");
+                return support.isDataFlavorSupported(DataFlavor.stringFlavor) || support.isDataFlavorSupported(DataFlavor.getTextPlainUnicodeFlavor());
+            }
+
+            @Override
+            public boolean importData(TransferSupport support) {
+                Debug.log("Hey does this ever run?");
+                return support.isDataFlavorSupported(DataFlavor.stringFlavor) || support.isDataFlavorSupported(DataFlavor.getTextPlainUnicodeFlavor());
+            }
+
+            @NotNull
+            @Override
+            protected Transferable createTransferable(JComponent c) {
+                Debug.log("called createTransferable");
+                return AdvancedEditor.this.createTransferable();
+            }
+
+            @Override
+            protected void exportDone(JComponent source, Transferable data, int action) {
+                Debug.log("Export done btw");
+                super.exportDone(source, data, action);
+            }
+
+            @Override
+            public int getSourceActions(JComponent c) {
+                return TransferHandler.COPY_OR_MOVE;
+            }
+        });
+
         tlm = new ThemeListenerManager();
 
         tlm.addThemeChangeListener(t -> {
@@ -116,12 +152,11 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
     }
 
     public AdvancedEditor() {
-        this.getDocument().putProperty(DefaultEditorKit.EndOfLineStringProperty, "\n");
+        super();
     }
 
     public AdvancedEditor(StyledDocument doc) {
         super(doc);
-        this.getDocument().putProperty(DefaultEditorKit.EndOfLineStringProperty, "\n");
     }
 
     @Override
@@ -288,6 +323,33 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
 
     public void setCurrentLineColor(Color c) {
         linePainter.setColor(c);
+    }
+
+    public TransferHandler getEditorTransferHandler() {
+        return editorTransferHandler;
+    }
+
+    protected Transferable createTransferable() {
+        return new Transferable() {
+            @Override
+            public DataFlavor[] getTransferDataFlavors() {
+                return new DataFlavor[] {DataFlavor.stringFlavor, DataFlavor.getTextPlainUnicodeFlavor()};
+            }
+
+            @Override
+            public boolean isDataFlavorSupported(DataFlavor flavor) {
+                return flavor == DataFlavor.stringFlavor || flavor.equals(DataFlavor.getTextPlainUnicodeFlavor());
+            }
+
+            @NotNull
+            @Override
+            public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
+                if(flavor == DataFlavor.stringFlavor || flavor.equals(DataFlavor.getTextPlainUnicodeFlavor())) {
+                    return caret.getTransferData();
+                }
+                throw new UnsupportedFlavorException(flavor);
+            }
+        };
     }
 
     private enum CharType {

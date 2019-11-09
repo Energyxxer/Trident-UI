@@ -15,18 +15,21 @@ import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
 import com.energyxxer.trident.global.temp.projects.TridentProject;
 import com.energyxxer.trident.main.window.TridentWindow;
-import com.energyxxer.trident.main.window.sections.EditArea;
 import com.energyxxer.trident.ui.editor.behavior.AdvancedEditor;
 import com.energyxxer.trident.ui.editor.completion.SuggestionDialog;
 import com.energyxxer.trident.ui.editor.inspector.Inspector;
 import com.energyxxer.util.logger.Debug;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.util.Date;
@@ -67,7 +70,47 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
         timer = new Timer(20, this);
         timer.start();
 
-        this.setTransferHandler(EditArea.dragToOpenFileHandler);
+        //this.setTransferHandler(TridentWindow.editArea.dragToOpenFileHandler);
+        this.setTransferHandler(new TransferHandler("string") {
+            @Override
+            public boolean importData(TransferSupport support) {
+                Debug.log("called importData");
+                if(support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                    return TridentWindow.editArea.dragToOpenFileHandler.importData(support);
+                } else {
+                    return getEditorTransferHandler().importData(support);
+                }
+            }
+
+            @Override
+            public boolean canImport(TransferSupport support) {
+                Debug.log("called canImport");
+                return support.isDrop() && (getEditorTransferHandler().canImport(support) || TridentWindow.editArea.dragToOpenFileHandler.canImport(support));
+            }
+
+            @Override
+            protected void exportDone(JComponent source, Transferable data, int action) {
+                Debug.log("Export done btw");
+                super.exportDone(source, data, action);
+            }
+
+            @Nullable
+            @Override
+            protected Transferable createTransferable(JComponent c) {
+                Debug.log("called createTransferable");
+                return TridentEditorComponent.this.createTransferable();
+            }
+
+            @Override
+            public void exportAsDrag(JComponent comp, InputEvent e, int action) {
+                super.exportAsDrag(comp, e, action);
+            }
+
+            @Override
+            public int getSourceActions(JComponent c) {
+                return TransferHandler.COPY_OR_MOVE | getEditorTransferHandler().getSourceActions(c);
+            }
+        });
 
         this.setSuggestionInterface(suggestionBox);
 

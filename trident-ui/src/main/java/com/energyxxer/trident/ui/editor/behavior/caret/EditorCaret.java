@@ -5,26 +5,37 @@ import com.energyxxer.trident.testing.LiveTestCase;
 import com.energyxxer.trident.testing.LiveTestManager;
 import com.energyxxer.trident.testing.LiveTestResult;
 import com.energyxxer.trident.ui.editor.behavior.AdvancedEditor;
+import com.energyxxer.trident.ui.editor.behavior.editmanager.edits.CompoundEdit;
+import com.energyxxer.trident.ui.editor.behavior.editmanager.edits.DeletionEdit;
+import com.energyxxer.trident.ui.editor.behavior.editmanager.edits.DragInsertionEdit;
+import com.energyxxer.trident.ui.editor.behavior.editmanager.edits.SetCaretProfileEdit;
 import com.energyxxer.trident.util.Range;
+import com.energyxxer.util.Lazy;
 import com.energyxxer.util.StringLocation;
 import com.energyxxer.util.logger.Debug;
 
+import javax.swing.*;
 import javax.swing.plaf.TextUI;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.Highlighter;
 import javax.swing.text.Utilities;
 import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
  * Created by User on 1/3/2017.
  */
-public class EditorCaret extends DefaultCaret {
+public class EditorCaret extends DefaultCaret implements DropTargetListener {
 
     static {
         LiveTestManager.registerTestCase(new LiveTestCase(
@@ -40,6 +51,8 @@ public class EditorCaret extends DefaultCaret {
 
     private static Highlighter.HighlightPainter nullHighlighter = (g,p0,p1,bounds,c) -> {};
 
+    private int dropLocation = -1;
+
     public EditorCaret(AdvancedEditor c) {
         this.editor = c;
         this.setBlinkRate(500);
@@ -50,6 +63,8 @@ public class EditorCaret extends DefaultCaret {
                 handleEvent(e);
             }
         });
+
+        c.setDropTarget(new DropTarget(c, TransferHandler.COPY_OR_MOVE, this));
 
         bufferedDot = new Dot(0, 0, editor);
         addDot(bufferedDot);
@@ -107,6 +122,9 @@ public class EditorCaret extends DefaultCaret {
     }
 
     public void mergeDots(Dot newDot) {
+        if(!dots.contains(newDot)) {
+            Debug.log("DOTS DO NOT CONTAIN NEWDOT, DOT WAS NOT ADDED");
+        }
         boolean hasMerged = true;
         while(hasMerged) {
             hasMerged = false;
@@ -155,6 +173,9 @@ public class EditorCaret extends DefaultCaret {
     @Override
     public void paint(Graphics g) {
         try {
+            g.setColor(getComponent().getCaretColor());
+            int paintWidth = 2;
+
             TextUI mapper = getComponent().getUI();
 
             ArrayList<Dot> allDots = new ArrayList<>(dots);
@@ -163,14 +184,18 @@ public class EditorCaret extends DefaultCaret {
                 Rectangle r = mapper.modelToView(getComponent(), dot.index, getDotBias());
 
                 if(isVisible()) {
-                    g.setColor(getComponent().getCaretColor());
-                    int paintWidth = 2;
                     r.x -= paintWidth >> 1;
                     g.fillRect(r.x, r.y, paintWidth, r.height);
                 }
                 else {
                     getComponent().repaint(r);
                 }
+            }
+
+            if(dropLocation >= 0) {
+                Rectangle r = mapper.modelToView(getComponent(), dropLocation, getDotBias());
+                r.x -= paintWidth >> 1;
+                g.fillRect(r.x, r.y, paintWidth, r.height);
             }
         } catch (BadLocationException x) {
             Debug.log(x.getMessage(), Debug.MessageType.ERROR);
@@ -185,6 +210,11 @@ public class EditorCaret extends DefaultCaret {
 
             for (Dot dot : allDots) {
                 Rectangle r = editor.modelToView(dot.index);
+                if(unionRect == null) unionRect = r; else unionRect = unionRect.union(r);
+            }
+
+            if(dropLocation >= 0) {
+                Rectangle r = editor.modelToView(dropLocation);
                 if(unionRect == null) unionRect = r; else unionRect = unionRect.union(r);
             }
 
@@ -284,7 +314,6 @@ public class EditorCaret extends DefaultCaret {
             Dot newDot = new Dot(r.clamp(profile.get(i)),r.clamp(profile.get(i+1)), editor);
             if(i == 0) bufferedDot = newDot;
             addDot(newDot);
-            bufferedDotAdded = true;
         }
         removeDuplicates();
         update();
@@ -301,17 +330,40 @@ public class EditorCaret extends DefaultCaret {
     private int columnDotsStartIndex = 0;
     private Point columnStartPoint = null;
 
+    private boolean clickStartInSelection = false;
+
+    private boolean isInSelection(int index) {
+        for(Dot dot : dots) {
+            if(dot.contains(index)) return true;
+        }
+        return false;
+    }
+
+    private Dot getSelectionAroundIndex(int index) {
+        for(Dot dot : dots) {
+            if(dot.contains(index)) return dot;
+        }
+        return null;
+    }
+
     @Override
     public void mousePressed(MouseEvent e) {
         editor.requestFocus();
-        if(!e.isAltDown() || !e.isShiftDown()) {
-            dots.clear();
-        }
+        transferData = null;
+        transferFromDot = null;
         int index = editor.viewToModel(e.getPoint());
 
+        clickStartInSelection = isInSelection(index);
+
         bufferedDot = new Dot(index, index, editor);
+        bufferedDotAdded = false;
         dragSelectMode = DragSelectMode.CHAR;
         if(e.getButton() == MouseEvent.BUTTON2 || (e.getButton() == MouseEvent.BUTTON1 && e.isAltDown())) {
+            clickStartInSelection = false;
+            if(!e.isAltDown() || !e.isShiftDown()) {
+                dots.clear();
+            }
+
             dragSelectMode = DragSelectMode.COLUMN;
             columnDotsStartIndex = dots.size();
             columnStartPoint = e.getPoint();
@@ -320,20 +372,38 @@ public class EditorCaret extends DefaultCaret {
             bufferedDot.index = bufferedDot.getWordEnd();
             dragSelectMode = DragSelectMode.WORD;
         } else if(e.getClickCount() >= 3 && !e.isConsumed() && e.getButton() == MouseEvent.BUTTON1) {
+            clickStartInSelection = false;
+
             bufferedDot.mark = bufferedDot.getRowStart();
             bufferedDot.index = bufferedDot.getRowEnd();
             dragSelectMode = DragSelectMode.LINE;
         }
-        addDot(bufferedDot);
-        bufferedDotAdded = true;
+        if(!clickStartInSelection) {
+            if(!e.isAltDown() || !e.isShiftDown()) {
+                dots.clear();
+            }
+            addDot(bufferedDot);
+            bufferedDotAdded = true;
+        } else if(dragSelectMode != DragSelectMode.CHAR) {
+            dragSelectMode = DragSelectMode.CHAR;
+            bufferedDot = null;
+            bufferedDotAdded = false;
+        }
         e.consume();
         update();
     }
+
+    private String transferData = null;
+    private Dot transferFromDot = null;
 
     @Override
     public void mouseReleased(MouseEvent e) {
         if(bufferedDot != null) {
             if(bufferedDotAdded) mergeDots(bufferedDot);
+            else if(clickStartInSelection && bufferedDot.isPoint() && transferData == null) {
+                dots.clear();
+                addDot(bufferedDot);
+            }
             bufferedDot = null;
             bufferedDotAdded = false;
         }
@@ -362,7 +432,20 @@ public class EditorCaret extends DefaultCaret {
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        if(bufferedDot != null) {
+        if(clickStartInSelection) { //DRAG TEXT
+            if(editor.getTransferHandler() != null && transferData == null) {
+                Dot selected = getSelectionAroundIndex(editor.viewToModel(e.getPoint()));
+                if(selected != null) {
+                    try {
+                        editor.getTransferHandler().exportAsDrag(editor, e, TransferHandler.MOVE);
+                        transferData = editor.getDocument().getText(selected.getMin(), selected.getMax() - selected.getMin());
+                        transferFromDot = selected;
+                    } catch (BadLocationException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        } else if(bufferedDot != null) {
             bufferedDot.index = editor.viewToModel(e.getPoint());
             try {
                 switch(dragSelectMode) {
@@ -446,5 +529,90 @@ public class EditorCaret extends DefaultCaret {
     @Override
     public void mouseMoved(MouseEvent e) {
         super.mouseMoved(e);
+    }
+
+    @Override
+    public void dragEnter(DropTargetDragEvent e) {
+        dragOver(e);
+    }
+
+    @Override
+    public void dragOver(DropTargetDragEvent e) {
+        if(e.getTransferable().isDataFlavorSupported(DataFlavor.stringFlavor) && editor.isEditable()) {
+            e.acceptDrag(e.getDropAction());
+
+            dropLocation = editor.viewToModel(e.getLocation());
+            readjustRect();
+            editor.repaint();
+        } else {
+            dropLocation = -1;
+            if(editor.getTransferHandler() != null && !editor.getTransferHandler().canImport(new TransferHandler.TransferSupport(editor, e.getTransferable()))) {
+                e.rejectDrag();
+            }
+        }
+    }
+
+    @Override
+    public void dropActionChanged(DropTargetDragEvent e) {
+
+    }
+
+    @Override
+    public void dragExit(DropTargetEvent e) {
+        dropLocation = -1;
+    }
+
+    @Override
+    public void drop(DropTargetDropEvent e) {
+        if(!editor.isEditable()) return;
+        Debug.log(e);
+        e.acceptDrop(TransferHandler.COPY_OR_MOVE);
+        if(!e.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+            Debug.log("Redirected to edit area");
+            if(editor.getTransferHandler() != null) editor.getTransferHandler().importData(new TransferHandler.TransferSupport(editor, e.getTransferable()));
+        } else {
+            Debug.log("Is string");
+            try {
+                dropLocation = editor.viewToModel(e.getLocation());
+
+                if(dropLocation >= 0) {
+                    Transferable t = e.getTransferable();
+                    String text = (String) t.getTransferData(DataFlavor.stringFlavor);
+
+                    Dot dropDot = getSelectionAroundIndex(dropLocation);
+                    if(dropDot == null) dropDot = new Dot(dropLocation, dropLocation, editor);
+
+                    boolean isMoveOperation = e.getDropAction() == TransferHandler.MOVE && e.isLocalTransfer() && transferFromDot != null;
+
+                    if (!isMoveOperation || transferFromDot.getMin() != dropDot.getMin() || transferFromDot.getMax() != dropDot.getMax()) {
+                        CompoundEdit edit = new CompoundEdit();
+
+                        if(isMoveOperation) { //Move operation
+                            Debug.log(transferFromDot);
+                            CaretProfile deletionProfile = new CaretProfile(transferFromDot.mark, transferFromDot.index);
+                            edit.appendEdit(new Lazy<>(() -> new SetCaretProfileEdit(deletionProfile, editor)));
+                            edit.appendEdit(new Lazy<>(() -> new DeletionEdit(editor)));
+                            int transferFromLength = transferFromDot.getMax() - transferFromDot.getMin();
+                            if(dropDot.mark > transferFromDot.getMin()) dropDot.mark = Math.max(transferFromDot.getMin(), dropDot.mark - transferFromLength);
+                            if(dropDot.index > transferFromDot.getMin()) dropDot.index = Math.max(transferFromDot.getMin(), dropDot.index - transferFromLength);
+                        }
+
+                        CaretProfile newProfile = new CaretProfile(dropDot.mark, dropDot.index);
+
+                        edit.appendEdit(new Lazy<>(() -> new SetCaretProfileEdit(newProfile, editor)));
+                        edit.appendEdit(new Lazy<>(() -> new DragInsertionEdit(text, editor)));
+
+                        editor.getEditManager().insertEdit(edit);
+                    }
+                }
+            } catch (UnsupportedFlavorException | IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        dropLocation = -1;
+    }
+
+    public String getTransferData() {
+        return transferData;
     }
 }

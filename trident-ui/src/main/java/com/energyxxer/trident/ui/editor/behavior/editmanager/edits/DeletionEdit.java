@@ -17,7 +17,7 @@ public class DeletionEdit extends Edit {
     private boolean wholeWord = false;
     private boolean forwards = false;
     private ArrayList<String> previousValues = new ArrayList<>();
-    private CaretProfile previousProfile = new CaretProfile();
+    private CaretProfile previousProfile;
     private CaretProfile nextProfile = null;
     private int deletionAmount = -1;
 

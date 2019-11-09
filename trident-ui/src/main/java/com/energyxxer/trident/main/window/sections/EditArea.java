@@ -15,6 +15,7 @@ import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.io.File;
+import java.util.List;
 
 /**
  * Created by User on 12/15/2016.
@@ -27,45 +28,19 @@ public class EditArea extends JPanel {
 
     private JComponent content = null;
 
-    public static final TransferHandler dragToOpenFileHandler = new TransferHandler("filepath") {
+    public final TransferHandler dragToOpenFileHandler = new TransferHandler("filepath") {
         @Override
         public Image getDragImage() {
             return Commons.getIcon("file");
         }
 
         public boolean canImport(TransferSupport support) {
-
-            if (!support.isDrop()) {
-                return false;
-            }
-
-            return support.isDataFlavorSupported(DataFlavor.javaFileListFlavor);
+            return EditArea.this.canImport(support.getTransferable());
         }
 
         @SuppressWarnings("unchecked")
         public boolean importData(TransferSupport support) {
-
-            if (!canImport(support)) {
-                return false;
-            }
-
-            Transferable transferable = support.getTransferable();
-            java.util.List<File> files;
-
-            try {
-                files = (java.util.List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
-            } catch (Exception e) {
-                Debug.log(e, Debug.MessageType.ERROR);
-                return false;
-            }
-
-            for(File file : files) {
-                if(file.isFile() && file.exists()) {
-                    TridentWindow.tabManager.openTab(new FileModuleToken(file));
-                }
-            }
-
-            return true;
+            return EditArea.this.importData(support.getTransferable());
         }
     };
 
@@ -136,5 +111,33 @@ public class EditArea extends JPanel {
 
         this.revalidate();
         this.repaint();
+    }
+
+    public boolean canImport(Transferable support) {
+        return support.isDataFlavorSupported(DataFlavor.javaFileListFlavor);
+    }
+
+    @SuppressWarnings("unchecked")
+    public boolean importData(Transferable t) {
+        if (!canImport(t)) {
+            return false;
+        }
+
+        List<File> files;
+
+        try {
+            files = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
+        } catch (Exception e) {
+            Debug.log(e, Debug.MessageType.ERROR);
+            return false;
+        }
+
+        for(File file : files) {
+            if(file.isFile() && file.exists()) {
+                TridentWindow.tabManager.openTab(new FileModuleToken(file));
+            }
+        }
+
+        return true;
     }
 }
