@@ -24,13 +24,14 @@ import org.jetbrains.annotations.NotNull;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class FileModuleToken implements ModuleToken {
+public class FileModuleToken implements ModuleToken, DraggableExplorerModuleToken, DropTargetExplorerModuleToken {
     public static ModuleTokenFactory<FileModuleToken> factory = str -> {
         if(!str.startsWith("file://")) return null;
         String path = str.substring("file://".length());
@@ -358,5 +359,32 @@ public class FileModuleToken implements ModuleToken {
     @Override
     public String toString() {
         return "[FileModuleToken: " + getPath() + "]";
+    }
+
+    private File getDragDestination() {
+        File destination = getFile().isDirectory() ? getFile() : getFile().getParentFile();
+        return destination.exists() ? destination : null;
+    }
+
+    @Override
+    public boolean canAccept(DraggableExplorerModuleToken[] draggables) {
+        File destination = getDragDestination();
+        if(destination == null) return false;
+        for(DraggableExplorerModuleToken draggable : draggables) {
+            if(!(draggable instanceof FileModuleToken)) return false;
+            if(destination.equals(((FileModuleToken) draggable).file.getParentFile())) return false;
+            if(destination.toPath().startsWith(((FileModuleToken) draggable).file.toPath())) return false;
+        }
+        return true;
+    }
+
+    @Override
+    public DataFlavor getDataFlavor() {
+        return DataFlavor.javaFileListFlavor;
+    }
+
+    @Override
+    public Object getTransferData() {
+        return file;
     }
 }

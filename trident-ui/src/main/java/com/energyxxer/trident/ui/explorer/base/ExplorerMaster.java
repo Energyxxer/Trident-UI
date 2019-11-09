@@ -25,6 +25,10 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
 
     protected ExplorerElement rolloverItem = null;
 
+    protected MouseEvent pressedEvent = null;
+    protected ExplorerElement dragStart = null;
+    protected boolean transferStarted = false;
+
     private ArrayList<ModuleToken> expandedElements = new ArrayList<>();
 
     protected ArrayList<ExplorerElement> flatList = new ArrayList<>();
@@ -109,17 +113,22 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
     @Override
     public void mousePressed(MouseEvent e) {
         ExplorerElement element = getElementAtMousePos(e);
+        dragStart = element;
+        pressedEvent = e;
         if(element != null) element.mousePressed(e);
         else if(e.getButton() == MouseEvent.BUTTON1) {
             clearSelected();
             repaint();
         }
+        transferStarted = false;
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        ExplorerElement element = getElementAtMousePos(e);
-        if(element != null) element.mouseReleased(e);
+        if(dragStart != null) dragStart.mouseReleased(e);
+        dragStart = null;
+        pressedEvent = null;
+        transferStarted = false;
     }
 
     @Override
@@ -136,7 +145,9 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
 
     @Override
     public void mouseDragged(MouseEvent e) {
-
+        if(dragStart != null) {
+            dragStart.mouseDragged(e);
+        }
     }
 
     @Override
@@ -178,13 +189,34 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
         selectionUpdated();
     }
 
+    private void ensureLast(ExplorerElement item) {
+        if(selectedItems.contains(item)) {
+            selectedItems.remove(item);
+            selectedItems.add(item);
+            selectionUpdated();
+        }
+    }
+
     public void setSelected(ExplorerElement item, MouseEvent e) {
         ExplorerElement lastItem = null;
         if(this.selectedItems.size() > 0) lastItem = this.selectedItems.get(this.selectedItems.size()-1);
-        if(e == null || !isPlatformControlDown(e)) {
+
+        MouseEvent firstE = e != null && e.getID() == MouseEvent.MOUSE_RELEASED ? pressedEvent : e;
+        int id = e != null ? e.getID() : MouseEvent.MOUSE_PRESSED;
+        boolean ctrl = firstE != null && isPlatformControlDown(firstE);
+        boolean shift = firstE != null && firstE.isShiftDown();
+
+        if(ctrl && !shift && e.getID() == MouseEvent.MOUSE_PRESSED) return;
+        if(shift && e.getID() == MouseEvent.MOUSE_RELEASED) return;
+
+        ExplorerElement lookingAt = getElementAtMousePos(firstE);
+        boolean lookingAtSelected = lookingAt != null && selectedItems.contains(lookingAt);
+
+        if(!ctrl && (shift || (!lookingAtSelected || id == MouseEvent.MOUSE_RELEASED))) {
             clearSelected();
         }
-        if(e != null && e.isShiftDown() && lastItem != null) {
+
+        if(shift && id == MouseEvent.MOUSE_PRESSED && lastItem != null) {
             int startIndex = flatList.indexOf(lastItem);
             int endIndex = flatList.indexOf(item);
 
@@ -193,8 +225,10 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
             for(int i = start; i <= end; i++) {
                 addSelected(flatList.get(i), false);
             }
+            ensureLast(lastItem);
         } else {
-            addSelected(item);
+            addSelected(item, ctrl);
+            ensureLast(item);
         }
         repaint();
         selectionUpdated();
@@ -207,6 +241,15 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
             if(path != null) list.add(path);
         });
         return list;
+    }
+
+    public void triggerDragStart(MouseEvent e) {
+        if(transferStarted) return;
+        transferStarted = true;
+        TransferHandler th = this.getTransferHandler();
+        if(th != null) {
+            th.exportAsDrag(this, e, TransferHandler.COPY);
+        }
     }
 
     public boolean getFlag(ExplorerFlag flag) {

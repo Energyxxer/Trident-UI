@@ -18,18 +18,18 @@ import java.util.ArrayList;
 import static com.energyxxer.trident.ui.editor.behavior.AdvancedEditor.isPlatformControlDown;
 
 public class StandardExplorerItem extends ExplorerElement {
-    private ExplorerElement parent = null;
+    private ExplorerElement parent;
 
-    private ModuleToken token = null;
+    private ModuleToken token;
 
     protected boolean expanded = false;
 
-    private Image icon = null;
+    private Image icon;
 
     protected int x = 0;
 
     private boolean detailed = false;
-    private boolean translucent = false;
+    private boolean translucent;
 
     private ArrayList<MouseListener> mouseListeners = new ArrayList<>();
 
@@ -259,8 +259,19 @@ public class StandardExplorerItem extends ExplorerElement {
 
     @Override
     public void mouseReleased(MouseEvent e) {
+        if(!e.isPopupTrigger() && e.getButton() == MouseEvent.BUTTON1) master.setSelected(this, e);
         confirmActivationMenu(e);
         dispatchMouseEvent(e);
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        master.triggerDragStart(e);
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+
     }
 
     @Override
@@ -296,7 +307,7 @@ public class StandardExplorerItem extends ExplorerElement {
                     listener.mousePressed(e);
                     break;
                 case MouseEvent.MOUSE_RELEASED:
-                    listener.mousePressed(e);
+                    listener.mouseReleased(e);
                     break;
                 case MouseEvent.MOUSE_ENTERED:
                     listener.mouseEntered(e);
