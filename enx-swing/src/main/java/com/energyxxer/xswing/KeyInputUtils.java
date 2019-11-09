@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 public class KeyInputUtils {
@@ -19,6 +20,7 @@ public class KeyInputUtils {
             return false;
         }
         boolean returnValue = lastThree.get(0).getID() == KeyEvent.KEY_PRESSED
+                && lastThree.get(0).getWhen() >= ke.getWhen() - doublePressSpeed
                 && lastThree.get(1).getID() == KeyEvent.KEY_RELEASED
                 && lastThree.get(2).getID() == KeyEvent.KEY_PRESSED;
         if(returnValue) timeline.get(ke.getKeyCode()).clear();
@@ -37,14 +39,28 @@ public class KeyInputUtils {
 
     private static void addEntry(KeyEvent ke) {
         if(!timeline.containsKey(ke.getKeyCode())) timeline.put(ke.getKeyCode(), new ArrayList<>());
-        timeline.get(ke.getKeyCode()).add(ke);
+        ArrayList<KeyEvent> events = timeline.get(ke.getKeyCode());
+        if(events.isEmpty() || ke.getID() != events.get(events.size()-1).getID()) {
+            events.add(ke);
+        }
         removeOldEntries(ke);
     }
 
     private static void removeOldEntries(KeyEvent ke) {
         long current = ke.getWhen();
         for(ArrayList<KeyEvent> list : timeline.values()) {
-            list.removeIf(k -> k.getWhen() < current - doublePressSpeed);
+
+            boolean foundFirstPressed = false;
+            Iterator<KeyEvent> it = list.iterator();
+            while(it.hasNext()) {
+                KeyEvent k = it.next();
+
+                if(!foundFirstPressed && k.getID() == KeyEvent.KEY_PRESSED) {
+                    foundFirstPressed = true;
+                } else if(!foundFirstPressed || k.getWhen() < current - doublePressSpeed) {
+                    it.remove();
+                }
+            }
         }
     }
 
