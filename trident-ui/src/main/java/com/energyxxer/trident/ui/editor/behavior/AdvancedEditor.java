@@ -69,7 +69,7 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         this.addKeyListener(this);
 
         //this.getInputMap().setParent(null);
-        this.setInputMap(JComponent.WHEN_FOCUSED,new InputMap());
+        this.setInputMap(JComponent.WHEN_FOCUSED, new InputMap());
 
         this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),"undo");
         this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),"redo");

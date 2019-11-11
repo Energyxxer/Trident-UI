@@ -88,6 +88,7 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
     }
 
     protected ExplorerElement getElementAtMousePos(MouseEvent e) {
+        if(e == null) return null;
         return getElementAtMousePos(e.getPoint());
     }
 
@@ -116,6 +117,7 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
 
     @Override
     public void mousePressed(MouseEvent e) {
+        this.requestFocus();
         ExplorerElement element = getElementAtMousePos(e);
         dragStart = element;
         pressedEvent = e;

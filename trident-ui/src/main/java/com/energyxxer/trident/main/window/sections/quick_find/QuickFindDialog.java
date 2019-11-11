@@ -46,6 +46,7 @@ public class QuickFindDialog extends JDialog implements WindowFocusListener, Act
 
     private final String[] filterOptions = new String[] {"Entire Workspace", "Current Project", "Project Data", "Project Resources"};
     private StyledDropdownMenu<String> rootPicker;
+    private Component lastFocusedComponent;
 
     private QuickFindDialog() {
         super(TridentWindow.jframe, false);
@@ -90,7 +91,6 @@ public class QuickFindDialog extends JDialog implements WindowFocusListener, Act
             public void keyPressed(KeyEvent e) {
                 if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     dismiss();
-                    TridentWindow.jframe.requestFocus();
                     e.consume();
                 }
             }
@@ -224,6 +224,7 @@ public class QuickFindDialog extends JDialog implements WindowFocusListener, Act
             }
             rootPicker.setValueIndex(index);
         } else {
+            lastFocusedComponent = TridentWindow.jframe.getFocusOwner();
             updateLastEdit();
         }
         this.setVisible(true);
@@ -234,6 +235,7 @@ public class QuickFindDialog extends JDialog implements WindowFocusListener, Act
 
     public void dismiss() {
         this.setVisible(false);
+        if(lastFocusedComponent != null) lastFocusedComponent.requestFocus();
     }
 
     void updateLastEdit() {
