@@ -309,7 +309,7 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
         tln.setBackground(t.getColor(new Color(235, 235, 235), "Editor.lineNumber.background"));
         tln.setForeground(t.getColor(new Color(150, 150, 150), "Editor.lineNumber.foreground"));
         //tln current line background
-        tln.setCurrentLineForeground(t.getColor(tln.getForeground(), "TridentEditorModule.lineNumber.currentLine.foreground"));
+        tln.setCurrentLineForeground(t.getColor(tln.getForeground(), "Editor.lineNumber.currentLine.foreground"));
         tln.setBorder(
                 BorderFactory.createCompoundBorder(
                         BorderFactory.createMatteBorder(

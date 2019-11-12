@@ -13,6 +13,7 @@ import com.energyxxer.trident.util.Range;
 import com.energyxxer.util.Lazy;
 import com.energyxxer.util.StringLocation;
 import com.energyxxer.util.logger.Debug;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.plaf.TextUI;
@@ -175,6 +176,7 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
 
     @Override
     public void paint(Graphics g) {
+        caretPaintListeners.forEach(Runnable::run);
         try {
             g.setColor(getComponent().getCaretColor());
             int paintWidth = 2;
@@ -294,7 +296,10 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
 
     @Override
     public int getDot() {
-        return dots.get(dots.size()-1).index;
+        if(dragSelectMode == COLUMN) return dots.get(columnDotCursorIndex).index;
+        int upperBound = dots.size()-1;
+        if(dragSelectMode == CHAR) upperBound = columnDotsStartIndex-1;
+        return dots.get(Math.min(upperBound, dots.size()-1)).index;
     }
 
     public ArrayList<Dot> getDots() {
@@ -334,7 +339,8 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
     Dot bufferedDot = null;
     private boolean bufferedDotAdded = false;
     DragSelectMode dragSelectMode = DragSelectMode.CHAR;
-    int columnDotsStartIndex = 0;
+    int columnDotsStartIndex = 1;
+    private int columnDotCursorIndex = 1;
     private Point columnStartPoint = null;
 
     private boolean clickStartInSelection = false;
@@ -398,6 +404,7 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
 
         columnStartPoint = e.getPoint();
         columnDotsStartIndex = dots.size();
+        columnDotCursorIndex = dots.size();
 
         e.consume();
         update();
@@ -414,6 +421,7 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
             }
         } else if(bufferedDot != null) {
             dots.remove(bufferedDot);
+            columnDotCursorIndex--;
             mergeDots();
             bufferedDot = null;
             bufferedDotAdded = false;
@@ -494,6 +502,7 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
                     }
                     case COLUMN: {
                         bufferedDotAdded = false;
+                        columnDotCursorIndex = Math.max(0,columnDotsStartIndex-1);
                         while(dots.size() > columnDotsStartIndex) {
                             dots.remove(columnDotsStartIndex);
                         }
@@ -505,6 +514,7 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
                         int bottomY = (Math.max(e.getPoint().y, columnStartPoint.y) / rowHeight) * rowHeight;
 
                         boolean rtl = e.getPoint().x < columnStartPoint.x;
+                        boolean topDown = e.getPoint().y >= columnStartPoint.y;
 
                         boolean hasUnselectedChars = false;
                         int selectedCharListIndex = -1;
@@ -536,12 +546,19 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
                         if(!e.isAltDown() || e.isShiftDown()) {
                             dragSelectMode = DragSelectMode.CHAR;
                         }
+
+                        if(topDown) {
+                            columnDotCursorIndex = dots.size()-1;
+                        } else {
+                            columnDotCursorIndex = columnDotsStartIndex;
+                        }
                         break;
                     }
                     case CHAR: {
                         bufferedDot.updateX();
                         if(e.isAltDown() && !e.isShiftDown()) {
                             dragSelectMode = COLUMN;
+                            columnDotCursorIndex = dots.size()-1;
                         }
                         break;
                     }
@@ -641,5 +658,11 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
 
     public String getTransferData() {
         return transferData;
+    }
+
+    private ArrayList<Runnable> caretPaintListeners = new ArrayList<>();
+
+    public void addCaretPaintListener(@NotNull Runnable runnable) {
+        caretPaintListeners.add(runnable);
     }
 }

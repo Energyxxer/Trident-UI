@@ -1,25 +1,16 @@
 package com.energyxxer.trident.util.linenumber;
 
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+import com.energyxxer.trident.ui.editor.behavior.AdvancedEditor;
+
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Element;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.StyleConstants;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Point;
-import java.awt.Rectangle;
+import javax.swing.text.*;
+import java.awt.*;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.util.HashMap;
@@ -60,6 +51,7 @@ public class TextLineNumber extends JPanel
 		setPadding(5);
 		component.getDocument().addDocumentListener(this);
 		component.addCaretListener( this );
+		if(component instanceof AdvancedEditor) ((AdvancedEditor) component).addCaretPaintListener(this::repaint);
 		scrollPane.getVerticalScrollBar().addAdjustmentListener(this);
 		setOpaque(false);
 	}
@@ -120,8 +112,11 @@ public class TextLineNumber extends JPanel
 				int x = getOffsetX(availableWidth, stringWidth) + padding;
 				int y = (start + ((n-startLine+1)*lineHeight)) - (lineHeight/4);
 
-				if(n == caretPosition) g.setColor(getCurrentLineForeground());
-				else g.setColor(getForeground());
+				if(n == caretPosition) {
+					g.setColor(getCurrentLineForeground());
+				} else {
+					g.setColor(getForeground());
+				}
 
 				g.drawString(label, x, y);
 			}

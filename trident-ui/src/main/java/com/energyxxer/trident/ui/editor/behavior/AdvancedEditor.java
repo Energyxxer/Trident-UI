@@ -343,6 +343,10 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         };
     }
 
+    public void addCaretPaintListener(@NotNull Runnable runnable) {
+        caret.addCaretPaintListener(runnable);
+    }
+
     private enum CharType {
         ALPHA(true, 1), WHITESPACE(true, 0), SYMBOL(false), NULL(false);
 
