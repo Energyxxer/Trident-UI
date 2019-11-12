@@ -3,6 +3,7 @@ package com.energyxxer.trident.main.window.sections;
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.global.Status;
+import com.energyxxer.trident.global.keystrokes.KeyMap;
 import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.global.temp.projects.TridentProject;
 import com.energyxxer.trident.main.TridentUI;
@@ -17,7 +18,6 @@ import com.energyxxer.util.FileUtil;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
@@ -68,7 +68,7 @@ public class MenuBar extends JMenuBar {
 
             {
                 StyledMenuItem item = new StyledMenuItem("Save", "save");
-                item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+                item.setAccelerator(KeyMap.TAB_SAVE.getFirstKeyStroke());
                 menu.add(item);
             }
 
@@ -76,7 +76,7 @@ public class MenuBar extends JMenuBar {
 
             {
                 StyledMenuItem item = new StyledMenuItem("Save As", "save_as");
-                item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.SHIFT_MASK | InputEvent.CTRL_MASK));
+                item.setAccelerator(KeyMap.TAB_SAVE_AS.getFirstKeyStroke());
                 menu.add(item);
             }
 
@@ -84,7 +84,7 @@ public class MenuBar extends JMenuBar {
 
             {
                 StyledMenuItem item = new StyledMenuItem("Save All", "save_all");
-                item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK | InputEvent.ALT_MASK));
+                item.setAccelerator(KeyMap.TAB_SAVE_ALL.getFirstKeyStroke());
                 menu.add(item);
             }
 
@@ -96,7 +96,7 @@ public class MenuBar extends JMenuBar {
 
             {
                 StyledMenuItem item = new StyledMenuItem("Close");
-                item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+                item.setAccelerator(KeyMap.CLOSE_TAB.getFirstKeyStroke());
                 menu.add(item);
             }
 
@@ -104,7 +104,7 @@ public class MenuBar extends JMenuBar {
 
             {
                 StyledMenuItem item = new StyledMenuItem("Close All");
-                item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.SHIFT_MASK & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+                item.setAccelerator(KeyMap.CLOSE_ALL_TABS.getFirstKeyStroke());
                 menu.add(item);
             }
 
@@ -160,7 +160,7 @@ public class MenuBar extends JMenuBar {
 
             {
                 StyledMenuItem item = new StyledMenuItem("Undo", "undo");
-                item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+                item.setAccelerator(KeyMap.UNDO.getFirstKeyStroke());
                 menu.add(item);
             }
 
@@ -168,7 +168,7 @@ public class MenuBar extends JMenuBar {
 
             {
                 StyledMenuItem item = new StyledMenuItem("Redo", "redo");
-                item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+                item.setAccelerator(KeyMap.REDO.getFirstKeyStroke());
                 menu.add(item);
             }
 
@@ -180,7 +180,7 @@ public class MenuBar extends JMenuBar {
 
             {
                 StyledMenuItem item = new StyledMenuItem("Copy");
-                item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+                item.setAccelerator(KeyMap.COPY.getFirstKeyStroke());
                 menu.add(item);
             }
 
@@ -188,7 +188,7 @@ public class MenuBar extends JMenuBar {
 
             {
                 StyledMenuItem item = new StyledMenuItem("Cut");
-                item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+                item.setAccelerator(KeyMap.CUT.getFirstKeyStroke());
                 menu.add(item);
             }
 
@@ -196,7 +196,7 @@ public class MenuBar extends JMenuBar {
 
             {
                 StyledMenuItem item = new StyledMenuItem("Paste");
-                item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+                item.setAccelerator(KeyMap.PASTE.getFirstKeyStroke());
                 menu.add(item);
             }
 
@@ -225,7 +225,7 @@ public class MenuBar extends JMenuBar {
 
             {
                 StyledMenuItem item = new StyledMenuItem("Generate", "export");
-                item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, 9));
+                item.setAccelerator(KeyMap.COMPILE.getFirstKeyStroke());
                 menu.add(item);
             }
 

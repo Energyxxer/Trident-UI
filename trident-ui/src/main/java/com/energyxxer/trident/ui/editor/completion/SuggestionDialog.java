@@ -3,6 +3,7 @@ package com.energyxxer.trident.ui.editor.completion;
 import com.energyxxer.enxlex.lexical_analysis.summary.SummaryModule;
 import com.energyxxer.enxlex.suggestions.Suggestion;
 import com.energyxxer.enxlex.suggestions.SuggestionModule;
+import com.energyxxer.trident.global.keystrokes.KeyMap;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.main.window.sections.quick_find.StyledExplorerMaster;
 import com.energyxxer.trident.ui.editor.TridentEditorComponent;
@@ -181,7 +182,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
             }
             explorer.setSelectedIndex(selectedIndex);
             e.consume();
-        } else if(e.getKeyCode() == KeyEvent.VK_TAB) {
+        } else if(KeyMap.SUGGESTION_SELECT.wasPerformedExact(e)) {
             java.util.List<ModuleToken> tokens = explorer.getSelectedTokens();
             if(!tokens.isEmpty()) {
                 tokens.get(0).onInteract();

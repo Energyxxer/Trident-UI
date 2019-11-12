@@ -1,6 +1,7 @@
 package com.energyxxer.trident.ui.editor.behavior;
 
 import com.energyxxer.trident.global.Commons;
+import com.energyxxer.trident.global.keystrokes.KeyMap;
 import com.energyxxer.trident.ui.editor.behavior.caret.CaretProfile;
 import com.energyxxer.trident.ui.editor.behavior.caret.Dot;
 import com.energyxxer.trident.ui.editor.behavior.caret.EditorCaret;
@@ -71,8 +72,8 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         //this.getInputMap().setParent(null);
         this.setInputMap(JComponent.WHEN_FOCUSED, new InputMap());
 
-        this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),"undo");
-        this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),"redo");
+        KeyMap.UNDO.apply(this.getInputMap(), "undo");
+        KeyMap.REDO.apply(this.getInputMap(), "redo");
 
         this.getActionMap().put("undo", new AbstractAction() {
             @Override
@@ -188,7 +189,7 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         } else if(keyCode == KeyEvent.VK_ENTER) {
             e.consume();
             editManager.insertEdit(new NewlineEdit(this, !isPlatformControlDown(e)));
-        } else if((keyCode == KeyEvent.VK_C || keyCode == KeyEvent.VK_X) && isPlatformControlDown(e)) {
+        } else if(KeyMap.COPY.wasPerformed(e) || KeyMap.CUT.wasPerformed(e)) {
             e.consume();
 
             try {
@@ -214,14 +215,14 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
                     clipboard.setContents(new MultiStringSelection(toCopy), null);
                 }
 
-                if(keyCode == KeyEvent.VK_X) {
+                if(KeyMap.CUT.wasPerformed(e)) {
                     editManager.insertEdit(new InsertionEdit("", this));
                 }
             } catch(BadLocationException x) {
                 Debug.log(x.getMessage(), Debug.MessageType.ERROR);
             }
 
-        } else if(keyCode == KeyEvent.VK_V && isPlatformControlDown(e)) {
+        } else if(KeyMap.PASTE.wasPerformed(e)) {
             e.consume();
             try {
                 Clipboard clipboard = this.getToolkit().getSystemClipboard();
@@ -241,17 +242,15 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
             } catch(Exception x) {
                 x.printStackTrace();
             }
-        } else if(keyCode == KeyEvent.VK_A && isPlatformControlDown(e)) {
+        } else if(KeyMap.TEXT_SELECT_ALL.wasPerformedExact(e)) {
             e.consume();
             caret.setProfile(new CaretProfile(0, getDocument().getLength()));
-        } else if(keyCode >= KeyEvent.VK_LEFT && keyCode <= KeyEvent.VK_DOWN && e.isAltDown()) {
+        } else if(KeyMap.TEXT_MOVE_LINE_UP.wasPerformedExact(e)) {
             e.consume();
-            if(keyCode == KeyEvent.VK_UP) {
-                editManager.insertEdit(new LineMoveEdit(this, Dot.UP));
-            }
-            else if(keyCode == KeyEvent.VK_DOWN) {
-                editManager.insertEdit(new LineMoveEdit(this, Dot.DOWN));
-            }
+            editManager.insertEdit(new LineMoveEdit(this, Dot.UP));
+        } else if(KeyMap.TEXT_MOVE_LINE_DOWN.wasPerformedExact(e)) {
+            e.consume();
+            editManager.insertEdit(new LineMoveEdit(this, Dot.DOWN));
         } else if(keyCode == KeyEvent.VK_ESCAPE) {
             int dotPos = caret.getDot();
             caret.setProfile(new CaretProfile(dotPos, dotPos));

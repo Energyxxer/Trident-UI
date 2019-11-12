@@ -1,6 +1,7 @@
 package com.energyxxer.xswing;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,9 +65,35 @@ public class KeyInputUtils {
         }
     }
 
-    public static String getReadableKeyStroke(KeyStroke keyStroke) {
-        String modifiersText = KeyEvent.getKeyModifiersText(keyStroke.getModifiers());
-        if(!modifiersText.isEmpty()) modifiersText += "+";
-        return modifiersText + KeyEvent.getKeyText(keyStroke.getKeyCode());
+    public static String getReadableKeyStroke(KeyStroke stroke) {
+        StringBuilder sb = new StringBuilder();
+        if(isControl(stroke)) {
+            sb.append(System.getProperty("os.name").contains("mac") ? "Command" : "Control");
+            sb.append('+');
+        }
+        if(isAlt(stroke)) {
+            sb.append("Alt+");
+        }
+        if(isShift(stroke)) {
+            sb.append("Shift+");
+        }
+        sb.append(KeyEvent.getKeyText(stroke.getKeyCode()));
+        return sb.toString();
+    }
+
+    public static int getPlatformControlMask() {
+        return Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+    }
+
+    public static boolean isControl(KeyStroke k) {
+        return (k.getModifiers() & getPlatformControlMask()) != 0;
+    }
+
+    public static boolean isAlt(KeyStroke k) {
+        return (k.getModifiers() & KeyEvent.ALT_DOWN_MASK) != 0;
+    }
+
+    public static boolean isShift(KeyStroke k) {
+        return (k.getModifiers() & KeyEvent.SHIFT_DOWN_MASK) != 0;
     }
 }

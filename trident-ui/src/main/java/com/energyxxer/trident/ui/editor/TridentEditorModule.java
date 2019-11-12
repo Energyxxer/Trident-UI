@@ -2,6 +2,7 @@ package com.energyxxer.trident.ui.editor;
 
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.Preferences;
+import com.energyxxer.trident.global.keystrokes.KeyMap;
 import com.energyxxer.trident.global.temp.Lang;
 import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
@@ -80,8 +81,7 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
 
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
-        KeyStroke findKeystroke = KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
-        editorComponent.getInputMap(WHEN_IN_FOCUSED_WINDOW).put(findKeystroke, "findKeystroke");
+        KeyMap.EDITOR_FIND.apply(editorComponent.getInputMap(WHEN_IN_FOCUSED_WINDOW), "findKeystroke");
 
         editorComponent.getActionMap().put("findKeystroke", new AbstractAction() {
 

@@ -49,6 +49,8 @@ public class IndentEdit extends Edit {
 
             CaretProfile nextProfile = new CaretProfile(previousProfile);
 
+            int previousL = -1;
+
             for (int i = 0; i < previousProfile.size()-1; i += 2) {
                 //Get bounds of the line to move
                 int selectionStart = previousProfile.get(i) + characterDrift;
@@ -59,9 +61,20 @@ public class IndentEdit extends Edit {
 
                 int spacesChanged = 0;
 
-                int previousL = -1;
+                int thisSelectionCharacterDrift = 0;
 
-                for(int l = start; l <= end + characterDrift && l != previousL; previousL = l, l = new Dot(l, editor).getPositionBelow()) {
+                boolean firstLineOfSelection = true;
+
+                for(int l = start; l < end + thisSelectionCharacterDrift; previousL = l, l = new Dot(l, editor).getPositionBelow()) {
+                    if(l == previousL) {
+                        if(firstLineOfSelection) {
+                            firstLineOfSelection = false;
+                            continue;
+                        } else {
+                            break;
+                        }
+                    }
+                    firstLineOfSelection = false;
                     int spaces = StringUtil.getSequenceCount(text," ", l - characterDrift);
                     if(!reverse) {
                         int spacesToAdd = 4 - (spaces % 4);
@@ -71,8 +84,9 @@ public class IndentEdit extends Edit {
                         modifications.add(spacesToAdd);
                         nextProfile.pushFrom(l,spacesToAdd);
                         actionPerformed = true;
-                        if(l == end + characterDrift) break;
+                        if(l >= end + thisSelectionCharacterDrift) break;
                         characterDrift += spacesToAdd;
+                        thisSelectionCharacterDrift += spacesToAdd;
                         spacesChanged += spacesToAdd;
                     } else {
                         if(spaces == 0) {
@@ -80,14 +94,15 @@ public class IndentEdit extends Edit {
                         }
                         int spacesToRemove = (spaces % 4 == 0) ? 4 : spaces % 4;
                         if(spacesToRemove != 0) {
-                            nextProfile.pushFrom(l,Math.min(0,spaces - (Math.min(selectionStart, selectionEnd) - start) - spacesToRemove));
+                            nextProfile.pushFrom(l,Math.min(0,-spacesToRemove));
                         }
                         actionPerformed = true;
                         doc.remove(l,spacesToRemove);
                         modifications.add(l);
                         modifications.add(spacesToRemove);
-                        if(l == end + characterDrift) break;
+                        if(l >= end + thisSelectionCharacterDrift) break;
                         characterDrift -= spacesToRemove;
+                        thisSelectionCharacterDrift -= spacesToRemove;
                         spacesChanged -= spacesToRemove;
                     }
                 }

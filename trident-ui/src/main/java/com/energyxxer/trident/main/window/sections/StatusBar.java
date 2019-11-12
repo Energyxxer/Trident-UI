@@ -60,14 +60,6 @@ public class StatusBar extends JPanel implements MouseListener {
         this.add(extension,BorderLayout.EAST);
 
         this.addMouseListener(this);
-
-        /*TODO remove this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_T, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "reloadResources");
-        this.getActionMap().put("reloadResources", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Resources.load();
-            }
-        });*/
     }
 
     public void setStatus(String text) {

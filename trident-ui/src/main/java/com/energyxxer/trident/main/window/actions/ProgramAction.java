@@ -1,14 +1,13 @@
 package com.energyxxer.trident.main.window.actions;
 
+import com.energyxxer.trident.global.keystrokes.UserKeyStroke;
 import com.energyxxer.trident.main.window.sections.quick_find.QuickFindDialog;
 import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.display.DisplayModule;
 import com.energyxxer.trident.ui.modules.ModuleToken;
 import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
-import com.energyxxer.xswing.KeyInputUtils;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.Collection;
 import java.util.Objects;
@@ -16,10 +15,10 @@ import java.util.Objects;
 public class ProgramAction implements ModuleToken {
     private String displayName;
     private String description;
-    private KeyStroke shortcut;
+    private UserKeyStroke shortcut;
     private Runnable action;
 
-    public ProgramAction(String displayName, String description, KeyStroke shortcut, Runnable action) {
+    public ProgramAction(String displayName, String description, UserKeyStroke shortcut, Runnable action) {
         this.displayName = displayName;
         this.description = description;
         this.shortcut = shortcut;
@@ -34,7 +33,7 @@ public class ProgramAction implements ModuleToken {
         return description;
     }
 
-    public KeyStroke getShortcut() {
+    public UserKeyStroke getShortcut() {
         return shortcut;
     }
 
@@ -55,7 +54,7 @@ public class ProgramAction implements ModuleToken {
 
     @Override
     public String getSubTitle() {
-        return shortcut != null ? KeyInputUtils.getReadableKeyStroke(shortcut) : null;
+        return shortcut != null ? shortcut.getReadableKeyStroke() : null;
     }
 
     @Override

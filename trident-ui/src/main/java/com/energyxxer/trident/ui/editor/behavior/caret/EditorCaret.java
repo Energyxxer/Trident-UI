@@ -32,6 +32,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import static com.energyxxer.trident.ui.editor.behavior.caret.DragSelectMode.CHAR;
+import static com.energyxxer.trident.ui.editor.behavior.caret.DragSelectMode.COLUMN;
+
 /**
  * Created by User on 1/3/2017.
  */
@@ -180,16 +183,20 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
 
             ArrayList<Dot> allDots = new ArrayList<>(dots);
 
+            int dotIndex = 0;
             for (Dot dot : allDots) {
                 Rectangle r = mapper.modelToView(getComponent(), dot.index, getDotBias());
 
-                if(isVisible()) {
+                boolean shouldPaint = !(dragSelectMode == COLUMN && dot == bufferedDot) && !(dragSelectMode == CHAR && dotIndex >= columnDotsStartIndex);
+
+                if(isVisible() && shouldPaint) {
                     r.x -= paintWidth >> 1;
                     g.fillRect(r.x, r.y, paintWidth, r.height);
                 }
                 else {
                     getComponent().repaint(r);
                 }
+                dotIndex++;
             }
 
             if(dropLocation >= 0) {
@@ -324,10 +331,10 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
 
     //Handle mouse selection
 
-    private Dot bufferedDot = null;
+    Dot bufferedDot = null;
     private boolean bufferedDotAdded = false;
-    private DragSelectMode dragSelectMode = DragSelectMode.CHAR;
-    private int columnDotsStartIndex = 0;
+    DragSelectMode dragSelectMode = DragSelectMode.CHAR;
+    int columnDotsStartIndex = 0;
     private Point columnStartPoint = null;
 
     private boolean clickStartInSelection = false;
@@ -358,15 +365,14 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
         bufferedDot = new Dot(index, index, editor);
         bufferedDotAdded = false;
         dragSelectMode = DragSelectMode.CHAR;
-        if(e.getButton() == MouseEvent.BUTTON2 || (e.getButton() == MouseEvent.BUTTON1 && e.isAltDown())) {
+
+        if(e.getButton() == MouseEvent.BUTTON2 || (e.getButton() == MouseEvent.BUTTON1 && e.isAltDown() && !e.isShiftDown())) {
             clickStartInSelection = false;
             if(!e.isAltDown() || !e.isShiftDown()) {
                 dots.clear();
             }
 
-            dragSelectMode = DragSelectMode.COLUMN;
-            columnDotsStartIndex = dots.size();
-            columnStartPoint = e.getPoint();
+            dragSelectMode = COLUMN;
         } else if(e.getClickCount() == 2 && !e.isConsumed() && e.getButton() == MouseEvent.BUTTON1) {
             bufferedDot.mark = bufferedDot.getWordStart();
             bufferedDot.index = bufferedDot.getWordEnd();
@@ -389,6 +395,10 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
             bufferedDot = null;
             bufferedDotAdded = false;
         }
+
+        columnStartPoint = e.getPoint();
+        columnDotsStartIndex = dots.size();
+
         e.consume();
         update();
     }
@@ -398,6 +408,17 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
 
     @Override
     public void mouseReleased(MouseEvent e) {
+        if(dragSelectMode != COLUMN) {
+            while(dots.size() > columnDotsStartIndex) {
+                dots.remove(columnDotsStartIndex);
+            }
+        } else if(bufferedDot != null) {
+            dots.remove(bufferedDot);
+            mergeDots();
+            bufferedDot = null;
+            bufferedDotAdded = false;
+        }
+
         if(bufferedDot != null) {
             if(bufferedDotAdded) mergeDots(bufferedDot);
             else if(clickStartInSelection && bufferedDot.isPoint() && transferData == null) {
@@ -512,10 +533,16 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
                                 }
                             }
                         }
+                        if(!e.isAltDown() || e.isShiftDown()) {
+                            dragSelectMode = DragSelectMode.CHAR;
+                        }
                         break;
                     }
                     case CHAR: {
                         bufferedDot.updateX();
+                        if(e.isAltDown() && !e.isShiftDown()) {
+                            dragSelectMode = COLUMN;
+                        }
                         break;
                     }
                 }

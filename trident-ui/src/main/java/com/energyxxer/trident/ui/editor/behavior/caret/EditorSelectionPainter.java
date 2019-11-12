@@ -10,6 +10,9 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.util.ArrayList;
 
+import static com.energyxxer.trident.ui.editor.behavior.caret.DragSelectMode.CHAR;
+import static com.energyxxer.trident.ui.editor.behavior.caret.DragSelectMode.COLUMN;
+
 /**
  * Created by User on 1/9/2017.
  */
@@ -27,8 +30,10 @@ public class EditorSelectionPainter implements Highlighter.HighlightPainter {
 
         ArrayList<Dot> dots = caret.getDots();
 
+        int dotIndex = 0;
         for(Dot dot : dots) {
-            try {
+            boolean shouldPaint = !(caret.dragSelectMode == COLUMN && dot == caret.bufferedDot) && !(caret.dragSelectMode == CHAR && dotIndex >= caret.columnDotsStartIndex);
+            if(shouldPaint) try {
                 StringBounds bounds = dot.getBounds();
 
                 for (int l = bounds.start.line; l <= bounds.end.line; l++) {
@@ -58,6 +63,7 @@ public class EditorSelectionPainter implements Highlighter.HighlightPainter {
                     rectangle.width = Math.abs(rectangle.width);
                     g.fillRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
                 }
+                dotIndex++;
             } catch (BadLocationException e) {
                 //Can't render
             }

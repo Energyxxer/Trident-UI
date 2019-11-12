@@ -1,6 +1,7 @@
 package com.energyxxer.trident.main.window.sections.editor_search;
 
 import com.energyxxer.trident.global.Preferences;
+import com.energyxxer.trident.global.keystrokes.KeyMap;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.ToolbarButton;
 import com.energyxxer.trident.ui.ToolbarSeparator;
@@ -267,12 +268,11 @@ public class FindAndReplaceBar extends JPanel {
 
                 @Override
                 public void keyPressed(KeyEvent e) {
-                    if ((e.getKeyCode() == KeyEvent.VK_ENTER && !isPlatformControlDown(e)) || e.getKeyCode() == KeyEvent.VK_F3) {
-                        if (!e.isShiftDown()) {
-                            onNextOccurrence();
-                        } else {
-                            onPreviousOccurrence();
-                        }
+                    if (KeyMap.FIND_NEXT.wasPerformedExact(e)) {
+                        onNextOccurrence();
+                        e.consume();
+                    } else if (KeyMap.FIND_PREVIOUS.wasPerformedExact(e)) {
+                        onPreviousOccurrence();
                         e.consume();
                     } else if(e.getKeyCode() == KeyEvent.VK_TAB) {
                         replaceField.requestFocus();

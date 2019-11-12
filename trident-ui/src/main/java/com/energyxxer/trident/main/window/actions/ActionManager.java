@@ -2,6 +2,7 @@ package com.energyxxer.trident.main.window.actions;
 
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.Resources;
+import com.energyxxer.trident.global.keystrokes.KeyMap;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.main.window.sections.search_path.SearchPathDialog;
 import com.energyxxer.trident.ui.Tab;
@@ -10,29 +11,27 @@ import com.energyxxer.trident.ui.editor.TridentEditorModule;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 
-@SuppressWarnings("MagicConstant")
 public class ActionManager {
     private static ArrayList<ProgramAction> actions = new ArrayList<>();
 
     static {
         actions.add(new ProgramAction(
                 "Compile", "Compile the active project",
-                KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),
+                KeyMap.COMPILE,
                 Commons::compileActive)
         );
         actions.add(new ProgramAction(
                 "Close Active Tab", "Close the tab currently visible",
-                KeyStroke.getKeyStroke(KeyEvent.VK_W, getPlatformControlMask()),
+                KeyMap.CLOSE_TAB,
                 TridentWindow.tabManager::closeSelectedTab)
         );
         actions.add(new ProgramAction(
                 "Save Active Tab", "Save the tab currently visible",
-                KeyStroke.getKeyStroke(KeyEvent.VK_S, getPlatformControlMask()),
+                KeyMap.TAB_SAVE,
                 () -> {
                     Tab st = TridentWindow.tabManager.getSelectedTab();
                     if(st != null) st.save();
@@ -40,7 +39,7 @@ public class ActionManager {
         );
         actions.add(new ProgramAction(
                 "Reload from Disk", "Reload the current file from disk",
-                KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0),
+                KeyMap.EDITOR_RELOAD,
                 () -> {
                     Tab st = TridentWindow.tabManager.getSelectedTab();
                     if(st != null) {
@@ -52,28 +51,19 @@ public class ActionManager {
         );
         actions.add(new ProgramAction(
                 "Reload UI Resources", "Reload themes, definition packs and feature maps from disk",
-                KeyStroke.getKeyStroke(KeyEvent.VK_T, getPlatformControlMask()),
+                KeyMap.THEME_RELOAD,
                 Resources::load)
         );
         actions.add(new ProgramAction(
                 "Find in Path", "Find all occurrences of a query in a folder or project",
-                KeyStroke.getKeyStroke(KeyEvent.VK_H, getPlatformControlMask()),
+                KeyMap.FIND_IN_PATH,
                 SearchPathDialog.INSTANCE::reveal)
         );
         actions.add(new ProgramAction(
-                "Temporary Indexing", "Summarize active project",
-                KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.ALT_DOWN_MASK),
-                Commons::indexActive)
-        );
-        actions.add(new ProgramAction(
                 "Check for updates", "Check for definition updates",
-                KeyStroke.getKeyStroke(KeyEvent.VK_U, getPlatformControlMask()),
+                null,
                 DefinitionUpdateProcess::tryUpdate)
         );
-    }
-
-    public static int getPlatformControlMask() {
-        return Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
     }
 
     private static long ctrlWasDown = -1L;
@@ -102,12 +92,7 @@ public class ActionManager {
             }
             for(ProgramAction action : actions) {
                 if(action.getShortcut() != null) {
-                    if(
-                            (e.getKeyCode() == action.getShortcut().getKeyCode() || //Check for matching character in keyPressed and keyReleased events
-                                    (Character.toUpperCase(e.getKeyChar()) == action.getShortcut().getKeyCode() && e.getID() == KeyEvent.KEY_TYPED))  //Check for matching character in keyTyped events
-                                    &&
-                            (((e.getModifiersEx() | e.getModifiers()) & action.getShortcut().getModifiers()) == action.getShortcut().getModifiers()) //Check for matching modifiers
-                    ) {
+                    if(action.getShortcut().wasPerformedExact(e)) {
                         if(e.getID() == KeyEvent.KEY_PRESSED) {
                             action.perform();
                         }
