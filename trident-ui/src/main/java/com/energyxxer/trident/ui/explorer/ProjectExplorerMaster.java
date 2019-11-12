@@ -161,7 +161,11 @@ public class ProjectExplorerMaster extends StyledExplorerMaster implements DropT
 
     @Override
     public void dragOver(DropTargetDragEvent e) {
-        if(!e.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) return;
+        if(!e.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+            e.rejectDrag();
+            return;
+        }
+        e.acceptDrag(e.getDropAction());
 
         clearDragRollover();
 
@@ -231,6 +235,7 @@ public class ProjectExplorerMaster extends StyledExplorerMaster implements DropT
     public void drop(DropTargetDropEvent e) {
         clearDragRollover();
         repaint();
+        e.acceptDrop(e.getDropAction());
 
         Transferable t = e.getTransferable();
 
