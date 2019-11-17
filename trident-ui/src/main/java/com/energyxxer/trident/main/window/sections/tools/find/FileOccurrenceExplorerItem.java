@@ -41,10 +41,10 @@ public class FileOccurrenceExplorerItem extends StandardExplorerItem {
         this.x = (master.getIndentation() * master.getIndentPerLevel()) + master.getInitialIndent();
         int x = this.x;
 
-        g.setColor((this.rollover || this.selected) ? master.getColorMap().get("item.rollover.background") : master.getColorMap().get("item.background"));
+        g.setColor((this.rollover || this.selected) ? master.getColors().get("item.rollover.background") : master.getColors().get("item.background"));
         g.fillRect(0, master.getOffsetY(), master.getWidth(), master.getRowHeight());
         if(this.selected) {
-            g.setColor(master.getColorMap().get("item.selected.background"));
+            g.setColor(master.getColors().get("item.selected.background"));
 
             switch(master.getSelectionStyle()) {
                 case "FULL": {
@@ -74,11 +74,11 @@ public class FileOccurrenceExplorerItem extends StandardExplorerItem {
 
         if(!isDetailed()) {
             if (this.selected) {
-                g.setColor(master.getColorMap().get("item.selected.foreground"));
+                g.setColor(master.getColors().get("item.selected.foreground"));
             } else if (this.rollover) {
-                g.setColor(master.getColorMap().get("item.rollover.foreground"));
+                g.setColor(master.getColors().get("item.rollover.foreground"));
             } else {
-                g.setColor(master.getColorMap().get("item.foreground"));
+                g.setColor(master.getColors().get("item.foreground"));
             }
 
             String subTitle = occurrence.lineNum + "";
@@ -91,16 +91,16 @@ public class FileOccurrenceExplorerItem extends StandardExplorerItem {
         //File Name
 
         if(!(master instanceof FindExplorerFilter) || ((FindExplorerFilter) master).highlightResult()) {
-            g.setColor(master.getColorMap().get("item.find.background"));
+            g.setColor(master.getColors().get("item.find.background"));
             g.fillRect(x+metrics.stringWidth(occurrence.linePreview.substring(0, occurrence.previewOffset)), master.getOffsetY() + metrics.getAscent()/2 - 2, metrics.stringWidth(occurrence.linePreview.substring(occurrence.previewOffset, occurrence.previewOffset+occurrence.length)), metrics.getHeight());
         }
 
         if(this.selected) {
-            g.setColor(master.getColorMap().get("item.selected.foreground"));
+            g.setColor(master.getColors().get("item.selected.foreground"));
         } else if(this.rollover) {
-            g.setColor(master.getColorMap().get("item.rollover.foreground"));
+            g.setColor(master.getColors().get("item.rollover.foreground"));
         } else {
-            g.setColor(master.getColorMap().get("item.foreground"));
+            g.setColor(master.getColors().get("item.foreground"));
         }
 
         g.drawString(occurrence.linePreview, x, master.getOffsetY() + metrics.getAscent() + ((master.getRowHeight() - metrics.getHeight())/2));
@@ -126,9 +126,9 @@ public class FileOccurrenceExplorerItem extends StandardExplorerItem {
             }
         }
 
-        master.setOffsetY(master.getOffsetY() + master.getRowHeight());
         master.setContentWidth(Math.max(master.getContentWidth(), x));
         master.pushIndentation();
+        master.renderOffset(this.getHeight());
         for(ExplorerElement i : children) {
             i.render(g);
         }

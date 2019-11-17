@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import static com.energyxxer.trident.ui.editor.behavior.caret.DragSelectMode.CHAR;
-import static com.energyxxer.trident.ui.editor.behavior.caret.DragSelectMode.COLUMN;
+import static com.energyxxer.trident.ui.editor.behavior.caret.DragSelectMode.RECTANGLE;
 
 /**
  * Created by User on 1/3/2017.
@@ -189,7 +189,7 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
             for (Dot dot : allDots) {
                 Rectangle r = mapper.modelToView(getComponent(), dot.index, getDotBias());
 
-                boolean shouldPaint = !(dragSelectMode == COLUMN && dot == bufferedDot) && !(dragSelectMode == CHAR && dotIndex >= columnDotsStartIndex);
+                boolean shouldPaint = !(dragSelectMode == RECTANGLE && dot == bufferedDot) && !(dragSelectMode == CHAR && dotIndex >= rectangleDotsStartIndex);
 
                 if(isVisible() && shouldPaint) {
                     r.x -= paintWidth >> 1;
@@ -296,9 +296,9 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
 
     @Override
     public int getDot() {
-        if(dragSelectMode == COLUMN) return dots.get(columnDotCursorIndex).index;
+        if(dragSelectMode == RECTANGLE) return dots.get(rectangleDotCursorIndex).index;
         int upperBound = dots.size()-1;
-        if(dragSelectMode == CHAR) upperBound = columnDotsStartIndex-1;
+        if(dragSelectMode == CHAR) upperBound = rectangleDotsStartIndex -1;
         return dots.get(Math.min(upperBound, dots.size()-1)).index;
     }
 
@@ -339,9 +339,9 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
     Dot bufferedDot = null;
     private boolean bufferedDotAdded = false;
     DragSelectMode dragSelectMode = DragSelectMode.CHAR;
-    int columnDotsStartIndex = 1;
-    private int columnDotCursorIndex = 1;
-    private Point columnStartPoint = null;
+    int rectangleDotsStartIndex = 1;
+    private int rectangleDotCursorIndex = 1;
+    private Point rectangleStartPoint = null;
 
     private boolean clickStartInSelection = false;
 
@@ -378,7 +378,7 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
                 dots.clear();
             }
 
-            dragSelectMode = COLUMN;
+            dragSelectMode = RECTANGLE;
         } else if(e.getClickCount() == 2 && !e.isConsumed() && e.getButton() == MouseEvent.BUTTON1) {
             bufferedDot.mark = bufferedDot.getWordStart();
             bufferedDot.index = bufferedDot.getWordEnd();
@@ -402,9 +402,9 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
             bufferedDotAdded = false;
         }
 
-        columnStartPoint = e.getPoint();
-        columnDotsStartIndex = dots.size();
-        columnDotCursorIndex = dots.size();
+        rectangleStartPoint = e.getPoint();
+        rectangleDotsStartIndex = dots.size();
+        rectangleDotCursorIndex = dots.size();
 
         e.consume();
         update();
@@ -415,13 +415,13 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        if(dragSelectMode != COLUMN) {
-            while(dots.size() > columnDotsStartIndex) {
-                dots.remove(columnDotsStartIndex);
+        if(dragSelectMode != RECTANGLE) {
+            while(dots.size() > rectangleDotsStartIndex) {
+                dots.remove(rectangleDotsStartIndex);
             }
         } else if(bufferedDot != null) {
             dots.remove(bufferedDot);
-            columnDotCursorIndex--;
+            rectangleDotCursorIndex--;
             mergeDots();
             bufferedDot = null;
             bufferedDotAdded = false;
@@ -500,21 +500,21 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
                         bufferedDot.updateX();
                         break;
                     }
-                    case COLUMN: {
+                    case RECTANGLE: {
                         bufferedDotAdded = false;
-                        columnDotCursorIndex = Math.max(0,columnDotsStartIndex-1);
-                        while(dots.size() > columnDotsStartIndex) {
-                            dots.remove(columnDotsStartIndex);
+                        rectangleDotCursorIndex = Math.max(0, rectangleDotsStartIndex -1);
+                        while(dots.size() > rectangleDotsStartIndex) {
+                            dots.remove(rectangleDotsStartIndex);
                         }
                         int rowHeight = editor.modelToView(bufferedDot.index).height;
-                        int leftX = Math.min(e.getPoint().x, columnStartPoint.x);
-                        int rightX = Math.max(e.getPoint().x, columnStartPoint.x);
+                        int leftX = Math.min(e.getPoint().x, rectangleStartPoint.x);
+                        int rightX = Math.max(e.getPoint().x, rectangleStartPoint.x);
 
-                        int topY = (Math.min(e.getPoint().y, columnStartPoint.y) / rowHeight) * rowHeight;
-                        int bottomY = (Math.max(e.getPoint().y, columnStartPoint.y) / rowHeight) * rowHeight;
+                        int topY = (Math.min(e.getPoint().y, rectangleStartPoint.y) / rowHeight) * rowHeight;
+                        int bottomY = (Math.max(e.getPoint().y, rectangleStartPoint.y) / rowHeight) * rowHeight;
 
-                        boolean rtl = e.getPoint().x < columnStartPoint.x;
-                        boolean topDown = e.getPoint().y >= columnStartPoint.y;
+                        boolean rtl = e.getPoint().x < rectangleStartPoint.x;
+                        boolean topDown = e.getPoint().y >= rectangleStartPoint.y;
 
                         boolean hasUnselectedChars = false;
                         int selectedCharListIndex = -1;
@@ -535,7 +535,7 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
                         }
 
                         if(hasUnselectedChars && selectedCharListIndex >= 0) {
-                            for(int i = columnDotsStartIndex; i < selectedCharListIndex; i++) {
+                            for(int i = rectangleDotsStartIndex; i < selectedCharListIndex; i++) {
                                 if(dots.get(i).isPoint()) {
                                     dots.remove(i);
                                     i--;
@@ -548,17 +548,17 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
                         }
 
                         if(topDown) {
-                            columnDotCursorIndex = dots.size()-1;
+                            rectangleDotCursorIndex = dots.size()-1;
                         } else {
-                            columnDotCursorIndex = columnDotsStartIndex;
+                            rectangleDotCursorIndex = rectangleDotsStartIndex;
                         }
                         break;
                     }
                     case CHAR: {
                         bufferedDot.updateX();
                         if(e.isAltDown() && !e.isShiftDown()) {
-                            dragSelectMode = COLUMN;
-                            columnDotCursorIndex = dots.size()-1;
+                            dragSelectMode = RECTANGLE;
+                            rectangleDotCursorIndex = dots.size()-1;
                         }
                         break;
                     }

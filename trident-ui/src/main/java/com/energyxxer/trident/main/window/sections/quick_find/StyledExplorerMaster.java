@@ -21,6 +21,7 @@ public class StyledExplorerMaster extends ExplorerMaster {
     public StyledExplorerMaster(String namespace) {
         if(namespace == null) {
             tlm.addThemeChangeListener(t -> {
+
                 colors.put("background", t.getColor(Color.WHITE, "Explorer.background"));
                 colors.put("item.background", t.getColor(new Color(0, 0, 0, 0), "Explorer.item.background"));
                 colors.put("item.foreground", t.getColor(Color.BLACK, "Explorer.item.foreground", "General.foreground"));
@@ -30,13 +31,39 @@ public class StyledExplorerMaster extends ExplorerMaster {
                 colors.put("item.rollover.foreground", t.getColor(Color.BLACK, "Explorer.item.hover.foreground", "Explorer.item.foreground", "General.foreground"));
 
                 rowHeight = Math.max(t.getInteger(20, "Explorer.item.height"), 1);
-                indentPerLevel = Math.max(t.getInteger(20, "Explorer.item.indent"), 0);
-                initialIndent = Math.max(t.getInteger(0, "Explorer.item.initialIndent"), 0);
 
                 selectionStyle = t.getString("Explorer.item.selectionStyle", "default:FULL");
                 selectionLineThickness = Math.max(t.getInteger(2, "Explorer.item.selectionLineThickness"), 0);
 
+                styleNumbers.put("button.border.thickness", Math.max(t.getInteger(1,"Explorer.button.border.thickness"),1));
+                styleNumbers.put("button.rollover.border.thickness", Math.max(t.getInteger(1,"Explorer.button.hover.border.thickness", "Explorer.button.border.thickness"),1));
+                styleNumbers.put("button.pressed.border.thickness", Math.max(t.getInteger(1,"Explorer.button.pressed.border.thickness", "Explorer.button.hover.border.thickness", "Explorer.button.border.thickness"),1));
+
+                styleNumbers.put("checkbox.border.thickness", Math.max(t.getInteger(1,"Explorer.checkbox.border.thickness"),1));
+                styleNumbers.put("checkbox.rollover.border.thickness", Math.max(t.getInteger(1,"Explorer.checkbox.hover.border.thickness", "Explorer.checkbox.border.thickness"),1));
+                styleNumbers.put("checkbox.pressed.border.thickness", Math.max(t.getInteger(1,"Explorer.checkbox.pressed.border.thickness", "Explorer.checkbox.hover.border.thickness", "Explorer.checkbox.border.thickness"),1));
+
                 this.setFont(t.getFont("Explorer.item", "General"));
+
+                colors.put("button.background", t.getColor(Color.GRAY, "Explorer.button.background"));
+                colors.put("button.rollover.background", t.getColor(Color.GRAY, "Explorer.button.hover.background", "Explorer.button.background"));
+                colors.put("button.pressed.background", t.getColor(Color.GRAY, "Explorer.button.pressed.background","Explorer.button.hover.background", "Explorer.button.background"));
+                colors.put("button.border.color", t.getColor(Color.BLACK, "Explorer.button.border.color"));
+                colors.put("button.rollover.border.color", t.getColor(Color.BLACK, "Explorer.button.hover.border.color", "Explorer.button.border.color"));
+                colors.put("button.pressed.border.color", t.getColor(Color.BLACK, "Explorer.button.pressed.border.color", "Explorer.button.hover.border.color", "Explorer.button.border.color"));
+
+                colors.put("checkbox.background", t.getColor(Color.GRAY, "Explorer.checkbox.background"));
+                colors.put("checkbox.rollover.background", t.getColor(Color.GRAY, "Explorer.checkbox.hover.background", "Explorer.checkbox.background"));
+                colors.put("checkbox.pressed.background", t.getColor(Color.GRAY, "Explorer.checkbox.pressed.background","Explorer.checkbox.hover.background", "Explorer.checkbox.background"));
+                colors.put("checkbox.border.color", t.getColor(Color.BLACK, "Explorer.checkbox.border.color"));
+                colors.put("checkbox.rollover.border.color", t.getColor(Color.BLACK, "Explorer.checkbox.hover.border.color", "Explorer.checkbox.border.color"));
+                colors.put("checkbox.pressed.border.color", t.getColor(Color.BLACK, "Explorer.checkbox.pressed.border.color", "Explorer.checkbox.hover.border.color", "Explorer.checkbox.border.color"));
+                
+                
+                
+                rowHeight = Math.max(t.getInteger(20, "Explorer.item.height"), 1);
+                indentPerLevel = Math.max(t.getInteger(20, "Explorer.item.indent"), 0);
+                initialIndent = Math.max(t.getInteger(0, "Explorer.item.initialIndent"), 0);
 
                 assets.put("expand", Commons.getIcon("triangle_right").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
                 assets.put("collapse", Commons.getIcon("triangle_down").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
@@ -45,9 +72,12 @@ public class StyledExplorerMaster extends ExplorerMaster {
                 assets.put("error", Commons.getIcon("error").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
 
                 colors.put("item.find.background", t.getColor(Color.YELLOW.darker(), "Explorer.item.find.background"));
+
+                children.forEach(e -> e.themeChanged(t));
             });
         } else {
             tlm.addThemeChangeListener(t -> {
+
                 colors.put("background", t.getColor(Color.WHITE, namespace + ".background", "Explorer.background"));
                 colors.put("item.background", t.getColor(new Color(0, 0, 0, 0), namespace + ".item.background", "Explorer.item.background"));
                 colors.put("item.foreground", t.getColor(Color.BLACK, namespace + ".item.foreground", "Explorer.item.foreground", "General.foreground"));
@@ -57,13 +87,39 @@ public class StyledExplorerMaster extends ExplorerMaster {
                 colors.put("item.rollover.foreground", t.getColor(Color.BLACK, namespace + ".item.hover.foreground", namespace + ".item.foreground", "Explorer.item.hover.foreground", "Explorer.item.foreground", "General.foreground"));
 
                 rowHeight = Math.max(t.getInteger(20, namespace + ".item.height", "Explorer.item.height"), 1);
-                indentPerLevel = Math.max(t.getInteger(20, namespace + ".item.indent", "Explorer.item.indent"), 0);
-                initialIndent = Math.max(t.getInteger(0, namespace + ".item.initialIndent", "Explorer.item.initialIndent"), 0);
 
                 selectionStyle = t.getString(namespace + ".item.selectionStyle", "Explorer.item.selectionStyle", "default:FULL");
                 selectionLineThickness = Math.max(t.getInteger(2, namespace + ".item.selectionLineThickness", "Explorer.item.selectionLineThickness"), 0);
 
+                styleNumbers.put("button.border.thickness", Math.max(t.getInteger(1,namespace + ".button.border.thickness", "Explorer.button.border.thickness"),1));
+                styleNumbers.put("button.rollover.border.thickness", Math.max(t.getInteger(1,namespace + ".button.hover.border.thickness", namespace + ".button.border.thickness", "Explorer.button.hover.border.thickness", "Explorer.button.border.thickness"),1));
+                styleNumbers.put("button.pressed.border.thickness", Math.max(t.getInteger(1,namespace + ".button.pressed.border.thickness", namespace + ".button.hover.border.thickness", namespace + ".button.border.thickness", "Explorer.button.pressed.border.thickness", "Explorer.button.hover.border.thickness", "Explorer.button.border.thickness"),1));
+
+                styleNumbers.put("checkbox.border.thickness", Math.max(t.getInteger(1,namespace + ".checkbox.border.thickness", "Explorer.checkbox.border.thickness"),1));
+                styleNumbers.put("checkbox.rollover.border.thickness", Math.max(t.getInteger(1,namespace + ".checkbox.hover.border.thickness", namespace + ".checkbox.border.thickness", "Explorer.checkbox.hover.border.thickness", "Explorer.checkbox.border.thickness"),1));
+                styleNumbers.put("checkbox.pressed.border.thickness", Math.max(t.getInteger(1,namespace + ".checkbox.pressed.border.thickness", namespace + ".checkbox.hover.border.thickness", namespace + ".checkbox.border.thickness", "Explorer.checkbox.pressed.border.thickness", "Explorer.checkbox.hover.border.thickness", "Explorer.checkbox.border.thickness"),1));
+
                 this.setFont(t.getFont(namespace + ".item", "Explorer.item", "General"));
+
+                colors.put("button.background", t.getColor(Color.GRAY, namespace + ".button.background", "Explorer.button.background"));
+                colors.put("button.rollover.background", t.getColor(Color.GRAY, namespace + ".button.hover.background", namespace + ".button.background", "Explorer.button.hover.background", "Explorer.button.background"));
+                colors.put("button.pressed.background", t.getColor(Color.GRAY, namespace + ".button.pressed.background", namespace + ".button.hover.background", namespace + ".button.background", "Explorer.button.pressed.background", "Explorer.button.hover.background", "Explorer.button.background"));
+                colors.put("button.border.color", t.getColor(Color.BLACK, namespace + ".button.border.color", "Explorer.button.border.color"));
+                colors.put("button.rollover.border.color", t.getColor(Color.BLACK, namespace + ".button.hover.border.color", namespace + ".button.border.color", "Explorer.button.hover.border.color", "Explorer.button.border.color"));
+                colors.put("button.pressed.border.color", t.getColor(Color.BLACK, namespace + ".button.pressed.border.color", namespace + ".button.hover.border.color", namespace + ".button.border.color", "Explorer.button.pressed.border.color", "Explorer.button.hover.border.color", "Explorer.button.border.color"));
+
+                colors.put("checkbox.background", t.getColor(Color.GRAY, namespace + ".checkbox.background", "Explorer.checkbox.background"));
+                colors.put("checkbox.rollover.background", t.getColor(Color.GRAY, namespace + ".checkbox.hover.background", namespace + ".checkbox.background", "Explorer.checkbox.hover.background", "Explorer.checkbox.background"));
+                colors.put("checkbox.pressed.background", t.getColor(Color.GRAY, namespace + ".checkbox.pressed.background", namespace + ".checkbox.hover.background", namespace + ".checkbox.background", "Explorer.checkbox.pressed.background", "Explorer.checkbox.hover.background", "Explorer.checkbox.background"));
+                colors.put("checkbox.border.color", t.getColor(Color.BLACK, namespace + ".checkbox.border.color", "Explorer.checkbox.border.color"));
+                colors.put("checkbox.rollover.border.color", t.getColor(Color.BLACK, namespace + ".checkbox.hover.border.color", namespace + ".checkbox.border.color", "Explorer.checkbox.hover.border.color", "Explorer.checkbox.border.color"));
+                colors.put("checkbox.pressed.border.color", t.getColor(Color.BLACK, namespace + ".checkbox.pressed.border.color", namespace + ".checkbox.hover.border.color", namespace + ".checkbox.border.color", "Explorer.checkbox.pressed.border.color", "Explorer.checkbox.hover.border.color", "Explorer.checkbox.border.color"));
+
+
+
+                rowHeight = Math.max(t.getInteger(20, namespace + ".item.height", "Explorer.item.height"), 1);
+                indentPerLevel = Math.max(t.getInteger(20, namespace + ".item.indent", "Explorer.item.indent"), 0);
+                initialIndent = Math.max(t.getInteger(0, namespace + ".item.initialIndent", "Explorer.item.initialIndent"), 0);
 
                 assets.put("expand", Commons.getIcon("triangle_right").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
                 assets.put("collapse", Commons.getIcon("triangle_down").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
@@ -72,6 +128,8 @@ public class StyledExplorerMaster extends ExplorerMaster {
                 assets.put("error", Commons.getIcon("error").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
 
                 colors.put("item.find.background", t.getColor(Color.YELLOW.darker(), namespace + ".item.find.background", "Explorer.item.find.background"));
+
+                children.forEach(e -> e.themeChanged(t));
             });
         }
 

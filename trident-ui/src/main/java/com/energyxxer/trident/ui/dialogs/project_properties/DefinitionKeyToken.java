@@ -3,9 +3,9 @@ package com.energyxxer.trident.ui.dialogs.project_properties;
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.ui.commodoreresources.DefinitionPacks;
 import com.energyxxer.trident.ui.modules.ModuleToken;
-import com.energyxxer.trident.ui.orderlist.OrderListAction;
-import com.energyxxer.trident.ui.orderlist.OrderListButtonAction;
-import com.energyxxer.trident.ui.orderlist.OrderListToken;
+import com.energyxxer.trident.ui.orderlist.ItemAction;
+import com.energyxxer.trident.ui.orderlist.ItemButtonAction;
+import com.energyxxer.trident.ui.orderlist.CompoundActionModuleToken;
 import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,7 +14,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DefinitionKeyToken implements OrderListToken {
+public class DefinitionKeyToken implements CompoundActionModuleToken {
 
     enum DefinitionSource {
         UNKNOWN, IDE, PROJECT;
@@ -29,9 +29,9 @@ public class DefinitionKeyToken implements OrderListToken {
     }
 
     @Override
-    public @NotNull List<OrderListAction> getActions() {
-        ArrayList<OrderListAction> list = new ArrayList<>();
-        list.add(new OrderListButtonAction() {
+    public @NotNull List<ItemAction> getActions() {
+        ArrayList<ItemAction> list = new ArrayList<>();
+        list.add(new ItemButtonAction() {
             @Override
             public Image getIcon() {
                 return Commons.getIcon("clear").getScaledInstance(16, 16, Image.SCALE_SMOOTH);
@@ -47,7 +47,7 @@ public class DefinitionKeyToken implements OrderListToken {
                 return 0;
             }
         });
-        list.add(new OrderListButtonAction() {
+        list.add(new ItemButtonAction() {
             @Override
             public Image getIcon() {
                 return Commons.getIcon("triangle_down").getScaledInstance(16, 16, Image.SCALE_SMOOTH);
@@ -63,7 +63,7 @@ public class DefinitionKeyToken implements OrderListToken {
                 return 1;
             }
         });
-        list.add(new OrderListButtonAction() {
+        list.add(new ItemButtonAction() {
             @Override
             public Image getIcon() {
                 return Commons.getIcon("triangle_up").getScaledInstance(16, 16, Image.SCALE_SMOOTH);
@@ -80,7 +80,7 @@ public class DefinitionKeyToken implements OrderListToken {
             }
         });
         if(packName != null && source != DefinitionSource.UNKNOWN) {
-            list.add(new OrderListButtonAction() {
+            list.add(new ItemButtonAction() {
                 @Override
                 public Image getIcon() {
                     return Commons.getIcon("explorer").getScaledInstance(16, 16, Image.SCALE_SMOOTH);

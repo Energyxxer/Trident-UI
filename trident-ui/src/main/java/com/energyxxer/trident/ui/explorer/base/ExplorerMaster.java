@@ -1,23 +1,25 @@
 package com.energyxxer.trident.ui.explorer.base;
 
+import com.energyxxer.trident.main.window.TridentWindow;
+import com.energyxxer.trident.ui.HintStylizer;
 import com.energyxxer.trident.ui.explorer.base.elements.ExplorerElement;
 import com.energyxxer.trident.ui.modules.ModuleToken;
+import com.energyxxer.xswing.hints.TextHint;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.*;
 
 import static com.energyxxer.trident.ui.editor.behavior.AdvancedEditor.isPlatformControlDown;
 
 /**
  * Created by User on 2/7/2017.
  */
-public class ExplorerMaster extends JComponent implements MouseListener, MouseMotionListener {
+public class ExplorerMaster extends JComponent implements MouseListener, MouseMotionListener, StyleProvider {
     protected HashMap<ExplorerFlag, Boolean> explorerFlags = new HashMap<>();
 
     protected ArrayList<ExplorerElement> children = new ArrayList<>();
@@ -36,6 +38,7 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
     private int offsetY = 0;
 
     protected HashMap<String, Color> colors = new HashMap<>();
+    protected HashMap<String, Integer> styleNumbers = new HashMap<>();
     protected HashMap<String, Image> assets = new HashMap<>();
 
     protected int rowHeight = 20;
@@ -156,18 +159,36 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
         }
     }
 
+    private String rolloverText = null;
+    private TextHint hint = TridentWindow.hintManager.createTextHint("a");
+
     @Override
     public void mouseMoved(MouseEvent e) {
         ExplorerElement element = getElementAtMousePos(e);
+        if(rolloverItem != null) {
+            rolloverItem.setRollover(false);
+            if(rolloverItem != element) {
+                rolloverItem.mouseExited(e);
+            }
+        }
         if(element != null) {
-            if(rolloverItem != null) rolloverItem.setRollover(false);
-            rolloverItem = element;
-            rolloverItem.setRollover(true);
+            element.setRollover(true);
+            if(rolloverItem != element) {
+                element.mouseEntered(e);
+            }
+            String text = element.getToolTipText();
+            this.rolloverText = text;
+            if(text != null && (rolloverItem != null || !hint.isShowing()) && (!Objects.equals(hint.getText(), text) || !hint.isShowing())) {
+                hint.setText(text);
+                HintStylizer.style(hint);
+                hint.show(new Point(this.getLocationOnScreen().x + element.getToolTipLocation().x, this.getLocationOnScreen().y + element.getLastRecordedOffset() + element.getToolTipLocation().y), () -> rolloverItem == element && Objects.equals(hint.getText(), rolloverText));
+            }
+            element.mouseMoved(e);
         } else {
-            if(rolloverItem != null) rolloverItem.setRollover(false);
-            rolloverItem = null;
+            rolloverText = null;
         }
         repaint();
+        rolloverItem = element;
     }
 
     public void clearSelected() {
@@ -270,8 +291,13 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
         return flatList;
     }
 
-    public HashMap<String, Color> getColorMap() {
+    public HashMap<String, Color> getColors() {
         return colors;
+    }
+
+    @Override
+    public Map<String, Integer> getStyleNumbers() {
+        return styleNumbers;
     }
 
     public HashMap<String, Image> getAssetMap() {
@@ -330,10 +356,6 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
         return offsetY;
     }
 
-    public void setOffsetY(int offsetY) {
-        this.offsetY = offsetY;
-    }
-
     public ArrayList<ModuleToken> getExpandedElements() {
         return expandedElements;
     }
@@ -343,6 +365,10 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
     }
 
     public ArrayList<ExplorerElement> getChildren() {
+        return children;
+    }
+
+    public List<ExplorerElement> getAllElements() {
         return children;
     }
 
@@ -364,5 +390,9 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
 
     public void addToFlatList(ExplorerElement element) {
         this.flatList.add(element);
+    }
+
+    public void renderOffset(int height) {
+        offsetY += height;
     }
 }

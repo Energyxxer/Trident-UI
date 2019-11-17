@@ -13,7 +13,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DependencyToken implements OrderListToken {
+public class DependencyToken implements CompoundActionModuleToken {
     enum DependencySource {
         PROJECT, DIRECTORY
     }
@@ -26,9 +26,9 @@ public class DependencyToken implements OrderListToken {
     private String dependencyPath;
 
     private boolean export = true;
-    private OrderListCheckboxAction exportCheckbox;
+    private ItemCheckboxAction exportCheckbox;
     private boolean combine = false;
-    private OrderListDropdownAction<String> modeDropdown;
+    private ItemDropdownAction<String> modeDropdown;
 
     public DependencyToken(TridentProject project) {
         root = project.getRootDirectory();
@@ -55,9 +55,9 @@ public class DependencyToken implements OrderListToken {
     }
 
     @Override
-    public @NotNull List<OrderListAction> getActions() {
-        ArrayList<OrderListAction> list = new ArrayList<>();
-        list.add(new OrderListButtonAction() {
+    public @NotNull List<ItemAction> getActions() {
+        ArrayList<ItemAction> list = new ArrayList<>();
+        list.add(new ItemButtonAction() {
             @Override
             public Image getIcon() {
                 return Commons.getIcon("clear").getScaledInstance(16, 16, Image.SCALE_SMOOTH);
@@ -73,7 +73,7 @@ public class DependencyToken implements OrderListToken {
                 return 0;
             }
         });
-        list.add(new OrderListButtonAction() {
+        list.add(new ItemButtonAction() {
             @Override
             public Image getIcon() {
                 return Commons.getIcon("triangle_down").getScaledInstance(16, 16, Image.SCALE_SMOOTH);
@@ -89,7 +89,7 @@ public class DependencyToken implements OrderListToken {
                 return 1;
             }
         });
-        list.add(new OrderListButtonAction() {
+        list.add(new ItemButtonAction() {
             @Override
             public Image getIcon() {
                 return Commons.getIcon("triangle_up").getScaledInstance(16, 16, Image.SCALE_SMOOTH);
@@ -105,7 +105,7 @@ public class DependencyToken implements OrderListToken {
                 return 2;
             }
         });
-        list.add(new OrderListButtonAction() {
+        list.add(new ItemButtonAction() {
             @Override
             public Image getIcon() {
                 return Commons.getIcon("explorer").getScaledInstance(16, 16, Image.SCALE_SMOOTH);
@@ -124,13 +124,13 @@ public class DependencyToken implements OrderListToken {
 
 
 
-        modeDropdown = new OrderListDropdownAction<>(new String[] {"Precompile", "Combine"});
+        modeDropdown = new ItemDropdownAction<>(new String[] {"Precompile", "Combine"});
         list.add(modeDropdown);
         setCombine(combine);
         modeDropdown.addChoiceListener(c -> combine = c.equals("Combine"));
 
 
-        exportCheckbox = new OrderListCheckboxAction() {
+        exportCheckbox = new ItemCheckboxAction() {
             {
                 this.leftAligned = true;
             }

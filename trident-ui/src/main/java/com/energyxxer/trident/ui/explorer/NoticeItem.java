@@ -53,10 +53,10 @@ public class NoticeItem extends ExplorerElement {
 
         int x = this.x + 23;
 
-        g.setColor((this.rollover || this.selected) ? master.getColorMap().get("item.rollover.background") : master.getColorMap().get("item.background"));
+        g.setColor((this.rollover || this.selected) ? master.getColors().get("item.rollover.background") : master.getColors().get("item.background"));
         g.fillRect(0, master.getOffsetY(), master.getWidth(), master.getRowHeight() * lineCount);
         if(this.selected) {
-            g.setColor(master.getColorMap().get("item.selected.background"));
+            g.setColor(master.getColors().get("item.selected.background"));
 
             switch(master.getSelectionStyle()) {
                 case "FULL": {
@@ -92,20 +92,19 @@ public class NoticeItem extends ExplorerElement {
         //File Name
 
         if(this.selected) {
-            g.setColor(master.getColorMap().get("item.selected.foreground"));
+            g.setColor(master.getColors().get("item.selected.foreground"));
         } else if(this.rollover) {
-            g.setColor(master.getColorMap().get("item.rollover.foreground"));
+            g.setColor(master.getColors().get("item.rollover.foreground"));
         } else {
-            g.setColor(master.getColorMap().get("item.foreground"));
+            g.setColor(master.getColors().get("item.foreground"));
         }
         FontMetrics metrics = g.getFontMetrics(g.getFont());
 
         int extraLength = 0;
 
         for(String line : notice.getExtendedMessage().split("\n")) {
-            g.drawString(line, x, master.getOffsetY() + metrics.getAscent() + ((master.getRowHeight() - metrics.getHeight())/2));
-
-            master.setOffsetY(master.getOffsetY() + master.getRowHeight());
+            g.drawString(line, x, y + metrics.getAscent() + ((master.getRowHeight() - metrics.getHeight())/2));
+            y += master.getRowHeight();
 
             extraLength = Math.max(extraLength, metrics.stringWidth(line));
         }
@@ -118,7 +117,10 @@ public class NoticeItem extends ExplorerElement {
             g.fillRect(x-2, master.getOffsetY(), 2, master.getRowHeight() * lineCount);
         }
 
+        master.renderOffset(this.getHeight());
+
         master.setContentWidth(Math.max(master.getContentWidth(), x));
+
         for(ExplorerElement i : children) {
             i.render(g);
         }

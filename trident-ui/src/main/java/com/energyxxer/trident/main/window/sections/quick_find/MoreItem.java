@@ -32,11 +32,11 @@ public class MoreItem extends ExplorerElement {
         //File Name
 
         if(this.selected) {
-            g.setColor(master.getColorMap().get("item.selected.foreground"));
+            g.setColor(master.getColors().get("item.selected.foreground"));
         } else if(this.rollover) {
-            g.setColor(master.getColorMap().get("item.rollover.foreground"));
+            g.setColor(master.getColors().get("item.rollover.foreground"));
         } else {
-            g.setColor(master.getColorMap().get("item.foreground"));
+            g.setColor(master.getColors().get("item.foreground"));
         }
 
         Font originalFont = g.getFont();
@@ -63,7 +63,6 @@ public class MoreItem extends ExplorerElement {
 
         g.setFont(originalFont);
 
-        master.setOffsetY(master.getOffsetY() + master.getRowHeight());
         master.setContentWidth(Math.max(master.getContentWidth(), x));
     }
 

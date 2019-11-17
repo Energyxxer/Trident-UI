@@ -1,5 +1,6 @@
 package com.energyxxer.trident.ui.orderlist;
 
+import com.energyxxer.trident.ui.explorer.base.StyleProvider;
 import com.energyxxer.trident.ui.modules.ModuleToken;
 import com.energyxxer.trident.ui.theme.Theme;
 import com.energyxxer.trident.util.ImageUtil;
@@ -12,9 +13,9 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 
 
-public class StandardOrderListItem extends OrderListElement {
+public class StandardOrderListItem extends OrderListElement implements ItemActionHost {
     @NotNull
-    private final OrderListToken token;
+    private final CompoundActionModuleToken token;
 
     private Image icon = null;
     private String name = null;
@@ -26,9 +27,9 @@ public class StandardOrderListItem extends OrderListElement {
     private int pressedStart = -1;
     private Point toolTipLocation = new Point();
 
-    private List<OrderListAction> actions;
+    private List<ItemAction> actions;
 
-    public StandardOrderListItem(OrderListMaster master, @NotNull OrderListToken token) {
+    public StandardOrderListItem(OrderListMaster master, @NotNull CompoundActionModuleToken token) {
         super(master);
         this.token = token;
         this.updateName();
@@ -105,8 +106,8 @@ public class StandardOrderListItem extends OrderListElement {
             }
 
             int actionIndex = 0;
-            for(OrderListAction action : actions) {
-                action.render(g, master, (action.isLeftAligned() ? leftX : rightX), offsetY, w, h, (actionIndex == actionRolloverIndex) ? (pressedStart == actionIndex ? 2 : 1) : 0, isActionEnabled(actionIndex));
+            for(ItemAction action : actions) {
+                action.render(g, this, (action.isLeftAligned() ? leftX : rightX), offsetY, w, h, (actionIndex == actionRolloverIndex) ? (pressedStart == actionIndex ? 2 : 1) : 0, isActionEnabled(actionIndex));
                 int actionOffset = action.getRenderedWidth();
 
                 if(action.isLeftAligned()) leftX += actionOffset;
@@ -162,10 +163,10 @@ public class StandardOrderListItem extends OrderListElement {
     }
 
     private boolean isActionEnabled(int index) {
-        OrderListAction action = actions.get(index);
-        if(action.getActionCode() == 1 && master.getAllElements().indexOf(this) == master.getAllElements().size()-1) return false;
-        if(action.getActionCode() == 2 && master.getAllElements().indexOf(this) == 0) return false;
-        return true;
+        ItemAction action = actions.get(index);
+        if(action.getActionCode() == 1) return master.getAllElements().indexOf(this) != master.getAllElements().size()-1;
+        if(action.getActionCode() == 2) return master.getAllElements().indexOf(this) != 0;
+        return action.getActionCode() == -1;
     }
 
     private int getActionRolloverIndex(MouseEvent e) {
@@ -188,7 +189,7 @@ public class StandardOrderListItem extends OrderListElement {
         }
 
         for(int i = 0; i < actions.size(); i++) {
-            OrderListAction action = actions.get(i);
+            ItemAction action = actions.get(i);
             if(action.intersects(new Point(action.isLeftAligned() ? (e.getX() - leftX) : (rightX - e.getX()), e.getY() - lastRecordedOffset), master.getWidth(), getHeight())) {
                 if(isActionEnabled(i)) {
                     if(update) {
@@ -231,7 +232,7 @@ public class StandardOrderListItem extends OrderListElement {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        OrderListAction action = getActionForMouseEvent(e);
+        ItemAction action = getActionForMouseEvent(e);
         if(action != null) action.mouseClicked(e, this);
     }
 
@@ -260,7 +261,7 @@ public class StandardOrderListItem extends OrderListElement {
         }
     }
 
-    private OrderListAction getActionForMouseEvent(MouseEvent e) {
+    private ItemAction getActionForMouseEvent(MouseEvent e) {
         int index = getActionRolloverIndex(e);
         return index >= 0 ? actions.get(index) : null;
     }
@@ -328,7 +329,17 @@ public class StandardOrderListItem extends OrderListElement {
     }
 
     @NotNull
-    public OrderListToken getToken() {
+    public CompoundActionModuleToken getToken() {
         return token;
+    }
+
+    @Override
+    public JComponent getComponent() {
+        return master;
+    }
+
+    @Override
+    public StyleProvider getStyleProvider() {
+        return master;
     }
 }

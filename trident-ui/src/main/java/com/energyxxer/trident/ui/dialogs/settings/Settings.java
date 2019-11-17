@@ -46,7 +46,7 @@ public class Settings {
 			sidebar.setMaximumSize(new Dimension(400, 1));
 			sidebarResizer.setResizable(false, false, false, true);
 
-			String[] sections = new String[] { "General", "Appearance", "Editor", "Resources", "In-game TridentCompiler" };
+			String[] sections = new String[] { "General", "Appearance", "Editor", "Resources", "Keymap" };
 
 			StyledList<String> navigator = new StyledList<>(sections, "Settings");
 			sidebar.setBackground(navigator.getBackground());
@@ -78,7 +78,7 @@ public class Settings {
 		sectionPanes.put("Appearance", new SettingsAppearance());
 		sectionPanes.put("Editor", new JPanel());
 		sectionPanes.put("Resources", new JPanel());
-		sectionPanes.put("In-game Compiler", new JPanel());
+		sectionPanes.put("Keymap", new SettingsKeymap());
 
 		contentPane.add(contentGeneral, BorderLayout.CENTER);
 		currentSection = contentGeneral;

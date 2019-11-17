@@ -2,6 +2,7 @@ package com.energyxxer.trident.ui.orderlist;
 
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.HintStylizer;
+import com.energyxxer.trident.ui.explorer.base.StyleProvider;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.xswing.hints.TextHint;
 
@@ -10,12 +11,10 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
-public class OrderListMaster extends JComponent implements MouseListener, MouseMotionListener {
+public class OrderListMaster extends JComponent implements MouseListener, MouseMotionListener, StyleProvider {
     ArrayList<OrderListElement> children = new ArrayList<>();
     private int y = 0;
 
@@ -144,11 +143,11 @@ public class OrderListMaster extends JComponent implements MouseListener, MouseM
         return selectionLineThickness;
     }
 
-    HashMap<String, Color> getColors() {
+    public Map<String, Color> getColors() {
         return colors;
     }
 
-    HashMap<String, Integer> getStyleNumbers() {
+    public Map<String, Integer> getStyleNumbers() {
         return styleNumbers;
     }
 

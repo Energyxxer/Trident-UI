@@ -11,7 +11,7 @@ import java.awt.Shape;
 import java.util.ArrayList;
 
 import static com.energyxxer.trident.ui.editor.behavior.caret.DragSelectMode.CHAR;
-import static com.energyxxer.trident.ui.editor.behavior.caret.DragSelectMode.COLUMN;
+import static com.energyxxer.trident.ui.editor.behavior.caret.DragSelectMode.RECTANGLE;
 
 /**
  * Created by User on 1/9/2017.
@@ -32,7 +32,7 @@ public class EditorSelectionPainter implements Highlighter.HighlightPainter {
 
         int dotIndex = 0;
         for(Dot dot : dots) {
-            boolean shouldPaint = !(caret.dragSelectMode == COLUMN && dot == caret.bufferedDot) && !(caret.dragSelectMode == CHAR && dotIndex >= caret.columnDotsStartIndex);
+            boolean shouldPaint = !(caret.dragSelectMode == RECTANGLE && dot == caret.bufferedDot) && !(caret.dragSelectMode == CHAR && dotIndex >= caret.rectangleDotsStartIndex);
             if(shouldPaint) try {
                 StringBounds bounds = dot.getBounds();
 

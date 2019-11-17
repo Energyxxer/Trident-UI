@@ -50,10 +50,10 @@ public class NoticeGroupElement extends ExplorerElement {
 
         int x = master.getInitialIndent();
 
-        g.setColor((this.rollover || this.selected) ? master.getColorMap().get("item.rollover.background") : master.getColorMap().get("item.background"));
+        g.setColor((this.rollover || this.selected) ? master.getColors().get("item.rollover.background") : master.getColors().get("item.background"));
         g.fillRect(0, master.getOffsetY(), master.getWidth(), master.getRowHeight());
         if(this.selected) {
-            g.setColor(master.getColorMap().get("item.selected.background"));
+            g.setColor(master.getColors().get("item.selected.background"));
 
             switch(master.getSelectionStyle()) {
                 case "FULL": {
@@ -100,11 +100,11 @@ public class NoticeGroupElement extends ExplorerElement {
         //File Name
 
         if(this.selected) {
-            g.setColor(master.getColorMap().get("item.selected.foreground"));
+            g.setColor(master.getColors().get("item.selected.foreground"));
         } else if(this.rollover) {
-            g.setColor(master.getColorMap().get("item.rollover.foreground"));
+            g.setColor(master.getColors().get("item.rollover.foreground"));
         } else {
-            g.setColor(master.getColorMap().get("item.foreground"));
+            g.setColor(master.getColors().get("item.foreground"));
         }
 
         Font originalFont = g.getFont();
@@ -125,8 +125,8 @@ public class NoticeGroupElement extends ExplorerElement {
 
         g.setFont(originalFont);
 
-        master.setOffsetY(master.getOffsetY() + master.getRowHeight());
         master.setContentWidth(Math.max(master.getContentWidth(), x));
+        master.renderOffset(this.getHeight());
         for(ExplorerElement i : children) {
             i.render(g);
         }
