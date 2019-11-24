@@ -73,31 +73,31 @@ public class ActionManager {
     public static void setup(JPanel panel) {
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher((e) -> {
             if(e.getID() == KeyEvent.KEY_PRESSED) {
-                if(altGraphCaught) {
-                    return true;
-                }
-                if(e.getKeyCode() == KeyEvent.VK_CONTROL) {
-                    ctrlWasDown = e.getWhen();
-                } else if(e.getKeyCode() == KeyEvent.VK_ALT) {
-                    altWasDown = e.getWhen();
-                }
-                if(e.isControlDown() && e.isAltDown() && altWasDown == e.getWhen() && altWasDown - ctrlWasDown >= 0 && altWasDown - ctrlWasDown <= 1 && ctrlWasDown > 0) {
-                    altGraphCaught = true;
-                    return true;
+                if(!altGraphCaught) {
+                    if(e.getKeyCode() == KeyEvent.VK_CONTROL) {
+                        ctrlWasDown = e.getWhen();
+                    } else if(e.getKeyCode() == KeyEvent.VK_ALT) {
+                        altWasDown = e.getWhen();
+                    }
+                    if(e.isControlDown() && e.isAltDown() && altWasDown == e.getWhen() && altWasDown - ctrlWasDown >= 0 && altWasDown - ctrlWasDown <= 1 && ctrlWasDown > 0) {
+                        altGraphCaught = true;
+                    }
                 }
             } else if(altGraphCaught && e.getID() == KeyEvent.KEY_RELEASED) {
                 if(e.getKeyCode() == KeyEvent.VK_CONTROL || e.getKeyCode() == KeyEvent.VK_ALT) {
                     altGraphCaught = false;
                 }
             }
-            for(ProgramAction action : actions) {
-                if(action.getShortcut() != null) {
-                    if(action.getShortcut().wasPerformedExact(e)) {
-                        if(e.getID() == KeyEvent.KEY_PRESSED) {
-                            action.perform();
+            if(!altGraphCaught) {
+                for(ProgramAction action : actions) {
+                    if(action.getShortcut() != null) {
+                        if(action.getShortcut().wasPerformedExact(e)) {
+                            if(e.getID() == KeyEvent.KEY_PRESSED) {
+                                action.perform();
+                            }
+                            e.consume();
+                            return true;
                         }
-                        e.consume();
-                        return true;
                     }
                 }
             }
