@@ -110,6 +110,7 @@ public class Hint extends JDialog implements MouseListener, Disposable {
         this.getContentPane().add(new Padding(MARGIN),BorderLayout.EAST);
 
         this.addMouseListener(this);
+        this.setModalityType(ModalityType.MODELESS);
     }
 
     public Hint(JFrame owner, Component content) {
