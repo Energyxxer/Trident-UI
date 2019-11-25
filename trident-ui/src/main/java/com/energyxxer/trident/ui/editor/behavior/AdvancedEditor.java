@@ -252,8 +252,7 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
             e.consume();
             editManager.insertEdit(new LineMoveEdit(this, Dot.DOWN));
         } else if(keyCode == KeyEvent.VK_ESCAPE) {
-            int dotPos = caret.getDot();
-            caret.setProfile(new CaretProfile(dotPos, dotPos));
+            caret.deselect();
         }
 
         if(e.isConsumed() && suggestionInterface != null) {

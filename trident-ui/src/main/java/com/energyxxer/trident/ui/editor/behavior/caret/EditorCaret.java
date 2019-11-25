@@ -289,14 +289,21 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
     }
 
     public void deselect() {
-        for(Dot dot : dots) {
-            dot.deselect();
-        }
+        int newDotPos = getDot();
+        dots.clear();
+        addDot(newDotPos);
+        dragSelectMode = CHAR;
+        rectangleDotsStartIndex = 1;
+        rectangleDotCursorIndex = 1;
+        rectangleStartPoint = null;
+        bufferedDot = null;
+        bufferedDotAdded = false;
+        update();
     }
 
     @Override
     public int getDot() {
-        if(dragSelectMode == RECTANGLE) return dots.get(rectangleDotCursorIndex).index;
+        if(dragSelectMode == RECTANGLE) return dots.get(Math.min(rectangleDotCursorIndex, dots.size()-1)).index;
         int upperBound = dots.size()-1;
         if(dragSelectMode == CHAR) upperBound = rectangleDotsStartIndex -1;
         return dots.get(Math.min(upperBound, dots.size()-1)).index;

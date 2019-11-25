@@ -3,6 +3,7 @@ package com.energyxxer.trident.main;
 import com.energyxxer.trident.compiler.TridentCompiler;
 import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.global.Resources;
+import com.energyxxer.trident.global.Status;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.commodoreresources.DefinitionUpdateProcess;
@@ -11,9 +12,7 @@ import com.energyxxer.util.logger.Debug;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.nio.charset.Charset;
 
 public class TridentUI {
@@ -30,6 +29,33 @@ public class TridentUI {
 
 	public static void main(String[] args) {
 		Debug.addStream(System.out);
+		//final PrintStream defaultErrStream = System.err;
+		System.setErr(new PrintStream(new OutputStream() {
+			StringBuilder sb = new StringBuilder();
+
+			@Override
+			public void flush() throws IOException {
+				String message = sb.toString();
+
+				if(message.startsWith("Exception in thread ")) {
+					Debug.log("", Debug.MessageType.PLAIN);
+					TridentWindow.setStatus(new Status("error", message));
+				}
+				//defaultErrStream.println(sb.toString());
+				Debug.log(message, Debug.MessageType.PLAIN);
+
+				sb.setLength(0);
+			}
+
+			@Override
+			public void write(int b) throws IOException {
+				if(b == '\n') {
+					flush();
+				} else {
+					sb.append((char) b);
+				}
+			}
+		}));
 		try {
             Debug.addStream(new FileOutputStream(new File(Preferences.LOG_FILE_PATH)));
         } catch(FileNotFoundException x) {
