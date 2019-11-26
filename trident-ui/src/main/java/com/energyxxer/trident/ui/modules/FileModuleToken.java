@@ -139,7 +139,7 @@ public class FileModuleToken implements ModuleToken, DraggableExplorerModuleToke
                     else if(file.getParentFile().getName().equals("lang"))
                         return Commons.getIcon("lang");
                     else
-                        return Commons.getIcon("model");
+                        return Commons.getIcon("json");
                 }
                 case ".mcmeta":
                 case TridentCompiler.PROJECT_FILE_NAME:
