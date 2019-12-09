@@ -32,6 +32,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 import java.util.function.Function;
@@ -184,8 +185,16 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
             suggestionBox.showSuggestions(analysis.lexer.getSuggestionModule());
         }
 
+        Token prevToken = null;
+        ArrayList<String> previousTokenStyles = new ArrayList<>();
+
         for(Token token : analysis.lexer.getStream().tokens) {
             Style style = TridentEditorComponent.this.getStyle(token.type.toString().toLowerCase());
+
+            int previousTokenStylesIndex = previousTokenStyles.size();
+
+            int styleStart = token.loc.index;
+
             if(style != null)
                 sd.setCharacterAttributes(token.loc.index, token.value.length(), style, false);
             else
@@ -195,18 +204,31 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
                 if(!entry.getValue().equals(true)) continue;
                 Style attrStyle = TridentEditorComponent.this.getStyle("~" + entry.getKey().toLowerCase());
                 if(attrStyle == null) continue;
-                sd.setCharacterAttributes(token.loc.index, token.value.length(), attrStyle, false);
+
+                if(prevToken != null && previousTokenStyles.contains(entry.getKey().toLowerCase())) {
+                    styleStart = prevToken.loc.index + prevToken.value.length();
+                }
+                previousTokenStyles.add(entry.getKey().toLowerCase());
+
+                sd.setCharacterAttributes(styleStart, token.value.length() + (token.loc.index - styleStart), attrStyle, false);
             }
             for(Map.Entry<TokenSection, String> entry : token.subSections.entrySet()) {
                 TokenSection section = entry.getKey();
                 Style attrStyle = TridentEditorComponent.this.getStyle("~" + entry.getValue().toLowerCase());
                 if(attrStyle == null) continue;
+
                 sd.setCharacterAttributes(token.loc.index + section.start, section.length, attrStyle, false);
             }
             for(String tag : token.tags) {
                 Style attrStyle = TridentEditorComponent.this.getStyle("$" + tag.toLowerCase());
                 if(attrStyle == null) continue;
-                sd.setCharacterAttributes(token.loc.index, token.value.length(), attrStyle, false);
+
+                if(prevToken != null && previousTokenStyles.contains(tag.toLowerCase())) {
+                    styleStart = prevToken.loc.index + prevToken.value.length();
+                }
+                previousTokenStyles.add(tag.toLowerCase());
+
+                sd.setCharacterAttributes(styleStart, token.value.length() + (token.loc.index - styleStart), attrStyle, false);
             }
 
             if(analysis.response != null) {
@@ -219,10 +241,20 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
                     }
                     Style attrStyle = TridentEditorComponent.this.getStyle(entry.getKey());
                     if(attrStyle == null) continue;
-                    sd.setCharacterAttributes(token.loc.index, token.value.length(), attrStyle, false);
+                    if(prevToken != null && previousTokenStyles.contains(entry.getKey())) {
+                        styleStart = prevToken.loc.index + prevToken.value.length();
+                    }
+                    previousTokenStyles.add(entry.getKey());
+                    sd.setCharacterAttributes(styleStart, token.value.length() + (token.loc.index - styleStart), attrStyle, false);
                 }
             }
+            while(previousTokenStylesIndex > 0) {
+                previousTokenStyles.remove(0);
+                previousTokenStylesIndex--;
+            }
+            prevToken = token;
         }
+        previousTokenStyles.clear();
 
         if(analysis.response != null && !analysis.response.matched) {
             TridentWindow.setStatus(analysis.response.getErrorMessage() + (analysis.response.faultyToken != null ? ". (line " + analysis.response.faultyToken.loc.line + " column " + analysis.response.faultyToken.loc.column + ")" : ""));

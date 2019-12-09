@@ -5,6 +5,8 @@ import com.energyxxer.commodore.types.defaults.BlockType;
 import com.energyxxer.commodore.types.defaults.EntityType;
 import com.energyxxer.commodore.types.defaults.FunctionReference;
 import com.energyxxer.commodore.types.defaults.ItemType;
+import com.energyxxer.crossbow.compiler.lexer.CrossbowSuggestionTags;
+import com.energyxxer.crossbow.compiler.lexer.summaries.CrossbowSummaryModule;
 import com.energyxxer.enxlex.lexical_analysis.summary.ProjectSummary;
 import com.energyxxer.enxlex.suggestions.ComplexSuggestion;
 import com.energyxxer.enxlex.suggestions.LiteralSuggestion;
@@ -48,12 +50,47 @@ public class SuggestionExpander {
                     }
                     break;
                 }
+                case CrossbowSuggestionTags
+                        .IDENTIFIER_EXISTING: {
+                    if(parent.getSummary() != null) {
+                        for(com.energyxxer.crossbow.compiler.lexer.summaries.SummarySymbol sym : ((CrossbowSummaryModule) parent.getSummary()).getSymbolsVisibleAt(suggestionModule.getSuggestionIndex())) {
+                            SuggestionToken token = new SuggestionToken(parent, sym.getName(), suggestion);
+                            token.setIconKey(SuggestionToken.getIconKeyForTags(sym.getSuggestionTags()));
+                            tokens.add(0, token);
+                            if(sym.getParentFileSummary() != parent.getSummary()) {
+                                token.setDarkened(true);
+                            }
+                        }
+                    }
+                    break;
+                }
                 case TridentSuggestionTags
                         .IDENTIFIER_MEMBER: {
                     if(parent.getSummary() != null) {
                         Collection<SummarySymbol> membersVisible = ((TridentSummaryModule) parent.getSummary()).getSymbolsVisibleAtIndexForPath(suggestionModule.getSuggestionIndex(), suggestionModule.getLookingAtMemberPath());
                         ArrayList<SuggestionToken> newTokens = new ArrayList<>(membersVisible.size());
                         for(SummarySymbol sym : membersVisible) {
+                            String text = sym.getName();
+                            int backspaces = 0;
+                            if(!TridentLexerProfile.isValidIdentifier(text)) {
+                                text = "[" + CommandUtils.quote(text) + "]";
+                                backspaces = 1;
+                            }
+                            SuggestionToken token = new SuggestionToken(parent, sym.getName(), text, suggestion);
+                            token.setBackspaces(backspaces);
+                            token.setIconKey(SuggestionToken.getIconKeyForTags(sym.getSuggestionTags()));
+                            newTokens.add(token);
+                        }
+                        tokens.addAll(0, newTokens);
+                    }
+                    break;
+                }
+                case CrossbowSuggestionTags
+                        .IDENTIFIER_MEMBER: {
+                    if(parent.getSummary() != null) {
+                        Collection<com.energyxxer.crossbow.compiler.lexer.summaries.SummarySymbol> membersVisible = ((CrossbowSummaryModule) parent.getSummary()).getSymbolsVisibleAtIndexForPath(suggestionModule.getSuggestionIndex(), suggestionModule.getLookingAtMemberPath());
+                        ArrayList<SuggestionToken> newTokens = new ArrayList<>(membersVisible.size());
+                        for(com.energyxxer.crossbow.compiler.lexer.summaries.SummarySymbol sym : membersVisible) {
                             String text = sym.getName();
                             int backspaces = 0;
                             if(!TridentLexerProfile.isValidIdentifier(text)) {
@@ -88,28 +125,28 @@ public class SuggestionExpander {
                             "function");
                     break;
                 }
-                case TridentSuggestionTags.SOUND_RESOURCE:{
+                case TridentSuggestionTags.SOUND_RESOURCE: {
                     collectResourceLocationSuggestions(
                             parent, suggestion, tokens,
                             s -> ((TridentProjectSummary) s).getSoundEvents(),
                             "sound");
                     break;
                 }
-                case TridentSuggestionTags.BLOCK:{
+                case TridentSuggestionTags.BLOCK: {
                     collectResourceLocationSuggestions(
                             parent, suggestion, tokens,
                             s -> ((TridentProjectSummary) s).getTypes().get(BlockType.CATEGORY),
                             "block", true);
                     break;
                 }
-                case TridentSuggestionTags.BLOCK_TAG:{
+                case TridentSuggestionTags.BLOCK_TAG: {
                     collectResourceLocationSuggestions(
                             parent, suggestion, tokens,
                             s -> ((TridentProjectSummary) s).getTags().get(BlockType.CATEGORY),
                             "block_tag");
                     break;
                 }
-                case TridentSuggestionTags.ITEM:{
+                case TridentSuggestionTags.ITEM: {
                     if(parent.getSummary() != null) {
                         collectResourceLocationSuggestions(
                                 parent, suggestion, tokens,
@@ -128,14 +165,14 @@ public class SuggestionExpander {
                     }
                     break;
                 }
-                case TridentSuggestionTags.ITEM_TAG:{
+                case TridentSuggestionTags.ITEM_TAG: {
                     collectResourceLocationSuggestions(
                             parent, suggestion, tokens,
                             s -> ((TridentProjectSummary) s).getTags().get(ItemType.CATEGORY),
                             "item_tag");
                     break;
                 }
-                case TridentSuggestionTags.ENTITY_TYPE:{
+                case TridentSuggestionTags.ENTITY_TYPE: {
                     if(parent.getSummary() != null) {
                         collectResourceLocationSuggestions(
                                 parent, suggestion, tokens,
@@ -161,7 +198,7 @@ public class SuggestionExpander {
                             "entity_type_tag");
                     break;
                 }
-                case TridentSuggestionTags.FUNCTION_TAG:{
+                case TridentSuggestionTags.FUNCTION_TAG: {
                     collectResourceLocationSuggestions(
                             parent, suggestion, tokens,
                             s -> ((TridentProjectSummary) s).getTags().get(FunctionReference.CATEGORY),

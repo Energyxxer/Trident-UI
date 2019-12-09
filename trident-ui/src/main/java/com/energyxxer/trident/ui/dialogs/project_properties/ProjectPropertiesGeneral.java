@@ -73,7 +73,7 @@ class ProjectPropertiesGeneral extends JPanel {
                 content.add(new StyledLabel("as well as which commands are allowed.", "ProjectProperties.content"));
             }
             {
-                JavaEditionVersion[] knownVersions = DefinitionPacks.getKnownVersions();
+                JavaEditionVersion[] knownVersions = DefinitionPacks.getKnownJavaVersions();
                 JavaEditionVersion[] shownVersions = new JavaEditionVersion[knownVersions.length+1];
                 shownVersions[0] = new UnsetVersion();
                 System.arraycopy(knownVersions, 0, shownVersions, 1, knownVersions.length);

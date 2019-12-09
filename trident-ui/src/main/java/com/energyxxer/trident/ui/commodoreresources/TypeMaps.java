@@ -4,16 +4,19 @@ import com.energyxxer.commodore.util.io.CompoundInput;
 import com.energyxxer.commodore.util.io.DirectoryCompoundInput;
 import com.energyxxer.commodore.util.io.ZipCompoundInput;
 import com.energyxxer.commodore.versioning.JavaEditionVersion;
+import com.energyxxer.commodore.versioning.ThreeNumberVersion;
 import com.energyxxer.util.logger.Debug;
 
 import java.io.*;
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TypeMaps {
     private static HashMap<String, String[]> loadedTypeMaps = new HashMap<>();
-    private static final Pattern vanillaKey = Pattern.compile("j_(\\d+)_(\\d+)");
 
     public static void loadAll() {
         loadedTypeMaps.clear();
@@ -81,10 +84,11 @@ public class TypeMaps {
         }
     }
 
-    public static String[] pickTypeMapsForVersion(JavaEditionVersion targetVersion) {
+    public static String[] pickTypeMapsForVersion(ThreeNumberVersion targetVersion) {
         if(targetVersion == null) return null;
 
-        String key = "j_" + targetVersion.getMajor() + "_" + targetVersion.getMinor();
+        String key = targetVersion.getEditionString().toLowerCase().charAt(0) + "_" + targetVersion.getMajor() + "_" + targetVersion.getMinor();
+        Pattern vanillaKey = Pattern.compile(targetVersion.getEditionString().toLowerCase().charAt(0) + "_(\\d+)_(\\d+)");
         String[] typemaps = loadedTypeMaps.get(key);
         if(typemaps != null) return typemaps;
 

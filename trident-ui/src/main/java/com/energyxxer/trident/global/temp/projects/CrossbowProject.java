@@ -1,16 +1,15 @@
 package com.energyxxer.trident.global.temp.projects;
 
-import com.energyxxer.commodore.module.CommandModule;
-import com.energyxxer.commodore.standard.StandardDefinitionPacks;
 import com.energyxxer.commodore.versioning.BedrockEditionVersion;
-import com.energyxxer.commodore.versioning.Version;
 import com.energyxxer.crossbow.compiler.CrossbowCompiler;
 import com.energyxxer.crossbow.compiler.lexer.CrossbowProductions;
+import com.energyxxer.crossbow.compiler.out.BedrockModule;
 import com.energyxxer.crossbow.compiler.util.CrossbowProjectSummary;
 import com.energyxxer.enxlex.lexical_analysis.summary.ProjectSummary;
 import com.energyxxer.enxlex.pattern_matching.ParsingSignature;
 import com.energyxxer.enxlex.pattern_matching.matching.lazy.LazyTokenPatternMatch;
 import com.energyxxer.trident.global.Commons;
+import com.energyxxer.trident.ui.commodoreresources.DefinitionPacks;
 import com.energyxxer.util.Lazy;
 import com.energyxxer.util.StringUtil;
 import com.energyxxer.util.logger.Debug;
@@ -27,17 +26,15 @@ public class CrossbowProject implements Project {
 
     private File rootDirectory;
 
-    private File behaviorpackRoot;
-    private File resourceRoot;
     private String name;
 
-    public final Lazy<CommandModule> module = new Lazy<>(() -> {
+    public final Lazy<BedrockModule> module = new Lazy<>(() -> {
         try {
-            return CrossbowCompiler.createModuleForProject(getName(), rootDirectory, StandardDefinitionPacks.MINECRAFT_BEDROCK_LATEST_RELEASE);
+            return CrossbowCompiler.createModuleForProject(getName(), rootDirectory, DefinitionPacks.pickPacksForVersion(getTargetVersion()), DefinitionPacks.getAliasMap());
         } catch(IOException x) {
             Debug.log("Exception while creating module: " + x.toString(), Debug.MessageType.ERROR);
         }
-        return Commons.getDefaultModule();
+        return Commons.getDefaultBedrockModule();
     });
 
     private final Lazy<CrossbowProductions> productions = new Lazy<>(() -> new CrossbowProductions(module.getValue()));
@@ -53,19 +50,14 @@ public class CrossbowProject implements Project {
         Path rootPath = Paths.get(ProjectManager.getWorkspaceDir()).resolve(name);
         this.rootDirectory = rootPath.toFile();
 
-        behaviorpackRoot = rootPath.resolve("behaviors").toFile();
-        resourceRoot = rootPath.resolve("resources").toFile();
-
         this.name = name;
         //this.prefix = StringUtil.getInitials(name).toLowerCase();
 
-        Path outFolder = Paths.get(System.getProperty("user.home"), "Trident", "out");
+        Path outFolder = Paths.get(System.getProperty("user.home"), "Trident", "out", name);
 
         config = new JsonObject();
         config.addProperty("default-namespace", StringUtil.getInitials(name).toLowerCase());
-        config.addProperty("language-level", 1);
-        config.addProperty("behaviors-output", outFolder.resolve(name).toString());
-        config.addProperty("resources-output", outFolder.resolve(name + "-resources.zip").toString());
+        config.addProperty("world-output", outFolder.resolve(name).toString());
         config.addProperty("export-comments", true);
         config.addProperty("strict-text-components", false);
         JsonObject loggerObj = new JsonObject();
@@ -79,8 +71,6 @@ public class CrossbowProject implements Project {
     public CrossbowProject(File rootDirectory) {
         this.rootDirectory = rootDirectory;
 
-        behaviorpackRoot = rootDirectory.toPath().resolve("behaviors").toFile();
-        resourceRoot = rootDirectory.toPath().resolve("resources").toFile();
         File config = new File(rootDirectory.getAbsolutePath() + File.separator + CrossbowCompiler.PROJECT_FILE_NAME);
         this.name = rootDirectory.getName();
 
@@ -152,7 +142,7 @@ public class CrossbowProject implements Project {
 
     public void createNew() {
         if(!exists()) {
-            this.behaviorpackRoot.mkdirs();
+            this.rootDirectory.mkdirs();
             File config = new File(rootDirectory.getAbsolutePath() + File.separator + CrossbowCompiler.PROJECT_FILE_NAME);
             try {
                 config.createNewFile();
@@ -192,7 +182,7 @@ public class CrossbowProject implements Project {
     }
 
     @Override
-    public Version getTargetVersion() {
+    public BedrockEditionVersion getTargetVersion() {
         return new BedrockEditionVersion(1, 13, 0);
     }
 
@@ -221,11 +211,11 @@ public class CrossbowProject implements Project {
     }
 
     public File getServerDataRoot() {
-        return behaviorpackRoot;
+        return rootDirectory.toPath().resolve("behavior_packs").toFile();
     }
 
     public File getClientDataRoot() {
-        return resourceRoot;
+        return rootDirectory.toPath().resolve("resource_packs").toFile();
     }
 
     public String getName() {

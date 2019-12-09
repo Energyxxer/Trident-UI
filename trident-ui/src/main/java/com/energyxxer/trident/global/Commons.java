@@ -2,7 +2,9 @@ package com.energyxxer.trident.global;
 
 import com.energyxxer.commodore.module.CommandModule;
 import com.energyxxer.commodore.standard.StandardDefinitionPacks;
+import com.energyxxer.crossbow.compiler.out.BedrockModule;
 import com.energyxxer.enxlex.pattern_matching.matching.lazy.LazyTokenPatternMatch;
+import com.energyxxer.trident.global.temp.projects.CrossbowProject;
 import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
 import com.energyxxer.trident.global.temp.projects.TridentProject;
@@ -33,6 +35,17 @@ public class Commons {
         try {
             StandardDefinitionPacks.MINECRAFT_JAVA_LATEST_SNAPSHOT.load();
             defaultModule.importDefinitions(StandardDefinitionPacks.MINECRAFT_JAVA_LATEST_SNAPSHOT);
+        } catch(IOException x) {
+            Debug.log(x.toString(), Debug.MessageType.ERROR);
+        }
+        return defaultModule;
+    });
+
+    private static Lazy<BedrockModule> defaultBedrockModule = new Lazy<> (() -> {
+        BedrockModule defaultModule = new BedrockModule("Default Module");
+        try {
+            StandardDefinitionPacks.MINECRAFT_BEDROCK_LATEST_RELEASE.load();
+            defaultModule.importDefinitions(StandardDefinitionPacks.MINECRAFT_BEDROCK_LATEST_RELEASE);
         } catch(IOException x) {
             Debug.log(x.toString(), Debug.MessageType.ERROR);
         }
@@ -117,6 +130,7 @@ public class Commons {
 
     public static void compile(Project project) {
         if(project instanceof TridentProject) ProcessManager.queueProcess(new TridentCompilerWrapper((TridentProject) project));
+        if(project instanceof CrossbowProject) ProcessManager.queueProcess(new CrossbowCompilerWrapper((CrossbowProject) project));
     }
 
     public static void indexActive() {
@@ -129,6 +143,10 @@ public class Commons {
 
     public static CommandModule getDefaultModule() {
         return defaultModule.getValue();
+    }
+
+    public static BedrockModule getDefaultBedrockModule() {
+        return defaultBedrockModule.getValue();
     }
 
     public static LazyTokenPatternMatch getActiveTridentProductions() {

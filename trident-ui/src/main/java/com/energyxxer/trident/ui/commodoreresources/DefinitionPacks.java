@@ -3,7 +3,10 @@ package com.energyxxer.trident.ui.commodoreresources;
 import com.energyxxer.commodore.defpacks.DefinitionPack;
 import com.energyxxer.commodore.util.io.DirectoryCompoundInput;
 import com.energyxxer.commodore.util.io.ZipCompoundInput;
+import com.energyxxer.commodore.versioning.BedrockEditionVersion;
 import com.energyxxer.commodore.versioning.JavaEditionVersion;
+import com.energyxxer.commodore.versioning.ThreeNumberVersion;
+import com.energyxxer.commodore.versioning.Version;
 import com.energyxxer.util.logger.Debug;
 
 import java.io.File;
@@ -13,10 +16,12 @@ import java.util.regex.Pattern;
 
 public class DefinitionPacks {
     private static HashMap<String, DefinitionPack> loadedDefinitionPacks = new LinkedHashMap<>();
-    private static final Pattern vanillaKey = Pattern.compile("minecraft_j_1_(\\d+)");
+    private static final Pattern javaPackKey = Pattern.compile("minecraft_j_1_(\\d+)");
+    private static final Pattern bedrockPackKey = Pattern.compile("minecraft_b_1_(\\d+)");
 
-    private static JavaEditionVersion latestKnownVersion = new JavaEditionVersion(1, 13, 0);
-    private static JavaEditionVersion[] knownVersionList = null;
+    private static JavaEditionVersion latestKnownJavaVersion = new JavaEditionVersion(1, 13, 0);
+    private static BedrockEditionVersion latestKnownBedrockVersion = new BedrockEditionVersion(1, 13, 0);
+    private static Version[] knownVersionList = null;
     public static final String DEF_PACK_DIR_PATH = System.getProperty("user.home") + File.separator + "Trident" + File.separator + "resources" + File.separator + "defpacks" + File.separator;
 
     public static void loadAll() {
@@ -49,35 +54,57 @@ public class DefinitionPacks {
     }
 
     private static void updateLatestKnownVersion(String packName) {
-        Matcher match = vanillaKey.matcher(packName);
+        Matcher match = javaPackKey.matcher(packName);
         if(match.matches()) {
             JavaEditionVersion thisVersion = new JavaEditionVersion(1, Integer.parseInt(match.group(1)), 0);
-            if(latestKnownVersion.compare(thisVersion) < 0) {
-                latestKnownVersion = thisVersion;
+            if(latestKnownJavaVersion.compare(thisVersion) < 0) {
+                latestKnownJavaVersion = thisVersion;
+                knownVersionList = null;
+            }
+        }
+        match = bedrockPackKey.matcher(packName);
+        if(match.matches()) {
+            BedrockEditionVersion thisVersion = new BedrockEditionVersion(1, Integer.parseInt(match.group(1)), 0);
+            if(latestKnownBedrockVersion.compare(thisVersion) < 0) {
+                latestKnownBedrockVersion = thisVersion;
                 knownVersionList = null;
             }
         }
     }
 
-    public static JavaEditionVersion[] getKnownVersions() {
+    public static Version[] getKnownVersions() {
         if(knownVersionList != null) return knownVersionList;
-        knownVersionList = new JavaEditionVersion[Math.max(0, latestKnownVersion.getMinor() - 13 + 1)];
-        for(int i = 13; i <= latestKnownVersion.getMinor(); i++) {
+        knownVersionList = new JavaEditionVersion[Math.max(0, latestKnownJavaVersion.getMinor() - 13 + 1) + Math.max(0, latestKnownBedrockVersion.getMinor() - 13 + 1)];
+        for(int i = 13; i <= latestKnownJavaVersion.getMinor(); i++) {
             knownVersionList[i-13] = new JavaEditionVersion(1, i, 0);
+        }
+        for(int i = 13; i <= latestKnownBedrockVersion.getMinor(); i++) {
+            knownVersionList[i-13+latestKnownJavaVersion.getMinor()] = new BedrockEditionVersion(1, i, 0);
         }
         return knownVersionList;
     }
 
-    public static DefinitionPack[] pickPacksForVersion(JavaEditionVersion targetVersion) {
+    public static JavaEditionVersion[] getKnownJavaVersions() {
+        return Arrays.stream(getKnownVersions()).filter(v -> v instanceof JavaEditionVersion).map(v -> (JavaEditionVersion) v).toArray(JavaEditionVersion[]::new);
+    }
+
+    public static BedrockEditionVersion[] getKnownBedrockVersions() {
+        return Arrays.stream(getKnownVersions()).filter(v -> v instanceof BedrockEditionVersion).map(v -> (BedrockEditionVersion) v).toArray(BedrockEditionVersion[]::new);
+    }
+
+    public static DefinitionPack[] pickPacksForVersion(ThreeNumberVersion targetVersion) {
         if(targetVersion == null) return null;
 
-        String key = "minecraft_j_" + targetVersion.getMajor() + "_" + targetVersion.getMinor();
+        String key = "minecraft_" + targetVersion.getEditionString().toLowerCase().charAt(0) + "_" + targetVersion.getMajor() + "_" + targetVersion.getMinor();
+        Pattern vanillaKey = Pattern.compile("minecraft_" + targetVersion.getEditionString().toLowerCase().charAt(0) + "_1_(\\d+)");
         DefinitionPack pack = loadedDefinitionPacks.get(key);
         Debug.log("key: " + key);
         if(pack != null) return new DefinitionPack[] {pack};
         Debug.log("oh no pack is null");
 
         Map.Entry<JavaEditionVersion, DefinitionPack> latestMatch = null;
+
+        targetVersion = new JavaEditionVersion(targetVersion.getMajor(), targetVersion.getMinor(), targetVersion.getPatch());
 
         for(Map.Entry<String, DefinitionPack> entry : loadedDefinitionPacks.entrySet()) {
             Matcher match = vanillaKey.matcher(entry.getKey());
