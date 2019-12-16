@@ -74,12 +74,13 @@ public class DefinitionPacks {
 
     public static Version[] getKnownVersions() {
         if(knownVersionList != null) return knownVersionList;
-        knownVersionList = new JavaEditionVersion[Math.max(0, latestKnownJavaVersion.getMinor() - 13 + 1) + Math.max(0, latestKnownBedrockVersion.getMinor() - 13 + 1)];
+        knownVersionList = new Version[Math.max(0, latestKnownJavaVersion.getMinor() - 13 + 1) + Math.max(0, latestKnownBedrockVersion.getMinor() - 13 + 1)];
+        int j = 0;
         for(int i = 13; i <= latestKnownJavaVersion.getMinor(); i++) {
-            knownVersionList[i-13] = new JavaEditionVersion(1, i, 0);
+            knownVersionList[j++] = new JavaEditionVersion(1, i, 0);
         }
         for(int i = 13; i <= latestKnownBedrockVersion.getMinor(); i++) {
-            knownVersionList[i-13+latestKnownJavaVersion.getMinor()] = new BedrockEditionVersion(1, i, 0);
+            knownVersionList[j++] = new BedrockEditionVersion(1, i, 0);
         }
         return knownVersionList;
     }

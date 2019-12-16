@@ -76,6 +76,10 @@ public class OrderListMaster extends JComponent implements MouseListener, MouseM
             colors.put("checkbox.rollover.border.color", t.getColor(Color.BLACK, "OrderList.checkbox.hover.border.color", "OrderList.checkbox.border.color"));
             colors.put("checkbox.pressed.border.color", t.getColor(Color.BLACK, "OrderList.checkbox.pressed.border.color", "OrderList.checkbox.hover.border.color", "OrderList.checkbox.border.color"));
 
+            colors.put("keybind.background", t.getColor(Color.GRAY, "OrderList.keybind.background"));
+            colors.put("keybind.border.color", t.getColor(Color.BLACK, "OrderList.keybind.border.color"));
+            colors.put("keybind.foreground", t.getColor(Color.BLACK, "OrderList.keybind.foreground", "OrderList.item.foreground", "General.foreground"));
+
             children.forEach(e -> e.themeChanged(t));
         });
 

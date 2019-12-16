@@ -143,7 +143,6 @@ public class ActionHostExplorerItem extends ExplorerElement implements ItemActio
 
         if(name != null) {
             int stringWidth = fm.stringWidth(name);
-            g.setColor(Color.WHITE);
             if(x + stringWidth > rightX) {
                 float estimatedCharacterWidth = (float)stringWidth/name.length();
                 int overlap = x + stringWidth - rightX;
@@ -240,7 +239,7 @@ public class ActionHostExplorerItem extends ExplorerElement implements ItemActio
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if(e.getButton() == MouseEvent.BUTTON1 && select(e)) {
+        if(select(e)) {
             master.setSelected(this, e);
         }
         int index = getActionRolloverIndex(e);

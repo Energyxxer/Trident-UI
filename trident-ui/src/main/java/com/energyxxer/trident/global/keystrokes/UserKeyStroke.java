@@ -10,12 +10,18 @@ import static com.energyxxer.trident.ui.editor.behavior.AdvancedEditor.isPlatfor
 import static com.energyxxer.xswing.KeyInputUtils.*;
 
 public class UserKeyStroke {
+    private String name;
     private KeyStroke[] strokes;
     private final String key;
 
     public UserKeyStroke(String key, KeyStroke... defaultStrokes) {
+        this(null, key, defaultStrokes);
+    }
+
+    public UserKeyStroke(String name, String key, KeyStroke... defaultStrokes) {
         this.key = key;
         this.strokes = defaultStrokes;
+        this.name = name;
 
         load();
     }
@@ -55,6 +61,14 @@ public class UserKeyStroke {
         return false;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public void apply(InputMap inputMap, Object actionMapKey) {
         for(KeyStroke stroke : strokes) {
             inputMap.put(stroke, actionMapKey);
@@ -71,6 +85,10 @@ public class UserKeyStroke {
             sb.setLength(sb.length() - " OR ".length());
         }
         return sb.toString();
+    }
+
+    public KeyStroke[] getAllStrokes() {
+        return strokes;
     }
 
     public KeyStroke getFirstKeyStroke() {

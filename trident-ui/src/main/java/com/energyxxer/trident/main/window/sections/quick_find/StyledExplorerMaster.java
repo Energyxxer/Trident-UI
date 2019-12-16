@@ -58,7 +58,10 @@ public class StyledExplorerMaster extends ExplorerMaster {
                 colors.put("checkbox.border.color", t.getColor(Color.BLACK, "Explorer.checkbox.border.color"));
                 colors.put("checkbox.rollover.border.color", t.getColor(Color.BLACK, "Explorer.checkbox.hover.border.color", "Explorer.checkbox.border.color"));
                 colors.put("checkbox.pressed.border.color", t.getColor(Color.BLACK, "Explorer.checkbox.pressed.border.color", "Explorer.checkbox.hover.border.color", "Explorer.checkbox.border.color"));
-                
+
+                colors.put("keybind.background", t.getColor(Color.GRAY, "Explorer.keybind.background"));
+                colors.put("keybind.border.color", t.getColor(Color.BLACK, "Explorer.keybind.border.color"));
+                colors.put("keybind.foreground", t.getColor(Color.BLACK, "Explorer.keybind.foreground", "Explorer.item.foreground", "General.foreground"));
                 
                 
                 rowHeight = Math.max(t.getInteger(20, "Explorer.item.height"), 1);
@@ -115,6 +118,9 @@ public class StyledExplorerMaster extends ExplorerMaster {
                 colors.put("checkbox.rollover.border.color", t.getColor(Color.BLACK, namespace + ".checkbox.hover.border.color", namespace + ".checkbox.border.color", "Explorer.checkbox.hover.border.color", "Explorer.checkbox.border.color"));
                 colors.put("checkbox.pressed.border.color", t.getColor(Color.BLACK, namespace + ".checkbox.pressed.border.color", namespace + ".checkbox.hover.border.color", namespace + ".checkbox.border.color", "Explorer.checkbox.pressed.border.color", "Explorer.checkbox.hover.border.color", "Explorer.checkbox.border.color"));
 
+                colors.put("keybind.background", t.getColor(Color.GRAY, namespace + ".keybind.background", "Explorer.keybind.background"));
+                colors.put("keybind.border.color", t.getColor(Color.BLACK, namespace + ".keybind.border.color", "Explorer.keybind.border.color"));
+                colors.put("keybind.foreground", t.getColor(Color.BLACK, namespace + ".keybind.foreground", "Explorer.keybind.foreground", namespace + ".item.foreground", "Explorer.item.foreground", "General.foreground"));
 
 
                 rowHeight = Math.max(t.getInteger(20, namespace + ".item.height", "Explorer.item.height"), 1);

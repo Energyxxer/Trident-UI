@@ -7,6 +7,7 @@ import com.energyxxer.trident.ui.commodoreresources.DefinitionPacks;
 import com.energyxxer.trident.ui.orderlist.OrderListElement;
 import com.energyxxer.trident.ui.orderlist.OrderListMaster;
 import com.energyxxer.trident.ui.orderlist.StandardOrderListItem;
+import com.energyxxer.trident.ui.scrollbar.OverlayScrollPaneLayout;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenuItem;
 import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
@@ -17,12 +18,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class ProjectPropertiesDefinitions extends JPanel {
@@ -197,7 +199,11 @@ public class ProjectPropertiesDefinitions extends JPanel {
                 }
             });
 
-            content.add(master);
+            JScrollPane sp = new JScrollPane(master);
+            sp.setBorder(new EmptyBorder(0,0,0,0));
+            sp.setLayout(new OverlayScrollPaneLayout(sp));
+
+            content.add(sp, BorderLayout.CENTER);
         }
     }
 
