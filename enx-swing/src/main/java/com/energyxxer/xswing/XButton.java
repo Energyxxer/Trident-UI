@@ -36,7 +36,7 @@ public class XButton extends JButton {
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());
 		if(this.getModel().isPressed()) {
 			g.setColor(this.getPressedColor());
-		} else if(this.getModel().isRollover()) {
+		} else if(this.getModel().isRollover() || this.hasFocus()) {
 			g.setColor(this.getRolloverColor());
 		} else {
 			g.setColor(this.getBackground());

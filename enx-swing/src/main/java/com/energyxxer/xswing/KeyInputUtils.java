@@ -68,7 +68,7 @@ public class KeyInputUtils {
     public static String getReadableKeyStroke(KeyStroke stroke) {
         StringBuilder sb = new StringBuilder();
         if(isControl(stroke)) {
-            sb.append(System.getProperty("os.name").contains("mac") ? "Command" : "Control");
+            sb.append(System.getProperty("os.name").contains("mac") ? "Command" : "Ctrl");
             sb.append('+');
         }
         if(isAlt(stroke)) {
@@ -77,7 +77,11 @@ public class KeyInputUtils {
         if(isShift(stroke)) {
             sb.append("Shift+");
         }
-        sb.append(KeyEvent.getKeyText(stroke.getKeyCode()));
+        if(stroke.getKeyCode() == KeyEvent.VK_SHIFT || stroke.getKeyCode() == KeyEvent.VK_CONTROL || stroke.getKeyCode() == KeyEvent.VK_META || stroke.getKeyCode() == KeyEvent.VK_ALT) {
+            sb.setLength(sb.length()-1);
+        } else {
+            sb.append(KeyEvent.getKeyText(stroke.getKeyCode()));
+        }
         return sb.toString();
     }
 

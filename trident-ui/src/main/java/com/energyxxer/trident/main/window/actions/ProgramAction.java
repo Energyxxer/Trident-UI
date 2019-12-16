@@ -1,6 +1,7 @@
 package com.energyxxer.trident.main.window.actions;
 
 import com.energyxxer.trident.global.keystrokes.UserKeyStroke;
+import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.main.window.sections.quick_find.QuickFindDialog;
 import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.display.DisplayModule;
@@ -17,6 +18,15 @@ public class ProgramAction implements ModuleToken {
     private String description;
     private UserKeyStroke shortcut;
     private Runnable action;
+
+    public ProgramAction(String displayName, String description, UserKeyStroke shortcut, String moduleActionKey) {
+        this(displayName, description, shortcut, () -> {
+            Tab st = TridentWindow.tabManager.getSelectedTab();
+            if(st != null) {
+                st.module.performModuleAction(moduleActionKey);
+            }
+        });
+    }
 
     public ProgramAction(String displayName, String description, UserKeyStroke shortcut, Runnable action) {
         this.displayName = displayName;

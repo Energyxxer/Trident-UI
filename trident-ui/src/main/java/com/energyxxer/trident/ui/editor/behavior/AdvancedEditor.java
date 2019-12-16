@@ -30,7 +30,6 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -68,25 +67,6 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         linePainter = new LinePainter(this);
         this.setCaret(this.caret = new EditorCaret(this));
         this.addKeyListener(this);
-
-        //this.getInputMap().setParent(null);
-        this.setInputMap(JComponent.WHEN_FOCUSED, new InputMap());
-
-        KeyMap.UNDO.apply(this.getInputMap(), "undo");
-        KeyMap.REDO.apply(this.getInputMap(), "redo");
-
-        this.getActionMap().put("undo", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                editManager.undo();
-            }
-        });
-        this.getActionMap().put("redo", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                editManager.redo();
-            }
-        });
 
         this.getDocument().addUndoableEditListener(e -> {
             lineCache.setText(this.getText());
@@ -171,7 +151,13 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         if(!enabled) return;
         if(e.isConsumed()) return;
         int keyCode = e.getKeyCode();
-        if(keyCode == KeyEvent.VK_TAB) {
+        if(KeyMap.UNDO.wasPerformedExact(e)) {
+            editManager.undo();
+            e.consume();
+        } else if(KeyMap.REDO.wasPerformedExact(e)) {
+            editManager.redo();
+            e.consume();
+        } else if(keyCode == KeyEvent.VK_TAB) {
             e.consume();
 
             CaretProfile profile = caret.getProfile();

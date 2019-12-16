@@ -8,11 +8,13 @@ import com.energyxxer.xswing.menu.XMenuItem;
 import javax.swing.ImageIcon;
 import java.awt.Color;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * Menu item that reacts to window theme changes.
  */
-public class StyledMenuItem extends XMenuItem implements Disposable {
+public class StyledMenuItem extends XMenuItem implements Disposable, ActionListener {
 
     private ThemeListenerManager tlm = new ThemeListenerManager();
     private String icon = null;
@@ -26,6 +28,7 @@ public class StyledMenuItem extends XMenuItem implements Disposable {
             this.setFont(t.getFont("General.menu","General"));
             updateIcon();
         });
+        this.addActionListener(this);
     }
     public StyledMenuItem(String text) {
         this(text, null);
@@ -48,5 +51,10 @@ public class StyledMenuItem extends XMenuItem implements Disposable {
     @Override
     public void dispose() {
         tlm.dispose();
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+
     }
 }

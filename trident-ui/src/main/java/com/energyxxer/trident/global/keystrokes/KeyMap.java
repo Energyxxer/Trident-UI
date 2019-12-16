@@ -1,11 +1,10 @@
 package com.energyxxer.trident.global.keystrokes;
 
-import com.energyxxer.util.logger.Debug;
-
 import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static com.energyxxer.xswing.KeyInputUtils.*;
@@ -28,7 +27,7 @@ public class KeyMap {
 
     public static final UserKeyStroke EDITOR_FIND = new UserKeyStroke("Find", "editor.find", identifierToStrokes("c+F"));
 
-    public static final UserKeyStroke EDITOR_RELOAD = new UserKeyStroke("Reload from file", "editor.reload", identifierToStrokes("" + KeyEvent.VK_F5));
+    public static final UserKeyStroke EDITOR_RELOAD = new UserKeyStroke("Reload from file", "editor.reload");
 
     public static final UserKeyStroke SUGGESTION_SELECT = new UserKeyStroke("Select editor suggestion", "editor.suggestion.select", identifierToStrokes("" + KeyEvent.VK_TAB));
 
@@ -41,6 +40,8 @@ public class KeyMap {
 
     public static final UserKeyStroke FIND_NEXT = new UserKeyStroke("find.next", identifierToStrokes(KeyEvent.VK_ENTER + ";" + KeyEvent.VK_F3));
     public static final UserKeyStroke FIND_PREVIOUS = new UserKeyStroke("find.previous", identifierToStrokes("s+" + KeyEvent.VK_ENTER + ";s+" + KeyEvent.VK_F3));
+
+    public static final UserKeyStroke SEARCH_EVERYWHERE = new UserKeyStroke("quick_access");
 
 
 
@@ -73,7 +74,7 @@ public class KeyMap {
                 x.printStackTrace();
             }
         }
-        Debug.log(keystrokes);
+        keystrokes.sort(Comparator.comparing(UserKeyStroke::getName));
         allKeyStrokes = keystrokes.toArray(new UserKeyStroke[0]);
     }
 
@@ -121,6 +122,7 @@ public class KeyMap {
     }
 
     public static KeyStroke[] identifierToStrokes(String ids) {
+        if(ids.isEmpty()) return new KeyStroke[0];
         String[] splits = ids.split(";");
         KeyStroke[] strokes = new KeyStroke[splits.length];
         for(int i = 0; i < splits.length; i++) {

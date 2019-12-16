@@ -4,10 +4,11 @@ import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.Resources;
 import com.energyxxer.trident.global.keystrokes.KeyMap;
 import com.energyxxer.trident.main.window.TridentWindow;
+import com.energyxxer.trident.main.window.sections.quick_find.QuickFindDialog;
 import com.energyxxer.trident.main.window.sections.search_path.SearchPathDialog;
 import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.commodoreresources.DefinitionUpdateProcess;
-import com.energyxxer.trident.ui.editor.TridentEditorModule;
+import com.energyxxer.trident.ui.dialogs.KeyStrokeDialog;
 
 import javax.swing.*;
 import java.awt.*;
@@ -40,14 +41,7 @@ public class ActionManager {
         actions.add(new ProgramAction(
                 "Reload from Disk", "Reload the current file from disk",
                 KeyMap.EDITOR_RELOAD,
-                () -> {
-                    Tab st = TridentWindow.tabManager.getSelectedTab();
-                    if(st != null) {
-                        if(st.module instanceof TridentEditorModule) {
-                            ((TridentEditorModule) st.module).reloadFromDisk();
-                        }
-                    }
-                })
+                "editor.reload")
         );
         actions.add(new ProgramAction(
                 "Reload UI Resources", "Reload themes, definition packs and feature maps from disk",
@@ -55,9 +49,19 @@ public class ActionManager {
                 Resources::load)
         );
         actions.add(new ProgramAction(
+                "Find in editor", "Find all occurrences of a query in the current editor tab",
+                KeyMap.EDITOR_FIND,
+                "editor.find")
+        );
+        actions.add(new ProgramAction(
                 "Find in Path", "Find all occurrences of a query in a folder or project",
                 KeyMap.FIND_IN_PATH,
                 SearchPathDialog.INSTANCE::reveal)
+        );
+        actions.add(new ProgramAction(
+                "Search Everywhere", "Search for files and actions",
+                KeyMap.SEARCH_EVERYWHERE,
+                QuickFindDialog.INSTANCE::reveal)
         );
         actions.add(new ProgramAction(
                 "Check for updates", "Check for definition updates",
@@ -72,6 +76,7 @@ public class ActionManager {
 
     public static void setup(JPanel panel) {
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher((e) -> {
+            if(KeyStrokeDialog.isVisible()) return false;
             if(e.getID() == KeyEvent.KEY_PRESSED) {
                 if(!altGraphCaught) {
                     if(e.getKeyCode() == KeyEvent.VK_CONTROL) {

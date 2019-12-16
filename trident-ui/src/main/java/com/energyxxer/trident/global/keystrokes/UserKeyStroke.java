@@ -5,13 +5,17 @@ import com.energyxxer.xswing.KeyInputUtils;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import static com.energyxxer.trident.ui.editor.behavior.AdvancedEditor.isPlatformControlDown;
 import static com.energyxxer.xswing.KeyInputUtils.*;
 
 public class UserKeyStroke {
     private String name;
+    private KeyStroke[] defaultStrokes;
     private KeyStroke[] strokes;
+    private ArrayList<KeyStroke> newStrokes = null;
     private final String key;
 
     public UserKeyStroke(String key, KeyStroke... defaultStrokes) {
@@ -20,6 +24,7 @@ public class UserKeyStroke {
 
     public UserKeyStroke(String name, String key, KeyStroke... defaultStrokes) {
         this.key = key;
+        this.defaultStrokes = defaultStrokes;
         this.strokes = defaultStrokes;
         this.name = name;
 
@@ -27,14 +32,14 @@ public class UserKeyStroke {
     }
 
     private void load() {
-        String savedValue = Preferences.get("keystroke." + key);
+        String savedValue = Preferences.get("keybind." + key);
         if(savedValue != null) {
             this.strokes = KeyMap.identifierToStrokes(savedValue);
         }
     }
 
-    private void save() {
-        Preferences.put("keystroke." + key, KeyMap.strokesToIdentifier(strokes));
+    public void save() {
+        Preferences.put("keybind." + key, KeyMap.strokesToIdentifier(strokes));
     }
 
     public boolean wasPerformed(KeyEvent e) {
@@ -89,6 +94,36 @@ public class UserKeyStroke {
 
     public KeyStroke[] getAllStrokes() {
         return strokes;
+    }
+
+    public ArrayList<KeyStroke> getNewStrokes() {
+        if(newStrokes == null) {
+            newStrokes = new ArrayList<>(Arrays.asList(strokes));
+        }
+        return newStrokes;
+    }
+
+    public boolean newMatchesDefault() {
+        if(defaultStrokes.length == getNewStrokes().size()) {
+            for(int i = 0; i < defaultStrokes.length; i++) {
+                if(!getNewStrokes().get(i).equals(defaultStrokes[i])) return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public void revertToDefault() {
+        newStrokes = new ArrayList<>(Arrays.asList(defaultStrokes));
+    }
+
+    public void applyChanges() {
+        strokes = newStrokes.toArray(new KeyStroke[0]);
+        newStrokes = null;
+    }
+
+    public void discardChanges() {
+        newStrokes = null;
     }
 
     public KeyStroke getFirstKeyStroke() {

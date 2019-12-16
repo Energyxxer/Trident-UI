@@ -12,6 +12,7 @@ public interface DisplayModule {
     Object save();
     void focus();
     default void onSelect() {}
+    default void performModuleAction(String key) {}
 
     boolean transform(ModuleToken newToken);
 }

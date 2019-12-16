@@ -29,33 +29,7 @@ public class TridentUI {
 
 	public static void main(String[] args) {
 		Debug.addStream(System.out);
-		//final PrintStream defaultErrStream = System.err;
-		System.setErr(new PrintStream(new OutputStream() {
-			StringBuilder sb = new StringBuilder();
 
-			@Override
-			public void flush() throws IOException {
-				String message = sb.toString();
-
-				if(message.startsWith("Exception in thread ")) {
-					Debug.log("", Debug.MessageType.PLAIN);
-					TridentWindow.setStatus(new Status("error", message));
-				}
-				//defaultErrStream.println(sb.toString());
-				Debug.log(message, Debug.MessageType.PLAIN);
-
-				sb.setLength(0);
-			}
-
-			@Override
-			public void write(int b) throws IOException {
-				if(b == '\n') {
-					flush();
-				} else {
-					sb.append((char) b);
-				}
-			}
-		}));
 		try {
             Debug.addStream(new FileOutputStream(new File(Preferences.LOG_FILE_PATH)));
         } catch(FileNotFoundException x) {
@@ -90,6 +64,32 @@ public class TridentUI {
 		Resources.load();
 
 		trident = new TridentUI();
+		System.setErr(new PrintStream(new OutputStream() {
+			StringBuilder sb = new StringBuilder();
+
+			@Override
+			public void flush() throws IOException {
+				String message = sb.toString();
+
+				if(message.startsWith("Exception in thread ")) {
+					Debug.log("", Debug.MessageType.PLAIN);
+					TridentWindow.setStatus(new Status("error", message));
+				}
+				//defaultErrStream.println(sb.toString());
+				Debug.log(message, Debug.MessageType.PLAIN);
+
+				sb.setLength(0);
+			}
+
+			@Override
+			public void write(int b) throws IOException {
+				if(b == '\n') {
+					flush();
+				} else {
+					sb.append((char) b);
+				}
+			}
+		}));
 
 		TridentWindow.setVisible(true);
 

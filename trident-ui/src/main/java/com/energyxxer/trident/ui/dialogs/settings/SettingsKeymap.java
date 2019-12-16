@@ -3,6 +3,7 @@ package com.energyxxer.trident.ui.dialogs.settings;
 import com.energyxxer.trident.global.keystrokes.KeyMap;
 import com.energyxxer.trident.global.keystrokes.UserKeyStroke;
 import com.energyxxer.trident.main.window.sections.quick_find.StyledExplorerMaster;
+import com.energyxxer.trident.ui.dialogs.KeyStrokeDialog;
 import com.energyxxer.trident.ui.explorer.base.ActionHostExplorerItem;
 import com.energyxxer.trident.ui.explorer.base.StyleProvider;
 import com.energyxxer.trident.ui.modules.ModuleToken;
@@ -20,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.List;
 
@@ -100,10 +102,39 @@ public class SettingsKeymap extends JPanel {
                     @Override
                     public StyledPopupMenu generateMenu(@NotNull MenuContext context) {
                         StyledPopupMenu menu = new StyledPopupMenu();
-                        menu.add(new StyledMenuItem("Add Shortcut"));
-                        menu.addSeparator();
-                        for(KeyStroke keybind : ks.getAllStrokes()) {
-                            menu.add(new StyledMenuItem("Remove " + KeyInputUtils.getReadableKeyStroke(keybind)));
+                        menu.add(new StyledMenuItem("Add Shortcut") {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                KeyStroke toAdd = new KeyStrokeDialog("Add Shortcut", "Action: " + ks.getName(), SettingsKeymap::checkCollisions).result;
+                                if(toAdd != null) {
+                                    List<KeyStroke> newList = ks.getNewStrokes();
+                                    if(!newList.contains(toAdd)) {
+                                        newList.add(toAdd);
+                                        master.repaint();
+                                    }
+                                }
+                            }
+                        });
+                        List<KeyStroke> allKeybinds = ks.getNewStrokes();
+                        if(!allKeybinds.isEmpty()) menu.addSeparator();
+                        for(KeyStroke keybind : allKeybinds) {
+                            menu.add(new StyledMenuItem("Remove " + KeyInputUtils.getReadableKeyStroke(keybind)) {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    ks.getNewStrokes().remove(keybind);
+                                    master.repaint();
+                                }
+                            });
+                        }
+                        if(!ks.newMatchesDefault()) {
+                            menu.addSeparator();
+                            menu.add(new StyledMenuItem("Reset Shortcuts") {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    ks.revertToDefault();
+                                    master.repaint();
+                                }
+                            });
                         }
                         return menu;
                     }
@@ -116,6 +147,28 @@ public class SettingsKeymap extends JPanel {
             }
 
         }
+        Settings.addApplyEvent(() -> {
+            for(UserKeyStroke uks : KeyMap.getAll()) {
+                uks.applyChanges();
+                uks.save();
+            }
+        });
+        Settings.addCancelEvent(() -> {
+            for(UserKeyStroke uks : KeyMap.getAll()) {
+                uks.discardChanges();
+            }
+        });
+    }
+
+    private static String checkCollisions(KeyStroke stroke) {
+        for(UserKeyStroke uks : KeyMap.getAll()) {
+            for(KeyStroke ks : uks.getNewStrokes()) {
+                if(stroke.equals(ks)) {
+                    return "Already assigned to: " + uks.getName();
+                }
+            }
+        }
+        return null;
     }
 
     SettingsKeymap() {
@@ -145,18 +198,22 @@ public class SettingsKeymap extends JPanel {
             x -= margin;
             FontMetrics fm = g.getFontMetrics();
 
-            for(KeyStroke stroke : this.stroke.getAllStrokes()) {
+            String styleVariant = stroke.newMatchesDefault() ? "default." : "";
+
+            List<KeyStroke> allStrokes = this.stroke.getNewStrokes();
+            for(int i = allStrokes.size()-1; i >= 0; i--) {
+                KeyStroke stroke = allStrokes.get(i);
                 int plateWidth = 2*padding;
                 String readableName = KeyInputUtils.getReadableKeyStroke(stroke);
                 plateWidth += fm.stringWidth(readableName);
 
-                g.setColor(styleProvider.getColors().get("keybind.border.color"));
+                g.setColor(styleProvider.getColors().get("keybind." + styleVariant + "border.color"));
                 g.fillRect(x - plateWidth - 1, y + buttonVGap - 1, plateWidth + 2, buttonVSize + 2);
 
-                g.setColor(styleProvider.getColors().get("keybind.background"));
+                g.setColor(styleProvider.getColors().get("keybind." + styleVariant + "background"));
                 g.fillRect(x - plateWidth, y + buttonVGap, plateWidth, buttonVSize);
 
-                g.setColor(styleProvider.getColors().get("keybind.foreground"));
+                g.setColor(styleProvider.getColors().get("keybind." + styleVariant + "foreground"));
                 g.drawString(readableName, x - plateWidth + padding, y + (h + fm.getAscent() - fm.getDescent())/2);
                 renderedWidth += plateWidth;
                 renderedWidth += margin;

@@ -81,7 +81,6 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         boolean any = false;
 
         if(results != null) {
-            Debug.log(results.getSuggestions());
             boolean createdAnywhereSnippets = false;
             for (int i = 0; i < results.getSuggestions().size(); i++) {
                 Suggestion suggestion = results.getSuggestions().get(i);

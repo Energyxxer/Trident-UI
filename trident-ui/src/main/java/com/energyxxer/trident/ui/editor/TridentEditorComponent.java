@@ -155,10 +155,8 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
         String text = getText();
 
         Lang lang = parent.getLanguage();
-        Debug.log(lang);
         if(lang == null) return;
         Project project = parent.file != null ? ProjectManager.getAssociatedProject(parent.file) : null;
-        Debug.log(project);
 
         SuggestionModule suggestionModule = (lang == Lang.TRIDENT || lang == Lang.CROSSBOW) && project != null ? new SuggestionModule(this.getCaretWordPosition(), this.getCaretPosition()) : null;
         SummaryModule summaryModule = project != null ? (lang == Lang.TRIDENT ? new TridentSummaryModule() : (lang == Lang.CROSSBOW ? new CrossbowSummaryModule() : null)) : null;

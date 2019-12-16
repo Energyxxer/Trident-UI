@@ -2,7 +2,6 @@ package com.energyxxer.trident.ui.editor;
 
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.Preferences;
-import com.energyxxer.trident.global.keystrokes.KeyMap;
 import com.energyxxer.trident.global.temp.Lang;
 import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
@@ -31,7 +30,9 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -81,17 +82,6 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
 
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
-        KeyMap.EDITOR_FIND.apply(editorComponent.getInputMap(WHEN_IN_FOCUSED_WINDOW), "findKeystroke");
-
-        editorComponent.getActionMap().put("findKeystroke", new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showSearchBar();
-                searchBar.getValue().focus();
-            }
-        });
-
         editorComponent.addMouseListener(this);
 
         scrollPane.setRowHeaderView(tln);
@@ -139,6 +129,7 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
 
             scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getValue() + searchBar.getValue().getHeight());
             repaint();
+            searchBar.getValue().focus();
         }
     }
 
@@ -152,6 +143,20 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
             focus();
             searchBarVisible = false;
             repaint();
+        }
+    }
+
+    @Override
+    public void performModuleAction(String key) {
+        switch(key) {
+            case "editor.find": {
+                showSearchBar();
+                break;
+            }
+            case "editor.reload": {
+                reloadFromDisk();
+                break;
+            }
         }
     }
 

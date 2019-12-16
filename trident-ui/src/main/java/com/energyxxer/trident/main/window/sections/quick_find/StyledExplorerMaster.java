@@ -62,6 +62,10 @@ public class StyledExplorerMaster extends ExplorerMaster {
                 colors.put("keybind.background", t.getColor(Color.GRAY, "Explorer.keybind.background"));
                 colors.put("keybind.border.color", t.getColor(Color.BLACK, "Explorer.keybind.border.color"));
                 colors.put("keybind.foreground", t.getColor(Color.BLACK, "Explorer.keybind.foreground", "Explorer.item.foreground", "General.foreground"));
+
+                colors.put("keybind.default.background", t.getColor(Color.GRAY, "Explorer.keybind.default.background", "Explorer.keybind.background"));
+                colors.put("keybind.default.border.color", t.getColor(Color.BLACK, "Explorer.keybind.default.border.color", "Explorer.keybind.border.color"));
+                colors.put("keybind.default.foreground", t.getColor(Color.BLACK, "Explorer.keybind.default.foreground", "Explorer.keybind.foreground", "Explorer.item.foreground", "General.foreground"));
                 
                 
                 rowHeight = Math.max(t.getInteger(20, "Explorer.item.height"), 1);
@@ -121,6 +125,10 @@ public class StyledExplorerMaster extends ExplorerMaster {
                 colors.put("keybind.background", t.getColor(Color.GRAY, namespace + ".keybind.background", "Explorer.keybind.background"));
                 colors.put("keybind.border.color", t.getColor(Color.BLACK, namespace + ".keybind.border.color", "Explorer.keybind.border.color"));
                 colors.put("keybind.foreground", t.getColor(Color.BLACK, namespace + ".keybind.foreground", "Explorer.keybind.foreground", namespace + ".item.foreground", "Explorer.item.foreground", "General.foreground"));
+
+                colors.put("keybind.default.background", t.getColor(Color.GRAY, namespace + ".keybind.default.background", namespace + ".keybind.background", "Explorer.keybind.default.background", "Explorer.keybind.background"));
+                colors.put("keybind.default.border.color", t.getColor(Color.BLACK, namespace + ".keybind.default.border.color", namespace + ".keybind.border.color", "Explorer.keybind.default.border.color", "Explorer.keybind.border.color"));
+                colors.put("keybind.default.foreground", t.getColor(Color.BLACK, namespace + ".keybind.default.foreground", namespace + ".keybind.foreground", "Explorer.keybind.default.foreground", "Explorer.keybind.foreground", namespace + ".item.foreground", "Explorer.item.foreground", "General.foreground"));
 
 
                 rowHeight = Math.max(t.getInteger(20, namespace + ".item.height", "Explorer.item.height"), 1);
