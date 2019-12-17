@@ -12,3 +12,4 @@ Syntax Themes:
 -Trident Syntax Dark
 -Crossbow Syntax Dark
 -NBTTM Syntax Dark
+-Snippet Syntax Dark

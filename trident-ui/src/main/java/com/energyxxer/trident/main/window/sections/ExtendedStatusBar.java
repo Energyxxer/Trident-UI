@@ -3,10 +3,8 @@ package com.energyxxer.trident.main.window.sections;
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 
-import javax.swing.JPanel;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Created by User on 1/3/2017.
@@ -23,8 +21,8 @@ public class ExtendedStatusBar extends JPanel {
         this.setOpaque(false);
         this.setBackground(new Color(0,0,0,0));
 
-        caretInfo = new StyledLabel(Commons.DEFAULT_CARET_DISPLAY_TEXT);
-        selectionInfo = new StyledLabel(" ");
+        caretInfo = new StyledLabel(Commons.DEFAULT_CARET_DISPLAY_TEXT, null);
+        selectionInfo = new StyledLabel(" ", null);
 
         this.add(selectionInfo);
         this.add(caretInfo);

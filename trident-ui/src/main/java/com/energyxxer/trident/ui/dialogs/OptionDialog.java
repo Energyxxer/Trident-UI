@@ -52,7 +52,7 @@ public class OptionDialog {
             JPanel content = new JPanel(new BorderLayout());
             content.setOpaque(false);
 
-            StyledLabel label = new StyledLabel(query, "OptionDialog");
+            StyledLabel label = new StyledLabel(query, "OptionDialog", tlm);
             label.setStyle(Font.BOLD);
             content.add(label, BorderLayout.CENTER);
 
@@ -62,9 +62,10 @@ public class OptionDialog {
                 buttons.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
 
                 for(String option : options) {
-                    StyledButton button = new StyledButton(option,"OptionDialog");
+                    StyledButton button = new StyledButton(option,"OptionDialog", tlm);
                     button.addActionListener(e -> {
                         result = option;
+                        tlm.dispose();
                         dialog.setVisible(false);
                     });
                     buttons.add(button);
@@ -81,6 +82,7 @@ public class OptionDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 result = options[0];
+                tlm.dispose();
                 dialog.setVisible(false);
             }
         });

@@ -27,7 +27,7 @@ class ProjectPropertiesOutput extends JPanel {
                 header.add(padding, BorderLayout.WEST);
             }
 
-            StyledLabel label = new StyledLabel("Output", "ProjectProperties.content.header");
+            StyledLabel label = new StyledLabel("Output", "ProjectProperties.content.header", tlm);
             header.add(label, BorderLayout.CENTER);
 
             tlm.addThemeChangeListener(t -> {
@@ -67,11 +67,11 @@ class ProjectPropertiesOutput extends JPanel {
 
             //region Data Pack Output
             {
-                StyledLabel label = new StyledLabel("Data Pack Output:", "ProjectProperties.content");
+                StyledLabel label = new StyledLabel("Data Pack Output:", "ProjectProperties.content", tlm);
                 label.setStyle(Font.BOLD);
                 content.add(label);
-                content.add(new StyledLabel("Where to store the data pack compilation result.", "ProjectProperties.content"));
-                content.add(new StyledLabel("May be a directory or a zip file.", "ProjectProperties.content"));
+                content.add(new StyledLabel("Where to store the data pack compilation result.", "ProjectProperties.content", tlm));
+                content.add(new StyledLabel("May be a directory or a zip file.", "ProjectProperties.content", tlm));
             }
             {
                 StyledFileField datapackOut = new StyledFileField(null, "ProjectProperties.content");
@@ -103,11 +103,11 @@ class ProjectPropertiesOutput extends JPanel {
 
             //region Resource Pack Output
             {
-                StyledLabel label = new StyledLabel("Resource Pack Output:", "ProjectProperties.content");
+                StyledLabel label = new StyledLabel("Resource Pack Output:", "ProjectProperties.content", tlm);
                 label.setStyle(Font.BOLD);
                 content.add(label);
-                content.add(new StyledLabel("Where to store the resource pack compilation result, if applicable.", "ProjectProperties.content"));
-                content.add(new StyledLabel("May be a directory or a zip file.", "ProjectProperties.content"));
+                content.add(new StyledLabel("Where to store the resource pack compilation result, if applicable.", "ProjectProperties.content", tlm));
+                content.add(new StyledLabel("May be a directory or a zip file.", "ProjectProperties.content", tlm));
             }
             {
                 StyledFileField resourcesOut = new StyledFileField(null, "ProjectProperties.content");
@@ -145,7 +145,7 @@ class ProjectPropertiesOutput extends JPanel {
                 ProjectProperties.addApplyEvent(p -> p.setExportComments(exportComments.isSelected()));
 
                 content.add(exportComments);
-                content.add(new StyledLabel("         If enabled, comments in Trident functions will be exported.", "ProjectProperties.content"));
+                content.add(new StyledLabel("         If enabled, comments in Trident functions will be exported.", "ProjectProperties.content", tlm));
             }
 
             {

@@ -2,8 +2,10 @@ package com.energyxxer.xswing;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class XButton extends JButton {
+public class XButton extends JButton implements ActionListener {
 	
 	protected Color borderColor = new Color(150,150,150);
 	protected int borderThickness = 1;
@@ -16,6 +18,7 @@ public class XButton extends JButton {
 		setContentAreaFilled(false);
 		setBackground(new Color(225,225,225));
 		this.setBorderPainted(false);
+		this.addActionListener(this);
 	}
 	
 	public XButton() {
@@ -72,5 +75,10 @@ public class XButton extends JButton {
 
 	public void setPressedColor(Color c) {
 		this.pressedColor = c;
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+
 	}
 }

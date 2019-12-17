@@ -304,8 +304,10 @@ public class StandardOrderListItem extends OrderListElement implements ItemActio
 
     @Override
     public void setSelected(boolean selected) {
+        if(selected && !this.selected) {
+            token.onInteract();
+        }
         super.setSelected(selected);
-        token.onInteract();
     }
 
     @Override
@@ -318,9 +320,7 @@ public class StandardOrderListItem extends OrderListElement implements ItemActio
     }
 
     private JPopupMenu generatePopup() {
-        JPopupMenu menu = token.generateMenu(ModuleToken.MenuContext.EXPLORER);
-        //TODO: add "move up/down" options
-        return menu;
+        return token.generateMenu(ModuleToken.MenuContext.EXPLORER);
     }
 
     @Override

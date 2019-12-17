@@ -79,7 +79,7 @@ public class FolderDialog {
             entry.setOpaque(false);
             entry.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
 
-            StyledLabel instructionsLabel = new StyledLabel("Enter new folder name:", "NewPackageDialog");
+            StyledLabel instructionsLabel = new StyledLabel("Enter new folder name:", "NewPackageDialog", tlm);
             instructionsLabel.setStyle(Font.PLAIN);
             instructionsLabel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
             instructionsLabel.setHorizontalTextPosition(JLabel.LEFT);
@@ -105,7 +105,7 @@ public class FolderDialog {
             errorPanel.setOpaque(false);
             errorPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 0));
 
-            errorLabel = new StyledLabel("", "NewPackageDialog.error");
+            errorLabel = new StyledLabel("", "NewPackageDialog.error", tlm);
             errorLabel.setStyle(Font.BOLD);
             errorLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, errorLabel.getPreferredSize().height));
             errorPanel.add(errorLabel);
@@ -120,11 +120,14 @@ public class FolderDialog {
             buttons.setOpaque(false);
             buttons.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
 
-            okButton = new StyledButton("OK");
+            okButton = new StyledButton("OK", tlm);
             okButton.addActionListener(e -> submit());
             buttons.add(okButton);
-            StyledButton cancelButton = new StyledButton("Cancel");
-            cancelButton.addActionListener(e -> dialog.setVisible(false));
+            StyledButton cancelButton = new StyledButton("Cancel", tlm);
+            cancelButton.addActionListener(e -> {
+                dialog.setVisible(false);
+                tlm.dispose();
+            });
 
             buttons.add(cancelButton);
             content.add(buttons);
@@ -162,6 +165,7 @@ public class FolderDialog {
         new File(path.replace('/',File.separatorChar)).mkdirs();
         TridentWindow.projectExplorer.refresh();
 
+        tlm.dispose();
         dialog.setVisible(false);
     }
 

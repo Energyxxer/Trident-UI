@@ -22,6 +22,7 @@ public class ActionHostExplorerItem extends ExplorerElement implements ItemActio
 
     private Image icon = null;
     private String name = null;
+    private boolean autoUpdateTitle = false;
 
     private int y = 0;
     private int height = 20;
@@ -141,6 +142,9 @@ public class ActionHostExplorerItem extends ExplorerElement implements ItemActio
             g.setColor(master.getColors().get("item.foreground"));
         }
 
+        if(autoUpdateTitle) {
+            updateName();
+        }
         if(name != null) {
             int stringWidth = fm.stringWidth(name);
             if(x + stringWidth > rightX) {
@@ -157,8 +161,17 @@ public class ActionHostExplorerItem extends ExplorerElement implements ItemActio
                     stripped = name.substring(0, name.length() - stripAmount) + "...";
                 }
                 g.drawString(stripped, x, offsetY + fm.getAscent() + ((h - fm.getHeight())/2));
+                x += fm.stringWidth(stripped);
             } else {
                 g.drawString(name, x, offsetY + fm.getAscent() + ((h - fm.getHeight())/2));
+                x += fm.stringWidth(name);
+            }
+            String subTitle = token.getSubTitle();
+            if(subTitle != null) {
+                g.setColor(new Color(g.getColor().getRed(), g.getColor().getGreen(), g.getColor().getBlue(), (int)(g.getColor().getAlpha() * 0.75)));
+                x += 8;
+                g.drawString(subTitle, x, master.getOffsetY() + fm.getAscent() + ((master.getRowHeight() - fm.getHeight())/2));
+                x += fm.stringWidth(subTitle);
             }
         }
 
@@ -292,8 +305,10 @@ public class ActionHostExplorerItem extends ExplorerElement implements ItemActio
 
     @Override
     public void setSelected(boolean selected) {
+        if(selected && !this.selected) {
+            token.onInteract();
+        }
         super.setSelected(selected);
-        token.onInteract();
     }
 
     @Override
@@ -306,9 +321,7 @@ public class ActionHostExplorerItem extends ExplorerElement implements ItemActio
     }
 
     private JPopupMenu generatePopup() {
-        JPopupMenu menu = token.generateMenu(ModuleToken.MenuContext.EXPLORER);
-        //TODO: add "move up/down" options
-        return menu;
+        return token.generateMenu(ModuleToken.MenuContext.EXPLORER);
     }
 
     @Override
@@ -329,5 +342,13 @@ public class ActionHostExplorerItem extends ExplorerElement implements ItemActio
     @Override
     public StyleProvider getStyleProvider() {
         return master;
+    }
+
+    public boolean isAutoUpdateTitle() {
+        return autoUpdateTitle;
+    }
+
+    public void setAutoUpdateTitle(boolean autoUpdateTitle) {
+        this.autoUpdateTitle = autoUpdateTitle;
     }
 }

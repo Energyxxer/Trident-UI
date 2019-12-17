@@ -3,6 +3,7 @@ package com.energyxxer.trident.ui.styledcomponents;
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.ui.theme.Theme;
 import com.energyxxer.trident.ui.theme.change.ThemeChangeListener;
+import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,66 +23,25 @@ public class StyledLabel extends JLabel implements ThemeChangeListener {
 
     private Theme theme;
 
-    public StyledLabel(String text, Icon icon, int horizontalAlignment) {
-        super(text, icon, horizontalAlignment);
-        setNamespaceInit(null);
-    }
-
-    public StyledLabel(String text, int horizontalAlignment) {
-        super(text, horizontalAlignment);
-        setNamespaceInit(null);
-    }
-
-    public StyledLabel(String text) {
+    public StyledLabel(String text, ThemeListenerManager tlm) {
         super(text);
-        setNamespaceInit(null);
+        setNamespaceInit(null, tlm);
     }
-
-    public StyledLabel(Icon image, int horizontalAlignment) {
-        super(image, horizontalAlignment);
-        setNamespaceInit(null);
-    }
-
-    public StyledLabel(Icon image) {
-        super(image);
-        setNamespaceInit(null);
-    }
-
-    public StyledLabel() {
-        setNamespaceInit(null);
-    }
-
     //New
 
-    public StyledLabel(String text, String namespace, Icon icon, int horizontalAlignment) {
-        super(text, icon, horizontalAlignment);
-        setNamespaceInit(namespace);
-    }
-
-    public StyledLabel(String text, String namespace, int horizontalAlignment) {
-        super(text, horizontalAlignment);
-        setNamespaceInit(namespace);
-    }
-
-    public StyledLabel(String text, String namespace) {
+    public StyledLabel(String text, String namespace, ThemeListenerManager tlm) {
         super(text);
-        setNamespaceInit(namespace);
+        setNamespaceInit(namespace, tlm);
     }
 
-    public StyledLabel(Icon image, String namespace, int horizontalAlignment) {
-        super(image, horizontalAlignment);
-        setNamespaceInit(namespace);
-    }
-
-    public StyledLabel(Icon image, String namespace) {
-        super(image);
-        setNamespaceInit(namespace);
-    }
-
-    private void setNamespaceInit(String namespace) {
+    private void setNamespaceInit(String namespace, ThemeListenerManager tlm) {
         setNamespace(namespace);
 
-        ThemeChangeListener.addThemeChangeListener(this);
+        if(tlm != null) {
+            tlm.addThemeChangeListener(this);
+        } else {
+            ThemeChangeListener.addThemeChangeListener(this);
+        }
     }
 
     public int getStyle() {

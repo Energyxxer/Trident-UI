@@ -50,7 +50,7 @@ public class Toolbar extends JPanel {
 
         projectIndicator.add(new Padding(10));
 
-        projectLabel = new StyledLabel("", "Toolbar.projectIndicator");
+        projectLabel = new StyledLabel("", "Toolbar.projectIndicator", tlm);
         projectLabel.setTextThemeDriven(false);
         projectIndicator.add(projectLabel);
 

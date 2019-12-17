@@ -52,7 +52,7 @@ public class ProjectPropertiesDependencies extends JPanel {
                 header.add(padding, BorderLayout.WEST);
             }
 
-            StyledLabel label = new StyledLabel("Dependencies", "ProjectProperties.content.header");
+            StyledLabel label = new StyledLabel("Dependencies", "ProjectProperties.content.header", tlm);
             header.add(label, BorderLayout.CENTER);
 
             tlm.addThemeChangeListener(t -> {
@@ -94,11 +94,11 @@ public class ProjectPropertiesDependencies extends JPanel {
 
                 preContent.add(new Padding(20));
 
-                preContent.add(new StyledLabel("A project may utilize functions from another Trident project.", "ProjectProperties.content"));
-                preContent.add(new StyledLabel("Select a project from the workspace or the .tdnproj file of the project to depend on.", "ProjectProperties.content"));
+                preContent.add(new StyledLabel("A project may utilize functions from another Trident project.", "ProjectProperties.content", tlm));
+                preContent.add(new StyledLabel("Select a project from the workspace or the .tdnproj file of the project to depend on.", "ProjectProperties.content", tlm));
                 preContent.add(new Padding(11));
-                preContent.add(new StyledLabel("The projects below will be applied from bottom to top, each", "ProjectProperties.content"));
-                preContent.add(new StyledLabel("overwriting any repeated definitions from those below.", "ProjectProperties.content"));
+                preContent.add(new StyledLabel("The projects below will be applied from bottom to top, each", "ProjectProperties.content", tlm));
+                preContent.add(new StyledLabel("overwriting any repeated definitions from those below.", "ProjectProperties.content", tlm));
 
                 preContent.add(new Padding(10));
 
@@ -164,7 +164,7 @@ public class ProjectPropertiesDependencies extends JPanel {
                 exportHead.setPreferredSize(new Dimension(38, 16));
                 tableHead.add(exportHead, BorderLayout.WEST);
 
-                StyledLabel exportHeadLabel = new StyledLabel("Export", "ProjectProperties.tablehead");
+                StyledLabel exportHeadLabel = new StyledLabel("Export", "ProjectProperties.tablehead", tlm);
                 exportHead.add(exportHeadLabel);
 
 
@@ -179,7 +179,7 @@ public class ProjectPropertiesDependencies extends JPanel {
                 modeHead.setPreferredSize(new Dimension(72, 16));
                 rightHead.add(modeHead, BorderLayout.WEST);
 
-                StyledLabel modeHeadLabel = new StyledLabel("Mode", "ProjectProperties.tablehead");
+                StyledLabel modeHeadLabel = new StyledLabel("Mode", "ProjectProperties.tablehead", tlm);
                 modeHead.add(modeHeadLabel);
 
 

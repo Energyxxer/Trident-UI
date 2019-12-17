@@ -7,6 +7,7 @@ import com.energyxxer.trident.global.Status;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.commodoreresources.DefinitionUpdateProcess;
+import com.energyxxer.trident.ui.editor.completion.snippets.SnippetManager;
 import com.energyxxer.util.ImageManager;
 import com.energyxxer.util.logger.Debug;
 
@@ -105,6 +106,7 @@ public class TridentUI {
 		TridentWindow.welcomePane.tipScreen.start(1000);
 		TridentWindow.tabManager.openSavedTabs();
 		TridentWindow.projectExplorer.openExplorerTree();
+		SnippetManager.load();
 
 		DefinitionUpdateProcess.tryUpdate();
 	}

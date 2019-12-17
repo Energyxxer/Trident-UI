@@ -3,7 +3,7 @@ package com.energyxxer.trident.ui.editor.completion.snippets;
 import com.energyxxer.trident.compiler.lexer.TridentSuggestionTags;
 
 public enum SnippetContext {
-    ANYWHERE(null),
+    EVERYWHERE(null),
     ENTRY(TridentSuggestionTags.CONTEXT_ENTRY),
     COMMAND(TridentSuggestionTags.CONTEXT_COMMAND),
     MODIFIER(TridentSuggestionTags.CONTEXT_MODIFIER),

@@ -47,7 +47,7 @@ public class Settings {
 			sidebar.setMaximumSize(new Dimension(400, 1));
 			sidebarResizer.setResizable(false, false, false, true);
 
-			String[] sections = new String[] { "General", "Appearance", "Editor", "Resources", "Keymap" };
+			String[] sections = new String[] { "General", "Appearance", "Editor", "Snippets", "Keymap" };
 
 			StyledList<String> navigator = new StyledList<>(sections, "Settings");
 			sidebar.setBackground(navigator.getBackground());
@@ -78,7 +78,7 @@ public class Settings {
 		sectionPanes.put("General", contentGeneral);
 		sectionPanes.put("Appearance", new SettingsAppearance());
 		sectionPanes.put("Editor", new JPanel());
-		sectionPanes.put("Resources", new JPanel());
+		sectionPanes.put("Snippets", new SettingsSnippets());
 		sectionPanes.put("Keymap", new SettingsKeymap());
 
 		contentPane.add(contentGeneral, BorderLayout.CENTER);
@@ -92,7 +92,7 @@ public class Settings {
 			buttons.add(new Padding(25));
 
 			{
-				StyledButton okay = new StyledButton("OK", "Settings");
+				StyledButton okay = new StyledButton("OK", "Settings", tlm);
 				tlm.addThemeChangeListener(t -> okay.setPreferredSize(new Dimension(Math.max(t.getInteger(75,"Settings.okButton.width"),10), Math.max(t.getInteger(25,"Settings.okButton.height"),10))));
 				buttons.add(okay);
 
@@ -104,7 +104,7 @@ public class Settings {
 			}
 
 			{
-				StyledButton cancel = new StyledButton("Cancel", "Settings");
+				StyledButton cancel = new StyledButton("Cancel", "Settings", tlm);
 				tlm.addThemeChangeListener(t -> cancel.setPreferredSize(new Dimension(Math.max(t.getInteger(75,"Settings.cancelButton.width"),10), Math.max(t.getInteger(25,"Settings.cancelButton.height"),10))));
 				buttons.add(cancel);
 

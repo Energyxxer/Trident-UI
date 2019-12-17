@@ -48,6 +48,8 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
     protected int selectionLineThickness = 2;
     private int indentation;
 
+    private boolean multipleSelectionsEnabled = true;
+
     public ExplorerMaster() {
         this.addMouseListener(this);
         this.addMouseMotionListener(this);
@@ -150,6 +152,7 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
             rolloverItem.setRollover(false);
             repaint();
         }
+        rolloverText = null;
     }
 
     @Override
@@ -181,7 +184,7 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
             if(text != null && (rolloverItem != null || !hint.isShowing()) && (!Objects.equals(hint.getText(), text) || !hint.isShowing())) {
                 hint.setText(text);
                 HintStylizer.style(hint);
-                hint.show(new Point(this.getLocationOnScreen().x + element.getToolTipLocation().x, this.getLocationOnScreen().y + element.getLastRecordedOffset() + element.getToolTipLocation().y), () -> rolloverItem == element && Objects.equals(hint.getText(), rolloverText));
+                hint.show(new Point(this.getLocationOnScreen().x + element.getToolTipLocation().x, this.getLocationOnScreen().y + element.getLastRecordedOffset() + element.getToolTipLocation().y), () -> this.isShowing() && rolloverItem == element && Objects.equals(hint.getText(), rolloverText));
             }
             element.mouseMoved(e);
         } else {
@@ -206,12 +209,18 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
     }
 
     public void addSelected(ExplorerElement item, boolean invert) {
-        if(!selectedItems.contains(item)) {
+        if(multipleSelectionsEnabled) {
+            if(!selectedItems.contains(item)) {
+                item.setSelected(true);
+                selectedItems.add(item);
+            } else if(invert) {
+                item.setSelected(false);
+                selectedItems.remove(item);
+            }
+        } else {
+            clearSelected();
             item.setSelected(true);
             selectedItems.add(item);
-        } else if(invert) {
-            item.setSelected(false);
-            selectedItems.remove(item);
         }
         selectionUpdated();
     }
@@ -394,5 +403,13 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
 
     public void renderOffset(int height) {
         offsetY += height;
+    }
+
+    public boolean isMultipleSelectionsEnabled() {
+        return multipleSelectionsEnabled;
+    }
+
+    public void setMultipleSelectionsEnabled(boolean multipleSelectionsEnabled) {
+        this.multipleSelectionsEnabled = multipleSelectionsEnabled;
     }
 }

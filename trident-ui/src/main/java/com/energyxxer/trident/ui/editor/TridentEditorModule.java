@@ -129,8 +129,8 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
 
             scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getValue() + searchBar.getValue().getHeight());
             repaint();
-            searchBar.getValue().focus();
         }
+        searchBar.getValue().focus();
     }
 
     public void hideSearchBar() {
@@ -414,6 +414,7 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
     @Override
     public void dispose() {
         editorComponent.dispose();
+        searchBar.getValue().dispose();
     }
 
     public void setEditable(boolean editable) {

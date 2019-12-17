@@ -39,7 +39,7 @@ public class ConfirmDialog {
             JPanel content = new JPanel(new BorderLayout());
             content.setOpaque(false);
 
-            StyledLabel label = new StyledLabel(query, "ConfirmDialog");
+            StyledLabel label = new StyledLabel(query, "ConfirmDialog", tlm); //tlm
             content.add(label, BorderLayout.CENTER);
 
             {
@@ -47,14 +47,14 @@ public class ConfirmDialog {
                 buttons.setOpaque(false);
                 buttons.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
 
-                StyledButton okButton = new StyledButton("Yes");
+                StyledButton okButton = new StyledButton("Yes", tlm);
                 okButton.addActionListener(e -> {
                     result = true;
                     dialog.setVisible(false);
                 });
                 buttons.add(okButton);
 
-                StyledButton cancelButton = new StyledButton("No");
+                StyledButton cancelButton = new StyledButton("No", tlm);
                 cancelButton.addActionListener(e -> {
                     result = false;
                     dialog.setVisible(false);

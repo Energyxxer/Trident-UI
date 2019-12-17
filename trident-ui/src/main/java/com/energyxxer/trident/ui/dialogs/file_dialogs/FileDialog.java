@@ -80,7 +80,7 @@ public class FileDialog {
             entry.setOpaque(false);
             entry.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
 
-            nameLabel = new StyledLabel("Enter new file name:", "NewFileDialog");
+            nameLabel = new StyledLabel("Enter new file name:", "NewFileDialog", tlm);
             nameLabel.setStyle(Font.PLAIN);
             nameLabel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
             nameLabel.setHorizontalTextPosition(JLabel.LEFT);
@@ -106,12 +106,12 @@ public class FileDialog {
             errorPanel.setOpaque(false);
             errorPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 0));
 
-            errorLabel = new StyledLabel("", "NewFileDialog.error");
+            errorLabel = new StyledLabel("", "NewFileDialog.error", tlm);
             errorLabel.setStyle(Font.BOLD);
             errorLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, errorLabel.getPreferredSize().height));
             errorPanel.add(errorLabel);
 
-            warningLabel = new StyledLabel("", "NewFileDialog.warning");
+            warningLabel = new StyledLabel("", "NewFileDialog.warning", tlm);
             warningLabel.setStyle(Font.BOLD);
             warningLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, warningLabel.getPreferredSize().height));
             errorPanel.add(warningLabel);
@@ -126,11 +126,14 @@ public class FileDialog {
             buttons.setOpaque(false);
             buttons.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
 
-            okButton = new StyledButton("OK");
+            okButton = new StyledButton("OK", tlm);
             okButton.addActionListener(e -> submit());
             buttons.add(okButton);
-            StyledButton cancelButton = new StyledButton("Cancel");
-            cancelButton.addActionListener(e -> dialog.setVisible(false));
+            StyledButton cancelButton = new StyledButton("Cancel", tlm);
+            cancelButton.addActionListener(e -> {
+                tlm.dispose();
+                dialog.setVisible(false);
+            });
 
             buttons.add(cancelButton);
             content.add(buttons);
@@ -182,6 +185,7 @@ public class FileDialog {
         } catch (IOException x) {
             x.printStackTrace();
         }
+        tlm.dispose();
         dialog.setVisible(false);
     }
 

@@ -13,6 +13,7 @@ import com.energyxxer.trident.ui.scrollbar.OverlayScrollBarUI;
 import com.energyxxer.trident.ui.scrollbar.OverlayScrollPaneLayout;
 import com.energyxxer.trident.ui.styledcomponents.*;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
+import com.energyxxer.util.Disposable;
 import com.energyxxer.util.logger.Debug;
 import com.energyxxer.xswing.TemporaryConfirmation;
 import com.energyxxer.xswing.UnifiedDocumentListener;
@@ -32,7 +33,7 @@ import java.util.regex.PatternSyntaxException;
 import static com.energyxxer.trident.ui.editor.behavior.AdvancedEditor.isPlatformControlDown;
 import static java.awt.Image.SCALE_SMOOTH;
 
-public class FindAndReplaceBar extends JPanel {
+public class FindAndReplaceBar extends JPanel implements Disposable {
 
     private ThemeListenerManager tlm;
 
@@ -58,7 +59,7 @@ public class FindAndReplaceBar extends JPanel {
         this.editor = editor;
         this.tlm = new ThemeListenerManager();
         this.highlighter = new SearchHighlighter(this, editor.editorComponent);
-        infoLabel = new StyledLabel("");
+        infoLabel = new StyledLabel("", tlm);
         infoLabel.setStyle(Font.BOLD);
         //this.setPreferredSize(new Dimension(0, 60));
 
@@ -451,5 +452,9 @@ public class FindAndReplaceBar extends JPanel {
 
     public void onDismiss() {
         highlighter.setEnabled(false);
+    }
+
+    public void dispose() {
+        tlm.dispose();
     }
 }

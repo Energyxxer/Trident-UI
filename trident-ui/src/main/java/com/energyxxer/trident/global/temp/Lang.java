@@ -26,6 +26,7 @@ import com.energyxxer.trident.global.temp.lang_defaults.parsing.MCFunctionProduc
 import com.energyxxer.trident.global.temp.lang_defaults.presets.JSONLexerProfile;
 import com.energyxxer.trident.global.temp.lang_defaults.presets.MCFunctionLexerProfile;
 import com.energyxxer.trident.global.temp.lang_defaults.presets.PropertiesLexerProfile;
+import com.energyxxer.trident.ui.dialogs.settings.SnippetLexerProfile;
 import com.energyxxer.util.Factory;
 
 import java.io.File;
@@ -42,7 +43,8 @@ public enum Lang {
     MCFUNCTION(MCFunctionLexerProfile::new, () -> MCFunctionProductions.FILE, "mcfunction"),
     TRIDENT(TridentLexerProfile.INSTANCE::getValue, Commons::getActiveTridentProductions, "tdn"),
     CROSSBOW(CrossbowLexerProfile.INSTANCE::getValue, Commons::getActiveCrossbowProductions, "cbw"),
-    NBTTM(() -> new NBTTMLexerProfile(StandardDefinitionPacks.MINECRAFT_JAVA_LATEST_SNAPSHOT), () -> NBTTMProductions.FILE, "nbttm");
+    NBTTM(() -> new NBTTMLexerProfile(StandardDefinitionPacks.MINECRAFT_JAVA_LATEST_SNAPSHOT), () -> NBTTMProductions.FILE, "nbttm"),
+    SNIPPET(SnippetLexerProfile::new);
 
     Factory<LexerProfile> factory;
     Factory<GeneralTokenPatternMatch> parserProduction;

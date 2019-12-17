@@ -21,7 +21,7 @@ public class ToolBoardMaster extends OverlayBorderPanel {
     private ThemeListenerManager tlm = new ThemeListenerManager();
 
     private JPanel header = new JPanel(new BorderLayout());
-    private StyledLabel headerLabel = new StyledLabel("Sample Text","ToolBoard.header");
+    private StyledLabel headerLabel = new StyledLabel("Sample Text","ToolBoard.header", tlm);
 
     private NavigatorMaster navbar = new NavigatorMaster(NavigatorMaster.VERTICAL);
 

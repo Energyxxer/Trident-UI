@@ -79,7 +79,7 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
         MouseAdapter dragAdapter = new DragHandler(this);
         titleBar.addMouseListener(dragAdapter);
         titleBar.addMouseMotionListener(dragAdapter);
-        titleBar.add(new StyledLabel("    Find in Path", "FindInPath.header"), BorderLayout.WEST);
+        titleBar.add(new StyledLabel("    Find in Path", "FindInPath.header", tlm), BorderLayout.WEST);
         JPanel controlsPanel = new JPanel();
         controlsPanel.setOpaque(false);
 
@@ -176,12 +176,12 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
         });
 
         previewPanel = new JPanel(new BorderLayout());
-        previewLabel = new StyledLabel("", "FindInPath.preview.header");
+        previewLabel = new StyledLabel("", "FindInPath.preview.header", tlm);
         previewLabel.setPreferredSize(new Dimension(1, 26));
         previewPanel.add(previewLabel, BorderLayout.NORTH);
 
         footerPanel = new JPanel(new BorderLayout());
-        StyledButton openInToolButton = new StyledButton("Open in Find Tool", "FindInPath.footer");
+        StyledButton openInToolButton = new StyledButton("Open in Find Tool", "FindInPath.footer", tlm);
         openInToolButton.addActionListener(e -> {
             QueryDetails query = new QueryDetails(field.getText(), matchCase.isSelected(), wordsOnly.isSelected(), regex.isSelected(), getRootFile());
             query.setFileNameFilter(this::shouldRead);

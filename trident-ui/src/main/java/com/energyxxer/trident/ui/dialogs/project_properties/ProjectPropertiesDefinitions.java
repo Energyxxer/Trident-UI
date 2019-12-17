@@ -50,7 +50,7 @@ public class ProjectPropertiesDefinitions extends JPanel {
                 header.add(padding, BorderLayout.WEST);
             }
 
-            StyledLabel label = new StyledLabel("Definitions", "ProjectProperties.content.header");
+            StyledLabel label = new StyledLabel("Definitions", "ProjectProperties.content.header", tlm);
             header.add(label, BorderLayout.CENTER);
 
             tlm.addThemeChangeListener(t -> {
@@ -88,11 +88,11 @@ public class ProjectPropertiesDefinitions extends JPanel {
 
                 preContent.add(new Padding(20));
 
-                preContent.add(new StyledLabel("Definition packs determine what types (blocks/items/entities...) can be used by a project.", "ProjectProperties.content"));
+                preContent.add(new StyledLabel("Definition packs determine what types (blocks/items/entities...) can be used by a project.", "ProjectProperties.content", tlm));
                 preContent.add(new Padding(11));
-                preContent.add(new StyledLabel("They can either be provided by the target version,", "ProjectProperties.content"));
-                preContent.add(new StyledLabel("the project directory (for project-specific definitions), or from a", "ProjectProperties.content"));
-                preContent.add(new StyledLabel("subdirectory in the IDE (for shared use by all projects in the workspace).", "ProjectProperties.content"));
+                preContent.add(new StyledLabel("They can either be provided by the target version,", "ProjectProperties.content", tlm));
+                preContent.add(new StyledLabel("the project directory (for project-specific definitions), or from a", "ProjectProperties.content", tlm));
+                preContent.add(new StyledLabel("subdirectory in the IDE (for shared use by all projects in the workspace).", "ProjectProperties.content", tlm));
 
                 preContent.add(new Padding(10));
 

@@ -46,7 +46,7 @@ public class Sidebar extends OverlayBorderPanel {
 
         JPanel header = new JPanel(new BorderLayout());
 
-        StyledLabel label = new StyledLabel("Project Explorer", "Explorer.header");
+        StyledLabel label = new StyledLabel("Project Explorer", "Explorer.header", tlm);
         label.setFontSize(14);
         label.setPreferredSize(new Dimension(500, 25));
         header.add(new Padding(15, "Explorer.header.indent"), BorderLayout.WEST);

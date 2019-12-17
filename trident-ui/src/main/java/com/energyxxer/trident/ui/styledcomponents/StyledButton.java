@@ -3,7 +3,6 @@ package com.energyxxer.trident.ui.styledcomponents;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.xswing.XButton;
 
-import javax.swing.ImageIcon;
 import java.awt.Color;
 
 /**
@@ -16,22 +15,12 @@ public class StyledButton extends XButton {
 
     private String namespace = null;
 
-    private ThemeListenerManager tlm = new ThemeListenerManager();
-
-    public StyledButton(String label) {
-        this(label, null, null);
+    public StyledButton(String label, ThemeListenerManager tlm) {
+        this(label, null, tlm);
     }
 
-    public StyledButton(String label, String namespace) {
-        this(label, namespace, null);
-    }
-
-    public StyledButton(String label, ImageIcon icon) {
-        this(label, null, icon);
-    }
-
-    public StyledButton(String label, String namespace, ImageIcon icon) {
-        super(label, icon);
+    public StyledButton(String label, String namespace, ThemeListenerManager tlm) {
+        super(label, null);
         if(namespace != null) this.setNamespace(namespace);
 
         tlm.addThemeChangeListener(t -> {

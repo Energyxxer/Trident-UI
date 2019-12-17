@@ -26,7 +26,7 @@ class ProjectPropertiesGeneral extends JPanel {
                 header.add(padding, BorderLayout.WEST);
             }
 
-            StyledLabel label = new StyledLabel("General", "ProjectProperties.content.header");
+            StyledLabel label = new StyledLabel("General", "ProjectProperties.content.header", tlm);
             header.add(label, BorderLayout.CENTER);
 
             tlm.addThemeChangeListener(t -> {
@@ -66,11 +66,11 @@ class ProjectPropertiesGeneral extends JPanel {
 
             //region Target Version
             {
-                StyledLabel label = new StyledLabel("Target Version:", "ProjectProperties.content");
+                StyledLabel label = new StyledLabel("Target Version:", "ProjectProperties.content", tlm);
                 label.setStyle(Font.BOLD);
                 content.add(label);
-                content.add(new StyledLabel("Determines which type definitions to use by default,", "ProjectProperties.content"));
-                content.add(new StyledLabel("as well as which commands are allowed.", "ProjectProperties.content"));
+                content.add(new StyledLabel("Determines which type definitions to use by default,", "ProjectProperties.content", tlm));
+                content.add(new StyledLabel("as well as which commands are allowed.", "ProjectProperties.content", tlm));
             }
             {
                 JavaEditionVersion[] knownVersions = DefinitionPacks.getKnownJavaVersions();
@@ -108,12 +108,12 @@ class ProjectPropertiesGeneral extends JPanel {
 
             //region Language Level
             {
-                StyledLabel label = new StyledLabel("Language Level:", "ProjectProperties.content");
+                StyledLabel label = new StyledLabel("Language Level:", "ProjectProperties.content", tlm);
                 label.setStyle(Font.BOLD);
                 content.add(label);
             }
             {
-                StyledLabel label = new StyledLabel("The default level of abstraction allowed for this project.", "ProjectProperties.content");
+                StyledLabel label = new StyledLabel("The default level of abstraction allowed for this project.", "ProjectProperties.content", tlm);
                 content.add(label);
             }
             {
@@ -146,12 +146,12 @@ class ProjectPropertiesGeneral extends JPanel {
 
             //region Default Namespace
             {
-                StyledLabel label = new StyledLabel("Default Namespace:", "ProjectProperties.content");
+                StyledLabel label = new StyledLabel("Default Namespace:", "ProjectProperties.content", tlm);
                 label.setStyle(Font.BOLD);
                 content.add(label);
             }
             {
-                StyledLabel label = new StyledLabel("Used for Trident-generated functions.", "ProjectProperties.content");
+                StyledLabel label = new StyledLabel("Used for Trident-generated functions.", "ProjectProperties.content", tlm);
                 content.add(label);
             }
             {
@@ -184,7 +184,7 @@ class ProjectPropertiesGeneral extends JPanel {
                 ProjectProperties.addApplyEvent(p -> p.setStrictNBT(strictNBT.isSelected()));
 
                 content.add(strictNBT);
-                content.add(new StyledLabel("         If enabled, type errors in NBT tags will prevent compilation.", "ProjectProperties.content"));
+                content.add(new StyledLabel("         If enabled, type errors in NBT tags will prevent compilation.", "ProjectProperties.content", tlm));
             }
 
             {
@@ -206,7 +206,7 @@ class ProjectPropertiesGeneral extends JPanel {
                 ProjectProperties.addApplyEvent(p -> p.setStrictTextComponents(strictTextComponents.isSelected()));
 
                 content.add(strictTextComponents);
-                content.add(new StyledLabel("         If enabled, malformed text components will prevent compilation.", "ProjectProperties.content"));
+                content.add(new StyledLabel("         If enabled, malformed text components will prevent compilation.", "ProjectProperties.content", tlm));
             }
 
             {

@@ -27,7 +27,7 @@ public class StatusBar extends JPanel implements MouseListener {
 
     private ExtendedStatusBar extension = new ExtendedStatusBar();
 
-    private ThemeListenerManager tlm = new ThemeListenerManager();
+    public ThemeListenerManager tlm = new ThemeListenerManager();
 
     {
         this.setLayout(new BorderLayout());
@@ -47,7 +47,7 @@ public class StatusBar extends JPanel implements MouseListener {
         JPanel progressWrapper = new JPanel(new BorderLayout());
         progressWrapper.setOpaque(false);
 
-        statusLabel = new StyledLabel("");
+        statusLabel = new StyledLabel("", tlm);
         statusLabel.setIconName("info");
         this.add(statusLabel,BorderLayout.WEST);
         this.add(progressWrapper, BorderLayout.CENTER);

@@ -31,7 +31,7 @@ class SettingsGeneral extends JPanel {
                 header.add(padding, BorderLayout.WEST);
             }
 
-            StyledLabel label = new StyledLabel("General","Settings.content.header");
+            StyledLabel label = new StyledLabel("General","Settings.content.header", tlm);
             header.add(label, BorderLayout.CENTER);
 
             tlm.addThemeChangeListener(t -> {
@@ -42,16 +42,16 @@ class SettingsGeneral extends JPanel {
         }
 
         {
-            JPanel padding_left = new JPanel();
-            padding_left.setOpaque(false);
-            padding_left.setPreferredSize(new Dimension(50,25));
-            this.add(padding_left, BorderLayout.WEST);
+            JPanel paddingLeft = new JPanel();
+            paddingLeft.setOpaque(false);
+            paddingLeft.setPreferredSize(new Dimension(50,25));
+            this.add(paddingLeft, BorderLayout.WEST);
         }
         {
-            JPanel padding_right = new JPanel();
-            padding_right.setOpaque(false);
-            padding_right.setPreferredSize(new Dimension(50,25));
-            this.add(padding_right, BorderLayout.EAST);
+            JPanel paddingRight = new JPanel();
+            paddingRight.setOpaque(false);
+            paddingRight.setPreferredSize(new Dimension(50,25));
+            this.add(paddingRight, BorderLayout.EAST);
         }
 
         {
@@ -70,7 +70,7 @@ class SettingsGeneral extends JPanel {
             }
 
             {
-                StyledLabel label = new StyledLabel("Display name:","Settings.content");
+                StyledLabel label = new StyledLabel("Display name:","Settings.content", tlm);
                 label.setStyle(Font.BOLD);
                 content.add(label);
             }
@@ -89,7 +89,7 @@ class SettingsGeneral extends JPanel {
             }
 
             {
-                StyledLabel label = new StyledLabel("Native Library Path (ADVANCED):","Settings.content");
+                StyledLabel label = new StyledLabel("Native Library Path (ADVANCED):","Settings.content", tlm);
                 label.setStyle(Font.BOLD);
                 content.add(label);
             }

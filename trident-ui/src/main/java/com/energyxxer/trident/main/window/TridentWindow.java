@@ -14,6 +14,7 @@ import com.energyxxer.trident.main.window.sections.tools.ToolBoardMaster;
 import com.energyxxer.trident.main.window.sections.tools.find.FindBoard;
 import com.energyxxer.trident.main.window.sections.tools.process.ProcessBoard;
 import com.energyxxer.trident.main.window.sections.tools.todo.TodoBoard;
+import com.energyxxer.trident.ui.editor.completion.snippets.SnippetManager;
 import com.energyxxer.trident.ui.explorer.NoticeExplorerMaster;
 import com.energyxxer.trident.ui.explorer.ProjectExplorerMaster;
 import com.energyxxer.trident.ui.tablist.TabListMaster;
@@ -71,7 +72,7 @@ public class TridentWindow {
 	public static TabManager tabManager;
 	public static TabListMaster tabList;
 
-	private ThemeListenerManager tlm = new ThemeListenerManager();
+	public ThemeListenerManager tlm = new ThemeListenerManager();
 
     public TridentWindow() {
 		jframe = new JFrame();
@@ -238,6 +239,7 @@ public class TridentWindow {
 		tabManager.saveOpenTabs();
 		projectExplorer.saveExplorerTree();
 		Resources.saveAll();
+		SnippetManager.save();
 		jframe.dispose();
 		System.exit(0);
 	}

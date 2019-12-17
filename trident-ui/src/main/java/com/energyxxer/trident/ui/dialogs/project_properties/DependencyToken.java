@@ -181,7 +181,6 @@ public class DependencyToken implements CompoundActionModuleToken {
 
     @Override
     public void onInteract() {
-
     }
 
     @Override

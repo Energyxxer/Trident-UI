@@ -10,6 +10,7 @@ import com.energyxxer.trident.ui.editor.TridentEditorComponent;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.edits.CompoundEdit;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.edits.DeletionEdit;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.edits.InsertionEdit;
+import com.energyxxer.trident.ui.editor.completion.snippets.Snippet;
 import com.energyxxer.trident.ui.editor.completion.snippets.SnippetManager;
 import com.energyxxer.trident.ui.modules.ModuleToken;
 import com.energyxxer.trident.ui.scrollbar.OverlayScrollPane;
@@ -81,7 +82,10 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         boolean any = false;
 
         if(results != null) {
-            boolean createdAnywhereSnippets = false;
+            for(Snippet snippet : SnippetManager.getAll()) {
+                snippet.expanderApplied = false;
+            }
+            boolean createdEverywhereSnippets = false;
             for (int i = 0; i < results.getSuggestions().size(); i++) {
                 Suggestion suggestion = results.getSuggestions().get(i);
                 for (SuggestionToken token : SuggestionExpander.expand(suggestion, this, results)) {
@@ -95,9 +99,9 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
                     }
                     any = true;
                 }
-                if(!createdAnywhereSnippets && i == results.getSuggestions().size()-1) {
+                if(!createdEverywhereSnippets && i == results.getSuggestions().size()-1) {
                     results.getSuggestions().addAll(SnippetManager.createSuggestionsForTag(null));
-                    createdAnywhereSnippets = true;
+                    createdEverywhereSnippets = true;
                 }
             }
         }

@@ -67,7 +67,7 @@ public class QuickFindDialog extends JDialog implements WindowFocusListener, Act
         MouseAdapter dragAdapter = new DragHandler(this);
         titleBar.addMouseListener(dragAdapter);
         titleBar.addMouseMotionListener(dragAdapter);
-        titleBar.add(new StyledLabel("    Quick Access", "QuickAccess.header"), BorderLayout.WEST);
+        titleBar.add(new StyledLabel("    Quick Access", "QuickAccess.header", tlm), BorderLayout.WEST);
         JPanel controlsPanel = new JPanel();
         controlsPanel.setOpaque(false);
         controlsPanel.add(this.rootPicker = new StyledDropdownMenu<>(filterOptions, "QuickAccess"));

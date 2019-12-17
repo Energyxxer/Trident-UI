@@ -49,7 +49,7 @@ public class NavigatorMaster extends JComponent implements MouseListener, MouseM
     }
 
     public void setOrientation(Constant orientation) {
-        if(orientation != HORIZONTAL && orientation != VERTICAL) throw new IllegalArgumentException("Navigator orientation must be either NavigatorMaster.HORIZONTAL or NavigatorMaster.VERTICAL. Found: '" + orientation.toString() + "'");
+        if(orientation != HORIZONTAL && orientation != VERTICAL) throw new IllegalArgumentException("Navigator orientation must be either NavigatorMaster.HORIZONTAL or NavigatorMaster.VERTICAL. Found: '" + orientation + "'");
         this.orientation = orientation;
     }
 

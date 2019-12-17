@@ -6,22 +6,12 @@ import com.energyxxer.trident.ui.styledcomponents.StyledButton;
 import com.energyxxer.trident.ui.styledcomponents.StyledFileField;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.theme.change.ThemeChangeListener;
+import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.xswing.Padding;
 import com.energyxxer.xswing.XFileField;
 
-import javax.swing.AbstractAction;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dialog;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GraphicsEnvironment;
-import java.awt.Point;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -43,9 +33,11 @@ public class WorkspaceDialog {
     private static JPanel input = new JPanel(new FlowLayout(FlowLayout.CENTER));
     private static StyledFileField field = new StyledFileField(XFileField.OPEN_DIRECTORY, new File(Preferences.DEFAULT_WORKSPACE_PATH), "WorkspaceDialog");
 
+    private static final ThemeListenerManager tlm = new ThemeListenerManager();
+
     private static JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-    private static StyledButton okay = new StyledButton("OK","WorkspaceDialog");
-    private static StyledButton cancel = new StyledButton("Cancel","WorkspaceDialog");
+    private static StyledButton okay = new StyledButton("OK","WorkspaceDialog", tlm);
+    private static StyledButton cancel = new StyledButton("Cancel","WorkspaceDialog", tlm);
 
     private static boolean valid = false;
 
@@ -61,7 +53,7 @@ public class WorkspaceDialog {
         instructions.setOpaque(false);
         instructions.add(
                 new StyledLabel(
-                        "<html>Specify the desired workspace directory.<br>This is where all your projects are going to be saved.</html>","WorkspaceDialog"),
+                        "<html>Specify the desired workspace directory.<br>This is where all your projects are going to be saved.</html>","WorkspaceDialog", null),
                 FlowLayout.LEFT);
         content.add(instructions, BorderLayout.NORTH);
         ThemeChangeListener.addThemeChangeListener(t ->

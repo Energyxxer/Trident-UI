@@ -59,7 +59,7 @@ public class KeyStrokeDialog  {
             subContent.setOpaque(false);
             content.add(subContent);
 
-            StyledLabel label = new StyledLabel(query, "PromptDialog");
+            StyledLabel label = new StyledLabel(query, "PromptDialog", tlm);
             subContent.add(label);
             label.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -141,7 +141,7 @@ public class KeyStrokeDialog  {
                     this.setAlignmentX(LEFT_ALIGNMENT);
                 }
             });
-            subContent.add(warningLabel = new StyledLabel(""));
+            subContent.add(warningLabel = new StyledLabel("", tlm));
 
             {
                 JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -149,13 +149,13 @@ public class KeyStrokeDialog  {
                 buttons.setOpaque(false);
                 buttons.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
 
-                okButton = new StyledButton("OK");
+                okButton = new StyledButton("OK", tlm);
                 okButton.addActionListener(e -> {
                     submit();
                 });
                 buttons.add(okButton);
 
-                StyledButton cancelButton = new StyledButton("Cancel");
+                StyledButton cancelButton = new StyledButton("Cancel", tlm);
                 cancelButton.addActionListener(e -> {
                     cancel();
                 });

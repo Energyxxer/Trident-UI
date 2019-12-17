@@ -19,14 +19,12 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.RenderingHints;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 
 /**
  * Represents a single button in the toolbar.
  */
-public class ToolbarButton extends JButton implements MouseListener, MouseMotionListener {
+public class ToolbarButton extends JButton implements MouseListener, MouseMotionListener, ActionListener {
 
     private static final int MARGIN = 1;
     private static final int BORDER_THICKNESS = 1;
@@ -77,6 +75,7 @@ public class ToolbarButton extends JButton implements MouseListener, MouseMotion
 
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
+		this.addActionListener(this);
 
 		updateSize();
 	}
@@ -237,5 +236,10 @@ public class ToolbarButton extends JButton implements MouseListener, MouseMotion
 			HintStylizer.style(hint);
 			hint.show(point, () -> rollover && this.isShowing());
 		}
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+
 	}
 }

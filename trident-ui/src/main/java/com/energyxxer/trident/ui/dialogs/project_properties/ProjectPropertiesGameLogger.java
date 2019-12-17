@@ -35,7 +35,7 @@ class ProjectPropertiesGameLogger extends JPanel {
                 header.add(padding, BorderLayout.WEST);
             }
 
-            StyledLabel label = new StyledLabel("Game Logger", "ProjectProperties.content.header");
+            StyledLabel label = new StyledLabel("Game Logger", "ProjectProperties.content.header", tlm);
             header.add(label, BorderLayout.CENTER);
 
             tlm.addThemeChangeListener(t -> {
@@ -79,8 +79,8 @@ class ProjectPropertiesGameLogger extends JPanel {
                 doExport.setAlignmentX(Component.LEFT_ALIGNMENT);
 
                 content.add(doExport);
-                content.add(new StyledLabel("         If disabled, gamelog commands will not generate an output.", "ProjectProperties.content"));
-                content.add(new StyledLabel("         The gamelog command requires Language Level 3.", "ProjectProperties.content"));
+                content.add(new StyledLabel("         If disabled, gamelog commands will not generate an output.", "ProjectProperties.content", tlm));
+                content.add(new StyledLabel("         The gamelog command requires Language Level 3.", "ProjectProperties.content", tlm));
             }
 
             {
@@ -100,7 +100,7 @@ class ProjectPropertiesGameLogger extends JPanel {
                 compact.setAlignmentX(Component.LEFT_ALIGNMENT);
 
                 content.add(compact);
-                content.add(new StyledLabel("         If enabled, game log messages are shortened, showing minimal information.", "ProjectProperties.content"));
+                content.add(new StyledLabel("         If enabled, game log messages are shortened, showing minimal information.", "ProjectProperties.content", tlm));
             }
 
             {
@@ -120,7 +120,7 @@ class ProjectPropertiesGameLogger extends JPanel {
                 timestampEnabled.setAlignmentX(Component.LEFT_ALIGNMENT);
 
                 content.add(timestampEnabled);
-                content.add(new StyledLabel("         If enabled, game log messages will show the time of execution, based on game time.", "ProjectProperties.content"));
+                content.add(new StyledLabel("         If enabled, game log messages will show the time of execution, based on game time.", "ProjectProperties.content", tlm));
             }
 
             {
@@ -140,7 +140,7 @@ class ProjectPropertiesGameLogger extends JPanel {
                 posEnabled.setAlignmentX(Component.LEFT_ALIGNMENT);
 
                 content.add(posEnabled);
-                content.add(new StyledLabel("         If enabled, game log messages will show the execution location.", "ProjectProperties.content"));
+                content.add(new StyledLabel("         If enabled, game log messages will show the execution location.", "ProjectProperties.content", tlm));
             }
 
             {
@@ -160,7 +160,7 @@ class ProjectPropertiesGameLogger extends JPanel {
                 lineNumberEnabled.setAlignmentX(Component.LEFT_ALIGNMENT);
 
                 content.add(lineNumberEnabled);
-                content.add(new StyledLabel("         If enabled, game log messages will show the line number of the gamelog command.", "ProjectProperties.content"));
+                content.add(new StyledLabel("         If enabled, game log messages will show the line number of the gamelog command.", "ProjectProperties.content", tlm));
             }
 
             {
@@ -174,7 +174,7 @@ class ProjectPropertiesGameLogger extends JPanel {
             }
             //endregion
 
-            StyledLabel previewLabel = new StyledLabel("Preview:", "ProjectProperties.content");
+            StyledLabel previewLabel = new StyledLabel("Preview:", "ProjectProperties.content", tlm);
             previewLabel.setStyle(Font.BOLD);
             content.add(previewLabel);
 

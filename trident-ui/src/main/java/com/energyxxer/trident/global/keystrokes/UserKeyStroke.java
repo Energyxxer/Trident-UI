@@ -118,8 +118,10 @@ public class UserKeyStroke {
     }
 
     public void applyChanges() {
-        strokes = newStrokes.toArray(new KeyStroke[0]);
-        newStrokes = null;
+        if(newStrokes != null) {
+            strokes = newStrokes.toArray(new KeyStroke[0]);
+            newStrokes = null;
+        }
     }
 
     public void discardChanges() {

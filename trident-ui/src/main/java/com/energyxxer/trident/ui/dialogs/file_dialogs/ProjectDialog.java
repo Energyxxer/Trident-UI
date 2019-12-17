@@ -75,7 +75,7 @@ public class ProjectDialog {
             entry.setOpaque(false);
             entry.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
 
-            StyledLabel instructionsLabel = new StyledLabel("Enter new project name:", "NewProjectDialog");
+            StyledLabel instructionsLabel = new StyledLabel("Enter new project name:", "NewProjectDialog", tlm);
             instructionsLabel.setStyle(Font.PLAIN);
             instructionsLabel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
             instructionsLabel.setHorizontalTextPosition(JLabel.LEFT);
@@ -101,7 +101,7 @@ public class ProjectDialog {
             errorPanel.setOpaque(false);
             errorPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 0));
 
-            errorLabel = new StyledLabel("", "NewProjectDialog.error");
+            errorLabel = new StyledLabel("", "NewProjectDialog.error", tlm);
             errorLabel.setStyle(Font.BOLD);
             errorLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, errorLabel.getPreferredSize().height));
             errorPanel.add(errorLabel);
@@ -116,11 +116,14 @@ public class ProjectDialog {
             buttons.setOpaque(false);
             buttons.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
 
-            okButton = new StyledButton("OK");
+            okButton = new StyledButton("OK", tlm);
             okButton.addActionListener(e -> submit());
             buttons.add(okButton);
-            StyledButton cancelButton = new StyledButton("Cancel");
-            cancelButton.addActionListener(e -> dialog.setVisible(false));
+            StyledButton cancelButton = new StyledButton("Cancel", tlm);
+            cancelButton.addActionListener(e -> {
+                tlm.dispose();
+                dialog.setVisible(false);
+            });
 
             buttons.add(cancelButton);
             content.add(buttons);
@@ -157,6 +160,7 @@ public class ProjectDialog {
 
         TridentWindow.projectExplorer.refresh();
 
+        tlm.dispose();
         dialog.setVisible(false);
     }
 

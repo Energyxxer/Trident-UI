@@ -34,7 +34,7 @@ class SettingsAppearance extends JPanel {
                 header.add(padding, BorderLayout.WEST);
             }
 
-            StyledLabel label = new StyledLabel("Appearance","Settings.content.header");
+            StyledLabel label = new StyledLabel("Appearance","Settings.content.header", tlm);
             header.add(label, BorderLayout.CENTER);
 
             tlm.addThemeChangeListener(t -> {
@@ -73,7 +73,7 @@ class SettingsAppearance extends JPanel {
             }
 
             {
-                StyledLabel label = new StyledLabel("GUI Theme:","Settings.content");
+                StyledLabel label = new StyledLabel("GUI Theme:","Settings.content", tlm);
                 label.setStyle(Font.BOLD);
                 content.add(label);
             }

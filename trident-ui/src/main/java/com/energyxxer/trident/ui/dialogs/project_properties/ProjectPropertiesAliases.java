@@ -39,7 +39,7 @@ class ProjectPropertiesAliases extends JPanel {
                 header.add(padding, BorderLayout.WEST);
             }
 
-            StyledLabel label = new StyledLabel("Type Aliases", "ProjectProperties.content.header");
+            StyledLabel label = new StyledLabel("Type Aliases", "ProjectProperties.content.header", tlm);
             header.add(label, BorderLayout.CENTER);
 
             tlm.addThemeChangeListener(t -> {
@@ -76,11 +76,11 @@ class ProjectPropertiesAliases extends JPanel {
 
                 preContent.add(new Padding(20));
 
-                preContent.add(new StyledLabel("Type key-value pairs, separated by equals (=) signs to create a type alias for the corresponding type category.", "ProjectProperties.content"));
-                preContent.add(new StyledLabel("Aliases will allow you to automatically replace appearances of an alias type with its real name.", "ProjectProperties.content"));
+                preContent.add(new StyledLabel("Type key-value pairs, separated by equals (=) signs to create a type alias for the corresponding type category.", "ProjectProperties.content", tlm));
+                preContent.add(new StyledLabel("Aliases will allow you to automatically replace appearances of an alias type with its real name.", "ProjectProperties.content", tlm));
                 preContent.add(new Padding(11));
-                preContent.add(new StyledLabel("Category names include (but are not limited to):", "ProjectProperties.content"));
-                preContent.add(new StyledLabel("block, item, entity, particle, enchantment, effect...", "ProjectProperties.content"));
+                preContent.add(new StyledLabel("Category names include (but are not limited to):", "ProjectProperties.content", tlm));
+                preContent.add(new StyledLabel("block, item, entity, particle, enchantment, effect...", "ProjectProperties.content", tlm));
 
                 preContent.add(new Padding(10));
             }

@@ -98,7 +98,7 @@ public class ProjectProperties {
 			buttons.add(new Padding(25));
 
 			{
-				StyledButton okay = new StyledButton("OK", "ProjectProperties");
+				StyledButton okay = new StyledButton("OK", "ProjectProperties", tlm);
 				tlm.addThemeChangeListener(t -> okay.setPreferredSize(new Dimension(Math.max(t.getInteger(75,"ProjectProperties.okButton.width"),10), Math.max(t.getInteger(25,"ProjectProperties.okButton.height"),10))));
 				buttons.add(okay);
 
@@ -111,7 +111,7 @@ public class ProjectProperties {
 			}
 
 			{
-				StyledButton cancel = new StyledButton("Cancel", "ProjectProperties");
+				StyledButton cancel = new StyledButton("Cancel", "ProjectProperties", tlm);
 				tlm.addThemeChangeListener(t -> cancel.setPreferredSize(new Dimension(Math.max(t.getInteger(75,"ProjectProperties.cancelButton.width"),10), Math.max(t.getInteger(25,"ProjectProperties.cancelButton.height"),10))));
 				buttons.add(cancel);
 
