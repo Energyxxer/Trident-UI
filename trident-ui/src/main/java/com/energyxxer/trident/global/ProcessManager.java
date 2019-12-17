@@ -1,25 +1,27 @@
 package com.energyxxer.trident.global;
 
 import com.energyxxer.trident.main.window.TridentWindow;
+import com.energyxxer.util.logger.Debug;
 import com.energyxxer.util.processes.AbstractProcess;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Predicate;
 
 public class ProcessManager {
-    private static ArrayList<AbstractProcess> activeProcesses = new ArrayList<>();
+    private static List<AbstractProcess> activeProcesses = Collections.synchronizedList(new ArrayList<>());
 
     public static void queueProcess(AbstractProcess process) {
         if(activeProcesses.contains(process)) return;
         process.addProgressListener((p) -> {
             updateStatusBar();
-            TridentWindow.processBoard.repaint();
         });
         process.addCompletionListener((p, s) -> {
+            Debug.log("Process completed: " + process);
             activeProcesses.remove(process);
             TridentWindow.processBoard.removeProcess(process);
             updateStatusBar();
-            TridentWindow.processBoard.repaint();
         });
         activeProcesses.add(process);
         TridentWindow.processBoard.addProcess(process);
@@ -45,6 +47,7 @@ public class ProcessManager {
         } else {
             TridentWindow.statusBar.setProgress(null);
         }
+        TridentWindow.processBoard.repaint();
     }
 
     public static int getCount() {

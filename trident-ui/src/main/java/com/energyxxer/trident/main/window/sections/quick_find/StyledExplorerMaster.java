@@ -158,8 +158,8 @@ public class StyledExplorerMaster extends ExplorerMaster {
         children.remove(elem);
     }
 
-    public void removeElementIf(Predicate<ExplorerElement> elem) {
-        children.removeIf(elem);
+    public void removeElementIf(Predicate<ExplorerElement> predicate) {
+        children.removeIf(predicate);
     }
 
     public void clear() {

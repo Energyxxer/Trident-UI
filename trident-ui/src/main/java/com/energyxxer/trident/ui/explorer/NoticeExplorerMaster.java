@@ -25,7 +25,7 @@ public class NoticeExplorerMaster extends StyledExplorerMaster {
         this.children.add(new NoticeGroupElement(this, label, notices));
     }
 
-    public void setNotices(HashMap<String, ArrayList<Notice>> map) {
+    public synchronized void setNotices(HashMap<String, ArrayList<Notice>> map) {
         this.children.clear();
 
         if(map.containsKey(null)) {

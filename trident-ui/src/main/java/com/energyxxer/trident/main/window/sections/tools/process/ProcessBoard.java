@@ -5,10 +5,12 @@ import com.energyxxer.trident.main.window.sections.tools.ToolBoard;
 import com.energyxxer.trident.main.window.sections.tools.ToolBoardMaster;
 import com.energyxxer.trident.ui.explorer.base.StandardExplorerItem;
 import com.energyxxer.trident.ui.scrollbar.OverlayScrollPane;
+import com.energyxxer.util.logger.Debug;
 import com.energyxxer.util.processes.AbstractProcess;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 
 public class ProcessBoard extends ToolBoard {
 
@@ -31,7 +33,14 @@ public class ProcessBoard extends ToolBoard {
     }
 
     public void removeProcess(AbstractProcess process) {
-        explorer.removeElementIf(e -> e instanceof StandardExplorerItem && e.getToken() instanceof ProcessToken && ((ProcessToken) e.getToken()).getProcess() == process);
+        while(true) {
+            try {
+                explorer.removeElementIf(e -> e instanceof StandardExplorerItem && e.getToken() instanceof ProcessToken && ((ProcessToken) e.getToken()).getProcess() == process);
+                break;
+            } catch(ConcurrentModificationException ignore) {
+                Debug.log("Concurrent modification exception, try again");
+            }
+        }
         explorer.repaint();
     }
 

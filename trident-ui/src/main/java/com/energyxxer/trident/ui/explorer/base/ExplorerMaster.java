@@ -22,8 +22,8 @@ import static com.energyxxer.trident.ui.editor.behavior.AdvancedEditor.isPlatfor
 public class ExplorerMaster extends JComponent implements MouseListener, MouseMotionListener, StyleProvider {
     protected HashMap<ExplorerFlag, Boolean> explorerFlags = new HashMap<>();
 
-    protected ArrayList<ExplorerElement> children = new ArrayList<>();
-    protected ArrayList<ExplorerElement> selectedItems = new ArrayList<>();
+    protected List<ExplorerElement> children = Collections.synchronizedList(new ArrayList<>());
+    protected List<ExplorerElement> selectedItems = Collections.synchronizedList(new ArrayList<>());
 
     protected ExplorerElement rolloverItem = null;
 
@@ -373,7 +373,7 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
         this.expandedElements = expandedElements;
     }
 
-    public ArrayList<ExplorerElement> getChildren() {
+    public List<ExplorerElement> getChildren() {
         return children;
     }
 
