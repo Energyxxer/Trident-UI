@@ -131,8 +131,7 @@ public class FileDialog {
             buttons.add(okButton);
             StyledButton cancelButton = new StyledButton("Cancel", tlm);
             cancelButton.addActionListener(e -> {
-                tlm.dispose();
-                dialog.setVisible(false);
+                cancel();
             });
 
             buttons.add(cancelButton);
@@ -150,6 +149,13 @@ public class FileDialog {
                 submit();
             }
         });
+        pane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");
+        pane.getActionMap().put("cancel", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cancel();
+            }
+        });
         //</editor-fold>
 
         dialog.setContentPane(pane);
@@ -161,7 +167,6 @@ public class FileDialog {
         dialog.setTitle("Create New File");
 
         dialog.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
-
     }
 
     private static void submit() {
@@ -185,7 +190,6 @@ public class FileDialog {
         } catch (IOException x) {
             x.printStackTrace();
         }
-        tlm.dispose();
         dialog.setVisible(false);
     }
 
@@ -206,6 +210,10 @@ public class FileDialog {
         dialog.setVisible(true);
         displayError(null);
         displayWarning(null);
+    }
+
+    private static void cancel() {
+        dialog.setVisible(false);
     }
 
     private static void validateInput() {

@@ -1,38 +1,15 @@
 package com.energyxxer.trident.main.window.sections;
 
-import com.energyxxer.trident.global.Commons;
-import com.energyxxer.trident.global.Preferences;
-import com.energyxxer.trident.global.Status;
-import com.energyxxer.trident.global.keystrokes.KeyMap;
-import com.energyxxer.trident.global.temp.projects.Project;
-import com.energyxxer.trident.global.temp.projects.TridentProject;
-import com.energyxxer.trident.main.TridentUI;
-import com.energyxxer.trident.main.window.TridentWindow;
-import com.energyxxer.trident.ui.dialogs.project_properties.ProjectProperties;
-import com.energyxxer.trident.ui.dialogs.settings.Settings;
-import com.energyxxer.trident.ui.modules.FileModuleToken;
+import com.energyxxer.trident.main.window.actions.ActionManager;
+import com.energyxxer.trident.main.window.actions.ProgramAction;
+import com.energyxxer.trident.ui.common.MenuItems;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenu;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenuItem;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
-import com.energyxxer.util.FileUtil;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.FileVisitResult;
-import java.nio.file.FileVisitor;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Enumeration;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
-import static java.nio.file.FileVisitResult.CONTINUE;
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 /**
  * Created by User on 12/15/2016.
@@ -56,98 +33,27 @@ public class MenuBar extends JMenuBar {
 
             // --------------------------------------------------
 
-
-            //StyledMenu newMenu = MenuItems.newMenu("New                    ");
-            //menu.add(newMenu);
-
-            // --------------------------------------------------
+            menu.add(MenuItems.newMenu("New"));
+            menu.add(createItemForAction("CHANGE_WORKSPACE"));
+            menu.add(createItemForAction("RELOAD_WORKSPACE"));
 
             menu.addSeparator();
 
-            // --------------------------------------------------
-
-            {
-                StyledMenuItem item = new StyledMenuItem("Save", "save");
-                item.setAccelerator(KeyMap.TAB_SAVE.getFirstKeyStroke());
-                menu.add(item);
-            }
-
-            // --------------------------------------------------
-
-            {
-                StyledMenuItem item = new StyledMenuItem("Save As", "save_as");
-                item.setAccelerator(KeyMap.TAB_SAVE_AS.getFirstKeyStroke());
-                menu.add(item);
-            }
-
-            // --------------------------------------------------
-
-            {
-                StyledMenuItem item = new StyledMenuItem("Save All", "save_all");
-                item.setAccelerator(KeyMap.TAB_SAVE_ALL.getFirstKeyStroke());
-                menu.add(item);
-            }
-
-            // --------------------------------------------------
+            menu.add(createItemForAction("SAVE"));
+            menu.add(createItemForAction("SAVE_ALL"));
 
             menu.addSeparator();
 
-            // --------------------------------------------------
-
-            {
-                StyledMenuItem item = new StyledMenuItem("Close");
-                item.setAccelerator(KeyMap.CLOSE_TAB.getFirstKeyStroke());
-                menu.add(item);
-            }
-
-            // --------------------------------------------------
-
-            {
-                StyledMenuItem item = new StyledMenuItem("Close All");
-                item.setAccelerator(KeyMap.CLOSE_ALL_TABS.getFirstKeyStroke());
-                menu.add(item);
-            }
-
-
-            // --------------------------------------------------
+            menu.add(createItemForAction("SETTINGS"));
+            menu.add(createItemForAction("PROJECT_PROPERTIES"));
 
             menu.addSeparator();
 
-            // --------------------------------------------------
-
-            {
-                StyledMenuItem item = new StyledMenuItem("Move");
-                menu.add(item);
-            }
-
-            // --------------------------------------------------
-
-            {
-                StyledMenuItem item = new StyledMenuItem("Rename", "rename");
-                menu.add(item);
-            }
-
-            // --------------------------------------------------
-
-            {
-                StyledMenuItem item = new StyledMenuItem("Refresh", "reload");
-                item.addActionListener(e -> TridentWindow.projectExplorer.refresh());
-                menu.add(item);
-            }
-
-            // --------------------------------------------------
+            menu.add(createItemForAction("COMPILE"));
 
             menu.addSeparator();
 
-            // --------------------------------------------------
-
-            {
-                StyledMenuItem item = new StyledMenuItem("Exit");
-                item.addActionListener(e -> TridentWindow.close());
-                menu.add(item);
-            }
-
-            // --------------------------------------------------
+            menu.add(createItemForAction("EXIT"));
 
             this.add(menu);
         }
@@ -159,45 +65,13 @@ public class MenuBar extends JMenuBar {
             // --------------------------------------------------
 
             {
-                StyledMenuItem item = new StyledMenuItem("Undo", "undo");
-                item.setAccelerator(KeyMap.UNDO.getFirstKeyStroke());
-                menu.add(item);
+                menu.add(createItemForAction("UNDO"));
             }
 
             // --------------------------------------------------
 
             {
-                StyledMenuItem item = new StyledMenuItem("Redo", "redo");
-                item.setAccelerator(KeyMap.REDO.getFirstKeyStroke());
-                menu.add(item);
-            }
-
-            // --------------------------------------------------
-
-            menu.addSeparator();
-
-            // --------------------------------------------------
-
-            {
-                StyledMenuItem item = new StyledMenuItem("Copy");
-                item.setAccelerator(KeyMap.COPY.getFirstKeyStroke());
-                menu.add(item);
-            }
-
-            // --------------------------------------------------
-
-            {
-                StyledMenuItem item = new StyledMenuItem("Cut");
-                item.setAccelerator(KeyMap.CUT.getFirstKeyStroke());
-                menu.add(item);
-            }
-
-            // --------------------------------------------------
-
-            {
-                StyledMenuItem item = new StyledMenuItem("Paste");
-                item.setAccelerator(KeyMap.PASTE.getFirstKeyStroke());
-                menu.add(item);
+                menu.add(createItemForAction("REDO"));
             }
 
             // --------------------------------------------------
@@ -207,15 +81,35 @@ public class MenuBar extends JMenuBar {
             // --------------------------------------------------
 
             {
-                StyledMenuItem item = new StyledMenuItem("Delete");
-                item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
-                menu.add(item);
+                menu.add(createItemForAction("COPY"));
+            }
+
+            // --------------------------------------------------
+
+            {
+                menu.add(createItemForAction("CUT"));
+            }
+
+            // --------------------------------------------------
+
+            {
+                menu.add(createItemForAction("PASTE"));
+            }
+
+            // --------------------------------------------------
+
+            menu.addSeparator();
+
+            // --------------------------------------------------
+
+            {
+                menu.add(createItemForAction("DELETE"));
             }
 
             // --------------------------------------------------
 
             this.add(menu);
-        }
+        }/*
 
         {
             StyledMenu menu = new StyledMenu(" Project ");
@@ -224,9 +118,7 @@ public class MenuBar extends JMenuBar {
             // --------------------------------------------------
 
             {
-                StyledMenuItem item = new StyledMenuItem("Generate", "export");
-                item.setAccelerator(KeyMap.COMPILE.getFirstKeyStroke());
-                menu.add(item);
+                menu.add(createItemForAction("COMPILE"));
             }
 
             // --------------------------------------------------
@@ -236,12 +128,7 @@ public class MenuBar extends JMenuBar {
             // --------------------------------------------------
 
             {
-                StyledMenuItem item = new StyledMenuItem("Properties");
-                item.addActionListener(e -> {
-                    Project selectedProject = Commons.getActiveProject();
-                    if(selectedProject instanceof TridentProject) ProjectProperties.show((TridentProject) selectedProject);
-                });
-                menu.add(item);
+                menu.add(createItemForAction("PROJECT_PROPERTIES"));
             }
 
             // --------------------------------------------------
@@ -357,20 +244,26 @@ public class MenuBar extends JMenuBar {
             // --------------------------------------------------
 
             this.add(menu);
-        }
+        }*/
 
         {
-            StyledMenu menu = new StyledMenu(" Window ");
+            StyledMenu menu = new StyledMenu(" Navigate ");
             menu.setMnemonic(KeyEvent.VK_W);
 
-            // --------------------------------------------------
-
-            {
-                StyledMenuItem item = new StyledMenuItem("Settings", "cog");
-
-                item.addActionListener(e -> Settings.show());
-                menu.add(item);
-            }
+            menu.add(createItemForAction("CLOSE_TAB"));
+            menu.add(createItemForAction("CLOSE_ALL_TABS"));
+            menu.add(createItemForAction("CLOSE_ALL_TABS_FOR_PROJECT"));
+            menu.addSeparator();
+            menu.add(createItemForAction("EDITOR_FIND"));
+            menu.add(createItemForAction("FIND_IN_PATH"));
+            menu.add(createItemForAction("SEARCH_EVERYWHERE"));
+            menu.addSeparator();
+            menu.add(createItemForAction("TOGGLE_TOOL_BOARD"));
+            menu.add(createItemForAction("OPEN_TODO"));
+            menu.add(createItemForAction("OPEN_NOTICE_BOARD"));
+            menu.add(createItemForAction("OPEN_CONSOLE"));
+            menu.add(createItemForAction("OPEN_SEARCH_RESULTS"));
+            menu.add(createItemForAction("OPEN_PROCESSES"));
 
             this.add(menu);
         }
@@ -379,16 +272,20 @@ public class MenuBar extends JMenuBar {
             StyledMenu menu = new StyledMenu("Help");
             menu.setMnemonic(KeyEvent.VK_H);
 
-            // --------------------------------------------------
-
-            {
-                StyledMenuItem item = new StyledMenuItem("About");
-
-                item.addActionListener(e -> AboutPane.INSTANCE.setVisible(true));
-                menu.add(item);
-            }
+            menu.add(createItemForAction("DOCUMENTATION"));
+            menu.addSeparator();
+            menu.add(createItemForAction("CHECK_FOR_UPDATES"));
+            menu.add(createItemForAction("ABOUT"));
 
             this.add(menu);
         }
+    }
+
+    private static StyledMenuItem createItemForAction(String actionKey) {
+        ProgramAction action = ActionManager.getAction(actionKey);
+        StyledMenuItem item = new StyledMenuItem(action.getTitle(), action.getIconKey());
+        if(action.getShortcut() != null && action.getShortcut().getFirstKeyStroke() != null) item.setAccelerator(action.getShortcut().getFirstKeyStroke());
+        item.addActionListener(e -> action.perform());
+        return item;
     }
 }

@@ -18,34 +18,16 @@ public class KeyMap {
     public static final UserKeyStroke UNDO = new UserKeyStroke("undo", identifierToStrokes("c+Z"));
     public static final UserKeyStroke REDO = new UserKeyStroke("redo", identifierToStrokes("c+Y"));
 
-    public static final UserKeyStroke COMPILE = new UserKeyStroke("compile", identifierToStrokes("as+X"));
-    public static final UserKeyStroke CLOSE_TAB = new UserKeyStroke("Close tab", "tab.close", identifierToStrokes("c+W"));
-    public static final UserKeyStroke CLOSE_ALL_TABS = new UserKeyStroke("Close all tabs", "tab.close_all", identifierToStrokes("cs+W"));
-    public static final UserKeyStroke TAB_SAVE = new UserKeyStroke("Save", "tab.save", identifierToStrokes("c+S"));
-    public static final UserKeyStroke TAB_SAVE_AS = new UserKeyStroke("Save as", "tab.save_as", identifierToStrokes("cs+S"));
-    public static final UserKeyStroke TAB_SAVE_ALL = new UserKeyStroke("Save all tabs", "tab.save_all", identifierToStrokes("sa+S"));
+    public static final UserKeyStroke SUGGESTION_SELECT = new UserKeyStroke("Expand Editor Suggestion", "editor.suggestion.select", identifierToStrokes("" + KeyEvent.VK_TAB));
 
-    public static final UserKeyStroke EDITOR_FIND = new UserKeyStroke("Find", "editor.find", identifierToStrokes("c+F"));
-
-    public static final UserKeyStroke EDITOR_RELOAD = new UserKeyStroke("Reload from file", "editor.reload");
-
-    public static final UserKeyStroke SUGGESTION_SELECT = new UserKeyStroke("Select editor suggestion", "editor.suggestion.select", identifierToStrokes("" + KeyEvent.VK_TAB));
-
-    public static final UserKeyStroke THEME_RELOAD = new UserKeyStroke("Reload GUI Theme", "theme.reload", identifierToStrokes("c+T"));
-    public static final UserKeyStroke FIND_IN_PATH = new UserKeyStroke("find_in_path", identifierToStrokes("c+H"));
-
-    public static final UserKeyStroke TEXT_SELECT_ALL = new UserKeyStroke("Select all text", "text.select_all", identifierToStrokes("c+A"));
-    public static final UserKeyStroke TEXT_MOVE_LINE_UP = new UserKeyStroke("Move line up", "text.move_line_up", identifierToStrokes("a+" + KeyEvent.VK_UP));
-    public static final UserKeyStroke TEXT_MOVE_LINE_DOWN = new UserKeyStroke("Move line down", "text.move_line_down", identifierToStrokes("a+" + KeyEvent.VK_DOWN));
+    public static final UserKeyStroke TEXT_SELECT_ALL = new UserKeyStroke("Select All Text", "text.select_all", identifierToStrokes("c+A"));
+    public static final UserKeyStroke TEXT_MOVE_LINE_UP = new UserKeyStroke("Move Line Up", "text.move_line_up", identifierToStrokes("a+" + KeyEvent.VK_UP));
+    public static final UserKeyStroke TEXT_MOVE_LINE_DOWN = new UserKeyStroke("Move Line Down", "text.move_line_down", identifierToStrokes("a+" + KeyEvent.VK_DOWN));
 
     public static final UserKeyStroke FIND_NEXT = new UserKeyStroke("find.next", identifierToStrokes(KeyEvent.VK_ENTER + ";" + KeyEvent.VK_F3));
     public static final UserKeyStroke FIND_PREVIOUS = new UserKeyStroke("find.previous", identifierToStrokes("s+" + KeyEvent.VK_ENTER + ";s+" + KeyEvent.VK_F3));
 
-    public static final UserKeyStroke SEARCH_EVERYWHERE = new UserKeyStroke("quick_access");
-
-
-
-    private static final UserKeyStroke[] allKeyStrokes;
+    private static final List<UserKeyStroke> allKeyStrokes;
 
     static {
         List<UserKeyStroke> keystrokes = new ArrayList<>();
@@ -75,7 +57,7 @@ public class KeyMap {
             }
         }
         keystrokes.sort(Comparator.comparing(UserKeyStroke::getName));
-        allKeyStrokes = keystrokes.toArray(new UserKeyStroke[0]);
+        allKeyStrokes = keystrokes;
     }
 
 
@@ -131,7 +113,17 @@ public class KeyMap {
         return strokes;
     }
 
-    public static UserKeyStroke[] getAll() {
+    public static List<UserKeyStroke> getAll() {
         return allKeyStrokes;
+    }
+
+    public static UserKeyStroke requestMapping(String key, KeyStroke... defaultStrokes) {
+        UserKeyStroke stroke = new UserKeyStroke(key, defaultStrokes);
+        allKeyStrokes.add(stroke);
+        return stroke;
+    }
+
+    public static void sortMappings() {
+        allKeyStrokes.sort(Comparator.comparing(UserKeyStroke::getName));
     }
 }

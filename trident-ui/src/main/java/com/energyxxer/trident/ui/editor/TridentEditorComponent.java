@@ -27,10 +27,7 @@ import javax.swing.event.CaretListener;
 import javax.swing.text.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,7 +37,7 @@ import java.util.function.Function;
 /**
  * Created by User on 1/1/2017.
  */
-public class TridentEditorComponent extends AdvancedEditor implements KeyListener, CaretListener, ActionListener {
+public class TridentEditorComponent extends AdvancedEditor implements KeyListener, CaretListener, ActionListener, FocusListener {
 
     private TridentEditorModule parent;
 
@@ -108,6 +105,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
         this.setSuggestionInterface(suggestionBox);
 
         //this.setOpaque(false);
+        this.addFocusListener(this);
     }
 
     @Override
@@ -320,5 +318,15 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
     public void dispose() {
         super.dispose();
         timer.stop();
+    }
+
+    @Override
+    public void focusGained(FocusEvent e) {
+        TridentWindow.projectExplorer.clearSelected();
+    }
+
+    @Override
+    public void focusLost(FocusEvent e) {
+
     }
 }

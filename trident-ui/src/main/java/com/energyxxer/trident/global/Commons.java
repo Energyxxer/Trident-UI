@@ -105,6 +105,23 @@ public class Commons {
             TridentWindow.toolbar.setActiveProject(getActiveProject());
     }
 
+    public static File getActiveFile() {
+        File activeFile = null;
+        for(ModuleToken token : TridentWindow.projectExplorer.getSelectedTokens()) {
+            if(token instanceof FileModuleToken) {
+                activeFile = ((FileModuleToken) token).getFile();
+                break;
+            }
+        }
+        if(activeFile == null) {
+            Tab selectedTab = TridentWindow.tabManager.getSelectedTab();
+            if(selectedTab != null && selectedTab.token instanceof FileModuleToken) {
+                activeFile = ((FileModuleToken) selectedTab.token).getFile();
+            }
+        }
+        return activeFile;
+    }
+
     public static Project getActiveProject() {
         Project selected = null;
 

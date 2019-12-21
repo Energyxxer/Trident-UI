@@ -15,7 +15,10 @@ import com.energyxxer.util.StringUtil;
 import com.energyxxer.util.logger.Debug;
 import com.google.gson.*;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -76,8 +79,8 @@ public class CrossbowProject implements Project {
 
         File resourceCacheFile = rootDirectory.toPath().resolve(".tdnui").resolve("resource_cache").toFile();
         if(resourceCacheFile.exists() && resourceCacheFile.isFile()) {
-            try {
-                JsonObject jsonObject = new Gson().fromJson(new FileReader(resourceCacheFile), JsonObject.class);
+            try(FileReader fr = new FileReader(resourceCacheFile)) {
+                JsonObject jsonObject = new Gson().fromJson(fr, JsonObject.class);
                 if(jsonObject != null) {
                     for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
                         try {
@@ -87,17 +90,16 @@ public class CrossbowProject implements Project {
                         }
                     }
                 }
-            } catch (FileNotFoundException | JsonParseException x) {
+            } catch (IOException | JsonParseException x) {
                 x.printStackTrace();
             }
         }
 
         if(config.exists() && config.isFile()) {
-            try {
-                this.config = new Gson().fromJson(new FileReader(config), JsonObject.class);
+            try(FileReader fr = new FileReader(config)) {
+                this.config = new Gson().fromJson(fr, JsonObject.class);
                 return;
-            } catch (FileNotFoundException | JsonParseException x) {
-                //I literally *just* checked if the file exists beforehand. Damn Java and its trust issues
+            } catch (IOException | JsonParseException x) {
                 x.printStackTrace();
             }
         }

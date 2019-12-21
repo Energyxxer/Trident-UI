@@ -125,8 +125,7 @@ public class FolderDialog {
             buttons.add(okButton);
             StyledButton cancelButton = new StyledButton("Cancel", tlm);
             cancelButton.addActionListener(e -> {
-                dialog.setVisible(false);
-                tlm.dispose();
+                cancel();
             });
 
             buttons.add(cancelButton);
@@ -143,6 +142,13 @@ public class FolderDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 submit();
+            }
+        });
+        pane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");
+        pane.getActionMap().put("cancel", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cancel();
             }
         });
         //</editor-fold>
@@ -165,7 +171,10 @@ public class FolderDialog {
         new File(path.replace('/',File.separatorChar)).mkdirs();
         TridentWindow.projectExplorer.refresh();
 
-        tlm.dispose();
+        dialog.setVisible(false);
+    }
+
+    private static void cancel() {
         dialog.setVisible(false);
     }
 

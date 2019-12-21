@@ -81,8 +81,6 @@ public class TridentWindow {
 
 		tlm.addThemeChangeListener(t -> jframe.getContentPane().setBackground(t.getColor(new Color(215, 215, 215), "Window.background")));
 
-		jframe.setJMenuBar(menuBar = new MenuBar());
-
 		jframe.setLayout(new BorderLayout());
 
 		tabList = new TabListMaster();
@@ -91,8 +89,6 @@ public class TridentWindow {
 		tabManager.setOpenTabSaveKey("open_tabs");
 
 		welcomePane = new WelcomePane();
-
-		jframe.getContentPane().add(toolbar = new Toolbar(), BorderLayout.NORTH);
 
 		JPanel mainContent = new JPanel(new OverlayBorderLayout());
 		jframe.getContentPane().add(mainContent, BorderLayout.CENTER);
@@ -113,8 +109,6 @@ public class TridentWindow {
             return false;
         });
 
-		ActionManager.setup(mainContent);
-
 		toolBoard = new ToolBoardMaster();
 		mainContent.add(toolBoard, BorderLayout.SOUTH);
 		mainContent.add(sidebar = new Sidebar(), BorderLayout.WEST);
@@ -129,6 +123,10 @@ public class TridentWindow {
 		mainContent.add(editArea = new EditArea(), BorderLayout.CENTER);
 
 		jframe.getContentPane().add(statusBar = new StatusBar(), BorderLayout.SOUTH);
+
+		ActionManager.setup();
+		jframe.getContentPane().add(toolbar = new Toolbar(), BorderLayout.NORTH);
+		jframe.setJMenuBar(menuBar = new MenuBar());
 
 		/*JWindow w = new JWindow(jframe);
 		w.setLocation(500,500);

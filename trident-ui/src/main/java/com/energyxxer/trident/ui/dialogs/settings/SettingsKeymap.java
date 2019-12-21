@@ -69,6 +69,10 @@ public class SettingsKeymap extends JPanel {
 
             content.add(sp, BorderLayout.CENTER);
 
+        }
+        Settings.addOpenEvent(() -> {
+            master.clear();
+            KeyMap.sortMappings();
             for(UserKeyStroke ks : KeyMap.getAll()) {
                 master.addElement(new ActionHostExplorerItem(master, new CompoundActionModuleToken() {
                     @Override
@@ -132,8 +136,7 @@ public class SettingsKeymap extends JPanel {
                     }
                 }));
             }
-
-        }
+        });
         Settings.addApplyEvent(() -> {
             for(UserKeyStroke uks : KeyMap.getAll()) {
                 uks.applyChanges();

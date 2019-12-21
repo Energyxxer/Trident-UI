@@ -166,7 +166,7 @@ public class QuickFindDialog extends JDialog implements WindowFocusListener, Act
             }
             searchInFile(query, startFile);
 
-            for(ProgramAction action : ActionManager.getAllActions()) {
+            for(ProgramAction action : ActionManager.getAllActions().values()) {
                 if(action.getDescription().toLowerCase().contains(query)
                 || action.getDisplayName().toLowerCase().contains(query)) {
                     StandardExplorerItem item = new StandardExplorerItem(action, explorer, new ArrayList<>());

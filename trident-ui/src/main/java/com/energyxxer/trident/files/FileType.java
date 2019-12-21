@@ -18,7 +18,7 @@ public enum FileType {
     META(1, "Meta File", "meta", ".mcmeta", FileDialog::create, (pr, pth) -> pr != null && pth.startsWith(pr + "resources" + File.separator)),
     JSON(1, "JSON File", "json", ".json", FileDialog::create, (pr, pth) -> true),
     FILE(2, "File", "file", "", FileDialog::create, (pr, pth) -> true),
-    PACKAGE(2, "Folder", "folder", null, FolderDialog::create, (pr, pth) -> true),
+    FOLDER(2, "Folder", "folder", null, FolderDialog::create, (pr, pth) -> true),
     PROJECT(3, "Project", "project", null, ProjectDialog::create, (pr, pth) -> true);
 
     public final int group;

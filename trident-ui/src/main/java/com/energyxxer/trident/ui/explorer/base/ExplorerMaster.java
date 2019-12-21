@@ -200,6 +200,7 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
         }
         selectedItems.clear();
         selectionUpdated();
+        repaint();
     }
 
     protected void selectionUpdated() {}

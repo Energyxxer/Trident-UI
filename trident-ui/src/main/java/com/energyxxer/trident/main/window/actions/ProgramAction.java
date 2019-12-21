@@ -18,6 +18,8 @@ public class ProgramAction implements ModuleToken {
     private String description;
     private UserKeyStroke shortcut;
     private Runnable action;
+    private String iconKey = null;
+    private boolean globalUsage = true;
 
     public ProgramAction(String displayName, String description, UserKeyStroke shortcut, String moduleActionKey) {
         this(displayName, description, shortcut, () -> {
@@ -33,6 +35,9 @@ public class ProgramAction implements ModuleToken {
         this.description = description;
         this.shortcut = shortcut;
         this.action = action;
+        if(shortcut != null && shortcut.getName() == null) {
+            shortcut.setName(displayName);
+        }
     }
 
     public String getDisplayName() {
@@ -132,5 +137,23 @@ public class ProgramAction implements ModuleToken {
     @Override
     public int hashCode() {
         return Objects.hash(displayName, description, shortcut, action);
+    }
+
+    public boolean isGlobalUsage() {
+        return globalUsage;
+    }
+
+    public ProgramAction setGlobalUsage(boolean globalUsage) {
+        this.globalUsage = globalUsage;
+        return this;
+    }
+
+    public String getIconKey() {
+        return iconKey;
+    }
+
+    public ProgramAction setIconKey(String iconKey) {
+        this.iconKey = iconKey;
+        return this;
     }
 }

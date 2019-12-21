@@ -106,6 +106,7 @@ public class ProjectExplorerMaster extends StyledExplorerMaster implements DropT
 
     @Override
     public void refresh() {
+        Debug.log("Refreshing workspace");
         ProjectManager.setWorkspaceDir(Preferences.get("workspace_dir", Preferences.DEFAULT_WORKSPACE_PATH));
         ProjectManager.loadWorkspace();
 

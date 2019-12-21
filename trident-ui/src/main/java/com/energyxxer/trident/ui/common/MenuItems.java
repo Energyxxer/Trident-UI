@@ -1,13 +1,12 @@
 package com.energyxxer.trident.ui.common;
 
 import com.energyxxer.trident.files.FileType;
-import com.energyxxer.trident.global.Preferences;
+import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenu;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenuItem;
-import com.energyxxer.util.ImageManager;
 
-import javax.swing.*;
+import java.io.File;
 
 /**
  * Provides managers that create menu components for file and project management.
@@ -15,26 +14,16 @@ import javax.swing.*;
 public class MenuItems {
 	public static StyledMenu newMenu(String title) {
 		StyledMenu newMenu = new StyledMenu(title);
-		newMenu.setIcon(new ImageIcon(
-				ImageManager.load("/assets/icons/light_theme/Trident.png").getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH)));
 
 		// --------------------------------------------------
 
-		StyledMenuItem projectItem = new StyledMenuItem("Project        ", "project");
-		projectItem.addActionListener(e -> FileType.PROJECT.create(null));
-
-		newMenu.add(projectItem);
-
-		// --------------------------------------------------
-
-		newMenu.addSeparator();
-
-		// --------------------------------------------------
-		
-		StyledMenuItem packageItem = new StyledMenuItem("Package", "folder");
-		packageItem.addActionListener(e -> FileType.PACKAGE.create(Preferences.get("workspace_dir")));
-
-		newMenu.add(packageItem);
+		{
+			StyledMenuItem item = new StyledMenuItem(FileType.PROJECT.name, FileType.PROJECT.icon);
+			item.addActionListener(e -> {
+				FileType.PROJECT.create(null);
+			});
+			newMenu.add(item);
+		}
 
 		// --------------------------------------------------
 
@@ -42,43 +31,35 @@ public class MenuItems {
 
 		// --------------------------------------------------
 
-		StyledMenuItem worldItem = new StyledMenuItem("World", "world");
-		//worldItem.addActionListener(e -> FileFactory.newUnit(Preferences.get("workspace_dir"), FileType.WORLD));
-
-		newMenu.add(worldItem);
+		newMenu.add(createNewFileItem(FileType.FOLDER));
 
 		// --------------------------------------------------
 
-		newMenu.addSeparator();
+		int prevGroup = -1;
+		for(FileType type : FileType.values()) {
+			if(type == FileType.FOLDER || type == FileType.PROJECT) continue;
 
-		// --------------------------------------------------
+			if(type.group != prevGroup) {
+				newMenu.addSeparator();
+				prevGroup = type.group;
+			}
 
-		StyledMenuItem entityItem = new StyledMenuItem("Entity", "entity");
-		//entityItem.addActionListener(e -> FileFactory.newUnit(Preferences.get("workspace_dir"), FileType.ENTITY));
-		
-		newMenu.add(entityItem);
+			newMenu.add(createNewFileItem(type));
+		}
 
-		// --------------------------------------------------
-
-		StyledMenuItem itemItem = new StyledMenuItem("Item", "item");
-		//itemItem.addActionListener(e -> FileFactory.newUnit(Preferences.get("workspace_dir"), FileType.ITEM));
-
-		newMenu.add(itemItem);
-
-		// --------------------------------------------------
-
-		StyledMenuItem featureItem = new StyledMenuItem("Feature", "feature");
-		//featureItem.addActionListener(e -> FileFactory.newUnit(Preferences.get("workspace_dir"), FileType.FEATURE));
-
-		newMenu.add(featureItem);
-
-		// --------------------------------------------------
-
-		StyledMenuItem classItem = new StyledMenuItem("Class", "class");
-		//classItem.addActionListener(e -> FileFactory.newUnit(Preferences.get("workspace_dir"), FileType.CLASS));
-
-		newMenu.add(classItem);
 		return newMenu;
+	}
+
+	private static StyledMenuItem createNewFileItem(FileType type) {
+		StyledMenuItem item = new StyledMenuItem(type.name, type.icon);
+		item.addActionListener(e -> {
+			File activeFile = Commons.getActiveFile();
+			if(activeFile != null) {
+				if(activeFile.isFile()) activeFile = activeFile.getParentFile();
+				type.create(activeFile.getPath());
+			}
+		});
+		return item;
 	}
 
 	public enum FileMenuItem {

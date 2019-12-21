@@ -175,59 +175,12 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         } else if(keyCode == KeyEvent.VK_ENTER) {
             e.consume();
             editManager.insertEdit(new NewlineEdit(this, !isPlatformControlDown(e)));
-        } else if(KeyMap.COPY.wasPerformed(e) || KeyMap.CUT.wasPerformed(e)) {
+        } else if(KeyMap.COPY.wasPerformedExact(e) || KeyMap.CUT.wasPerformedExact(e)) {
             e.consume();
-
-            try {
-                CaretProfile profile = caret.getProfile();
-                if(profile.size() > 2 || profile.getSelectedCharCount() > 0) {
-
-                    String[] toCopy = new String[profile.size() / 2];
-                    for (int i = 0; i < profile.size() - 1; i += 2) {
-                        int start = profile.get(i);
-                        int end = profile.get(i + 1);
-                        if (start > end) {
-                            int temp = start;
-                            start = end;
-                            end = temp;
-                        }
-                        int len = end - start;
-
-                        String segment = this.getDocument().getText(start, len);
-                        toCopy[i/2] = segment;
-                    }
-
-                    Clipboard clipboard = this.getToolkit().getSystemClipboard();
-                    clipboard.setContents(new MultiStringSelection(toCopy), null);
-                }
-
-                if(KeyMap.CUT.wasPerformed(e)) {
-                    editManager.insertEdit(new InsertionEdit("", this));
-                }
-            } catch(BadLocationException x) {
-                Debug.log(x.getMessage(), Debug.MessageType.ERROR);
-            }
-
+            this.copyOrCut(KeyMap.CUT.wasPerformedExact(e));
         } else if(KeyMap.PASTE.wasPerformed(e)) {
             e.consume();
-            try {
-                Clipboard clipboard = this.getToolkit().getSystemClipboard();
-                if(this.getToolkit().getSystemClipboard().isDataFlavorAvailable(MultiStringSelection.multiStringFlavor)) {
-                    Object rawContents = clipboard.getData(MultiStringSelection.multiStringFlavor);
-
-                    if(rawContents == null) return;
-                    String[] contents = ((String[]) rawContents);
-                    editManager.insertEdit(new PasteEdit(contents, this));
-                } else if(clipboard.isDataFlavorAvailable(DataFlavor.stringFlavor)) {
-                    Object rawContents = clipboard.getData(DataFlavor.stringFlavor);
-
-                    if(rawContents == null) return;
-                    String contents = ((String) rawContents).replace("\t", "    ").replace("\r","");
-                    editManager.insertEdit(new PasteEdit(contents, this));
-                }
-            } catch(Exception x) {
-                x.printStackTrace();
-            }
+            this.paste();
         } else if(KeyMap.TEXT_SELECT_ALL.wasPerformedExact(e)) {
             e.consume();
             caret.setProfile(new CaretProfile(0, getDocument().getLength()));
@@ -326,6 +279,70 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
                 throw new UnsupportedFlavorException(flavor);
             }
         };
+    }
+
+    @Override
+    public void cut() {
+        copyOrCut(true);
+    }
+
+    @Override
+    public void copy() {
+        copyOrCut(false);
+    }
+
+    private void copyOrCut(boolean cut) {
+        try {
+            CaretProfile profile = caret.getProfile();
+            if(profile.size() > 2 || profile.getSelectedCharCount() > 0) {
+
+                String[] toCopy = new String[profile.size() / 2];
+                for (int i = 0; i < profile.size() - 1; i += 2) {
+                    int start = profile.get(i);
+                    int end = profile.get(i + 1);
+                    if (start > end) {
+                        int temp = start;
+                        start = end;
+                        end = temp;
+                    }
+                    int len = end - start;
+
+                    String segment = this.getDocument().getText(start, len);
+                    toCopy[i/2] = segment;
+                }
+
+                Clipboard clipboard = this.getToolkit().getSystemClipboard();
+                clipboard.setContents(new MultiStringSelection(toCopy), null);
+            }
+
+            if(cut) {
+                editManager.insertEdit(new InsertionEdit("", this));
+            }
+        } catch(BadLocationException x) {
+            Debug.log(x.getMessage(), Debug.MessageType.ERROR);
+        }
+    }
+
+    @Override
+    public void paste() {
+        try {
+            Clipboard clipboard = this.getToolkit().getSystemClipboard();
+            if(this.getToolkit().getSystemClipboard().isDataFlavorAvailable(MultiStringSelection.multiStringFlavor)) {
+                Object rawContents = clipboard.getData(MultiStringSelection.multiStringFlavor);
+
+                if(rawContents == null) return;
+                String[] contents = ((String[]) rawContents);
+                editManager.insertEdit(new PasteEdit(contents, this));
+            } else if(clipboard.isDataFlavorAvailable(DataFlavor.stringFlavor)) {
+                Object rawContents = clipboard.getData(DataFlavor.stringFlavor);
+
+                if(rawContents == null) return;
+                String contents = ((String) rawContents).replace("\t", "    ").replace("\r","");
+                editManager.insertEdit(new PasteEdit(contents, this));
+            }
+        } catch(Exception x) {
+            x.printStackTrace();
+        }
     }
 
     public void addCaretPaintListener(@NotNull Runnable runnable) {

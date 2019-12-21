@@ -100,7 +100,7 @@ public class WorkspaceDialog {
     private static void submit() {
         if(!valid) return;
 
-        field.getFile().mkdirs();
+        //field.getFile().mkdirs();
         Preferences.put("workspace_dir",field.getFile().getAbsolutePath());
         TridentWindow.projectExplorer.refresh();
         dialog.setVisible(false);

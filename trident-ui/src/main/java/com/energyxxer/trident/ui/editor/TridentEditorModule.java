@@ -11,6 +11,7 @@ import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.main.window.sections.editor_search.FindAndReplaceBar;
 import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.display.DisplayModule;
+import com.energyxxer.trident.ui.editor.behavior.editmanager.edits.DeletionEdit;
 import com.energyxxer.trident.ui.modules.FileModuleToken;
 import com.energyxxer.trident.ui.modules.ModuleToken;
 import com.energyxxer.trident.ui.scrollbar.OverlayScrollPaneLayout;
@@ -155,6 +156,30 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
             }
             case "editor.reload": {
                 reloadFromDisk();
+                break;
+            }
+            case "undo": {
+                editorComponent.getEditManager().undo();
+                break;
+            }
+            case "redo": {
+                editorComponent.getEditManager().redo();
+                break;
+            }
+            case "copy": {
+                editorComponent.copy();
+                break;
+            }
+            case "cut": {
+                editorComponent.cut();
+                break;
+            }
+            case "paste": {
+                editorComponent.paste();
+                break;
+            }
+            case "delete": {
+                editorComponent.getEditManager().insertEdit(new DeletionEdit(editorComponent));
                 break;
             }
         }

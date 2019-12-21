@@ -1,13 +1,14 @@
 package com.energyxxer.trident.main.window.sections;
 
-import com.energyxxer.trident.files.FileType;
-import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.main.window.TridentWindow;
+import com.energyxxer.trident.main.window.actions.ActionManager;
+import com.energyxxer.trident.main.window.actions.ProgramAction;
 import com.energyxxer.trident.ui.ToolbarButton;
 import com.energyxxer.trident.ui.ToolbarSeparator;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
+import com.energyxxer.xswing.KeyInputUtils;
 import com.energyxxer.xswing.Padding;
 import com.energyxxer.xswing.hints.TextHint;
 
@@ -66,70 +67,50 @@ public class Toolbar extends JPanel {
         buttonBar.setOpaque(false);
         this.add(buttonBar, BorderLayout.EAST);
 
-        buttonBar.add(new ToolbarSeparator());
-
         {
-            ToolbarButton button = new ToolbarButton("project",tlm);
-            button.setHintText("New Project");
-            button.addActionListener(e -> FileType.PROJECT.create(null));
-            buttonBar.add(button);
-        }
-
-        {
-            ToolbarButton button = new ToolbarButton("save",tlm);
-            button.setHintText("Save File");
-            buttonBar.add(button);
-        }
-
-        {
-            ToolbarButton button = new ToolbarButton("save_all",tlm);
-            button.setHintText("Save All Files");
-            buttonBar.add(button);
+            buttonBar.add(createButtonForAction("COMPILE"));
         }
 
         buttonBar.add(new ToolbarSeparator());
 
         {
-            ToolbarButton button = new ToolbarButton("world",tlm);
-            button.setHintText("New Global Unit");
-            buttonBar.add(button);
+            buttonBar.add(createButtonForAction("SAVE"));
+        }
+
+        {
+            buttonBar.add(createButtonForAction("SAVE_ALL"));
         }
 
         buttonBar.add(new ToolbarSeparator());
 
-        {
-            ToolbarButton button = new ToolbarButton("entity",tlm);
-            button.setHintText("New Entity");
-            buttonBar.add(button);
-        }
-
-        {
-            ToolbarButton button = new ToolbarButton("item",tlm);
-            button.setHintText("New Item");
-            buttonBar.add(button);
-        }
-
-        {
-            ToolbarButton button = new ToolbarButton("feature",tlm);
-            button.setHintText("New Feature");
-            buttonBar.add(button);
-        }
-
-        {
-            ToolbarButton button = new ToolbarButton("class",tlm);
-            button.setHintText("New Class");
-            buttonBar.add(button);
-        }
+        buttonBar.add(createButtonForAction("DOCUMENTATION"));
 
         buttonBar.add(new ToolbarSeparator());
 
         {
-            ToolbarButton button = new ToolbarButton("export",tlm);
-            button.setHintText("Compile");
-            button.addActionListener(e -> Commons.compileActive());
-            buttonBar.add(button);
+            buttonBar.add(createButtonForAction("NEW_PROJECT"));
+        }
+
+        {
+            buttonBar.add(createButtonForAction("PROJECT_PROPERTIES"));
+        }
+
+        {
+            buttonBar.add(createButtonForAction("SEARCH_EVERYWHERE"));
         }
 
         buttonBar.add(new Padding(10));
+    }
+
+    private ToolbarButton createButtonForAction(String actionKey) {
+        ProgramAction action = ActionManager.getAction(actionKey);
+        ToolbarButton button = new ToolbarButton(action.getIconKey(),tlm);
+        String title = action.getTitle();
+        if(action.getShortcut() != null && action.getShortcut().getFirstKeyStroke() != null) {
+            title += " (" + KeyInputUtils.getReadableKeyStroke(action.getShortcut().getFirstKeyStroke()) + ")";
+        }
+        button.setHintText(title);
+        button.addActionListener(e -> action.perform());
+        return button;
     }
 }

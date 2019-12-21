@@ -91,8 +91,8 @@ public class TridentProject implements Project {
 
         File resourceCacheFile = rootDirectory.toPath().resolve(".tdnui").resolve("resource_cache").toFile();
         if(resourceCacheFile.exists() && resourceCacheFile.isFile()) {
-            try {
-                JsonObject jsonObject = new Gson().fromJson(new FileReader(resourceCacheFile), JsonObject.class);
+            try(FileReader fr = new FileReader(resourceCacheFile)) {
+                JsonObject jsonObject = new Gson().fromJson(fr, JsonObject.class);
                 if(jsonObject != null) {
                     for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
                         try {
@@ -102,14 +102,14 @@ public class TridentProject implements Project {
                         }
                     }
                 }
-            } catch (FileNotFoundException | JsonParseException x) {
+            } catch (IOException | JsonParseException x) {
                 x.printStackTrace();
             }
         }
 
         if(config.exists() && config.isFile()) {
-            try {
-                this.config = new Gson().fromJson(new FileReader(config), JsonObject.class);
+            try(FileReader fr = new FileReader(config)) {
+                this.config = new Gson().fromJson(fr, JsonObject.class);
 
                 if(this.config.has("target-version") && this.config.get("target-version").isJsonArray()) {
                     JsonArray arr = this.config.getAsJsonArray("target-version");
@@ -143,8 +143,7 @@ public class TridentProject implements Project {
                 }
 
                 return;
-            } catch (FileNotFoundException | JsonParseException x) {
-                //I literally *just* checked if the file exists beforehand. Damn Java and its trust issues
+            } catch (IOException | JsonParseException x) {
                 x.printStackTrace();
             }
         }

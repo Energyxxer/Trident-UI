@@ -22,7 +22,7 @@ public class FileManager {
         if(files.size() > 1) {
 
             HashMap<String, Integer> contents = new HashMap<>();
-            contents.put("unit", 0);
+            contents.put("function", 0);
             contents.put("path", 0);
             contents.put("model", 0);
             contents.put("sound index file", 0);
@@ -31,10 +31,11 @@ public class FileManager {
             contents.put("texture", 0);
             contents.put("sound", 0);
             contents.put("file", 0);
+            contents.put("folder", 0);
 
             for (String path : files) {
-                if (path.endsWith(".tdn")) {
-                    contents.put("unit", contents.get("unit") + 1);
+                if (path.endsWith(".tdn") || path.endsWith(".mcfunction")) {
+                    contents.put("function", contents.get("function") + 1);
                 } else if (path.endsWith(".json")) {
                     if (path.endsWith(File.separator + "sounds.json")) {
                         contents.put("sound index file", contents.get("sound index file") + 1);
@@ -79,8 +80,8 @@ public class FileManager {
                 if(_package.equals("")) _package = file.getName();
                 subject.append(_package);
             } else {
-                if(file.getName().endsWith(".trident")) {
-                    subject.append("unit ");
+                if(file.getName().endsWith(".tdn") || file.getName().endsWith(".mcfunction")) {
+                    subject.append("function ");
                     subject.append('\'');
                     subject.append(FileUtil.stripExtension(file.getName()));
                 } else {
@@ -109,5 +110,6 @@ public class FileManager {
             }
         }
         TridentWindow.projectExplorer.refresh();
+        TridentWindow.tabManager.checkForDeletion();
     }
 }

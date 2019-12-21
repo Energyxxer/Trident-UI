@@ -1,7 +1,6 @@
 package com.energyxxer.trident.global;
 
 import com.energyxxer.trident.main.window.TridentWindow;
-import com.energyxxer.util.logger.Debug;
 import com.energyxxer.util.processes.AbstractProcess;
 
 import java.util.ArrayList;
@@ -18,7 +17,6 @@ public class ProcessManager {
             updateStatusBar();
         });
         process.addCompletionListener((p, s) -> {
-            Debug.log("Process completed: " + process);
             activeProcesses.remove(process);
             TridentWindow.processBoard.removeProcess(process);
             updateStatusBar();

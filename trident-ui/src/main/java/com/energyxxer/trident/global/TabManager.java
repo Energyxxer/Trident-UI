@@ -1,10 +1,13 @@
 package com.energyxxer.trident.global;
 
+import com.energyxxer.trident.global.temp.projects.Project;
+import com.energyxxer.trident.global.temp.projects.ProjectManager;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.dialogs.OptionDialog;
 import com.energyxxer.trident.ui.editor.TridentEditorModule;
 import com.energyxxer.trident.ui.editor.behavior.caret.CaretProfile;
+import com.energyxxer.trident.ui.modules.FileModuleToken;
 import com.energyxxer.trident.ui.modules.ModuleToken;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenuItem;
 import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
@@ -15,7 +18,9 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.regex.Pattern;
 
 /**
@@ -30,7 +35,7 @@ public class TabManager {
 	private boolean changeWindowInfo = false;
 	private String openTabSaveKey = null;
 
-	public ArrayList<Tab> openTabs = new ArrayList<>();
+	public List<Tab> openTabs = Collections.synchronizedList(new ArrayList<>());
 
 	private Tab selectedTab = null;
 	
@@ -238,5 +243,25 @@ public class TabManager {
 			if(tab.token.equals(token)) return tab;
 		}
 		return null;
+	}
+
+	public void checkForDeletion() {
+		for (int i = 0; i < openTabs.size(); i++) {
+			Tab tab = openTabs.get(i);
+			if(tab.token instanceof FileModuleToken && !((FileModuleToken) tab.token).getFile().exists()) {
+				closeTab(tab, true);
+				i--;
+			}
+		}
+	}
+
+	public void closeAllTabsForProject(Project activeProject) {
+		for (int i = 0; i < openTabs.size(); i++) {
+			Tab tab = openTabs.get(i);
+			if(tab.token instanceof FileModuleToken && ProjectManager.getAssociatedProject(((FileModuleToken) tab.token).getFile()) == activeProject) {
+				closeTab(tab, false);
+				i--;
+			}
+		}
 	}
 }
