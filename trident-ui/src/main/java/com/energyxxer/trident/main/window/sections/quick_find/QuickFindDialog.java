@@ -24,7 +24,6 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Date;
 
 public class QuickFindDialog extends JDialog implements WindowFocusListener, ActionListener {
@@ -141,7 +140,7 @@ public class QuickFindDialog extends JDialog implements WindowFocusListener, Act
         String query = this.field.getText().toLowerCase();
         if(query.isEmpty()) {
             for(File file : FileModuleToken.recentFiles) {
-                StandardExplorerItem item = new StandardExplorerItem(new FileModuleToken(file), explorer, new ArrayList<>());
+                StandardExplorerItem item = new StandardExplorerItem(new FileModuleToken(file), explorer, null);
                 item.setDetailed(true);
                 recentFilesCategory.addElement(item);
             }
@@ -169,7 +168,7 @@ public class QuickFindDialog extends JDialog implements WindowFocusListener, Act
             for(ProgramAction action : ActionManager.getAllActions().values()) {
                 if(action.getDescription().toLowerCase().contains(query)
                 || action.getDisplayName().toLowerCase().contains(query)) {
-                    StandardExplorerItem item = new StandardExplorerItem(action, explorer, new ArrayList<>());
+                    StandardExplorerItem item = new StandardExplorerItem(action, explorer, null);
                     item.setDetailed(true);
                     actionsCategory.addElement(item);
                 }
@@ -195,7 +194,7 @@ public class QuickFindDialog extends JDialog implements WindowFocusListener, Act
     }
 
     private void addFileResult(File file) {
-        StandardExplorerItem item = new StandardExplorerItem(new FileModuleToken(file), explorer, new ArrayList<>());
+        StandardExplorerItem item = new StandardExplorerItem(new FileModuleToken(file), explorer, null);
         item.setDetailed(true);
         filesCategory.addElement(item);
         temp++;

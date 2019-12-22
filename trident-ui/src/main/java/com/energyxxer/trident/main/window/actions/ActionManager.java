@@ -35,35 +35,35 @@ public class ActionManager {
         actions.put("COMPILE",
                 new ProgramAction(
                         "Compile", "Compile the active project", 
-                        KeyMap.requestMapping("compile", identifierToStrokes("as+X")),
+                        KeyMap.requestMapping("compile", identifierToStrokes("as+X")).setGroupName("Projects"),
                         Commons::compileActive
                 ).setIconKey("export")
         );
         actions.put("CLOSE_TAB",
                 new ProgramAction(
                     "Close Active Tab", "Close the tab currently visible",
-                    KeyMap.requestMapping("tab.close", identifierToStrokes("c+W")),
+                    KeyMap.requestMapping("tab.close", identifierToStrokes("c+W")).setGroupName("Tabs"),
                     TridentWindow.tabManager::closeSelectedTab
                 )
         );
         actions.put("CLOSE_ALL_TABS",
                 new ProgramAction(
                         "Close All Tabs", "Close all tabs",
-                        KeyMap.requestMapping("tab.close_all", identifierToStrokes("cs+W")),
+                        KeyMap.requestMapping("tab.close_all", identifierToStrokes("cs+W")).setGroupName("Tabs"),
                         () -> TridentWindow.tabManager.closeAllTabs(false)
                 )
         );
         actions.put("CLOSE_ALL_TABS_FOR_PROJECT",
                 new ProgramAction(
                         "Close All Tabs For Project", "Close all tabs",
-                        KeyMap.requestMapping("tab.close_project"),
+                        KeyMap.requestMapping("tab.close_project").setGroupName("Tabs"),
                         () -> TridentWindow.tabManager.closeAllTabsForProject(Commons.getActiveProject())
                 )
         );
         actions.put("SAVE",
                 new ProgramAction(
                 "Save Active Tab", "Save the tab currently visible",
-                    KeyMap.requestMapping("tab.save", identifierToStrokes("c+S")),
+                    KeyMap.requestMapping("tab.save", identifierToStrokes("c+S")).setGroupName("Tabs"),
                     () -> {
                         Tab st = TridentWindow.tabManager.getSelectedTab();
                         if(st != null) st.save();
@@ -73,7 +73,7 @@ public class ActionManager {
         actions.put("SAVE_ALL",
                 new ProgramAction(
                     "Save All Tabs", "Save all open tabs",
-                    KeyMap.requestMapping("tab.save_all", identifierToStrokes("ca+S")),
+                    KeyMap.requestMapping("tab.save_all", identifierToStrokes("ca+S")).setGroupName("Tabs"),
                     () -> {
                         for(Tab st : TridentWindow.tabManager.openTabs) {
                             st.save();
@@ -85,7 +85,7 @@ public class ActionManager {
         actions.put("RELOAD_FROM_DISK",
                 new ProgramAction(
                     "Reload from Disk", "Reload the current file from disk",
-                    KeyMap.requestMapping("editor.reload"),
+                    KeyMap.requestMapping("editor.reload").setGroupName("Editor"),
                     "editor.reload"
                 ).setIconKey("reload")
         );
@@ -99,28 +99,28 @@ public class ActionManager {
         actions.put("EDITOR_FIND",
                 new ProgramAction(
                     "Find in Editor", "Find all occurrences of a query in the current editor tab",
-                    KeyMap.requestMapping("editor.find", identifierToStrokes("c+F")),
+                    KeyMap.requestMapping("editor.find", identifierToStrokes("c+F")).setGroupName("Editor"),
                     "editor.find"
                 ).setIconKey("search")
         );
         actions.put("FIND_IN_PATH",
                 new ProgramAction(
                     "Find in Path", "Find all occurrences of a query in a folder or project",
-                    KeyMap.requestMapping("find_in_path", identifierToStrokes("c+H")),
+                    KeyMap.requestMapping("find_in_path", identifierToStrokes("c+H")).setGroupName("Windows"),
                     SearchPathDialog.INSTANCE::reveal
                 ).setIconKey("search")
         );
         actions.put("SEARCH_EVERYWHERE",
                 new ProgramAction(
                     "Search Everywhere", "Search for files and actions",
-                    KeyMap.requestMapping("quick_access", identifierToStrokes("cs+E")),
+                    KeyMap.requestMapping("quick_access", identifierToStrokes("cs+E")).setGroupName("Windows"),
                     QuickFindDialog.INSTANCE::reveal
                 ).setIconKey("search")
         );
         actions.put("PROJECT_PROPERTIES",
                 new ProgramAction(
                     "Project Properties", "Edit the current project",
-                    KeyMap.requestMapping("open_project_properties", identifierToStrokes("csa+S")),
+                    KeyMap.requestMapping("open_project_properties", identifierToStrokes("csa+S")).setGroupName("Windows"),
                     () -> {
                         Project selectedProject = Commons.getActiveProject();
                         if(selectedProject instanceof TridentProject) ProjectProperties.show((TridentProject) selectedProject);
@@ -137,14 +137,14 @@ public class ActionManager {
         actions.put("CHANGE_WORKSPACE",
                 new ProgramAction(
                         "Change Workspace", "Select a directory to put projects in",
-                        KeyMap.requestMapping("change_workspace"),
+                        KeyMap.requestMapping("change_workspace").setGroupName("Projects"),
                         WorkspaceDialog::prompt
                 ).setIconKey("folder")
         );
         actions.put("RELOAD_WORKSPACE",
                 new ProgramAction(
                         "Reload Workspace", "Refresh the list of projects",
-                        KeyMap.requestMapping("reload_workspace", identifierToStrokes("" + KeyEvent.VK_F5)),
+                        KeyMap.requestMapping("reload_workspace", identifierToStrokes("" + KeyEvent.VK_F5)).setGroupName("Projects"),
                         TridentWindow.projectExplorer::refresh
                 ).setIconKey("reload")
         );
@@ -186,21 +186,21 @@ public class ActionManager {
         actions.put("DELETE",
                 new ProgramAction(
                     "Delete", "Delete selected text",
-                    KeyMap.requestMapping("delete", identifierToStrokes(KeyEvent.VK_DELETE + ";" + KeyEvent.VK_BACK_SPACE)),
+                    KeyMap.requestMapping("delete", identifierToStrokes(KeyEvent.VK_DELETE + ";" + KeyEvent.VK_BACK_SPACE)).setGroupName("Editor"),
                     "delete"
                 ).setGlobalUsage(false)
         );
         actions.put("NEW_PROJECT",
                 new ProgramAction(
                         "New Project", "Create new Trident project",
-                        KeyMap.requestMapping("new_project"),
+                        KeyMap.requestMapping("new_project").setGroupName("Projects"),
                         () -> FileType.PROJECT.create(null)
                 ).setIconKey("project")
         );
         actions.put("SETTINGS",
                 new ProgramAction(
                         "Settings", "Configure Trident UI",
-                        KeyMap.requestMapping("open_settings", identifierToStrokes("sa+S")),
+                        KeyMap.requestMapping("open_settings", identifierToStrokes("sa+S")).setGroupName("Windows"),
                         Settings::show
                 ).setIconKey("cog")
         );
@@ -220,42 +220,42 @@ public class ActionManager {
         actions.put("TOGGLE_TOOL_BOARD",
                 new ProgramAction(
                         "Toggle Tool Board", "Open/Close Tool Boards",
-                        KeyMap.requestMapping("toggle_tool_board", identifierToStrokes("c+" + KeyEvent.VK_BACK_QUOTE + ";c+" + KeyEvent.VK_NUMPAD0)),
+                        KeyMap.requestMapping("toggle_tool_board", identifierToStrokes("c+" + KeyEvent.VK_BACK_QUOTE + ";c+" + KeyEvent.VK_NUMPAD0)).setGroupName("Windows"),
                         () -> TridentWindow.toolBoard.toggle()
                 )
         );
         actions.put("OPEN_TODO",
                 new ProgramAction(
                         "Show TODO", "Open TODO Board",
-                        KeyMap.requestMapping("open_tool_board_todo", identifierToStrokes("c+" + KeyEvent.VK_1 + ";c+" + KeyEvent.VK_NUMPAD1)),
+                        KeyMap.requestMapping("open_tool_board_todo", identifierToStrokes("c+" + KeyEvent.VK_1 + ";c+" + KeyEvent.VK_NUMPAD1)).setGroupName("Windows"),
                         () -> TridentWindow.todoBoard.open()
                 ).setIconKey("todo")
         );
         actions.put("OPEN_NOTICE_BOARD",
                 new ProgramAction(
                         "Show Notices", "Open Notice Board",
-                        KeyMap.requestMapping("open_tool_board_notices", identifierToStrokes("c+" + KeyEvent.VK_2 + ";c+" + KeyEvent.VK_NUMPAD2)),
+                        KeyMap.requestMapping("open_tool_board_notices", identifierToStrokes("c+" + KeyEvent.VK_2 + ";c+" + KeyEvent.VK_NUMPAD2)).setGroupName("Windows"),
                         () -> TridentWindow.noticeBoard.open()
                 ).setIconKey("notices")
         );
         actions.put("OPEN_CONSOLE",
                 new ProgramAction(
                         "Show Console", "Open Console Board",
-                        KeyMap.requestMapping("open_tool_board_console", identifierToStrokes("c+" + KeyEvent.VK_3 + ";c+" + KeyEvent.VK_NUMPAD3)),
+                        KeyMap.requestMapping("open_tool_board_console", identifierToStrokes("c+" + KeyEvent.VK_3 + ";c+" + KeyEvent.VK_NUMPAD3)).setGroupName("Windows"),
                         () -> TridentWindow.consoleBoard.open()
                 ).setIconKey("console")
         );
         actions.put("OPEN_SEARCH_RESULTS",
                 new ProgramAction(
                         "Show Search Results", "Open Search Results Board",
-                        KeyMap.requestMapping("open_tool_board_search_results", identifierToStrokes("c+" + KeyEvent.VK_4 + ";c+" + KeyEvent.VK_NUMPAD4)),
+                        KeyMap.requestMapping("open_tool_board_search_results", identifierToStrokes("c+" + KeyEvent.VK_4 + ";c+" + KeyEvent.VK_NUMPAD4)).setGroupName("Windows"),
                         () -> TridentWindow.findBoard.open()
                 ).setIconKey("search")
         );
         actions.put("OPEN_PROCESSES",
                 new ProgramAction(
                         "Show Processes", "Open Processes Board",
-                        KeyMap.requestMapping("open_tool_board_processes", identifierToStrokes("c+" + KeyEvent.VK_5 + ";c+" + KeyEvent.VK_NUMPAD5)),
+                        KeyMap.requestMapping("open_tool_board_processes", identifierToStrokes("c+" + KeyEvent.VK_5 + ";c+" + KeyEvent.VK_NUMPAD5)).setGroupName("Windows"),
                         () -> TridentWindow.processBoard.open()
                 ).setIconKey("process")
         );

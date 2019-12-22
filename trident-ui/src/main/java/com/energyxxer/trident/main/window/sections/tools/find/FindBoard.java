@@ -13,7 +13,6 @@ import com.energyxxer.xswing.hints.Hint;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 
 public class FindBoard extends ToolBoard implements FindExplorerFilter {
 
@@ -102,7 +101,7 @@ public class FindBoard extends ToolBoard implements FindExplorerFilter {
 
     public void showResults(FindResults results) {
         explorer.clear();
-        StandardExplorerItem item = new StandardExplorerItem(results, explorer, new ArrayList<>());
+        StandardExplorerItem item = new StandardExplorerItem(results, explorer, null);
         item.setDetailed(true);
         explorer.addElement(item);
         this.repaint();

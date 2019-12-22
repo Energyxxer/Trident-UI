@@ -59,7 +59,7 @@ public class ActionHostExplorerItem extends ExplorerElement implements ItemActio
         FontMetrics fm = g.getFontMetrics();
         master.flatList.add(this);
 
-        int x = 0;
+        int x = master.getIndentation() * master.getIndentPerLevel() + master.getInitialIndent();
         this.y = master.getOffsetY();
         this.lastRecordedOffset = y;
         int w = master.getWidth();
@@ -99,7 +99,7 @@ public class ActionHostExplorerItem extends ExplorerElement implements ItemActio
             }
         }
 
-        int leftX = 6;
+        int leftX = 6 + x;
         int rightX = master.getWidth() - 6;
         {
 

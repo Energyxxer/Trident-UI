@@ -11,21 +11,21 @@ import static com.energyxxer.xswing.KeyInputUtils.*;
 
 public class KeyMap {
 
-    public static final UserKeyStroke COPY = new UserKeyStroke("copy", identifierToStrokes("c+C"));
-    public static final UserKeyStroke CUT = new UserKeyStroke("cut", identifierToStrokes("c+X"));
-    public static final UserKeyStroke PASTE = new UserKeyStroke("paste", identifierToStrokes("c+V"));
+    public static final UserKeyStroke COPY = new UserKeyStroke("copy", identifierToStrokes("c+C")).setGroupName("Editor");
+    public static final UserKeyStroke CUT = new UserKeyStroke("cut", identifierToStrokes("c+X")).setGroupName("Editor");
+    public static final UserKeyStroke PASTE = new UserKeyStroke("paste", identifierToStrokes("c+V")).setGroupName("Editor");
 
-    public static final UserKeyStroke UNDO = new UserKeyStroke("undo", identifierToStrokes("c+Z"));
-    public static final UserKeyStroke REDO = new UserKeyStroke("redo", identifierToStrokes("c+Y"));
+    public static final UserKeyStroke UNDO = new UserKeyStroke("undo", identifierToStrokes("c+Z")).setGroupName("Editor");
+    public static final UserKeyStroke REDO = new UserKeyStroke("redo", identifierToStrokes("c+Y")).setGroupName("Editor");
 
-    public static final UserKeyStroke SUGGESTION_SELECT = new UserKeyStroke("Expand Editor Suggestion", "editor.suggestion.select", identifierToStrokes("" + KeyEvent.VK_TAB));
+    public static final UserKeyStroke SUGGESTION_SELECT = new UserKeyStroke("Expand Suggestion", "editor.suggestion.select", identifierToStrokes("" + KeyEvent.VK_TAB)).setGroupName("Editor");
 
-    public static final UserKeyStroke TEXT_SELECT_ALL = new UserKeyStroke("Select All Text", "text.select_all", identifierToStrokes("c+A"));
-    public static final UserKeyStroke TEXT_MOVE_LINE_UP = new UserKeyStroke("Move Line Up", "text.move_line_up", identifierToStrokes("a+" + KeyEvent.VK_UP));
-    public static final UserKeyStroke TEXT_MOVE_LINE_DOWN = new UserKeyStroke("Move Line Down", "text.move_line_down", identifierToStrokes("a+" + KeyEvent.VK_DOWN));
+    public static final UserKeyStroke TEXT_SELECT_ALL = new UserKeyStroke("Select All Text", "text.select_all", identifierToStrokes("c+A")).setGroupName("Editor");
+    public static final UserKeyStroke TEXT_MOVE_LINE_UP = new UserKeyStroke("Move Line Up", "text.move_line_up", identifierToStrokes("a+" + KeyEvent.VK_UP)).setGroupName("Editor");
+    public static final UserKeyStroke TEXT_MOVE_LINE_DOWN = new UserKeyStroke("Move Line Down", "text.move_line_down", identifierToStrokes("a+" + KeyEvent.VK_DOWN)).setGroupName("Editor");
 
-    public static final UserKeyStroke FIND_NEXT = new UserKeyStroke("find.next", identifierToStrokes(KeyEvent.VK_ENTER + ";" + KeyEvent.VK_F3));
-    public static final UserKeyStroke FIND_PREVIOUS = new UserKeyStroke("find.previous", identifierToStrokes("s+" + KeyEvent.VK_ENTER + ";s+" + KeyEvent.VK_F3));
+    public static final UserKeyStroke FIND_NEXT = new UserKeyStroke("find.next", identifierToStrokes(KeyEvent.VK_ENTER + ";" + KeyEvent.VK_F3)).setGroupName("Editor");
+    public static final UserKeyStroke FIND_PREVIOUS = new UserKeyStroke("find.previous", identifierToStrokes("s+" + KeyEvent.VK_ENTER + ";s+" + KeyEvent.VK_F3)).setGroupName("Editor");
 
     private static final List<UserKeyStroke> allKeyStrokes;
 
@@ -56,7 +56,7 @@ public class KeyMap {
                 x.printStackTrace();
             }
         }
-        keystrokes.sort(Comparator.comparing(UserKeyStroke::getName));
+        //keystrokes.sort(Comparator.comparing(UserKeyStroke::getName));
         allKeyStrokes = keystrokes;
     }
 

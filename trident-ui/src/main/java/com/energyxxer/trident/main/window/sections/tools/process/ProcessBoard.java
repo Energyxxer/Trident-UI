@@ -9,7 +9,6 @@ import com.energyxxer.util.logger.Debug;
 import com.energyxxer.util.processes.AbstractProcess;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 
 public class ProcessBoard extends ToolBoard {
@@ -26,7 +25,7 @@ public class ProcessBoard extends ToolBoard {
     }
 
     public void addProcess(AbstractProcess process) {
-        StandardExplorerItem item = new StandardExplorerItem(new ProcessToken(process), explorer, new ArrayList<>());
+        StandardExplorerItem item = new StandardExplorerItem(new ProcessToken(process), explorer, null);
         item.setDetailed(true);
         explorer.addElement(item);
         explorer.repaint();

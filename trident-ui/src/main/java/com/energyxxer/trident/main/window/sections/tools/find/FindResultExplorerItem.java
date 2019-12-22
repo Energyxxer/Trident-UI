@@ -14,12 +14,12 @@ public class FindResultExplorerItem extends StandardExplorerItem {
     private Predicate<FindExplorerFilter> filter;
 
     public FindResultExplorerItem(ModuleToken token, StandardExplorerItem parent, Predicate<FindExplorerFilter> filter) {
-        super(token, parent, new ArrayList<>());
+        super(token, parent, null);
         this.filter = filter;
     }
 
     public FindResultExplorerItem(ModuleToken token, ExplorerMaster master, Predicate<FindExplorerFilter> filter) {
-        super(token, master, new ArrayList<>());
+        super(token, master, null);
         this.filter = filter;
     }
 

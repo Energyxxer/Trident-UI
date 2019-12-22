@@ -1,12 +1,17 @@
 package com.energyxxer.trident.ui.dialogs.settings;
 
+import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.keystrokes.KeyMap;
 import com.energyxxer.trident.global.keystrokes.UserKeyStroke;
 import com.energyxxer.trident.main.window.sections.quick_find.StyledExplorerMaster;
 import com.energyxxer.trident.ui.dialogs.KeyStrokeDialog;
 import com.energyxxer.trident.ui.explorer.base.ActionHostExplorerItem;
+import com.energyxxer.trident.ui.explorer.base.ExplorerMaster;
+import com.energyxxer.trident.ui.explorer.base.StandardExplorerItem;
 import com.energyxxer.trident.ui.explorer.base.StyleProvider;
+import com.energyxxer.trident.ui.explorer.base.elements.ExplorerElement;
 import com.energyxxer.trident.ui.modules.ModuleToken;
+import com.energyxxer.trident.ui.modules.NonStandardModuleToken;
 import com.energyxxer.trident.ui.orderlist.CompoundActionModuleToken;
 import com.energyxxer.trident.ui.orderlist.ItemAction;
 import com.energyxxer.trident.ui.orderlist.ItemActionHost;
@@ -22,8 +27,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.util.Collections;
 import java.util.List;
+import java.util.*;
 
 public class SettingsKeymap extends JPanel {
 
@@ -72,70 +77,57 @@ public class SettingsKeymap extends JPanel {
         }
         Settings.addOpenEvent(() -> {
             master.clear();
-            KeyMap.sortMappings();
+            HashMap<String, ArrayList<KeybindToken>> groupedKeyTokens = new HashMap<>();
             for(UserKeyStroke ks : KeyMap.getAll()) {
-                master.addElement(new ActionHostExplorerItem(master, new CompoundActionModuleToken() {
+                if(!groupedKeyTokens.containsKey(ks.getGroupName())) {
+                    groupedKeyTokens.put(ks.getGroupName(), new ArrayList<>());
+                }
+                groupedKeyTokens.get(ks.getGroupName()).add(new KeybindToken(ks, master));
+            }
+            ArrayList<Map.Entry<String, ArrayList<KeybindToken>>> entries = new ArrayList<>(groupedKeyTokens.entrySet());
+            entries.sort(Comparator.comparing(Map.Entry::getKey));
+
+            for(Map.Entry<String, ArrayList<KeybindToken>> entry : entries) {
+                master.addElement(new StandardExplorerItem(new CompoundActionModuleToken() {
                     @Override
                     public @NotNull List<ItemAction> getActions() {
-                        return Collections.singletonList(new KeyStrokeAction(ks));
+                        return Collections.emptyList();
                     }
 
                     @Override
                     public String getTitle() {
-                        return ks.getName();
+                        return entry.getKey();
                     }
 
                     @Override
                     public Image getIcon() {
-                        return null;
+                        return Commons.getIcon("folder");
                     }
 
                     @Override
                     public StyledPopupMenu generateMenu(@NotNull MenuContext context) {
-                        StyledPopupMenu menu = new StyledPopupMenu();
-                        menu.add(new StyledMenuItem("Add Shortcut") {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                KeyStroke toAdd = new KeyStrokeDialog("Add Shortcut", "Action: " + ks.getName(), SettingsKeymap::checkCollisions).result;
-                                if(toAdd != null) {
-                                    List<KeyStroke> newList = ks.getNewStrokes();
-                                    if(!newList.contains(toAdd)) {
-                                        newList.add(toAdd);
-                                        master.repaint();
-                                    }
-                                }
-                            }
-                        });
-                        List<KeyStroke> allKeybinds = ks.getNewStrokes();
-                        if(!allKeybinds.isEmpty()) menu.addSeparator();
-                        for(KeyStroke keybind : allKeybinds) {
-                            menu.add(new StyledMenuItem("Remove " + KeyInputUtils.getReadableKeyStroke(keybind)) {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    ks.getNewStrokes().remove(keybind);
-                                    master.repaint();
-                                }
-                            });
-                        }
-                        if(!ks.newMatchesDefault()) {
-                            menu.addSeparator();
-                            menu.add(new StyledMenuItem("Reset Shortcuts") {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    ks.revertToDefault();
-                                    master.repaint();
-                                }
-                            });
-                        }
-                        return menu;
+                        return null;
                     }
 
                     @Override
                     public boolean equals(ModuleToken other) {
                         return other == this;
                     }
-                }));
+
+                    @Override
+                    public Collection<? extends ModuleToken> getSubTokens() {
+                        return entry.getValue();
+                    }
+
+                    @Override
+                    public boolean isExpandable() {
+                        return true;
+                    }
+                }, master, null));
             }
+
+            groupedKeyTokens.clear();
+            entries.clear();
         });
         Settings.addApplyEvent(() -> {
             for(UserKeyStroke uks : KeyMap.getAll()) {
@@ -236,6 +228,87 @@ public class SettingsKeymap extends JPanel {
         @Override
         public int getHintOffset() {
             return 0;
+        }
+    }
+
+    private static class KeybindToken implements CompoundActionModuleToken, NonStandardModuleToken {
+
+        private UserKeyStroke ks;
+        private ExplorerMaster master;
+
+        public KeybindToken(UserKeyStroke ks, ExplorerMaster master) {
+            this.ks = ks;
+            this.master = master;
+        }
+
+        @Override
+        public @NotNull List<ItemAction> getActions() {
+            return Collections.singletonList(new KeyStrokeAction(ks));
+        }
+
+        @Override
+        public String getTitle() {
+            return ks.getName();
+        }
+
+        @Override
+        public Image getIcon() {
+            return null;
+        }
+
+        @Override
+        public StyledPopupMenu generateMenu(@NotNull MenuContext context) {
+            StyledPopupMenu menu = new StyledPopupMenu();
+            menu.add(new StyledMenuItem("Add Shortcut") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    KeyStroke toAdd = new KeyStrokeDialog("Add Shortcut", "Action: " + ks.getName(), SettingsKeymap::checkCollisions).result;
+                    if(toAdd != null) {
+                        List<KeyStroke> newList = ks.getNewStrokes();
+                        if(!newList.contains(toAdd)) {
+                            newList.add(toAdd);
+                            master.repaint();
+                        }
+                    }
+                }
+            });
+            List<KeyStroke> allKeybinds = ks.getNewStrokes();
+            if(!allKeybinds.isEmpty()) menu.addSeparator();
+            for(KeyStroke keybind : allKeybinds) {
+                menu.add(new StyledMenuItem("Remove " + KeyInputUtils.getReadableKeyStroke(keybind)) {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        ks.getNewStrokes().remove(keybind);
+                        master.repaint();
+                    }
+                });
+            }
+            if(!ks.newMatchesDefault()) {
+                menu.addSeparator();
+                menu.add(new StyledMenuItem("Reset Shortcuts") {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        ks.revertToDefault();
+                        master.repaint();
+                    }
+                });
+            }
+            return menu;
+        }
+
+        @Override
+        public boolean equals(ModuleToken other) {
+            return other == this;
+        }
+
+        @Override
+        public ExplorerElement createElement(StandardExplorerItem parent) {
+            return new ActionHostExplorerItem(master, this);
+        }
+
+        @Override
+        public ExplorerElement createElement(ExplorerMaster parent) {
+            return new ActionHostExplorerItem(parent, this);
         }
     }
 }

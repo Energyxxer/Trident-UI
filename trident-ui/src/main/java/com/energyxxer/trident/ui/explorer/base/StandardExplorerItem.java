@@ -13,6 +13,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
+import java.util.List;
 import java.util.ArrayList;
 
 import static com.energyxxer.trident.ui.editor.behavior.AdvancedEditor.isPlatformControlDown;
@@ -33,15 +34,15 @@ public class StandardExplorerItem extends ExplorerElement {
 
     private ArrayList<MouseListener> mouseListeners = new ArrayList<>();
 
-    public StandardExplorerItem(ModuleToken token, StandardExplorerItem parent, ArrayList<String> toOpen) {
+    public StandardExplorerItem(ModuleToken token, StandardExplorerItem parent, List<String> toOpen) {
         this(parent, parent.getMaster(), token, toOpen);
     }
 
-    public StandardExplorerItem(ModuleToken token, ExplorerMaster master, ArrayList<String> toOpen) {
+    public StandardExplorerItem(ModuleToken token, ExplorerMaster master, List<String> toOpen) {
         this(null, master, token, toOpen);
     }
 
-    private StandardExplorerItem(StandardExplorerItem parent, ExplorerMaster master, ModuleToken token, ArrayList<String> toOpen) {
+    private StandardExplorerItem(StandardExplorerItem parent, ExplorerMaster master, ModuleToken token, List<String> toOpen) {
         super(master);
         this.parent = parent;
         if(parent != null) this.setDetailed(parent.detailed);
@@ -52,12 +53,12 @@ public class StandardExplorerItem extends ExplorerElement {
         this.icon = token.getIcon();
         if(this.icon != null) this.icon = ImageUtil.fitToSize(this.icon, 16, 16);
 
-        if(toOpen.contains(this.token.getIdentifier())) {
+        if(toOpen != null && toOpen.contains(this.token.getIdentifier())) {
             expand(toOpen);
         }
     }
 
-    public void expand(ArrayList<String> toOpen) {
+    public void expand(List<String> toOpen) {
         for(ModuleToken subToken : token.getSubTokens()) {
             ExplorerElement inner;
             if(subToken instanceof NonStandardModuleToken) {
@@ -136,10 +137,10 @@ public class StandardExplorerItem extends ExplorerElement {
                 g.drawImage(master.getAssetMap().get("expand"), x, y + margin, 16, 16, new Color(0, 0, 0, 0), null);
             }
         }
-        x += 23;
 
         //File Icon
         if (icon != null) {
+            x += 23;
             g.drawImage(this.icon, x + 8 - icon.getWidth(null) / 2, y + margin + 8 - icon.getHeight(null) / 2, null);
         }
 

@@ -8,14 +8,13 @@ import com.energyxxer.trident.util.ImageUtil;
 
 import java.awt.*;
 import java.io.File;
-import java.util.ArrayList;
 
 public class FileOccurrenceExplorerItem extends StandardExplorerItem {
     private FileOccurrence occurrence;
     private Image icon = null;
 
     public FileOccurrenceExplorerItem(FileOccurrence occurrence, StandardExplorerItem parent) {
-        super(occurrence, parent, new ArrayList<>());
+        super(occurrence, parent, null);
         this.setDetailed(false);
         this.occurrence = occurrence;
 
@@ -24,7 +23,7 @@ public class FileOccurrenceExplorerItem extends StandardExplorerItem {
     }
 
     public FileOccurrenceExplorerItem(FileOccurrence occurrence, ExplorerMaster master) {
-        super(occurrence, master, new ArrayList<>());
+        super(occurrence, master, null);
         this.setDetailed(false);
         this.occurrence = occurrence;
 

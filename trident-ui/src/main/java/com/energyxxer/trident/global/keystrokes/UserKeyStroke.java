@@ -17,6 +17,7 @@ public class UserKeyStroke {
     private KeyStroke[] strokes;
     private ArrayList<KeyStroke> newStrokes = null;
     private final String key;
+    private String groupName = "Miscellaneous";
 
     public UserKeyStroke(String key, KeyStroke... defaultStrokes) {
         this(null, key, defaultStrokes);
@@ -130,5 +131,14 @@ public class UserKeyStroke {
 
     public KeyStroke getFirstKeyStroke() {
         return strokes.length > 0 ? strokes[0] : null;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public UserKeyStroke setGroupName(String groupName) {
+        this.groupName = groupName;
+        return this;
     }
 }
