@@ -120,7 +120,7 @@ public class ActionManager {
         actions.put("PROJECT_PROPERTIES",
                 new ProgramAction(
                     "Project Properties", "Edit the current project",
-                    KeyMap.requestMapping("open_project_properties", identifierToStrokes("csa+S")).setGroupName("Windows"),
+                    KeyMap.requestMapping("open_project_properties", identifierToStrokes("sa+S")).setGroupName("Windows"),
                     () -> {
                         Project selectedProject = Commons.getActiveProject();
                         if(selectedProject instanceof TridentProject) ProjectProperties.show((TridentProject) selectedProject);
@@ -200,7 +200,7 @@ public class ActionManager {
         actions.put("SETTINGS",
                 new ProgramAction(
                         "Settings", "Configure Trident UI",
-                        KeyMap.requestMapping("open_settings", identifierToStrokes("sa+S")).setGroupName("Windows"),
+                        KeyMap.requestMapping("open_settings", identifierToStrokes("csa+S")).setGroupName("Windows"),
                         Settings::show
                 ).setIconKey("cog")
         );

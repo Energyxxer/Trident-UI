@@ -129,4 +129,8 @@ public class ThemeManager {
         String s = guiTheme.getString("Syntax." + lang.toString().toLowerCase());
         return getSyntaxTheme(s);
     }
+
+    public static void fireThemeUpdate() {
+
+    }
 }

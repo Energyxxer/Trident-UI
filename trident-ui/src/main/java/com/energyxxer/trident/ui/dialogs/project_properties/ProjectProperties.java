@@ -15,6 +15,8 @@ import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.Consumer;
@@ -91,35 +93,50 @@ public class ProjectProperties {
 		currentSection = contentGeneral;
 
 		{
-			JPanel buttons = new JPanel(new FlowLayout(FlowLayout.LEFT));
+			JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 			buttons.setPreferredSize(new Dimension(0,60));
 			tlm.addThemeChangeListener(t -> buttons.setBackground(contentPane.getBackground()));
 
-			buttons.add(new Padding(25));
-
 			{
-				StyledButton okay = new StyledButton("OK", "ProjectProperties", tlm);
+				StyledButton okay = new StyledButton("OK", "ProjectProperties.okButton", tlm);
 				tlm.addThemeChangeListener(t -> okay.setPreferredSize(new Dimension(Math.max(t.getInteger(75,"ProjectProperties.okButton.width"),10), Math.max(t.getInteger(25,"ProjectProperties.okButton.height"),10))));
 				buttons.add(okay);
 
 				okay.addActionListener(e -> {
 					dialog.setVisible(false);
-					dialog.dispose();
 					applyEvents.forEach(ae -> ae.accept(project));
 					project.updateConfig();
 				});
 			}
 
 			{
-				StyledButton cancel = new StyledButton("Cancel", "ProjectProperties", tlm);
+				StyledButton cancel = new StyledButton("Cancel", "ProjectProperties.cancelButton", tlm);
 				tlm.addThemeChangeListener(t -> cancel.setPreferredSize(new Dimension(Math.max(t.getInteger(75,"ProjectProperties.cancelButton.width"),10), Math.max(t.getInteger(25,"ProjectProperties.cancelButton.height"),10))));
 				buttons.add(cancel);
 
-				cancel.addActionListener(e -> {
-					dialog.setVisible(false);
-					dialog.dispose();
+
+				pane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");
+				pane.getActionMap().put("cancel", new AbstractAction() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						cancel();
+					}
+				});
+
+				cancel.addActionListener(e -> {cancel();});
+			}
+
+			{
+				StyledButton apply = new StyledButton("Apply", "ProjectProperties.applyButton", tlm);
+				tlm.addThemeChangeListener(t -> apply.setPreferredSize(new Dimension(Math.max(t.getInteger(75,"ProjectProperties.applyButton.width"),10), Math.max(t.getInteger(25,"ProjectProperties.applyButton.height"),10))));
+				buttons.add(apply);
+
+				apply.addActionListener(e -> {
+					applyEvents.forEach(ae -> ae.accept(project));
 				});
 			}
+
+			buttons.add(new Padding(25));
 
 			contentPane.add(buttons, BorderLayout.SOUTH);
 		}
@@ -138,6 +155,10 @@ public class ProjectProperties {
 		dialog.setLocation(center);
 
 		dialog.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
+	}
+
+	private static void cancel() {
+		dialog.setVisible(false);
 	}
 
 	public static void show(TridentProject p) {

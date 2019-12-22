@@ -35,12 +35,14 @@ public class StyledList<T> extends XList<T> {
                 setCellBackground           (t.getColor(new Color(215, 215, 215), this.namespace + ".list.cell.background","General.list.cell.background"));
 
                 setSelectedCellBackground(  t.getColor(new Color(235, 235, 235), this.namespace + ".list.cell.selected.background","General.list.cell.selected.background"));
+                setSelectedCellForeground(  t.getColor(Color.BLACK, this.namespace + ".list.cell.selected.foreground",this.namespace + ".list.cell.foreground","General.list.cell.selected.foreground","General.list.cell.foreground","General.foreground"));
                 setSelectedCellBorder(
                         BorderFactory.createMatteBorder(
                         0, 0, Math.max(t.getInteger(1,this.namespace + ".list.cell.selected.border.thickness","General.list.cell.selected.border.thickness"),0), 0,
                                             t.getColor(new Color(0, 0, 0, 0), this.namespace + ".list.cell.selected.border.color","General.list.cell.selected.border.color")));
 
                 setRolloverCellBackground(  t.getColor(new Color(235, 235, 235), this.namespace + ".list.cell.hover.background","General.list.cell.hover.background"));
+                setRolloverCellForeground(  t.getColor(Color.BLACK, this.namespace + ".list.cell.rollover.foreground",this.namespace + ".list.cell.foreground","General.list.cell.rollover.foreground","General.list.cell.foreground","General.foreground"));
                 setRolloverCellBorder(
                         BorderFactory.createMatteBorder(
                         0, 0, Math.max(t.getInteger(1,this.namespace + ".list.cell.rollover.border.thickness","General.list.cell.rollover.border.thickness"),0), 0,
@@ -54,12 +56,14 @@ public class StyledList<T> extends XList<T> {
                 setCellBackground(          t.getColor(new Color(215, 215, 215), "General.list.cell.background"));
 
                 setSelectedCellBackground(  t.getColor(new Color(235, 235, 235), "General.list.cell.selected.background"));
+                setSelectedCellForeground(  t.getColor(Color.BLACK, "General.list.cell.selected.foreground", "General.list.cell.foreground","General.foreground"));
                 setSelectedCellBorder(
                         BorderFactory.createMatteBorder(
                         0, 0, Math.max(t.getInteger(1,"General.list.cell.selected.border.thickness"),0), 0,
                                 t.getColor(new Color(0, 0, 0, 0), "General.list.cell.selected.border")));
 
                 setRolloverCellBackground(  t.getColor(new Color(235, 235, 235), "General.list.cell.hover.background"));
+                setRolloverCellForeground(  t.getColor(Color.BLACK, "General.list.cell.rollover.foreground", "General.list.cell.foreground","General.foreground"));
                 setRolloverCellBorder(
                         BorderFactory.createMatteBorder(
                         0, 0, Math.max(t.getInteger(1,"General.list.cell.rollover.border.thickness"),0), 0,

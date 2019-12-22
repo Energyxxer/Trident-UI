@@ -1,5 +1,6 @@
 package com.energyxxer.trident.ui.theme;
 
+import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.main.window.TridentWindow;
 
 import java.awt.Color;
@@ -52,7 +53,7 @@ public class Theme {
 	public Color getColor(Color defaultValue, String... keys) {
 		for(String key : keys) {
 			Object value = values.get(key);
-			if(value != null && value instanceof Color) return (Color) value;
+			if(value instanceof Color) return (Color) value;
 		}
 		return defaultValue;
 	}
@@ -64,7 +65,7 @@ public class Theme {
 	public boolean getBoolean(boolean defaultValue, String... keys) {
 		for(String key : keys) {
 			Object value = values.get(key);
-			if(value != null && value instanceof Boolean) return (Boolean) value;
+			if(value instanceof Boolean) return (Boolean) value;
 		}
 		return defaultValue;
 	}
@@ -81,7 +82,7 @@ public class Theme {
 				continue;
 			}
 			Object value = values.get(key);
-			if(value != null && value instanceof String) return (String) value;
+			if(value instanceof String) return (String) value;
 		}
 		return defaultValue;
 	}
@@ -91,12 +92,26 @@ public class Theme {
 	public int getInteger(int defaultValue, String... keys) {
 		for(String key : keys) {
 			Object value = values.get(key);
-			if(value != null && value instanceof Integer) return (Integer) value;
+			if(value instanceof Integer) return (Integer) value;
 		}
 		return defaultValue;
 	}
 
 	public int getInteger(String... keys) {
+		return getInteger(0, keys);
+	}
+
+	//Integers
+
+	public float getFloat(float defaultValue, String... keys) {
+		for(String key : keys) {
+			Object value = values.get(key);
+			if(value instanceof Float) return (Float) value;
+		}
+		return defaultValue;
+	}
+
+	public float getFloat(String... keys) {
 		return getInteger(0, keys);
 	}
 
@@ -110,15 +125,15 @@ public class Theme {
 
 		for(int i = 0; i < keys.length; i++) {
 			names[i] = keys[i] + ".font";
-			sizes[i] = keys[i] + ".fontSize";
+			sizes[i] = keys[i] + ".fontScale";
 			bolds[i] = keys[i] + ".bold";
 			italics[i] = keys[i] + ".italic";
 		}
 
 		String name = this.getString(names);
 		if(name == null) name = defaultValue.getName();
-		int size = this.getInteger(defaultValue.getSize(), sizes);
-		if(size < 0) size = 14;
+		int size = Math.round(Preferences.getBaseFontSize() * this.getFloat(1, sizes));
+		if(size < 0) size = Preferences.getBaseFontSize();
 		boolean bold = this.getBoolean(defaultValue.isBold(), bolds);
 		boolean italic = this.getBoolean(defaultValue.isItalic(), italics);
 

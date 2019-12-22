@@ -13,6 +13,8 @@ import com.energyxxer.xswing.Padding;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -85,35 +87,47 @@ public class Settings {
 		currentSection = contentGeneral;
 
 		{
-			JPanel buttons = new JPanel(new FlowLayout(FlowLayout.LEFT));
+			JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 			buttons.setPreferredSize(new Dimension(0,60));
 			tlm.addThemeChangeListener(t -> buttons.setBackground(contentPane.getBackground()));
 
-			buttons.add(new Padding(25));
-
 			{
-				StyledButton okay = new StyledButton("OK", "Settings", tlm);
+				StyledButton okay = new StyledButton("OK", "Settings.okButton", tlm);
 				tlm.addThemeChangeListener(t -> okay.setPreferredSize(new Dimension(Math.max(t.getInteger(75,"Settings.okButton.width"),10), Math.max(t.getInteger(25,"Settings.okButton.height"),10))));
 				buttons.add(okay);
 
 				okay.addActionListener(e -> {
 					dialog.setVisible(false);
-					dialog.dispose();
 					applyEvents.forEach(Runnable::run);
 				});
 			}
 
 			{
-				StyledButton cancel = new StyledButton("Cancel", "Settings", tlm);
+				StyledButton cancel = new StyledButton("Cancel", "Settings.cancelButton", tlm);
 				tlm.addThemeChangeListener(t -> cancel.setPreferredSize(new Dimension(Math.max(t.getInteger(75,"Settings.cancelButton.width"),10), Math.max(t.getInteger(25,"Settings.cancelButton.height"),10))));
 				buttons.add(cancel);
 
-				cancel.addActionListener(e -> {
-					dialog.setVisible(false);
-					dialog.dispose();
-					cancelEvents.forEach(Runnable::run);
+				pane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");
+				pane.getActionMap().put("cancel", new AbstractAction() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						cancel();
+					}
+				});
+
+				cancel.addActionListener(e -> {cancel();});
+			}
+
+			{
+				StyledButton apply = new StyledButton("Apply", "Settings.applyButton", tlm);
+				tlm.addThemeChangeListener(t -> apply.setPreferredSize(new Dimension(Math.max(t.getInteger(75,"Settings.applyButton.width"),10), Math.max(t.getInteger(25,"Settings.applyButton.height"),10))));
+				buttons.add(apply);
+
+				apply.addActionListener(e -> {
+					applyEvents.forEach(Runnable::run);
 				});
 			}
+			buttons.add(new Padding(25));
 
 			contentPane.add(buttons, BorderLayout.SOUTH);
 		}
@@ -121,7 +135,7 @@ public class Settings {
 		dialog.pack();
 
 		dialog.setTitle("Settings");
-		dialog.setIconImage(ImageManager.load("/assets/icons/ui/settings.png").getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH));
+		dialog.setIconImage(ImageManager.load("/assets/icons/ui/settings.png").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
 
 		Point center = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
 		center.x -= dialog.getWidth()/2;
@@ -130,6 +144,11 @@ public class Settings {
 		dialog.setLocation(center);
 
 		dialog.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
+	}
+
+	private static void cancel() {
+		dialog.setVisible(false);
+		cancelEvents.forEach(Runnable::run);
 	}
 
 	public static void show() {

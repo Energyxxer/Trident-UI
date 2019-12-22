@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class XList<T> extends JPanel {
 
@@ -34,9 +35,7 @@ public class XList<T> extends JPanel {
 
 	public void setOptions(T[] options) {
 		this.options.clear();
-		for(T o : options) {
-			this.options.add(o);
-		}
+		this.options.addAll(Arrays.asList(options));
 		updateChildren();
 	}
 	
@@ -56,14 +55,19 @@ public class XList<T> extends JPanel {
 			this.add(option);
 		}
 	}
+
+	private int lastPaintedWidth = -1;
 	
 	@Override
 	protected void paintComponent(Graphics g) {
-		for(Component c : this.getComponents()) {
-			c.setMinimumSize(new Dimension(this.getWidth(),c.getPreferredSize().height));
-			c.setMaximumSize(new Dimension(this.getWidth(),c.getPreferredSize().height));
+		int width = this.getWidth();
+		if(width != lastPaintedWidth) {
+			for(Component c : this.getComponents()) {
+				c.setMinimumSize(new Dimension(width,c.getPreferredSize().height));
+				c.setMaximumSize(new Dimension(width,c.getPreferredSize().height));
+			}
+			revalidate();
 		}
-		revalidate();
 		super.paintComponent(g);
 	}
 	
@@ -76,9 +80,6 @@ public class XList<T> extends JPanel {
 		for(Component c : this.getComponents()) {
 			JComponent jc = (JComponent) c;
 			normalStyle.applyStyle(jc);
-			if(normalStyle.foreground != null) {
-				jc.getComponents()[0].setForeground(normalStyle.foreground);
-			}
 		}
 		if(selected >= 0) {
 			selectedStyle.applyStyle((JComponent) this.getComponents()[selected]);
@@ -264,7 +265,7 @@ class XListItem extends JPanel implements MouseListener {
 		this.parent = parent;
 		JLabel label = new JLabel(labelText);
 		this.add(label);
-		
+
 		this.addMouseListener(this);
 	}
 	

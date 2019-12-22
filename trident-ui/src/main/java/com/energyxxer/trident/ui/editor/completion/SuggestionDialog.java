@@ -261,7 +261,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
             loc.y += rect.height;
             loc.translate(editor.getLocationOnScreen().x, editor.getLocationOnScreen().y);
             if(loc.y + this.getHeight() >= TridentWindow.jframe.getLocationOnScreen().y + TridentWindow.jframe.getHeight()) {
-                loc.y -= 17;
+                loc.y -= editor.getLineHeight();
                 loc.y -= this.getHeight();
             }
             this.setLocation(loc);

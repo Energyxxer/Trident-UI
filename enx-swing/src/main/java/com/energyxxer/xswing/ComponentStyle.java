@@ -5,10 +5,10 @@ import javax.swing.border.Border;
 import java.awt.*;
 
 public class ComponentStyle {
-	public Color background = SystemDefaults.BACKGROUND;
-	public Color foreground = SystemDefaults.FOREGROUND;
-	public Font font = SystemDefaults.FONT;
-	public Border border = SystemDefaults.BORDER;
+	public Color background;
+	public Color foreground;
+	public Font font;
+	public Border border;
 	
 	public ComponentStyle() {
 		background = SystemDefaults.BACKGROUND;
@@ -28,9 +28,16 @@ public class ComponentStyle {
 	
 	public void applyStyle(JComponent c) {
 		if(background != null) c.setBackground(background);
+		if(foreground != null || font != null) applyTextStyles(c);
+		if(border != null) {c.setBorder(border);} else {c.setBorder(BorderFactory.createEmptyBorder(0,0,1,0));}
+	}
+
+	private void applyTextStyles(JComponent c) {
 		if(foreground != null) c.setForeground(foreground);
 		if(font != null) c.setFont(font);
-		if(border != null) {c.setBorder(border);} else {c.setBorder(BorderFactory.createEmptyBorder(0,0,1,0));}
+		for(Component jc : c.getComponents()) {
+			if(jc instanceof JComponent) applyTextStyles((JComponent) jc);
+		}
 	}
 	
 	public Color getBackground() {

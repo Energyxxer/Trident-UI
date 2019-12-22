@@ -7,14 +7,15 @@ import com.energyxxer.trident.ui.modules.FileModuleToken;
 import com.energyxxer.trident.ui.modules.ModuleToken;
 import com.energyxxer.trident.ui.modules.NonStandardModuleToken;
 import com.energyxxer.trident.util.ImageUtil;
+import com.energyxxer.util.logger.Debug;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.energyxxer.trident.ui.editor.behavior.AdvancedEditor.isPlatformControlDown;
 

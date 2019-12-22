@@ -1,6 +1,7 @@
 package com.energyxxer.trident.ui.editor.behavior;
 
 import com.energyxxer.trident.global.Commons;
+import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.global.keystrokes.KeyMap;
 import com.energyxxer.trident.ui.editor.behavior.caret.CaretProfile;
 import com.energyxxer.trident.ui.editor.behavior.caret.Dot;
@@ -61,6 +62,8 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
 
     private SuggestionInterface suggestionInterface;
 
+    private int lineHeight = 17;
+
     {
         this.getDocument().putProperty(DefaultEditorKit.EndOfLineStringProperty, "\n");
 
@@ -108,7 +111,7 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
             this.setSelectionColor(t.getColor(new Color(50, 100, 175), "Editor.selection.background"));
             this.setSelectedTextColor(t.getColor(this.getForeground(), "Editor.selection.foreground"));
             this.setCurrentLineColor(t.getColor(new Color(235, 235, 235), "Editor.currentLine.background"));
-            this.setFont(new Font(t.getString("Editor.font","default:monospaced"), Font.PLAIN, 12));
+            this.setFont(new Font(t.getString("Editor.font","default:monospaced"), Font.PLAIN, Preferences.getEditorFontSize()));
         });
     }
 
@@ -224,6 +227,7 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
             if(ch == '\n') return superResult;
             Rectangle backward = this.modelToView(superResult);
             Rectangle forward = this.modelToView(superResult+1);
+            setLineHeight(backward.height);
             if(backward.x > forward.x) return superResult;
 
             float offset = (float) (pt.x - backward.x) / (forward.x - backward.x);
@@ -516,7 +520,7 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
     private void updateDefaultSize() {
         if(defaultSize != null) {
             int lines = getText().split("\n", -1).length;
-            Dimension size = new Dimension(defaultSize.width, (17 * lines) + defaultSize.height - 17);
+            Dimension size = new Dimension(defaultSize.width, (getLineHeight() * lines) + defaultSize.height - getLineHeight());
             this.setPreferredSize(size);
             for(Consumer<Dimension> consumer : defaultSizeListeners) {
                 consumer.accept(size);
@@ -555,6 +559,14 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
             e.printStackTrace();
             return 0;
         }
+    }
+
+    public int getLineHeight() {
+        return lineHeight;
+    }
+
+    void setLineHeight(int lineHeight) {
+        this.lineHeight = lineHeight;
     }
 
     //Delegates and deprecated managers

@@ -357,7 +357,7 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
                         )
                 )
         );
-        tln.setFont(new Font(t.getString("TridentEditorModule.lineNumber.font","default:monospaced"),0,12));
+        tln.setFont(new Font(t.getString("Editor.lineNumber.font","default:monospaced"),Font.PLAIN, Preferences.getEditorFontSize()));
 
         updateSyntax(t);
     }

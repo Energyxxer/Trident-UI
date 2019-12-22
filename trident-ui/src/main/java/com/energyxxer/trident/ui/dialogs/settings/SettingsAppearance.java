@@ -1,21 +1,15 @@
 package com.energyxxer.trident.ui.dialogs.settings;
 
+import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.main.window.TridentWindow;
-import com.energyxxer.trident.ui.styledcomponents.StyledDropdownMenu;
-import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
-import com.energyxxer.trident.ui.styledcomponents.StyledMenuItem;
-import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
+import com.energyxxer.trident.ui.styledcomponents.*;
 import com.energyxxer.trident.ui.theme.Theme;
 import com.energyxxer.trident.ui.theme.ThemeManager;
+import com.energyxxer.trident.ui.theme.change.ThemeChangeListener;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JPanel;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
+import javax.swing.*;
+import java.awt.*;
 
 class SettingsAppearance extends JPanel {
 
@@ -73,7 +67,7 @@ class SettingsAppearance extends JPanel {
             }
 
             {
-                StyledLabel label = new StyledLabel("GUI Theme:","Settings.content", tlm);
+                StyledLabel label = new StyledLabel("Theme:","Settings.content", tlm);
                 label.setStyle(Font.BOLD);
                 content.add(label);
             }
@@ -87,6 +81,53 @@ class SettingsAppearance extends JPanel {
                 content.add(themeDropdown);
             }
 
+            {
+                JPanel padding = new JPanel();
+                padding.setOpaque(false);
+                padding.setMinimumSize(new Dimension(1,20));
+                padding.setMaximumSize(new Dimension(1,20));
+                content.add(padding);
+            }
+
+            {
+                StyledLabel label = new StyledLabel("Base Font Size:","Settings.content", tlm);
+                label.setStyle(Font.BOLD);
+                content.add(label);
+            }
+            {
+                StyledTextField baseFontSizeField = new StyledTextField("","Settings.content");
+                baseFontSizeField.setMaximumSize(new Dimension(300,25));
+                baseFontSizeField.setAlignmentX(Component.LEFT_ALIGNMENT);
+                Settings.addOpenEvent(() -> baseFontSizeField.setText("" + Preferences.getBaseFontSize()));
+                Settings.addApplyEvent(() -> {
+                    try {
+                        int fontSize = Integer.parseInt(baseFontSizeField.getText());
+                        Preferences.setBaseFontSize(fontSize);
+                        ThemeChangeListener.dispatchThemeChange(TridentWindow.getTheme());
+                    } catch(NumberFormatException ignore) {}
+                });
+                content.add(baseFontSizeField);
+            }
+
+            {
+                StyledLabel label = new StyledLabel("Editor Font Scale:","Settings.content", tlm);
+                label.setStyle(Font.BOLD);
+                content.add(label);
+            }
+            {
+                StyledTextField editorFontSizeField = new StyledTextField("","Settings.content");
+                editorFontSizeField.setMaximumSize(new Dimension(300,25));
+                editorFontSizeField.setAlignmentX(Component.LEFT_ALIGNMENT);
+                Settings.addOpenEvent(() -> editorFontSizeField.setText("" + Preferences.getEditorFontSize()));
+                Settings.addApplyEvent(() -> {
+                    try {
+                        int fontSize = Integer.parseInt(editorFontSizeField.getText());
+                        Preferences.setEditorFontSize(fontSize);
+                        ThemeChangeListener.dispatchThemeChange(TridentWindow.getTheme());
+                    } catch(NumberFormatException ignore) {}
+                });
+                content.add(editorFontSizeField);
+            }
         }
     }
 
