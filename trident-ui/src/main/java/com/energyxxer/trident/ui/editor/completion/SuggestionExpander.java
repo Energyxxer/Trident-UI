@@ -214,6 +214,12 @@ public class SuggestionExpander {
                     suggestionModule.getSuggestions().addAll(SnippetManager.createSuggestionsForTag(((ComplexSuggestion) suggestion).getKey()));
                     break;
                 }
+                case TridentSuggestionTags.BOOLEAN: {
+                    Debug.log("SUGGESTION BOOLEAN");
+                    tokens.add(new ExpandableSuggestionToken(parent, "true", suggestion));
+                    tokens.add(new ExpandableSuggestionToken(parent, "false", suggestion));
+                    break;
+                }
                 default: {
                     if(((ComplexSuggestion) suggestion).getKey().startsWith("cspn:")) {
                         Debug.log("Found a parameter name suggestion: " + ((ComplexSuggestion) suggestion).getKey());
