@@ -2,7 +2,7 @@ package com.energyxxer.trident.ui.editor.completion.paths;
 
 import com.energyxxer.enxlex.suggestions.Suggestion;
 import com.energyxxer.trident.ui.editor.completion.SuggestionDialog;
-import com.energyxxer.trident.ui.editor.completion.SuggestionToken;
+import com.energyxxer.trident.ui.editor.completion.ExpandableSuggestionToken;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 import static com.energyxxer.trident.ui.editor.completion.paths.ResourcePathExpander.DELIMITER_REGEX;
 
-public class ResourcePathNode extends SuggestionToken {
+public class ResourcePathNode extends ExpandableSuggestionToken {
     String parentPath;
     String name;
     ArrayList<ResourcePathNode> subPaths = new ArrayList<>();

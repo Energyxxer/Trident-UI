@@ -121,7 +121,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
         try {
             while (true) {
                 char c = this.getDocument().getText(index-1, 1).charAt(0);
-                if (!Character.isJavaIdentifierPart(c) || --index <= 1)
+                if (!(Character.isJavaIdentifierPart(c) && c != '$') || --index <= 1)
                     break;
             }
         } catch(BadLocationException ex) {
@@ -136,7 +136,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
         try {
             while (true) {
                 char c = this.getDocument().getText(index-1, 1).charAt(0);
-                if (!(Character.isJavaIdentifierPart(c) || "#:/.".contains(c+"")) || --index <= 1)
+                if (!((Character.isJavaIdentifierPart(c) && c != '$') || "#:/.".contains(c+"")) || --index <= 1)
                     break;
             }
         } catch(BadLocationException ex) {
@@ -318,6 +318,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
     public void dispose() {
         super.dispose();
         timer.stop();
+        suggestionBox.dispose();
     }
 
     @Override

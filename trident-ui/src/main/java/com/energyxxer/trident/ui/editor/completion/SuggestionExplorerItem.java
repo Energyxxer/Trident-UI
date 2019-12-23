@@ -7,9 +7,9 @@ import java.awt.*;
 
 public class SuggestionExplorerItem extends StandardExplorerItem {
 
-    SuggestionToken token;
+    ExpandableSuggestionToken token;
 
-    public SuggestionExplorerItem(SuggestionToken token, ExplorerMaster master) {
+    public SuggestionExplorerItem(ExpandableSuggestionToken token, ExplorerMaster master) {
         super(token, master, null);
         this.token = token;
     }

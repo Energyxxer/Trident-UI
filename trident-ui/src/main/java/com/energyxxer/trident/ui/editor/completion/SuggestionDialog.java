@@ -14,6 +14,7 @@ import com.energyxxer.trident.ui.editor.completion.snippets.Snippet;
 import com.energyxxer.trident.ui.editor.completion.snippets.SnippetManager;
 import com.energyxxer.trident.ui.modules.ModuleToken;
 import com.energyxxer.trident.ui.scrollbar.OverlayScrollPane;
+import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.Lazy;
 import com.energyxxer.util.StringUtil;
@@ -32,6 +33,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
     private TridentEditorComponent editor;
 
     private OverlayScrollPane scrollPane;
+    private StyledLabel parameterLabel;
     private StyledExplorerMaster explorer;
 
     private ThemeListenerManager tlm = new ThemeListenerManager();
@@ -43,7 +45,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
 
     private SuggestionModule activeResults = null;
 
-    private ArrayList<SuggestionToken> activeTokens = new ArrayList<>();
+    private ArrayList<ExpandableSuggestionToken> activeTokens = new ArrayList<>();
     private boolean safe = false;
 
     public SuggestionDialog(TridentEditorComponent editor) {
@@ -53,12 +55,19 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
 
         this.explorer = new StyledExplorerMaster("EditorSuggestions");
 
-        this.setContentPane(scrollPane = new OverlayScrollPane(explorer));
+        JPanel contentPane = new JPanel(new BorderLayout());
+        scrollPane = new OverlayScrollPane(explorer);
+        contentPane.add(scrollPane);
+        contentPane.add(parameterLabel = new StyledLabel(" <ENTITY>", "EditorSuggestions.header", tlm), BorderLayout.NORTH);
+
+        this.setContentPane(contentPane);
 
         tlm.addThemeChangeListener(t -> {
             //titleBar.setBackground(t.getColor(new Color(230, 230, 230), "FindInPath.header.background"));
             int thickness = Math.max(t.getInteger(1, "EditorSuggestions.border.thickness"), 0);
-            scrollPane.setBorder(BorderFactory.createMatteBorder(thickness, thickness, thickness, thickness, t.getColor(new Color(200, 200, 200), "EditorSuggestions.border.color")));
+            contentPane.setBackground(t.getColor(new Color(200, 200, 200), "EditorSuggestions.header.background"));
+            contentPane.setBorder(BorderFactory.createMatteBorder(thickness, thickness, thickness, thickness, t.getColor(new Color(200, 200, 200), "EditorSuggestions.border.color")));
+            parameterLabel.setBorder(BorderFactory.createMatteBorder(0, 0, thickness, 0, t.getColor(new Color(200, 200, 200), "EditorSuggestions.border.color")));
         });
 
         editor.addKeyListener(this);
@@ -80,22 +89,30 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         activeTokens.clear();
 
         boolean any = false;
+        boolean anyExpandable = false;
 
         if(results != null) {
             for(Snippet snippet : SnippetManager.getAll()) {
                 snippet.expanderApplied = false;
             }
+            StringBuilder sb = new StringBuilder();
             boolean createdEverywhereSnippets = false;
             for (int i = 0; i < results.getSuggestions().size(); i++) {
                 Suggestion suggestion = results.getSuggestions().get(i);
                 for (SuggestionToken token : SuggestionExpander.expand(suggestion, this, results)) {
-                    SuggestionExplorerItem item = new SuggestionExplorerItem(token, explorer);
-                    item.setDetailed(true);
-                    explorer.addElement(item);
-                    activeTokens.add(token);
-                    if (!any) {
-                        item.setSelected(true);
-                        explorer.setSelected(item, null);
+                    if(token instanceof ExpandableSuggestionToken) {
+                        SuggestionExplorerItem item = new SuggestionExplorerItem(((ExpandableSuggestionToken) token), explorer);
+                        item.setDetailed(true);
+                        explorer.addElement(item);
+                        activeTokens.add(((ExpandableSuggestionToken) token));
+                        if (!anyExpandable) {
+                            item.setSelected(true);
+                            explorer.setSelected(item, null);
+                        }
+                        anyExpandable = true;
+                    } else if(token instanceof ParameterNameSuggestionToken) {
+                        sb.append(((ParameterNameSuggestionToken) token).getParameterName());
+                        sb.append(", ");
                     }
                     any = true;
                 }
@@ -104,6 +121,13 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
                     createdEverywhereSnippets = true;
                 }
             }
+            if(sb.length() > 0) {
+                sb.setLength(sb.length()-2);
+                parameterLabel.setText(" <" + sb.toString() + ">");
+            } else {
+                Debug.log("No parameter suggestion");
+                parameterLabel.setText("");
+            }
         }
 
         if(any) {
@@ -111,7 +135,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
             this.setVisible(true);
             filter();
             int shownTokens = 0;
-            for(SuggestionToken token : activeTokens) {
+            for(ExpandableSuggestionToken token : activeTokens) {
                 if(token.isEnabled()) shownTokens += 1;
             }
             Debug.log("After filtering: " + shownTokens);
@@ -229,7 +253,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
                 String typed = editor.getDocument().getText(cwpos, editor.getCaretPosition() - cwpos);
 
                 anyEnabled = false;
-                for(SuggestionToken token : activeTokens) {
+                for(ExpandableSuggestionToken token : activeTokens) {
                     token.setEnabledFilter(typed);
                     if(token.isEnabled()) anyEnabled = true;
                 }
@@ -246,10 +270,10 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
 
     private void resize() {
         int shownTokens = 0;
-        for(SuggestionToken token : activeTokens) {
+        for(ExpandableSuggestionToken token : activeTokens) {
             if(token.isEnabled()) shownTokens += 1;
         }
-        this.setSize(new Dimension(400, Math.min(300, explorer.getRowHeight() * shownTokens + 2)));
+        this.setSize(new Dimension(400, Math.min(300, explorer.getRowHeight() * shownTokens + 2 + parameterLabel.getPreferredSize().height)));
     }
 
     private void relocate(int index) {
@@ -308,5 +332,11 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
     public void setSafeToSuggest(boolean safe) {
         //Debug.log("Set safe to suggest: " + safe);
         this.safe = safe;
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        tlm.dispose();
     }
 }

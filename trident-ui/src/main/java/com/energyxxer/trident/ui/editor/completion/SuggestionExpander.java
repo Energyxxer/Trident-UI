@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 public class SuggestionExpander {
     public static Collection<SuggestionToken> expand(Suggestion suggestion, SuggestionDialog parent, SuggestionModule suggestionModule) {
         if(suggestion instanceof LiteralSuggestion) {
-            return Collections.singletonList(new SuggestionToken(parent, ((LiteralSuggestion) suggestion).getPreview(), ((LiteralSuggestion) suggestion).getLiteral(), suggestion));
+            return Collections.singletonList(new ExpandableSuggestionToken(parent, ((LiteralSuggestion) suggestion).getPreview(), ((LiteralSuggestion) suggestion).getLiteral(), suggestion));
         } else if(suggestion instanceof ComplexSuggestion) {
             ArrayList<SuggestionToken> tokens = new ArrayList<>();
             switch(((ComplexSuggestion) suggestion).getKey()) {
@@ -40,8 +40,8 @@ public class SuggestionExpander {
                         .IDENTIFIER_EXISTING: {
                     if(parent.getSummary() != null) {
                         for(SummarySymbol sym : ((TridentSummaryModule) parent.getSummary()).getSymbolsVisibleAt(suggestionModule.getSuggestionIndex())) {
-                            SuggestionToken token = new SuggestionToken(parent, sym.getName(), suggestion);
-                            token.setIconKey(SuggestionToken.getIconKeyForTags(sym.getSuggestionTags()));
+                            ExpandableSuggestionToken token = new ExpandableSuggestionToken(parent, sym.getName(), suggestion);
+                            token.setIconKey(ExpandableSuggestionToken.getIconKeyForTags(sym.getSuggestionTags()));
                             tokens.add(0, token);
                             if(sym.getParentFileSummary() != parent.getSummary()) {
                                 token.setDarkened(true);
@@ -54,8 +54,8 @@ public class SuggestionExpander {
                         .IDENTIFIER_EXISTING: {
                     if(parent.getSummary() != null) {
                         for(com.energyxxer.crossbow.compiler.lexer.summaries.SummarySymbol sym : ((CrossbowSummaryModule) parent.getSummary()).getSymbolsVisibleAt(suggestionModule.getSuggestionIndex())) {
-                            SuggestionToken token = new SuggestionToken(parent, sym.getName(), suggestion);
-                            token.setIconKey(SuggestionToken.getIconKeyForTags(sym.getSuggestionTags()));
+                            ExpandableSuggestionToken token = new ExpandableSuggestionToken(parent, sym.getName(), suggestion);
+                            token.setIconKey(ExpandableSuggestionToken.getIconKeyForTags(sym.getSuggestionTags()));
                             tokens.add(0, token);
                             if(sym.getParentFileSummary() != parent.getSummary()) {
                                 token.setDarkened(true);
@@ -68,7 +68,7 @@ public class SuggestionExpander {
                         .IDENTIFIER_MEMBER: {
                     if(parent.getSummary() != null) {
                         Collection<SummarySymbol> membersVisible = ((TridentSummaryModule) parent.getSummary()).getSymbolsVisibleAtIndexForPath(suggestionModule.getSuggestionIndex(), suggestionModule.getLookingAtMemberPath());
-                        ArrayList<SuggestionToken> newTokens = new ArrayList<>(membersVisible.size());
+                        ArrayList<ExpandableSuggestionToken> newTokens = new ArrayList<>(membersVisible.size());
                         for(SummarySymbol sym : membersVisible) {
                             String text = sym.getName();
                             int backspaces = 0;
@@ -76,9 +76,9 @@ public class SuggestionExpander {
                                 text = "[" + CommandUtils.quote(text) + "]";
                                 backspaces = 1;
                             }
-                            SuggestionToken token = new SuggestionToken(parent, sym.getName(), text, suggestion);
+                            ExpandableSuggestionToken token = new ExpandableSuggestionToken(parent, sym.getName(), text, suggestion);
                             token.setBackspaces(backspaces);
-                            token.setIconKey(SuggestionToken.getIconKeyForTags(sym.getSuggestionTags()));
+                            token.setIconKey(ExpandableSuggestionToken.getIconKeyForTags(sym.getSuggestionTags()));
                             newTokens.add(token);
                         }
                         tokens.addAll(0, newTokens);
@@ -89,7 +89,7 @@ public class SuggestionExpander {
                         .IDENTIFIER_MEMBER: {
                     if(parent.getSummary() != null) {
                         Collection<com.energyxxer.crossbow.compiler.lexer.summaries.SummarySymbol> membersVisible = ((CrossbowSummaryModule) parent.getSummary()).getSymbolsVisibleAtIndexForPath(suggestionModule.getSuggestionIndex(), suggestionModule.getLookingAtMemberPath());
-                        ArrayList<SuggestionToken> newTokens = new ArrayList<>(membersVisible.size());
+                        ArrayList<ExpandableSuggestionToken> newTokens = new ArrayList<>(membersVisible.size());
                         for(com.energyxxer.crossbow.compiler.lexer.summaries.SummarySymbol sym : membersVisible) {
                             String text = sym.getName();
                             int backspaces = 0;
@@ -97,9 +97,9 @@ public class SuggestionExpander {
                                 text = "[" + CommandUtils.quote(text) + "]";
                                 backspaces = 1;
                             }
-                            SuggestionToken token = new SuggestionToken(parent, sym.getName(), text, suggestion);
+                            ExpandableSuggestionToken token = new ExpandableSuggestionToken(parent, sym.getName(), text, suggestion);
                             token.setBackspaces(backspaces);
-                            token.setIconKey(SuggestionToken.getIconKeyForTags(sym.getSuggestionTags()));
+                            token.setIconKey(ExpandableSuggestionToken.getIconKeyForTags(sym.getSuggestionTags()));
                             newTokens.add(token);
                         }
                         tokens.addAll(0, newTokens);
@@ -110,7 +110,7 @@ public class SuggestionExpander {
                         .OBJECTIVE_EXISTING: {
                     if(parent.getSummary() != null) {
                         for(String objective : ((TridentSummaryModule) parent.getSummary()).getAllObjectives()) {
-                            SuggestionToken token = new SuggestionToken(parent, objective, suggestion);
+                            ExpandableSuggestionToken token = new ExpandableSuggestionToken(parent, objective, suggestion);
                             token.setIconKey("objective");
                             tokens.add(0, token);
                         }
@@ -154,8 +154,8 @@ public class SuggestionExpander {
                                 "item", true);
                         for(SummarySymbol sym : ((TridentSummaryModule)parent.getSummary()).getSymbolsVisibleAt(suggestionModule.getSuggestionIndex())) {
                             if(sym.getSuggestionTags().contains(TridentSuggestionTags.TAG_CUSTOM_ITEM)) {
-                                SuggestionToken token = new SuggestionToken(parent, "$" + sym.getName(), suggestion);
-                                token.setIconKey(SuggestionToken.getIconKeyForTags(sym.getSuggestionTags()));
+                                ExpandableSuggestionToken token = new ExpandableSuggestionToken(parent, "$" + sym.getName(), suggestion);
+                                token.setIconKey(ExpandableSuggestionToken.getIconKeyForTags(sym.getSuggestionTags()));
                                 tokens.add(0, token);
                                 if(sym.getParentFileSummary() != parent.getSummary()) {
                                     token.setDarkened(true);
@@ -180,8 +180,8 @@ public class SuggestionExpander {
                                 "entity", true);
                         for(SummarySymbol sym : ((TridentSummaryModule)parent.getSummary()).getSymbolsVisibleAt(suggestionModule.getSuggestionIndex())) {
                             if(sym.getSuggestionTags().contains(TridentSuggestionTags.TAG_CUSTOM_ENTITY) && !sym.getSuggestionTags().contains(TridentSuggestionTags.TAG_ENTITY_COMPONENT)) {
-                                SuggestionToken token = new SuggestionToken(parent, "$" + sym.getName(), suggestion);
-                                token.setIconKey(SuggestionToken.getIconKeyForTags(sym.getSuggestionTags()));
+                                ExpandableSuggestionToken token = new ExpandableSuggestionToken(parent, "$" + sym.getName(), suggestion);
+                                token.setIconKey(ExpandableSuggestionToken.getIconKeyForTags(sym.getSuggestionTags()));
                                 tokens.add(0, token);
                                 if(sym.getParentFileSummary() != parent.getSummary()) {
                                     token.setDarkened(true);
@@ -215,7 +215,12 @@ public class SuggestionExpander {
                     break;
                 }
                 default: {
-                    Debug.log("Missing SuggestionExpander case for: " + ((ComplexSuggestion) suggestion).getKey());
+                    if(((ComplexSuggestion) suggestion).getKey().startsWith("cspn:")) {
+                        Debug.log("Found a parameter name suggestion: " + ((ComplexSuggestion) suggestion).getKey());
+                        tokens.add(new ParameterNameSuggestionToken(((ComplexSuggestion) suggestion).getKey().substring("cspn:".length())));
+                    } else {
+                        Debug.log("Missing SuggestionExpander case for: " + ((ComplexSuggestion) suggestion).getKey());
+                    }
                 }
             }
             return tokens;
