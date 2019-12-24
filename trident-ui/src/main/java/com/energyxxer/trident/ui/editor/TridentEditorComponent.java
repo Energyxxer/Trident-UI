@@ -2,6 +2,7 @@ package com.energyxxer.trident.ui.editor;
 
 import com.energyxxer.crossbow.compiler.lexer.summaries.CrossbowSummaryModule;
 import com.energyxxer.crossbow.compiler.util.CrossbowProjectSummary;
+import com.energyxxer.enxlex.lexical_analysis.LazyLexer;
 import com.energyxxer.enxlex.lexical_analysis.summary.SummaryModule;
 import com.energyxxer.enxlex.lexical_analysis.token.Token;
 import com.energyxxer.enxlex.lexical_analysis.token.TokenSection;
@@ -112,20 +113,16 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
     public void caretUpdate(CaretEvent e) {
         super.caretUpdate(e);
         displayCaretInfo();
-        parent.ensureVisible(getCaret().getProfile().get(0));
+        parent.ensureVisible(getCaret().getDot());
     }
 
     public int getCaretWordPosition() {
         int index = this.getCaretPosition();
         if(index <= 0) return 0;
-        try {
-            while (true) {
-                char c = this.getDocument().getText(index-1, 1).charAt(0);
-                if (!(Character.isJavaIdentifierPart(c) && c != '$') || --index <= 1)
-                    break;
-            }
-        } catch(BadLocationException ex) {
-            ex.printStackTrace();
+        while (true) {
+            char c = this.getFoldableDocument().getModelText(index-1, 1).charAt(0);
+            if (!(Character.isJavaIdentifierPart(c) && c != '$') || --index <= 1)
+                break;
         }
         return index;
     }
@@ -133,14 +130,10 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
     public int getSoftCaretWordPosition() {
         int index = this.getCaretPosition();
         if(index <= 0) return 0;
-        try {
-            while (true) {
-                char c = this.getDocument().getText(index-1, 1).charAt(0);
-                if (!((Character.isJavaIdentifierPart(c) && c != '$') || "#:/.".contains(c+"")) || --index <= 1)
-                    break;
-            }
-        } catch(BadLocationException ex) {
-            ex.printStackTrace();
+        while (true) {
+            char c = this.getFoldableDocument().getModelText(index-1, 1).charAt(0);
+            if (!((Character.isJavaIdentifierPart(c) && c != '$') || "#:/.".contains(c+"")) || --index <= 1)
+                break;
         }
         return index;
     }
@@ -151,6 +144,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
         Style defaultStyle = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
 
         String text = getText();
+        //Debug.log(text);
 
         Lang lang = parent.getLanguage();
         if(lang == null) return;
@@ -184,6 +178,12 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
         Token prevToken = null;
         ArrayList<String> previousTokenStyles = new ArrayList<>();
 
+        if(analysis.response != null && !analysis.response.matched) {
+            TridentWindow.setStatus(analysis.response.getErrorMessage() + (analysis.response.faultyToken != null ? ". (line " + analysis.response.faultyToken.loc.line + " column " + analysis.response.faultyToken.loc.column + ")" : ""));
+            if(analysis.response.faultyToken != null && analysis.response.faultyToken.value != null && analysis.response.faultyToken.loc != null) sd.setCharacterAttributes(analysis.response.faultyToken.loc.index, analysis.response.faultyToken.value.length(), TridentEditorComponent.this.getStyle("error"), true);
+            if(analysis.lexer instanceof LazyLexer) return;
+        }
+
         for(Token token : analysis.lexer.getStream().tokens) {
             Style style = TridentEditorComponent.this.getStyle(token.type.toString().toLowerCase());
 
@@ -191,10 +191,9 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
 
             int styleStart = token.loc.index;
 
+            sd.setCharacterAttributes(token.loc.index, token.value.length(), defaultStyle, true);
             if(style != null)
                 sd.setCharacterAttributes(token.loc.index, token.value.length(), style, false);
-            else
-                sd.setCharacterAttributes(token.loc.index, token.value.length(), defaultStyle, true);
 
             for(Map.Entry<String, Object> entry : token.attributes.entrySet()) {
                 if(!entry.getValue().equals(true)) continue;
@@ -252,15 +251,12 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
         }
         previousTokenStyles.clear();
 
-        if(analysis.response != null && !analysis.response.matched) {
-            TridentWindow.setStatus(analysis.response.getErrorMessage() + (analysis.response.faultyToken != null ? ". (line " + analysis.response.faultyToken.loc.line + " column " + analysis.response.faultyToken.loc.column + ")" : ""));
-            if(analysis.response.faultyToken != null && analysis.response.faultyToken.value != null && analysis.response.faultyToken.loc != null) sd.setCharacterAttributes(analysis.response.faultyToken.loc.index, analysis.response.faultyToken.value.length(), TridentEditorComponent.this.getStyle("error"), true);
-        }
-
         if(this.inspector != null) {
             this.inspector.inspect(analysis.lexer.getStream());
             this.inspector.insertNotices(analysis.notices);
         }
+
+        //sd.setCharacterAttributes(81, 119, getStyle("do_not_display"), true);
     }
 
     void highlight() {
@@ -306,12 +302,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
 
     @Override
     public String getText() {
-        try {
-            return getDocument().getText(0, getDocument().getLength());
-        } catch (BadLocationException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return getFoldableDocument().getUnfoldedText();
     }
 
     @Override

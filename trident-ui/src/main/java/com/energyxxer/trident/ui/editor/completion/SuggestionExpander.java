@@ -215,7 +215,6 @@ public class SuggestionExpander {
                     break;
                 }
                 case TridentSuggestionTags.BOOLEAN: {
-                    Debug.log("SUGGESTION BOOLEAN");
                     tokens.add(new ExpandableSuggestionToken(parent, "true", suggestion));
                     tokens.add(new ExpandableSuggestionToken(parent, "false", suggestion));
                     break;

@@ -8,7 +8,6 @@ import com.energyxxer.trident.ui.ToolbarButton;
 import com.energyxxer.trident.ui.ToolbarSeparator;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
-import com.energyxxer.xswing.KeyInputUtils;
 import com.energyxxer.xswing.Padding;
 import com.energyxxer.xswing.hints.TextHint;
 
@@ -106,8 +105,8 @@ public class Toolbar extends JPanel {
         ProgramAction action = ActionManager.getAction(actionKey);
         ToolbarButton button = new ToolbarButton(action.getIconKey(),tlm);
         String title = action.getTitle();
-        if(action.getShortcut() != null && action.getShortcut().getFirstKeyStroke() != null) {
-            title += " (" + KeyInputUtils.getReadableKeyStroke(action.getShortcut().getFirstKeyStroke()) + ")";
+        if(action.getShortcut() != null && action.getShortcut().getFirstMapping() != null) {
+            title += " (" + action.getShortcut().getFirstMapping().getHumanReadableName() + ")";
         }
         button.setHintText(title);
         button.addActionListener(e -> action.perform());

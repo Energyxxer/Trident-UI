@@ -4,6 +4,9 @@ import com.energyxxer.trident.files.FileType;
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.Resources;
 import com.energyxxer.trident.global.keystrokes.KeyMap;
+import com.energyxxer.trident.global.keystrokes.SpecialMapping;
+import com.energyxxer.trident.global.keystrokes.UserKeyBind;
+import com.energyxxer.trident.global.keystrokes.UserMapping;
 import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.global.temp.projects.TridentProject;
 import com.energyxxer.trident.main.WorkspaceDialog;
@@ -113,14 +116,14 @@ public class ActionManager {
         actions.put("SEARCH_EVERYWHERE",
                 new ProgramAction(
                     "Search Everywhere", "Search for files and actions",
-                    KeyMap.requestMapping("quick_access", identifierToStrokes("cs+E")).setGroupName("Windows"),
+                    KeyMap.requestMapping("quick_access", identifierToStrokes("cs+E;"+ UserKeyBind.Special.DOUBLE_SHIFT.getIdentifier())).setGroupName("Windows"),
                     QuickFindDialog.INSTANCE::reveal
                 ).setIconKey("search")
         );
         actions.put("PROJECT_PROPERTIES",
                 new ProgramAction(
                     "Project Properties", "Edit the current project",
-                    KeyMap.requestMapping("open_project_properties", identifierToStrokes("sa+S")).setGroupName("Windows"),
+                    KeyMap.requestMapping("open_project_properties", identifierToStrokes("sa+S;"+ UserKeyBind.Special.DOUBLE_SHIFT)).setGroupName("Windows"),
                     () -> {
                         Project selectedProject = Commons.getActiveProject();
                         if(selectedProject instanceof TridentProject) ProjectProperties.show((TridentProject) selectedProject);
@@ -321,5 +324,19 @@ public class ActionManager {
 
     public static ProgramAction getAction(String key) {
         return actions.get(key);
+    }
+
+    public static void performActionForSpecial(UserKeyBind.Special special) {
+        for(ProgramAction action : actions.values()) {
+            if(action.getShortcut() == null) continue;
+            boolean performed = false;
+            for(UserMapping mapping : action.getShortcut().getAllMappings()) {
+                if(mapping instanceof SpecialMapping && ((SpecialMapping) mapping).getSpecial() == special) {
+                    performed = true;
+                    break;
+                }
+            }
+            if(performed) action.perform();
+        }
     }
 }

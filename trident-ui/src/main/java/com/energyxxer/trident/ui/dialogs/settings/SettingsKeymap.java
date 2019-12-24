@@ -2,7 +2,8 @@ package com.energyxxer.trident.ui.dialogs.settings;
 
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.keystrokes.KeyMap;
-import com.energyxxer.trident.global.keystrokes.UserKeyStroke;
+import com.energyxxer.trident.global.keystrokes.UserKeyBind;
+import com.energyxxer.trident.global.keystrokes.UserMapping;
 import com.energyxxer.trident.main.window.sections.quick_find.StyledExplorerMaster;
 import com.energyxxer.trident.ui.dialogs.KeyStrokeDialog;
 import com.energyxxer.trident.ui.explorer.base.ActionHostExplorerItem;
@@ -20,7 +21,6 @@ import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenuItem;
 import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
-import com.energyxxer.xswing.KeyInputUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -78,7 +78,7 @@ public class SettingsKeymap extends JPanel {
         Settings.addOpenEvent(() -> {
             master.clear();
             HashMap<String, ArrayList<KeybindToken>> groupedKeyTokens = new HashMap<>();
-            for(UserKeyStroke ks : KeyMap.getAll()) {
+            for(UserKeyBind ks : KeyMap.getAll()) {
                 if(!groupedKeyTokens.containsKey(ks.getGroupName())) {
                     groupedKeyTokens.put(ks.getGroupName(), new ArrayList<>());
                 }
@@ -130,21 +130,21 @@ public class SettingsKeymap extends JPanel {
             entries.clear();
         });
         Settings.addApplyEvent(() -> {
-            for(UserKeyStroke uks : KeyMap.getAll()) {
+            for(UserKeyBind uks : KeyMap.getAll()) {
                 uks.applyChanges();
                 uks.save();
             }
         });
         Settings.addCancelEvent(() -> {
-            for(UserKeyStroke uks : KeyMap.getAll()) {
+            for(UserKeyBind uks : KeyMap.getAll()) {
                 uks.discardChanges();
             }
         });
     }
 
-    private static String checkCollisions(KeyStroke stroke) {
-        for(UserKeyStroke uks : KeyMap.getAll()) {
-            for(KeyStroke ks : uks.getNewStrokes()) {
+    private static String checkCollisions(UserMapping stroke) {
+        for(UserKeyBind uks : KeyMap.getAll()) {
+            for(UserMapping ks : uks.getNewMappings()) {
                 if(stroke.equals(ks)) {
                     return "Already assigned to: " + uks.getName();
                 }
@@ -158,14 +158,14 @@ public class SettingsKeymap extends JPanel {
     }
 
     private static class KeyStrokeAction implements ItemAction {
-        private UserKeyStroke stroke;
+        private UserKeyBind stroke;
 
         private int renderedWidth = 0;
 
         private int margin = 8;
         private int padding = 4;
 
-        public KeyStrokeAction(UserKeyStroke stroke) {
+        public KeyStrokeAction(UserKeyBind stroke) {
             this.stroke = stroke;
         }
 
@@ -182,11 +182,11 @@ public class SettingsKeymap extends JPanel {
 
             String styleVariant = stroke.newMatchesDefault() ? "default." : "";
 
-            List<KeyStroke> allStrokes = this.stroke.getNewStrokes();
+            List<UserMapping> allStrokes = this.stroke.getNewMappings();
             for(int i = allStrokes.size()-1; i >= 0; i--) {
-                KeyStroke stroke = allStrokes.get(i);
+                UserMapping stroke = allStrokes.get(i);
                 int plateWidth = 2*padding;
-                String readableName = KeyInputUtils.getReadableKeyStroke(stroke);
+                String readableName = stroke.getHumanReadableName();
                 plateWidth += fm.stringWidth(readableName);
 
                 g.setColor(styleProvider.getColors().get("keybind." + styleVariant + "border.color"));
@@ -233,10 +233,10 @@ public class SettingsKeymap extends JPanel {
 
     private static class KeybindToken implements CompoundActionModuleToken, NonStandardModuleToken {
 
-        private UserKeyStroke ks;
+        private UserKeyBind ks;
         private ExplorerMaster master;
 
-        public KeybindToken(UserKeyStroke ks, ExplorerMaster master) {
+        public KeybindToken(UserKeyBind ks, ExplorerMaster master) {
             this.ks = ks;
             this.master = master;
         }
@@ -262,9 +262,9 @@ public class SettingsKeymap extends JPanel {
             menu.add(new StyledMenuItem("Add Shortcut") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    KeyStroke toAdd = new KeyStrokeDialog("Add Shortcut", "Action: " + ks.getName(), SettingsKeymap::checkCollisions).result;
+                    UserMapping toAdd = new KeyStrokeDialog("Add Shortcut", "Action: " + ks.getName(), SettingsKeymap::checkCollisions).result;
                     if(toAdd != null) {
-                        List<KeyStroke> newList = ks.getNewStrokes();
+                        List<UserMapping> newList = ks.getNewMappings();
                         if(!newList.contains(toAdd)) {
                             newList.add(toAdd);
                             master.repaint();
@@ -272,13 +272,13 @@ public class SettingsKeymap extends JPanel {
                     }
                 }
             });
-            List<KeyStroke> allKeybinds = ks.getNewStrokes();
+            List<UserMapping> allKeybinds = ks.getNewMappings();
             if(!allKeybinds.isEmpty()) menu.addSeparator();
-            for(KeyStroke keybind : allKeybinds) {
-                menu.add(new StyledMenuItem("Remove " + KeyInputUtils.getReadableKeyStroke(keybind)) {
+            for(UserMapping keybind : allKeybinds) {
+                menu.add(new StyledMenuItem("Remove " + keybind.getHumanReadableName()) {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        ks.getNewStrokes().remove(keybind);
+                        ks.getNewMappings().remove(keybind);
                         master.repaint();
                     }
                 });

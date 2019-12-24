@@ -259,6 +259,14 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
                 }
             }
         }
+
+        //nullPanel.setPreferredSize(new Dimension(1,-17));
+
+        Style doNotDisplay = editorComponent.addStyle("do_not_display", null);
+        //StyleConstants.setIcon(doNotDisplay, new ImageIcon(Commons.getIcon("package")));
+        //StyleConstants.setComponent(doNotDisplay, nullPanel);
+        StyleConstants.setFontSize(doNotDisplay, 0);
+        StyleConstants.setForeground(doNotDisplay, new Color(255, 255, 255,125));
     }
 
     public void setText(String text) {

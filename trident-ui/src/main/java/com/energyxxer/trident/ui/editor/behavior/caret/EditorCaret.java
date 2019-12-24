@@ -264,7 +264,7 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
         if(dots.size() > 1) {
             return dots.size() + " carets";
         } else {
-            StringLocation loc = editor.getLocationForOffset(dots.get(0).index);
+            StringLocation loc = editor.getModelLocationForOffset(dots.get(0).index);
             return loc.line + ":" + loc.column;
         }
     }
@@ -330,7 +330,11 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
         this.dots.clear();
         Range r = new Range(0,editor.getDocument().getLength());
         for(int i = 0; i < profile.size()-1; i += 2) {
-            Dot newDot = new Dot(r.clamp(profile.get(i)),r.clamp(profile.get(i+1)), editor);
+            Dot newDot = new Dot(
+                    editor.getFoldableDocument().modelIndexToView(r.clamp(profile.get(i))),
+                    editor.getFoldableDocument().modelIndexToView(r.clamp(profile.get(i+1))),
+                    editor
+            );
             if(i == 0) bufferedDot = newDot;
             addDot(newDot);
         }

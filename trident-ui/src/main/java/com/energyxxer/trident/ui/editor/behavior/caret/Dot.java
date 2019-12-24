@@ -263,4 +263,12 @@ public class Dot {
     public boolean contains(int index) {
         return this.getMin() <= index && index < this.getMax();
     }
+
+    public int getModelIndex() {
+        return component.getFoldableDocument().viewIndexToModel(this.index);
+    }
+
+    public int getModelMark() {
+        return component.getFoldableDocument().viewIndexToModel(this.mark);
+    }
 }

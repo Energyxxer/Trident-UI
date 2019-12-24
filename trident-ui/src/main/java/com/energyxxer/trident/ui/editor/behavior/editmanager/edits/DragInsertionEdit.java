@@ -4,10 +4,10 @@ import com.energyxxer.trident.ui.editor.behavior.AdvancedEditor;
 import com.energyxxer.trident.ui.editor.behavior.caret.CaretProfile;
 import com.energyxxer.trident.ui.editor.behavior.caret.EditorCaret;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.Edit;
+import com.energyxxer.trident.ui.editor.folding.FoldableDocument;
 
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 import java.util.ArrayList;
 
 public class DragInsertionEdit extends Edit {
@@ -23,10 +23,10 @@ public class DragInsertionEdit extends Edit {
     @Override
     public boolean redo(AdvancedEditor editor) {
 
-        Document doc = editor.getDocument();
+        FoldableDocument doc = editor.getFoldableDocument();
         EditorCaret caret = editor.getCaret();
         try {
-            String result = doc.getText(0, doc.getLength()); //Result
+            String result = doc.getUnfoldedText(); //Result
 
             int characterDrift = 0;
 
@@ -67,10 +67,10 @@ public class DragInsertionEdit extends Edit {
     @Override
     public boolean undo(AdvancedEditor editor) {
 
-        Document doc = editor.getDocument();
+        FoldableDocument doc = editor.getFoldableDocument();
         EditorCaret caret = editor.getCaret();
         try {
-            String str = doc.getText(0, doc.getLength());
+            String str = doc.getUnfoldedText();
 
             for (int i = 0; i < previousProfile.size() - 1; i += 2) {
                 int start = Math.min(previousProfile.get(i), previousProfile.get(i+1));

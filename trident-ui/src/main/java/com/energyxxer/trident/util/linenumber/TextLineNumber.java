@@ -24,7 +24,7 @@ public class TextLineNumber extends JPanel
 
 	private final int HEIGHT = getPreferredSize().height;
 
-	private JTextComponent component;
+	private AdvancedEditor component;
 	private JScrollPane scrollPane;
 
 	private Color currentLineForeground = null;
@@ -39,11 +39,11 @@ public class TextLineNumber extends JPanel
 	private int lastHeight = 0;
 	private int lastLine = -1;
 
-	public TextLineNumber(JTextComponent component, JScrollPane scrollPane) {
+	public TextLineNumber(AdvancedEditor component, JScrollPane scrollPane) {
 		this(component, scrollPane, 3);
 	}
 
-	public TextLineNumber(JTextComponent component, JScrollPane scrollPane, int minimumDigits) {
+	public TextLineNumber(AdvancedEditor component, JScrollPane scrollPane, int minimumDigits) {
 		this.component = component;
 		this.scrollPane = scrollPane;
 		this.minimumDigits = minimumDigits;
@@ -51,7 +51,7 @@ public class TextLineNumber extends JPanel
 		setPadding(5);
 		component.getDocument().addDocumentListener(this);
 		component.addCaretListener( this );
-		if(component instanceof AdvancedEditor) ((AdvancedEditor) component).addCaretPaintListener(this::repaint);
+		component.addCaretPaintListener(this::repaint);
 		scrollPane.getVerticalScrollBar().addAdjustmentListener(this);
 		setOpaque(false);
 	}
@@ -100,7 +100,33 @@ public class TextLineNumber extends JPanel
 
 			Rectangle viewport = scrollPane.getViewport().getViewRect();
 
-			int start = component.modelToView(component.viewToModel(new Point(0, viewport.y))).y - viewport.y; //b1
+			int caretPosition = component.getModelLocationForOffset(component.getCaretPosition()).line;
+
+			int start = component.viewToModel(new Point(0, viewport.y));
+			int maxLength = component.getDocument().getLength();
+			int prevIndex = -1;
+			int y = -(viewport.y % lineHeight) - fontMetrics.getDescent();
+			for(int currentIndex = start; currentIndex <= maxLength; currentIndex = Utilities.getPositionBelow(component, currentIndex, 0)) {
+				if(currentIndex == prevIndex) break;
+
+				int line = getLineNumberFor(currentIndex);
+				String label = String.valueOf(line);
+				int stringWidth = fontMetrics.stringWidth(label);
+				int x = getOffsetX(availableWidth, stringWidth) + padding;
+				y += lineHeight;
+
+				if(line == caretPosition) {
+					g.setColor(getCurrentLineForeground());
+				} else {
+					g.setColor(getForeground());
+				}
+
+				g.drawString(String.valueOf(line), x, y);
+
+				prevIndex = currentIndex;
+			}
+
+			/*int start = component.modelToView(component.viewToModel(new Point(0, viewport.y))).y - viewport.y; //b1
 			int startLine = getLineNumberFor(component.viewToModel(new Point(0, viewport.y))); //a1
 			int endLine = getLineCount();
 
@@ -119,7 +145,7 @@ public class TextLineNumber extends JPanel
 				}
 
 				g.drawString(label, x, y);
-			}
+			}*/
 
 		} catch(BadLocationException e) {
 			e.printStackTrace();
@@ -135,7 +161,7 @@ public class TextLineNumber extends JPanel
 	}
 
 	protected int getLineNumberFor(int offset) {
-		return component.getDocument().getDefaultRootElement().getElementIndex(offset) + 1;
+		return component.getModelLocationForOffset(offset).line;
 	}
 
 	private int getOffsetX(int availableWidth, int stringWidth)

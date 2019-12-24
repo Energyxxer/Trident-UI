@@ -37,7 +37,7 @@ public class CaretProfile implements Iterable<Integer> {
     }
 
     public boolean add(Dot dot) {
-        return add(dot.index, dot.mark);
+        return add(dot.getModelIndex(), dot.getModelMark());
     }
 
     public Integer get(int index) {

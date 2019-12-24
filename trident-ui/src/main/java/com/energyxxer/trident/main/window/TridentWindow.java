@@ -3,6 +3,7 @@ package com.energyxxer.trident.main.window;
 import com.energyxxer.trident.global.Resources;
 import com.energyxxer.trident.global.Status;
 import com.energyxxer.trident.global.TabManager;
+import com.energyxxer.trident.global.keystrokes.UserKeyBind;
 import com.energyxxer.trident.main.TridentUI;
 import com.energyxxer.trident.main.window.actions.ActionManager;
 import com.energyxxer.trident.main.window.sections.MenuBar;
@@ -96,7 +97,7 @@ public class TridentWindow {
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher((e) -> {
 			if(e.getID() == KeyEvent.KEY_PRESSED) {
 				if(e.getKeyCode() == KeyEvent.VK_SHIFT && isDoublePress(e)) {
-					QuickFindDialog.INSTANCE.reveal();
+					ActionManager.performActionForSpecial(UserKeyBind.Special.DOUBLE_SHIFT);
 					return true;
 				} else if(e.getKeyCode() != KeyEvent.VK_SHIFT && e.isShiftDown()) {
 					interruptDoublePresses();

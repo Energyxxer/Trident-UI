@@ -3,12 +3,14 @@ package com.energyxxer.trident.ui.editor.behavior;
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.global.keystrokes.KeyMap;
+import com.energyxxer.trident.global.keystrokes.UserKeyBind;
 import com.energyxxer.trident.ui.editor.behavior.caret.CaretProfile;
 import com.energyxxer.trident.ui.editor.behavior.caret.Dot;
 import com.energyxxer.trident.ui.editor.behavior.caret.EditorCaret;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.EditManager;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.edits.*;
 import com.energyxxer.trident.ui.editor.completion.SuggestionInterface;
+import com.energyxxer.trident.ui.editor.folding.FoldableDocument;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.trident.util.linepainter.LinePainter;
 import com.energyxxer.util.Disposable;
@@ -58,13 +60,24 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
     private EditManager editManager = new EditManager(this);
     private LinePainter linePainter;
 
-    private final StringLocationCache lineCache = new StringLocationCache();
+    private final StringLocationCache modelLineCache = new StringLocationCache();
+    private final StringLocationCache viewLineCache = new StringLocationCache();
 
     private SuggestionInterface suggestionInterface;
 
     private int lineHeight = 17;
+    private FoldableDocument foldableDoc;
+
+    private static UserKeyBind FOLD;
+    private static UserKeyBind UNFOLD;
+
+    static {
+        UNFOLD = KeyMap.requestMapping("test.unfold", KeyMap.identifierToStrokes("")).setName("Unfold").setGroupName("Testing - please do not use");
+        FOLD = KeyMap.requestMapping("test.fold", KeyMap.identifierToStrokes("")).setName("Fold").setGroupName("Testing - please do not use");
+    }
 
     {
+        this.setStyledDocument(foldableDoc = new FoldableDocument());
         this.getDocument().putProperty(DefaultEditorKit.EndOfLineStringProperty, "\n");
 
         linePainter = new LinePainter(this);
@@ -72,7 +85,8 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         this.addKeyListener(this);
 
         this.getDocument().addUndoableEditListener(e -> {
-            lineCache.setText(this.getText());
+            modelLineCache.setText(getFoldableDocument().getUnfoldedText());
+            viewLineCache.setText(getFoldableDocument().getFoldedText());
         });
 
         this.getDocument().addDocumentListener((UnifiedDocumentListener) e -> updateDefaultSize());
@@ -195,6 +209,16 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
             editManager.insertEdit(new LineMoveEdit(this, Dot.DOWN));
         } else if(keyCode == KeyEvent.VK_ESCAPE) {
             caret.deselect();
+        } else if(FOLD.wasPerformedExact(e)) {
+            Debug.log("FOLDING");
+            foldableDoc.fold(caret.getDots().get(0).getMin(), caret.getDots().get(0).getMax());
+            caret.deselect();
+            e.consume();
+        } else if(UNFOLD.wasPerformedExact(e)) {
+            Debug.log("UNFOLDING");
+            foldableDoc.unfold();
+            caret.deselect();
+            e.consume();
         }
 
         if(e.isConsumed() && suggestionInterface != null) {
@@ -206,8 +230,12 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         return editManager;
     }
 
+    public StringLocation getModelLocationForOffset(int index) {
+        return modelLineCache.getLocationForOffset(foldableDoc.viewIndexToModel(index));
+    }
+
     public StringLocation getLocationForOffset(int index) {
-        return lineCache.getLocationForOffset(index);
+        return viewLineCache.getLocationForOffset(index);
     }
 
     @Override
@@ -650,5 +678,9 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
     @Deprecated
     public void selectAll() {
         super.selectAll();
+    }
+
+    public FoldableDocument getFoldableDocument() {
+        return foldableDoc;
     }
 }

@@ -108,7 +108,9 @@ public class LinePainter
             if (lastView == null)
                 lastView = r;
         }
-        catch(BadLocationException ble) {ble.printStackTrace();}
+        catch(BadLocationException ble) {
+            ble.printStackTrace();
+        }
     }
 
     /*

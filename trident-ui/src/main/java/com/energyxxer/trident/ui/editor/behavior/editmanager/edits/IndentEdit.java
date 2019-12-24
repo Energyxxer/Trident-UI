@@ -5,6 +5,7 @@ import com.energyxxer.trident.ui.editor.behavior.caret.CaretProfile;
 import com.energyxxer.trident.ui.editor.behavior.caret.Dot;
 import com.energyxxer.trident.ui.editor.behavior.caret.EditorCaret;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.Edit;
+import com.energyxxer.trident.ui.editor.folding.FoldableDocument;
 import com.energyxxer.util.StringUtil;
 
 import javax.swing.text.BadLocationException;
@@ -36,13 +37,13 @@ public class IndentEdit extends Edit {
 
     @Override
     public boolean redo(AdvancedEditor editor) {
-        Document doc = editor.getDocument();
+        FoldableDocument doc = editor.getFoldableDocument();
         EditorCaret caret = editor.getCaret();
 
         boolean actionPerformed = false;
 
         try {
-            String text = doc.getText(0, doc.getLength()); //Result
+            String text = doc.getUnfoldedText(); //Result
             this.modifications.clear();
 
             int characterDrift = 0;

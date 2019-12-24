@@ -1,5 +1,6 @@
 package com.energyxxer.trident.main.window.sections;
 
+import com.energyxxer.trident.global.keystrokes.SimpleMapping;
 import com.energyxxer.trident.main.window.actions.ActionManager;
 import com.energyxxer.trident.main.window.actions.ProgramAction;
 import com.energyxxer.trident.ui.common.MenuItems;
@@ -284,7 +285,7 @@ public class MenuBar extends JMenuBar {
     private static StyledMenuItem createItemForAction(String actionKey) {
         ProgramAction action = ActionManager.getAction(actionKey);
         StyledMenuItem item = new StyledMenuItem(action.getTitle(), action.getIconKey());
-        if(action.getShortcut() != null && action.getShortcut().getFirstKeyStroke() != null) item.setAccelerator(action.getShortcut().getFirstKeyStroke());
+        if(action.getShortcut() != null && action.getShortcut().getFirstMapping() instanceof SimpleMapping) item.setAccelerator(((SimpleMapping) action.getShortcut().getFirstMapping()).getKeyStroke());
         item.addActionListener(e -> action.perform());
         return item;
     }

@@ -26,9 +26,9 @@ public class JSONLexerProfile extends LexerProfile {
 
     private static final TokenType
             BRACE = new TokenType("BRACE"), // (, ), {, }...
-            COMMA = new TokenType("COMMA"), // {1[,] 2[,]...}
-            COLON = new TokenType("COLON"), // case 8[:]
-            NUMBER = new TokenType("NUMBER"), // 0.1f
+            COMMA = new TokenType("COMMA"), // ,
+            COLON = new TokenType("COLON"), // :
+            NUMBER = new TokenType("NUMBER"), // 0.1
             STRING_LITERAL = new TokenType("STRING_LITERAL"), // "STRING LITERAL"
             BOOLEAN = new TokenType("BOOLEAN"); // true, false
 

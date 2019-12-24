@@ -1,5 +1,9 @@
 package com.energyxxer.trident.ui.dialogs;
 
+import com.energyxxer.trident.global.keystrokes.SimpleMapping;
+import com.energyxxer.trident.global.keystrokes.SpecialMapping;
+import com.energyxxer.trident.global.keystrokes.UserKeyBind;
+import com.energyxxer.trident.global.keystrokes.UserMapping;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.ToolbarButton;
 import com.energyxxer.trident.ui.styledcomponents.*;
@@ -25,10 +29,10 @@ public class KeyStrokeDialog  {
     private final JDialog dialog;
     private final StyledTextField field;
     private final StyledButton okButton;
-    private final Function<KeyStroke, String> warningFunction;
+    private final Function<UserMapping, String> warningFunction;
     private final StyledLabel warningLabel;
 
-    public KeyStroke result = null;
+    public UserMapping result = null;
 
     private ThemeListenerManager tlm = new ThemeListenerManager();
 
@@ -36,7 +40,7 @@ public class KeyStrokeDialog  {
         this(title, query, null);
     }
 
-    public KeyStrokeDialog(String title, String query, Function<KeyStroke, String> warningFunction) {
+    public KeyStrokeDialog(String title, String query, Function<UserMapping, String> warningFunction) {
         dialog = new JDialog(TridentWindow.jframe);
         this.warningFunction = warningFunction;
 
@@ -73,7 +77,7 @@ public class KeyStrokeDialog  {
                 @Override
                 public void keyPressed(KeyEvent e) {
                     if(e.getModifiers() != 0 || (e.getKeyCode() != KeyEvent.VK_ESCAPE && e.getKeyCode() != KeyEvent.VK_ENTER)) {
-                        setResult(KeyStroke.getKeyStroke(e.getKeyCode(), e.getModifiers()));
+                        setResult(new SimpleMapping(KeyStroke.getKeyStroke(e.getKeyCode(), e.getModifiers())));
                         e.consume();
                     }
                 }
@@ -97,41 +101,50 @@ public class KeyStrokeDialog  {
                 menu.add(new StyledMenuItem("Set Enter") {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        setResult(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
+                        setResult(new SimpleMapping(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)));
                     }
                 });
                 menu.add(new StyledMenuItem("Set Escape") {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        setResult(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
+                        setResult(new SimpleMapping(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)));
                     }
                 });
                 menu.add(new StyledMenuItem("Set Tab") {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        setResult(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0));
+                        setResult(new SimpleMapping(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0)));
                     }
                 });
                 menu.add(new StyledMenuItem("Set " + (System.getProperty("os.name").contains("mac") ? "Command" : "Ctrl") + "+Tab") {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         //noinspection MagicConstant
-                        setResult(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyInputUtils.getPlatformControlMask()));
+                        setResult(new SimpleMapping(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyInputUtils.getPlatformControlMask())));
                     }
                 });
                 menu.add(new StyledMenuItem("Set " + (System.getProperty("os.name").contains("mac") ? "Command" : "Ctrl") + "+Shift+Tab") {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         //noinspection MagicConstant
-                        setResult(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyInputUtils.getPlatformControlMask() | KeyEvent.SHIFT_MASK));
+                        setResult(new SimpleMapping(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyInputUtils.getPlatformControlMask() | KeyEvent.SHIFT_MASK)));
                     }
                 });
                 menu.add(new StyledMenuItem("Set Shift+Tab") {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        setResult(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyEvent.SHIFT_MASK));
+                        setResult(new SimpleMapping(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyEvent.SHIFT_MASK)));
                     }
                 });
+                menu.addSeparator();
+                for(UserKeyBind.Special special : UserKeyBind.Special.values()) {
+                    menu.add(new StyledMenuItem("Set " + special.getHumanReadableKeystroke()) {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            setResult(new SpecialMapping(special));
+                        }
+                    });
+                }
                 menu.show(extraBtn, 0, extraBtn.getHeight());
             });
             fieldPanel.add(extraBtn, BorderLayout.EAST);
@@ -200,13 +213,15 @@ public class KeyStrokeDialog  {
         dialog.setVisible(true);
     }
 
-    private void setResult(KeyStroke keyStroke) {
-        if(keyStroke.getKeyCode() == KeyEvent.VK_SHIFT ||
-                keyStroke.getKeyCode() == KeyEvent.VK_CONTROL ||
-                keyStroke.getKeyCode() == KeyEvent.VK_META ||
-                keyStroke.getKeyCode() == KeyEvent.VK_ALT) return;
-        result = keyStroke;
-        field.setText(KeyInputUtils.getReadableKeyStroke(result));
+    private void setResult(UserMapping mapping) {
+        if(mapping instanceof SimpleMapping && (
+                ((SimpleMapping) mapping).getKeyStroke().getKeyCode() == KeyEvent.VK_SHIFT ||
+                ((SimpleMapping) mapping).getKeyStroke().getKeyCode() == KeyEvent.VK_CONTROL ||
+                ((SimpleMapping) mapping).getKeyStroke().getKeyCode() == KeyEvent.VK_META ||
+                ((SimpleMapping) mapping).getKeyStroke().getKeyCode() == KeyEvent.VK_ALT)
+        ) return;
+        result = mapping;
+        field.setText(result.getHumanReadableName());
 
         if(warningFunction != null) {
             String warn = warningFunction.apply(result);

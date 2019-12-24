@@ -334,9 +334,14 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         this.safe = safe;
     }
 
+    private boolean disposed = false;
+
     @Override
     public void dispose() {
-        super.dispose();
-        tlm.dispose();
+        if(!disposed) {
+            super.dispose();
+            tlm.dispose();
+        }
+        disposed = true;
     }
 }
