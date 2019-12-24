@@ -164,6 +164,7 @@ public class StandardOrderListItem extends OrderListElement implements ItemActio
 
     private boolean isActionEnabled(int index) {
         ItemAction action = actions.get(index);
+        if(action.getActionCode() == 0) return true;
         if(action.getActionCode() == 1) return master.getAllElements().indexOf(this) != master.getAllElements().size()-1;
         if(action.getActionCode() == 2) return master.getAllElements().indexOf(this) != 0;
         return action.getActionCode() == -1;
