@@ -2,7 +2,6 @@ package com.energyxxer.trident.util;
 
 import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
-import com.energyxxer.util.FileUtil;
 
 import java.io.File;
 
@@ -16,8 +15,8 @@ public class ProjectUtil {
         Project associatedProject = ProjectManager.getAssociatedProject(file);
         return (
                 (associatedProject != null) ?
-                        FileUtil.stripExtension(
-                                FileUtil.getRelativePath(
+                        FileCommons.stripExtension(
+                                FileCommons.getRelativePath(
                                         file,
                                         associatedProject.getServerDataRoot()
                                 )

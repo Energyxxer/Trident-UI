@@ -4,7 +4,7 @@ import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.display.DisplayModule;
 import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
-import com.energyxxer.util.FileUtil;
+import com.energyxxer.trident.util.FileCommons;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -37,7 +37,7 @@ public class WorkspaceRootModuleToken implements ModuleToken {
 
         ArrayList<ModuleToken> subTokens = new ArrayList<>();
         if(root.exists()) {
-            for(File file : FileUtil.listFilesOrdered(root)) {
+            for(File file : FileCommons.listFilesOrdered(root)) {
                 subTokens.add(new FileModuleToken(file));
             }
         }

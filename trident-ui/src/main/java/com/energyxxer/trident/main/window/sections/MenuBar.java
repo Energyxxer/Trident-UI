@@ -185,7 +185,7 @@ public class MenuBar extends JMenuBar {
                         URL url = TridentUI.class.getResource("/natives/");
 
                         File extractedNatives = new File(System.getProperty("user.home") + File.separator + "Trident" + File.separator + "natives" + File.separator);
-                        FileUtil.deleteFolder(extractedNatives);
+                        FileCommons.deleteFolder(extractedNatives);
                         extractedNatives.mkdir();
 
                         String protocol = url.getProtocol();

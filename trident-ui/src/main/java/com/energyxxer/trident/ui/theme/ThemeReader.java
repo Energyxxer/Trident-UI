@@ -1,10 +1,10 @@
 package com.energyxxer.trident.ui.theme;
 
-import com.energyxxer.util.FileUtil;
+import com.energyxxer.trident.util.FileCommons;
 import com.energyxxer.trident.util.LineReader;
 import com.energyxxer.trident.util.Range;
 
-import java.awt.Color;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -31,7 +31,7 @@ public class ThemeReader {
 
     public Theme read(Theme.ThemeType type, File file) throws ThemeParserException {
         try {
-            return read(type, FileUtil.stripExtension(file.getName()), LineReader.read(file));
+            return read(type, FileCommons.stripExtension(file.getName()), LineReader.read(file));
         } catch(IOException x) {
             throw new ThemeParserException(x.getMessage(),0,"");
         }

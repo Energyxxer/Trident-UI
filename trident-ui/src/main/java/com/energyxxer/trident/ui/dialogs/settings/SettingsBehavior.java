@@ -151,9 +151,20 @@ class SettingsBehavior extends JPanel {
 
                 content.add(showExtensions);
             }
+            {
+                content.add(new Padding(15));
+            }
+            {
+                StyledCheckBox showExtensions = new StyledCheckBox("Move to Trash on file delete","Settings.content");
+                showExtensions.setAlignmentX(Component.LEFT_ALIGNMENT);
+                Settings.addOpenEvent(() -> showExtensions.setSelected(FileModuleToken.DELETE_MOVES_TO_TRASH.get()));
+                Settings.addApplyEvent(() -> FileModuleToken.DELETE_MOVES_TO_TRASH.set(showExtensions.isSelected()));
+
+                content.add(showExtensions);
+            }
 
             {
-                content.add(new Padding(40));
+                content.add(new Padding(30));
             }
 
 

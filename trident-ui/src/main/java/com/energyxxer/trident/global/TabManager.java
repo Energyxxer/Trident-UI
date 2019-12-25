@@ -36,8 +36,8 @@ public class TabManager {
 	private boolean changeWindowInfo = false;
 	private String openTabSaveKey = null;
 
-	public static Preferences.SettingPref<Boolean> SAVE_OPEN_TABS = new Preferences.SettingPref<>("settings.behavior.save_open_tabs", true, Boolean::new);
-	public static final Preferences.SettingPref<Integer> TAB_LIMIT = new Preferences.SettingPref<>("settings.behavior.tab_limit", 0, Integer::new);
+	public static Preferences.SettingPref<Boolean> SAVE_OPEN_TABS = new Preferences.SettingPref<>("settings.behavior.save_open_tabs", true, Boolean::parseBoolean);
+	public static final Preferences.SettingPref<Integer> TAB_LIMIT = new Preferences.SettingPref<>("settings.behavior.tab_limit", 0, Integer::parseInt);
 
 	public List<Tab> openTabs = Collections.synchronizedList(new ArrayList<>());
 

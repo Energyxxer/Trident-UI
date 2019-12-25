@@ -10,7 +10,7 @@ import com.energyxxer.trident.ui.styledcomponents.StyledIcon;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.styledcomponents.StyledTextField;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
-import com.energyxxer.util.FileUtil;
+import com.energyxxer.trident.util.FileCommons;
 import com.energyxxer.xswing.Padding;
 
 import javax.swing.*;
@@ -203,7 +203,7 @@ public class FolderDialog {
         }
 
         //Check if package name is a valid filename
-        valid = FileUtil.validatePath(str);
+        valid = FileCommons.validatePath(str);
         if(!valid) {
             displayError("Error: Not a valid file name");
         }

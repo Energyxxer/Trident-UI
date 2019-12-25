@@ -18,7 +18,7 @@ import com.energyxxer.trident.ui.imageviewer.ImageViewer;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenu;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenuItem;
 import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
-import com.energyxxer.util.FileUtil;
+import com.energyxxer.trident.util.FileCommons;
 import com.energyxxer.util.logger.Debug;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,9 +43,10 @@ public class FileModuleToken implements ModuleToken, DraggableExplorerModuleToke
     private static final int MAX_RECENT_FILES = 16;
     public static final ArrayList<File> recentFiles = new ArrayList<>(MAX_RECENT_FILES);
 
-    public static final Preferences.SettingPref<Boolean> SHOW_EXTENSIONS_EXPLORER = new Preferences.SettingPref<>("settings.behavior.hide_extensions.explorer", true, Boolean::new);
-    public static final Preferences.SettingPref<Boolean> SHOW_EXTENSIONS_TAB = new Preferences.SettingPref<>("settings.behavior.hide_extensions.tab", true, Boolean::new);
-    public static final Preferences.SettingPref<Boolean> LOAD_PNGS = new Preferences.SettingPref<>("settings.behavior.load_pngs", true, Boolean::new);
+    public static final Preferences.SettingPref<Boolean> SHOW_EXTENSIONS_EXPLORER = new Preferences.SettingPref<>("settings.behavior.hide_extensions.explorer", true, Boolean::parseBoolean);
+    public static final Preferences.SettingPref<Boolean> SHOW_EXTENSIONS_TAB = new Preferences.SettingPref<>("settings.behavior.hide_extensions.tab", true, Boolean::parseBoolean);
+    public static final Preferences.SettingPref<Boolean> LOAD_PNGS = new Preferences.SettingPref<>("settings.behavior.load_pngs", true, Boolean::parseBoolean);
+    public static final Preferences.SettingPref<Boolean> DELETE_MOVES_TO_TRASH = new Preferences.SettingPref<>("settings.behavior.delete_moves_to_trash", true, Boolean::parseBoolean);
 
     private final File file;
     private boolean isProjectRoot;
@@ -303,7 +304,7 @@ public class FileModuleToken implements ModuleToken, DraggableExplorerModuleToke
                 String newName = new PromptDialog("Rename", "Enter a new name for the file:", name) {
                     @Override
                     protected boolean validate(String str) {
-                        return str.trim().length() > 0 && FileUtil.validateFilename(str)
+                        return str.trim().length() > 0 && FileCommons.validateFilename(str)
                                 && !new File(pathToParent + str).exists();
                     }
 

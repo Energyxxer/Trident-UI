@@ -3,6 +3,7 @@ package com.energyxxer.trident.ui.common;
 import com.energyxxer.trident.files.FileType;
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.main.window.TridentWindow;
+import com.energyxxer.trident.ui.modules.FileModuleToken;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenu;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenuItem;
 
@@ -73,7 +74,7 @@ public class MenuItems {
 			item = new StyledMenuItem("Copy");
 			break;
 		case DELETE:
-			item = new StyledMenuItem("Delete");
+			item = new StyledMenuItem(FileModuleToken.DELETE_MOVES_TO_TRASH.get() ? "Move to Trash" : "Delete");
 			/*item.setEnabled(false);
 			item.setEnabled(ExplorerMaster.selectedLabels.size() > 0);
 			item.addActionListener(e -> {
@@ -99,7 +100,7 @@ public class MenuItems {
 						"        Are you sure you want to delete " + subject + "?        ",
 						"Delete " + fileType, JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 				if (confirmation == JOptionPane.YES_OPTION) {
-					for(File file : files) FileUtil.deleteFolder(file);
+					for(File file : files) FileCommons.deleteFolder(file);
 					TridentWindow.projectExplorer.refresh();
 				}
 			});*/

@@ -56,8 +56,8 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
     private final Timer timer;
     private Thread highlightingThread = null;
 
-    public static final Preferences.SettingPref<Integer> AUTOREPARSE_DELAY = new Preferences.SettingPref<>("settings.editor.auto_reparse_delay", 500, Integer::new);
-    public static final Preferences.SettingPref<Boolean> SHOW_SUGGESTIONS = new Preferences.SettingPref<>("settings.editor.show_suggestions", true, Boolean::new);
+    public static final Preferences.SettingPref<Integer> AUTOREPARSE_DELAY = new Preferences.SettingPref<>("settings.editor.auto_reparse_delay", 500, Integer::parseInt);
+    public static final Preferences.SettingPref<Boolean> SHOW_SUGGESTIONS = new Preferences.SettingPref<>("settings.editor.show_suggestions", true, Boolean::parseBoolean);
 
     TridentEditorComponent(TridentEditorModule parent) {
         this.parent = parent;

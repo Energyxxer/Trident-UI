@@ -41,7 +41,7 @@ public class ProjectExplorerMaster extends StyledExplorerMaster implements DropT
     private DraggableExplorerModuleToken[] draggingFiles = null;
     private ArrayList<ExplorerElement> draggingRollover = new ArrayList<>();
 
-    public static Preferences.SettingPref<Boolean> SAVE_EXPLORER_TREE = new Preferences.SettingPref<>("settings.behavior.save_explorer_tree", true, Boolean::new);
+    public static Preferences.SettingPref<Boolean> SAVE_EXPLORER_TREE = new Preferences.SettingPref<>("settings.behavior.save_explorer_tree", true, Boolean::parseBoolean);
 
     public static final ExplorerFlag
             FLATTEN_EMPTY_PACKAGES = new ExplorerFlag("Flatten Empty Packages"),

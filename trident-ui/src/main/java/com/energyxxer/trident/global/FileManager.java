@@ -2,10 +2,12 @@ package com.energyxxer.trident.global;
 
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.dialogs.ConfirmDialog;
+import com.energyxxer.trident.ui.modules.FileModuleToken;
+import com.energyxxer.trident.util.FileCommons;
 import com.energyxxer.trident.util.ProjectUtil;
-import com.energyxxer.util.FileUtil;
 import com.energyxxer.util.logger.Debug;
 
+import java.awt.*;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -83,7 +85,7 @@ public class FileManager {
                 if(file.getName().endsWith(".tdn") || file.getName().endsWith(".mcfunction")) {
                     subject.append("function ");
                     subject.append('\'');
-                    subject.append(FileUtil.stripExtension(file.getName()));
+                    subject.append(FileCommons.stripExtension(file.getName()));
                 } else {
                     subject.append("file ");
                     subject.append('\'');
@@ -93,9 +95,9 @@ public class FileManager {
             subject.append('\'');
         }
 
-        String query = "Delete " + subject + "?";
+        String query = FileModuleToken.DELETE_MOVES_TO_TRASH.get() ? ("Move " + subject + " to trash?") : ( "Delete " + subject + "?");
 
-        boolean confirmation = new ConfirmDialog("Delete", query).result;
+        boolean confirmation = new ConfirmDialog(FileModuleToken.DELETE_MOVES_TO_TRASH.get() ? "Move to Trash" : "Permanently Delete", query).result;
 
         if(!confirmation) return;
 
@@ -103,13 +105,26 @@ public class FileManager {
             File file = new File(path);
             if(!file.exists()) continue;
             if(file.isDirectory()) {
-                FileUtil.deleteFolder(file);
+                FileCommons.deleteFolder(file);
             } else {
-                boolean success = file.delete();
+                boolean success = deleteOrTrashFile(file);
                 if(!success) Debug.log("Couldn't delete file '" + file.getName() + "'", Debug.MessageType.ERROR);
             }
         }
         TridentWindow.projectExplorer.refresh();
         TridentWindow.tabManager.checkForDeletion();
+    }
+
+    public static boolean deleteOrTrashFile(File file) {
+        if(FileModuleToken.DELETE_MOVES_TO_TRASH.get()) {
+            if(Desktop.getDesktop().isSupported(Desktop.Action.MOVE_TO_TRASH)) {
+                return Desktop.getDesktop().moveToTrash(file);
+            } else if(new ConfirmDialog("Move to Trash", "'Move to Trash' is not supported in your platform. Permanently delete '" + file + "'?").result) {
+                return file.delete();
+            }
+            return false;
+        } else {
+            return file.delete();
+        }
     }
 }
