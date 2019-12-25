@@ -46,8 +46,7 @@ public class DefinitionUpdateProcess extends AbstractProcess {
 
     public void checkForUpdates() {
         try {
-            Debug.log("Checking for definition updates");
-            updateStatus("Checking for updates");
+            updateStatus("Checking for definition updates");
             JsonElement lastCheckedDefCommitElement = Resources.resources.get("last-checked-definition-commit");
             lastCheckedDefCommit = null;
             if(lastCheckedDefCommitElement != null) {
@@ -172,7 +171,7 @@ public class DefinitionUpdateProcess extends AbstractProcess {
         }
     }
 
-    private static InputStream retrieveStreamForURL(String link, boolean accept404Null) throws IOException {
+    public static InputStream retrieveStreamForURL(String link, boolean accept404Null) throws IOException {
         URL latestURL = new URL(link);
         HttpURLConnection connection = (HttpURLConnection) latestURL.openConnection();
 
@@ -198,7 +197,7 @@ public class DefinitionUpdateProcess extends AbstractProcess {
         }
     }
 
-    private static String inputStreamToString(InputStream is) throws IOException {
+    public static String inputStreamToString(InputStream is) throws IOException {
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(is));
         String inputLine;
@@ -214,6 +213,6 @@ public class DefinitionUpdateProcess extends AbstractProcess {
         ProcessManager.queueProcess(new DefinitionUpdateProcess());
     }
 
-    private class UpdateAbortException extends RuntimeException {
+    public class UpdateAbortException extends RuntimeException {
     }
 }

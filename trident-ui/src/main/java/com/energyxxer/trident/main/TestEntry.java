@@ -1,8 +1,8 @@
 package com.energyxxer.trident.main;
 
-import com.energyxxer.trident.util.FileCommons;
-
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 
 public class TestEntry {
 
@@ -29,6 +29,14 @@ public class TestEntry {
         System.out.println(System.getProperty("java.version"));
         System.out.println(getJavaVersion() == 8);
 
-        System.out.println(FileCommons.createCopyFileName(new File("C:\\Users\\PC\\AppData\\Local\\Packages\\Microsoft.MinecraftUWP_8wekyb3d8bbwe\\LocalState\\games\\com.mojang\\minecraftWorlds\\Project KS\\behavior_packs\\ksBP\\functions\\health_interface\\")));
+
+        String javaPath = System.getProperty("java.home")
+                + File.separator + "bin" + File.separator + "java";
+        ProcessBuilder pb = new ProcessBuilder(javaPath, "-jar", Paths.get("C:\\Users\\PC\\Desktop\\temp\\Trident-UI u0_1_0c0_5_0-beta.jar").toString());
+        try {
+            pb.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

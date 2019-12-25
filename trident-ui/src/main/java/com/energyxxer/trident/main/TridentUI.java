@@ -8,6 +8,7 @@ import com.energyxxer.trident.global.temp.projects.ProjectManager;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.main.window.sections.tools.ConsoleBoard;
 import com.energyxxer.trident.ui.commodoreresources.DefinitionUpdateProcess;
+import com.energyxxer.trident.ui.common.ProgramUpdateProcess;
 import com.energyxxer.trident.ui.editor.completion.snippets.SnippetManager;
 import com.energyxxer.util.ImageManager;
 import com.energyxxer.util.logger.Debug;
@@ -41,9 +42,20 @@ public class TridentUI {
 			"SOFTWARE.\n";
 
 	public static TridentUI trident;
-	public static final String UI_VERSION = "0.1.0";
+	public static final String UI_VERSION = "0.0.9";
 	public static final String MIXED_VERSION = "u" + UI_VERSION + "c" + TridentCompiler.TRIDENT_LANGUAGE_VERSION;
 	public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
+
+	public static File RUNNING_PATH;
+
+	static {
+		try {
+			RUNNING_PATH = new File(TridentUI.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+		} catch(Exception x) {
+			x.printStackTrace();
+			RUNNING_PATH = null;
+		}
+	}
 
 	public static TridentWindow window;
 
@@ -131,6 +143,7 @@ public class TridentUI {
 		TridentWindow.projectExplorer.openExplorerTree();
 		SnippetManager.load();
 
+		if(ProgramUpdateProcess.CHECK_FOR_PROGRAM_UPDATES_STARTUP.get()) ProgramUpdateProcess.tryUpdate();
 		if(DefinitionUpdateProcess.CHECK_FOR_DEF_UPDATES_STARTUP.get()) DefinitionUpdateProcess.tryUpdate();
 
 		ConsoleBoard.registerCommandHandler("license", new ConsoleBoard.CommandHandler() {
@@ -150,6 +163,12 @@ public class TridentUI {
 				Debug.log("\n"+LICENSE);
 			}
 		});
+
+
+		Debug.log("java path: " + System.getProperty("java.home")
+				+ File.separator + "bin" + File.separator + "java");
+		//C:\Program Files\Java\jdk-13.0.1\bin\java (via intellij)
+		//C:\Program Files\Java\jdk-11.0.4\bin\java
 	}
 
 }

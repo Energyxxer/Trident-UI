@@ -1,5 +1,6 @@
 package com.energyxxer.trident.main.window;
 
+import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.global.Resources;
 import com.energyxxer.trident.global.Status;
 import com.energyxxer.trident.global.TabManager;
@@ -32,6 +33,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -78,6 +81,14 @@ public class TridentWindow {
 		jframe = new JFrame();
 		setTitle("");
 		jframe.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+
+		if(Preferences.get("meta.delete_old_jar", null) != null) {
+			File oldJar = new File(Preferences.get("meta.delete_old_jar"));
+			if(oldJar.delete()) {
+				Preferences.remove("meta.delete_old_jar");
+				Debug.log("Deleted '" + oldJar + "'");
+			}
+		}
 
 		tlm.addThemeChangeListener(t -> jframe.getContentPane().setBackground(t.getColor(new Color(215, 215, 215), "Window.background")));
 
@@ -232,6 +243,12 @@ public class TridentWindow {
 		jframe.dispatchEvent(new WindowEvent(jframe, WindowEvent.WINDOW_CLOSING));
 	}
 
+	private static File restartingJar = null;
+
+	public static void setRestartingJar(File value) {
+		restartingJar = value;
+	}
+
 	private static void terminate() {
 		Debug.log("Terminating...");
 		tabManager.saveOpenTabs();
@@ -239,6 +256,19 @@ public class TridentWindow {
 		Resources.saveAll();
 		SnippetManager.save();
 		jframe.dispose();
-		System.exit(0);
+		if(restartingJar != null) {
+			try {
+				String javaPath = System.getProperty("java.home")
+						+ File.separator + "bin" + File.separator + "java";
+				ProcessBuilder pb = new ProcessBuilder(javaPath, "-jar", restartingJar.getPath());
+				pb.start();
+				System.exit(0);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			restartingJar = null;
+		} else {
+			System.exit(0);
+		}
 	}
 }

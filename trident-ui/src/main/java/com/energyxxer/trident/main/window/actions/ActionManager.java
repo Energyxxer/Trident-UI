@@ -134,9 +134,9 @@ public class ActionManager {
         );
         actions.put("CHECK_FOR_UPDATES",
                 new ProgramAction(
-                    "Check for Updates", "Check for definition updates",
-                    KeyMap.requestMapping("update_check"),
-                    DefinitionUpdateProcess::tryUpdate
+                        "Check for Definition Updates", "Check for definition updates",
+                        KeyMap.requestMapping("update_check"),
+                        DefinitionUpdateProcess::tryUpdate
                 )
         );
         actions.put("CHANGE_WORKSPACE",

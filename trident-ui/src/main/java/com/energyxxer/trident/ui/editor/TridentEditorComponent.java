@@ -35,6 +35,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.*;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 import java.util.function.Function;
@@ -236,7 +237,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
             }
 
             if(analysis.response != null) {
-                ps: for(Map.Entry<String, String[]> entry : parent.parserStyles.entrySet()) {
+                ps: for(Map.Entry<String, String[]> entry : Collections.synchronizedSet(parent.parserStyles.entrySet())) {
                     String[] tagList = entry.getValue();
                     int startIndex = token.tags.indexOf(tagList[0]);
                     if(startIndex < 0) continue;
