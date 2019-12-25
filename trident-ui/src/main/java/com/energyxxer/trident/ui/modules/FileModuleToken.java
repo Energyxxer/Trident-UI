@@ -25,7 +25,10 @@ import org.jetbrains.annotations.NotNull;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -279,24 +282,81 @@ public class FileModuleToken implements ModuleToken, DraggableExplorerModuleToke
 
         if(context == TokenContext.EXPLORER) {
             List<ModuleToken> selectedTokens = TridentWindow.projectExplorer.getSelectedTokens();
-            ArrayList<FileModuleToken> selectedFiles = new ArrayList<>();
-            selectedFiles.add(this);
+            ArrayList<FileModuleToken> selectedFileTokens = new ArrayList<>();
+            ArrayList<File> selectedFiles = new ArrayList<>();
+            selectedFileTokens.add(this);
             for(ModuleToken token : selectedTokens) {
-                if(token instanceof FileModuleToken && token != this) selectedFiles.add((FileModuleToken) token);
+                if(token instanceof FileModuleToken) {
+                    if(token != this) selectedFileTokens.add((FileModuleToken) token);
+                    selectedFiles.add(((FileModuleToken) token).getFile());
+                }
             }
 
+            ArrayList<String> selectedPaths = new ArrayList<>();
+            for(FileModuleToken file : selectedFileTokens) {
+                selectedPaths.add(file.getPath());
+            }
 
-            menu.add(MenuItems.fileItem(MenuItems.FileMenuItem.COPY));
-            menu.add(MenuItems.fileItem(MenuItems.FileMenuItem.PASTE));
+            StyledMenuItem copyItem = MenuItems.fileItem(MenuItems.FileMenuItem.COPY);
+            copyItem.addActionListener(e -> {
+                Clipboard clipboard = menu.getToolkit().getSystemClipboard();
+                clipboard.setContents(new Transferable() {
+                    @Override
+                    public DataFlavor[] getTransferDataFlavors() {
+                        return new DataFlavor[] {DataFlavor.javaFileListFlavor, DataFlavor.stringFlavor};
+                    }
+
+                    @Override
+                    public boolean isDataFlavorSupported(DataFlavor flavor) {
+                        return flavor == DataFlavor.stringFlavor || flavor == DataFlavor.javaFileListFlavor;
+                    }
+
+                    @NotNull
+                    @Override
+                    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+                        if(flavor == DataFlavor.stringFlavor) {
+                            StringBuilder sb = new StringBuilder();
+                            for(File file : selectedFiles) {
+                                sb.append(file);
+                                sb.append('\n');
+                            }
+                            if(sb.length() > 0) sb.setLength(sb.length()-1);
+                            return sb.toString();
+                        }
+                        if(flavor == DataFlavor.javaFileListFlavor) return selectedFiles;
+                        throw new UnsupportedFlavorException(flavor);
+                    }
+                }, null);
+            });
+            menu.add(copyItem);
+
+            StyledMenuItem pasteItem = MenuItems.fileItem(MenuItems.FileMenuItem.PASTE);
+            pasteItem.addActionListener(e -> {
+                try {
+                    Clipboard clipboard = menu.getToolkit().getSystemClipboard();
+                    if (clipboard.isDataFlavorAvailable(DataFlavor.javaFileListFlavor)) {
+                        //noinspection unchecked
+                        File[] filesToCopy = ((List<File>) clipboard.getData(DataFlavor.javaFileListFlavor)).toArray(new File[0]);
+                        for (File destination : selectedFiles) {
+                            if (destination.isFile()) destination = destination.getParentFile();
+                            FileCommons.copyFiles(filesToCopy, destination);
+                            TridentWindow.projectExplorer.refresh();
+                        }
+                    }
+                } catch (UnsupportedFlavorException | IOException x) {
+                    x.printStackTrace();
+                }
+            });
+            menu.add(pasteItem);
 
 
             menu.addSeparator();
 
             StyledMenuItem renameItem = MenuItems.fileItem(MenuItems.FileMenuItem.RENAME);
             renameItem.addActionListener(e -> {
-                if(selectedFiles.size() != 1) return;
+                if(selectedFileTokens.size() != 1) return;
 
-                String pathToRename = selectedFiles.get(0).getPath();
+                String pathToRename = selectedFileTokens.get(0).getPath();
                 String name = new File(pathToRename).getName();
                 String rawName = name.substring(0, name.contains(".") ? name.lastIndexOf(".") : name.length());
                 final String pathToParent = pathToRename.substring(0, pathToRename.lastIndexOf(name));
@@ -338,11 +398,7 @@ public class FileModuleToken implements ModuleToken, DraggableExplorerModuleToke
 
 
             StyledMenuItem deleteItem = MenuItems.fileItem(MenuItems.FileMenuItem.DELETE);
-            deleteItem.setEnabled(selectedFiles.size() >= 1);
-            ArrayList<String> selectedPaths = new ArrayList<>();
-            for(FileModuleToken file : selectedFiles) {
-                selectedPaths.add(file.getPath());
-            }
+            deleteItem.setEnabled(selectedFileTokens.size() >= 1);
             deleteItem.addActionListener(e -> FileManager.delete(selectedPaths));
             menu.add(deleteItem);
 
