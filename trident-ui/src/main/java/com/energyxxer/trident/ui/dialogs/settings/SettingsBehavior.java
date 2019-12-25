@@ -190,7 +190,7 @@ class SettingsBehavior extends JPanel {
                 content.add(label);
             }
             {
-                StyledLabel label = new StyledLabel("Enter 0 for no limit:","Settings.content", tlm);
+                StyledLabel label = new StyledLabel("Enter 0 for no limit.","Settings.content", tlm);
                 content.add(label);
             }
             //endregion
