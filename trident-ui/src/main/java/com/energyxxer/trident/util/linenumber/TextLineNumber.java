@@ -128,27 +128,6 @@ public class TextLineNumber extends JPanel
 				if(y >= viewport.height) break;
 			}
 
-			/*int start = component.modelToView(component.viewToModel(new Point(0, viewport.y))).y - viewport.y; //b1
-			int startLine = getLineNumberFor(component.viewToModel(new Point(0, viewport.y))); //a1
-			int endLine = getLineCount();
-
-			int caretPosition = getLineNumberFor(component.viewToModel(new Point(0,component.modelToView(component.getCaretPosition()).y)));
-
-			for (int n = startLine; n <= endLine; n++) {
-				String label = String.valueOf(n);
-				int stringWidth = fontMetrics.stringWidth(label);
-				int x = getOffsetX(availableWidth, stringWidth) + padding;
-				int y = (start + ((n-startLine+1)*lineHeight)) - (lineHeight/4);
-
-				if(n == caretPosition) {
-					g.setColor(getCurrentLineForeground());
-				} else {
-					g.setColor(getForeground());
-				}
-
-				g.drawString(label, x, y);
-			}*/
-
 		} catch(BadLocationException e) {
 			e.printStackTrace();
 		}
