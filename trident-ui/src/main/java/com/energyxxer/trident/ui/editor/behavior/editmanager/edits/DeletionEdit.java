@@ -76,7 +76,14 @@ public class DeletionEdit extends Edit {
                             if(forwards) {
                                 start = new Dot(start, end, editor).getPositionAfter();
                             } else {
-                                start = new Dot(start, end, editor).getPositionBefore();
+                                Dot tempDot = new Dot(start, end, editor);
+                                if(tempDot.isInIndentation()) {
+                                    start = tempDot.getRowStart()-1;
+                                    if(start < 0) start = 0;
+                                    end = tempDot.getRowContentStart();
+                                } else {
+                                    start = tempDot.getPositionBefore();
+                                }
                             }
                         }
                     }

@@ -91,7 +91,7 @@ public class Dot {
             actionPerformed = true;
         } else if(key == KeyEvent.VK_HOME) {
             if (!isPlatformControlDown(e)) {
-                nextPos = getRowStart();
+                nextPos = getRowHome();
             }
             doUpdateX = true;
             actionPerformed = true;
@@ -161,6 +161,18 @@ public class Dot {
         return component.getDocument().getLength();
     }
 
+    public int getRowHome() {
+        try {
+            int rowStart = Utilities.getRowStart(component, index);
+            int pos = component.getNextWord(rowStart);
+            if(index <= pos && index > rowStart) return rowStart;
+            return pos;
+        } catch(BadLocationException ble) {
+            Debug.log(ble.getMessage(), Debug.MessageType.ERROR);
+        }
+        return index;
+    }
+
     public int getWordStart() {
         try {
             return Math.max(component.getWordStart(index), Math.max(0,getRowStart()-1));
@@ -197,6 +209,20 @@ public class Dot {
             Debug.log(ble.getMessage(), Debug.MessageType.ERROR);
         }
         return index;
+    }
+
+    public int getRowContentStart() {
+        try {
+            int rowStart = Utilities.getRowStart(component, index);
+            return component.getNextWord(rowStart);
+        } catch(BadLocationException ble) {
+            Debug.log(ble.getMessage(), Debug.MessageType.ERROR);
+        }
+        return index;
+    }
+
+    public boolean isInIndentation() {
+        return this.index >= getRowStart() && this.index <= getRowContentStart();
     }
 
     public StringBounds getBounds() {
