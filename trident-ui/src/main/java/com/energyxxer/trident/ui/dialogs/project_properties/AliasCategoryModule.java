@@ -6,6 +6,7 @@ import com.energyxxer.trident.global.temp.Lang;
 import com.energyxxer.trident.ui.display.DisplayModule;
 import com.energyxxer.trident.ui.editor.TridentEditorModule;
 import com.energyxxer.trident.ui.modules.ModuleToken;
+import com.energyxxer.util.Disposable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -14,7 +15,7 @@ import java.awt.*;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-public class AliasCategoryModule extends JPanel implements DisplayModule {
+public class AliasCategoryModule extends JPanel implements DisplayModule, Disposable {
     private String category;
     private JsonObject config;
     private TridentEditorModule editorModule;
@@ -108,5 +109,10 @@ public class AliasCategoryModule extends JPanel implements DisplayModule {
     @Override
     public boolean transform(ModuleToken newToken) {
         return false;
+    }
+
+    @Override
+    public void dispose() {
+        editorModule.dispose();
     }
 }

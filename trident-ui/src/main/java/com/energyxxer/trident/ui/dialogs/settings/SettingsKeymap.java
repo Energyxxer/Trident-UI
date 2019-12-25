@@ -70,7 +70,7 @@ public class SettingsKeymap extends JPanel {
 
             JScrollPane sp = new JScrollPane(master);
             sp.setBorder(new EmptyBorder(0,0,0,0));
-            sp.setLayout(new OverlayScrollPaneLayout(sp));
+            sp.setLayout(new OverlayScrollPaneLayout(sp, tlm));
 
             content.add(sp, BorderLayout.CENTER);
 

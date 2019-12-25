@@ -24,9 +24,7 @@ public class OverlayScrollBarUI extends BasicScrollBarUI {
 
     private JScrollPane sp;
 
-    private ThemeListenerManager tlm = new ThemeListenerManager();
-
-    public OverlayScrollBarUI(JScrollPane sp) {
+    public OverlayScrollBarUI(JScrollPane sp, ThemeListenerManager tlm) {
         super();
         this.sp = sp;
 

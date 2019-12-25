@@ -49,7 +49,7 @@ public class Sidebar extends OverlayBorderPanel {
         StyledLabel label = new StyledLabel("Project Explorer", "Explorer.header", tlm);
         label.setFontSize(14);
         label.setPreferredSize(new Dimension(500, 25));
-        header.add(new Padding(15, "Explorer.header.indent"), BorderLayout.WEST);
+        header.add(new Padding(15, tlm, "Explorer.header.indent"), BorderLayout.WEST);
         header.add(label, BorderLayout.CENTER);
 
         tlm.addThemeChangeListener(t -> {
@@ -141,7 +141,7 @@ public class Sidebar extends OverlayBorderPanel {
 
         JScrollPane sp = new JScrollPane(TridentWindow.projectExplorer = new ProjectExplorerMaster());
         sp.setBorder(new EmptyBorder(0, 0, 0, 0));
-        sp.setLayout(new OverlayScrollPaneLayout(sp));
+        sp.setLayout(new OverlayScrollPaneLayout(sp, tlm));
 
         expanded.add(sp, BorderLayout.CENTER);
     }

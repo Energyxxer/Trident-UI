@@ -17,16 +17,14 @@ public class OverlayScrollPaneLayout extends ScrollPaneLayout {
     private int thumbSize = 10;
     private final JScrollPane sp;
 
-    private ThemeListenerManager tlm = new ThemeListenerManager();
-
-    public OverlayScrollPaneLayout(JScrollPane sp) {
+    public OverlayScrollPaneLayout(JScrollPane sp, ThemeListenerManager tlm) {
         this.sp = sp;
         tlm.addThemeChangeListener(t -> {
             thumbSize = t.getInteger(10, "General.scrollbar.thickness");
         });
 
-        sp.getVerticalScrollBar().setUI(new OverlayScrollBarUI(sp));
-        sp.getHorizontalScrollBar().setUI(new OverlayScrollBarUI(sp));
+        sp.getVerticalScrollBar().setUI(new OverlayScrollBarUI(sp, tlm));
+        sp.getHorizontalScrollBar().setUI(new OverlayScrollBarUI(sp, tlm));
         sp.getVerticalScrollBar().setUnitIncrement(20);
         sp.getHorizontalScrollBar().setUnitIncrement(20);
         sp.getVerticalScrollBar().setOpaque(false);

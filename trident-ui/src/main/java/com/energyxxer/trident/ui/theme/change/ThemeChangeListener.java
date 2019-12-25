@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public interface ThemeChangeListener extends Disposable {
 	
-	ArrayList<ThemeChangeListener> listeners = new ArrayList<ThemeChangeListener>();
+	ArrayList<ThemeChangeListener> listeners = new ArrayList<>();
 
 	static void addThemeChangeListener(ThemeChangeListener l) {
 		addThemeChangeListener(l, false);
@@ -26,14 +26,19 @@ public interface ThemeChangeListener extends Disposable {
 	}
 	
 	static void dispatchThemeChange(Theme t) {
-		for(int i = 0; i < listeners.size(); i++) {
-			listeners.get(i).themeChanged(t);
+		for(ThemeChangeListener listener : listeners) {
+			listener.themeChanged(t);
 		}
 	}
 	
 	void themeChanged(Theme t);
 
-	default void dispose() {
+	default void disposeTLM() {
 		listeners.remove(this);
 	}
+
+	default void dispose() {
+		disposeTLM();
+	}
+
 }

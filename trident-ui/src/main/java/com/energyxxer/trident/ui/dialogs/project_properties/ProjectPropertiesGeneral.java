@@ -155,7 +155,7 @@ class ProjectPropertiesGeneral extends JPanel {
                 content.add(label);
             }
             {
-                StyledTextField namespaceField = new StyledTextField("trident_temp_please_specify_default_namespace","ProjectProperties.content");
+                StyledTextField namespaceField = new StyledTextField("trident_temp_please_specify_default_namespace","ProjectProperties.content", tlm);
                 namespaceField.setPreferredSize(new Dimension(300,25));
                 namespaceField.setMaximumSize(new Dimension(200,25));
                 namespaceField.setAlignmentX(Component.LEFT_ALIGNMENT);

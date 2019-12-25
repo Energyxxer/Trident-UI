@@ -56,7 +56,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         this.explorer = new StyledExplorerMaster("EditorSuggestions");
 
         JPanel contentPane = new JPanel(new BorderLayout());
-        scrollPane = new OverlayScrollPane(explorer);
+        scrollPane = new OverlayScrollPane(tlm, explorer);
         contentPane.add(scrollPane);
         contentPane.add(parameterLabel = new StyledLabel(" <ENTITY>", "EditorSuggestions.header", tlm), BorderLayout.NORTH);
 
@@ -341,6 +341,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         if(!disposed) {
             super.dispose();
             tlm.dispose();
+            explorer.dispose();
         }
         disposed = true;
     }

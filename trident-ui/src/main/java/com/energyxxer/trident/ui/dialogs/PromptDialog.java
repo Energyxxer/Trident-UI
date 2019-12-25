@@ -56,7 +56,7 @@ public class PromptDialog {
             subContent.add(label, BorderLayout.CENTER);
             label.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            field = new StyledTextField(defaultText);
+            field = new StyledTextField(defaultText, tlm);
             field.setMaximumSize(new Dimension(Integer.MAX_VALUE,30));
             field.setAlignmentX(Component.LEFT_ALIGNMENT);
             field.getDocument().addUndoableEditListener(l -> revalidate(field.getText()));

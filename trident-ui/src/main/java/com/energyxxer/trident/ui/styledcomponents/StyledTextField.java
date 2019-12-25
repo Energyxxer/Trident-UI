@@ -15,29 +15,19 @@ public class StyledTextField extends XTextField {
 
     private String namespace = null;
 
-    private ThemeListenerManager tlm = new ThemeListenerManager();
-
-    public StyledTextField() {
-        this(null,null,-1);
+    public StyledTextField(ThemeListenerManager tlm) {
+        this(null,null,tlm);
     }
 
-    public StyledTextField(String text) {
-        this(text,null,-1);
+    public StyledTextField(String text, ThemeListenerManager tlm) {
+        this(text,null,tlm);
     }
 
-    public StyledTextField(String text, String namespace) {
-        this(text,namespace,-1);
+    public StyledTextField(String text, String namespace, ThemeListenerManager tlm) {
+        this(text,namespace,-1,tlm);
     }
 
-    public StyledTextField(int columns) {
-        this(null,null,columns);
-    }
-
-    public StyledTextField(int columns, String namespace) {
-        this(null,namespace,columns);
-    }
-
-    public StyledTextField(String text, String namespace, int columns) {
+    public StyledTextField(String text, String namespace, int columns, ThemeListenerManager tlm) {
         if(text != null) this.setText(text);
         if(namespace != null) this.setNamespace(namespace);
         if(columns >= 0) this.setColumns(columns);

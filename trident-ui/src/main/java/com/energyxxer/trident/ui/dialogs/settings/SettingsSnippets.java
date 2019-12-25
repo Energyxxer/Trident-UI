@@ -158,7 +158,7 @@ public class SettingsSnippets extends JPanel implements ContentSwapper {
 
             JScrollPane sp = new JScrollPane(master);
             sp.setBorder(new EmptyBorder(0,0,0,0));
-            sp.setLayout(new OverlayScrollPaneLayout(sp));
+            sp.setLayout(new OverlayScrollPaneLayout(sp, tlm));
 
             listPane.add(sp, BorderLayout.CENTER);
 
@@ -184,6 +184,15 @@ public class SettingsSnippets extends JPanel implements ContentSwapper {
             Settings.addApplyEvent(() -> {
                 SnippetManager.getAll().clear();
                 SnippetManager.getAll().addAll(snippets);
+            });
+
+            Settings.addCloseEvent(() -> {
+                master.getChildren().forEach(e -> {
+                    if(e.getToken() instanceof Disposable) {
+                        ((Disposable) e.getToken()).dispose();
+                    }
+                });
+                master.clear();
             });
         }
     }

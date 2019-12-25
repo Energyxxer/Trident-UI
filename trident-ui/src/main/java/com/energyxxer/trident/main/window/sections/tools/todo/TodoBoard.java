@@ -58,10 +58,10 @@ public class TodoBoard extends ToolBoard {
         }
     }
 
-    private OverlayScrollPane scrollPane = new OverlayScrollPane();
-    private StyledExplorerMaster explorer = new TodoExplorer();
-
     private ThemeListenerManager tlm = new ThemeListenerManager();
+
+    private OverlayScrollPane scrollPane = new OverlayScrollPane(tlm);
+    private StyledExplorerMaster explorer = new TodoExplorer();
 
     public TodoBoard(ToolBoardMaster parent) {
         super(parent);

@@ -59,7 +59,7 @@ public class FileDialog {
         iconPanel.setPreferredSize(new Dimension(73, 48));
         iconPanel.add(new Padding(25), BorderLayout.WEST);
         iconPanel.setBorder(new EmptyBorder(0, 0, 0, 2));
-        iconPanel.add(icon = new StyledIcon("file", 48, 48, Image.SCALE_SMOOTH));
+        iconPanel.add(icon = new StyledIcon("file", 48, 48, Image.SCALE_SMOOTH, tlm));
         pane.add(iconPanel, BorderLayout.WEST);
         //</editor-fold>
 
@@ -93,7 +93,7 @@ public class FileDialog {
             entry.setOpaque(false);
             entry.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
 
-            nameField = new StyledTextField("", "NewFileDialog");
+            nameField = new StyledTextField("", "NewFileDialog", tlm);
             nameField.getDocument().addUndoableEditListener(e -> validateInput());
 
             entry.add(nameField, BorderLayout.CENTER);

@@ -3,11 +3,11 @@ package com.energyxxer.trident.main.window.sections.tools;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.explorer.NoticeExplorerMaster;
 import com.energyxxer.trident.ui.scrollbar.OverlayScrollPaneLayout;
+import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 
-import javax.swing.JScrollPane;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.awt.*;
 
 /**
  * Created by User on 5/16/2017.
@@ -16,6 +16,7 @@ public class NoticeBoard extends ToolBoard {
 
     private static final int BOARD_HEIGHT = 250;
 
+    private ThemeListenerManager tlm = new ThemeListenerManager();
 
     public NoticeBoard(ToolBoardMaster parent) {
         super(parent);
@@ -60,7 +61,7 @@ public class NoticeBoard extends ToolBoard {
 
         JScrollPane sp = new JScrollPane(TridentWindow.noticeExplorer = new NoticeExplorerMaster());
         sp.setBorder(new EmptyBorder(0,0,0,0));
-        sp.setLayout(new OverlayScrollPaneLayout(sp));
+        sp.setLayout(new OverlayScrollPaneLayout(sp, tlm));
 
         this.add(sp, BorderLayout.CENTER);
 

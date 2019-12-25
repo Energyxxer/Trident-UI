@@ -55,7 +55,7 @@ public class ProjectDialog {
         iconPanel.setPreferredSize(new Dimension(73, 48));
         iconPanel.add(new Padding(25), BorderLayout.WEST);
         iconPanel.setBorder(new EmptyBorder(0, 0, 0, 2));
-        iconPanel.add(new StyledIcon("project", 48, 48, Image.SCALE_SMOOTH));
+        iconPanel.add(new StyledIcon("project", 48, 48, Image.SCALE_SMOOTH, tlm));
         pane.add(iconPanel, BorderLayout.WEST);
         //</editor-fold>
 
@@ -88,7 +88,7 @@ public class ProjectDialog {
             entry.setOpaque(false);
             entry.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
 
-            nameField = new StyledTextField("", "NewProjectDialog");
+            nameField = new StyledTextField("", "NewProjectDialog", tlm);
             nameField.getDocument().addUndoableEditListener(e -> validateInput());
 
             entry.add(nameField, BorderLayout.CENTER);

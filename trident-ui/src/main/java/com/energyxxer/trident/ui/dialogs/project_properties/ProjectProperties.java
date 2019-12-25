@@ -29,6 +29,7 @@ public class ProjectProperties {
 
 	private static ArrayList<Consumer<TridentProject>> openEvents = new ArrayList<>();
 	private static ArrayList<Consumer<TridentProject>> applyEvents = new ArrayList<>();
+	private static ArrayList<Runnable> closeEvents = new ArrayList<>();
 
 	private static JPanel currentSection;
 
@@ -106,6 +107,7 @@ public class ProjectProperties {
 					dialog.setVisible(false);
 					applyEvents.forEach(ae -> ae.accept(project));
 					project.updateConfig();
+					closeEvents.forEach(Runnable::run);
 				});
 			}
 
@@ -159,6 +161,7 @@ public class ProjectProperties {
 
 	private static void cancel() {
 		dialog.setVisible(false);
+		closeEvents.forEach(Runnable::run);
 	}
 
 	public static void show(TridentProject p) {
@@ -175,4 +178,8 @@ public class ProjectProperties {
 	static void addApplyEvent(Consumer<TridentProject> r) {
 		applyEvents.add(r);
 	}
+
+    public static void addCloseEvent(Runnable r) {
+		closeEvents.add(r);
+    }
 }

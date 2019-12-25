@@ -26,6 +26,7 @@ public class Settings {
 	private static ArrayList<Runnable> openEvents = new ArrayList<>();
 	private static ArrayList<Runnable> applyEvents = new ArrayList<>();
 	private static ArrayList<Runnable> cancelEvents = new ArrayList<>();
+	private static ArrayList<Runnable> closeEvents = new ArrayList<>();
 
 	private static JPanel currentSection;
 
@@ -99,6 +100,7 @@ public class Settings {
 				okay.addActionListener(e -> {
 					dialog.setVisible(false);
 					applyEvents.forEach(Runnable::run);
+					closeEvents.forEach(Runnable::run);
 				});
 			}
 
@@ -149,6 +151,7 @@ public class Settings {
 	private static void cancel() {
 		dialog.setVisible(false);
 		cancelEvents.forEach(Runnable::run);
+		closeEvents.forEach(Runnable::run);
 	}
 
 	public static void show() {
@@ -169,4 +172,8 @@ public class Settings {
     public static void addCancelEvent(Runnable r) {
 		cancelEvents.add(r);
     }
+
+	public static void addCloseEvent(Runnable r) {
+		closeEvents.add(r);
+	}
 }

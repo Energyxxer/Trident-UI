@@ -6,6 +6,7 @@ import com.energyxxer.trident.ui.modules.FileModuleToken;
 import com.energyxxer.trident.ui.modules.ModuleToken;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.trident.util.MathUtil;
+import com.energyxxer.util.Disposable;
 import com.energyxxer.util.ImageManager;
 import com.energyxxer.util.StringUtil;
 import com.energyxxer.util.logger.Debug;
@@ -23,7 +24,7 @@ import static com.energyxxer.trident.ui.editor.behavior.AdvancedEditor.isPlatfor
 /**
  * Created by User on 2/8/2017.
  */
-public class ImageViewer extends JPanel implements DisplayModule, MouseWheelListener, MouseMotionListener, KeyListener {
+public class ImageViewer extends JPanel implements DisplayModule, MouseWheelListener, MouseMotionListener, KeyListener, Disposable {
 
     private static final double MIN_SCALE = 0.25;
     private static final double MAX_SCALE = 50;
@@ -305,5 +306,10 @@ public class ImageViewer extends JPanel implements DisplayModule, MouseWheelList
             this.file = ((FileModuleToken) newToken).getFile();
         }
         return true;
+    }
+
+    @Override
+    public void dispose() {
+        tlm.dispose();
     }
 }

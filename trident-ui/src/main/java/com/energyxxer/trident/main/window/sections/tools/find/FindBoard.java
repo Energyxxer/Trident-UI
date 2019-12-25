@@ -31,7 +31,7 @@ public class FindBoard extends ToolBoard implements FindExplorerFilter {
 
         this.setPreferredSize(new Dimension(1, 300));
 
-        this.add(new OverlayScrollPane(explorer), BorderLayout.CENTER);
+        this.add(new OverlayScrollPane(tlm, explorer), BorderLayout.CENTER);
         JPanel filterPanel = new JPanel(new BorderLayout());
 
         JPanel wrapper = new JPanel(new BorderLayout());

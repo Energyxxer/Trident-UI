@@ -92,7 +92,7 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
         this.fileMaskEnabled = new StyledCheckBox("File Mask:", "FindInPath.header");
         controlsPanel.add(this.fileMaskEnabled);
 
-        this.fileMask = new StyledTextField("", "FindInPath.header");
+        this.fileMask = new StyledTextField("", "FindInPath.header", tlm);
         this.fileMask.setPreferredSize(new Dimension(60, 24));
         this.fileMask.setText("*.tdn");
         controlsPanel.add(this.fileMask);
@@ -114,7 +114,7 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
 
 
 
-        this.field = new StyledTextField("", "FindInPath");
+        this.field = new StyledTextField("", "FindInPath", tlm);
         field.setPreferredSize(new Dimension(1, 28));
         this.field.addKeyListener(new KeyAdapter() {
             @Override
@@ -129,7 +129,7 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
         this.field.getDocument().addDocumentListener((UnifiedDocumentListener) e -> updateLastEdit());
         header.add(this.field, BorderLayout.SOUTH);
         contentPanel.add(header, BorderLayout.NORTH);
-        this.scrollPane = new OverlayScrollPane(this.explorer);
+        this.scrollPane = new OverlayScrollPane(tlm, this.explorer);
         contentPanel.add(this.scrollPane, BorderLayout.CENTER);
 
         //this.addMouseListener(this);

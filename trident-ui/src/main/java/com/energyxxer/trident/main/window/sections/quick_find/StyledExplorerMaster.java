@@ -5,11 +5,12 @@ import com.energyxxer.trident.ui.explorer.base.ExplorerFlag;
 import com.energyxxer.trident.ui.explorer.base.ExplorerMaster;
 import com.energyxxer.trident.ui.explorer.base.elements.ExplorerElement;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
+import com.energyxxer.util.Disposable;
 
 import java.awt.*;
 import java.util.function.Predicate;
 
-public class StyledExplorerMaster extends ExplorerMaster {
+public class StyledExplorerMaster extends ExplorerMaster implements Disposable {
 
     private ThemeListenerManager tlm = new ThemeListenerManager();
     private boolean forceSelectNext;
@@ -214,5 +215,10 @@ public class StyledExplorerMaster extends ExplorerMaster {
             setSelectedIndex(0);
             forceSelectNext = false;
         }
+    }
+
+    @Override
+    public void dispose() {
+        tlm.dispose();
     }
 }

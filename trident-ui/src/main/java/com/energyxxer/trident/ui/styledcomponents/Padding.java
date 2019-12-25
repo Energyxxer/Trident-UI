@@ -9,9 +9,13 @@ import java.awt.Dimension;
  */
 public class Padding extends com.energyxxer.xswing.Padding {
 
-    private ThemeListenerManager tlm = new ThemeListenerManager();
+    public Padding(int size) {
+        Dimension dim = new Dimension(size, size);
+        this.setPreferredSize(dim);
+        this.setMaximumSize(dim);
+    }
 
-    public Padding(int size, String... keys) {
+    public Padding(int size, ThemeListenerManager tlm, String... keys) {
         tlm.addThemeChangeListener(t -> {
             int realSize = t.getInteger(size, keys);
             Dimension dim = new Dimension(realSize, realSize);

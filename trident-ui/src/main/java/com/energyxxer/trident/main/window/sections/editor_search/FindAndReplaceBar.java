@@ -96,7 +96,7 @@ public class FindAndReplaceBar extends JPanel implements Disposable {
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         topPanel.setOpaque(false);
-        topPanel.add(new StyledIcon("search_28", 23, 23, SCALE_SMOOTH));
+        topPanel.add(new StyledIcon("search_28", 23, 23, SCALE_SMOOTH, tlm));
         topPanel.add(createInput(false));
         inputPanel.add(topPanel, BorderLayout.NORTH);
         ToolbarButton prevButton = new ToolbarButton("triangle_up", tlm);
@@ -112,7 +112,7 @@ public class FindAndReplaceBar extends JPanel implements Disposable {
         selectButton.addActionListener(e -> onSelectAll());
         topPanel.add(selectButton);
 
-        topPanel.add(new ToolbarSeparator());
+        topPanel.add(new ToolbarSeparator(tlm));
 
 
         {
@@ -322,9 +322,9 @@ public class FindAndReplaceBar extends JPanel implements Disposable {
         }
         JScrollPane scrollPane = new JScrollPane(field);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        scrollPane.getVerticalScrollBar().setUI(new OverlayScrollBarUI(scrollPane));
-        scrollPane.getHorizontalScrollBar().setUI(new OverlayScrollBarUI(scrollPane));
-        scrollPane.setLayout(new OverlayScrollPaneLayout(scrollPane));
+        scrollPane.getVerticalScrollBar().setUI(new OverlayScrollBarUI(scrollPane, tlm));
+        scrollPane.getHorizontalScrollBar().setUI(new OverlayScrollBarUI(scrollPane, tlm));
+        scrollPane.setLayout(new OverlayScrollPaneLayout(scrollPane, tlm));
 
         field.addDefaultSizeListener(preferredSize -> {
             scrollPane.setPreferredSize(preferredSize);
@@ -456,5 +456,7 @@ public class FindAndReplaceBar extends JPanel implements Disposable {
 
     public void dispose() {
         tlm.dispose();
+        findField.dispose();
+        replaceField.dispose();
     }
 }

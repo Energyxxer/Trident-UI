@@ -76,7 +76,7 @@ class SettingsGeneral extends JPanel {
             }
 
             {
-                StyledTextField nameField = new StyledTextField("","Settings.content");
+                StyledTextField nameField = new StyledTextField("","Settings.content", tlm);
                 nameField.setMaximumSize(new Dimension(300,25));
                 nameField.setAlignmentX(Component.LEFT_ALIGNMENT);
                 Settings.addOpenEvent(() -> nameField.setText(Preferences.get("username","User")));
@@ -95,7 +95,7 @@ class SettingsGeneral extends JPanel {
             }
 
             {
-                StyledTextField libField = new StyledTextField("","Settings.content");
+                StyledTextField libField = new StyledTextField("","Settings.content", tlm);
                 libField.setMaximumSize(new Dimension(300,25));
                 libField.setAlignmentX(Component.LEFT_ALIGNMENT);
                 Settings.addOpenEvent(() -> libField.setText(Preferences.get("nativelib","null")));

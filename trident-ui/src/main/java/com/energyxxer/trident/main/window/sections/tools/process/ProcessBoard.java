@@ -5,6 +5,7 @@ import com.energyxxer.trident.main.window.sections.tools.ToolBoard;
 import com.energyxxer.trident.main.window.sections.tools.ToolBoardMaster;
 import com.energyxxer.trident.ui.explorer.base.StandardExplorerItem;
 import com.energyxxer.trident.ui.scrollbar.OverlayScrollPane;
+import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.logger.Debug;
 import com.energyxxer.util.processes.AbstractProcess;
 
@@ -13,7 +14,7 @@ import java.util.ConcurrentModificationException;
 
 public class ProcessBoard extends ToolBoard {
 
-    private OverlayScrollPane scrollPane = new OverlayScrollPane();
+    private OverlayScrollPane scrollPane = new OverlayScrollPane(new ThemeListenerManager());
     private StyledExplorerMaster explorer = new StyledExplorerMaster();
 
     public ProcessBoard(ToolBoardMaster parent) {

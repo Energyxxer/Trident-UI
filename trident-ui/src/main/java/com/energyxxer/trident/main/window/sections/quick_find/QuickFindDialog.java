@@ -83,7 +83,7 @@ public class QuickFindDialog extends JDialog implements WindowFocusListener, Act
 
 
 
-        this.field = new StyledTextField("", "QuickAccess");
+        this.field = new StyledTextField("", "QuickAccess", tlm);
         field.setPreferredSize(new Dimension(1, 28));
         this.field.addKeyListener(new KeyAdapter() {
             @Override
@@ -97,7 +97,7 @@ public class QuickFindDialog extends JDialog implements WindowFocusListener, Act
         this.field.getDocument().addDocumentListener((UnifiedDocumentListener) e -> updateLastEdit());
         header.add(this.field, BorderLayout.SOUTH);
         contentPanel.add(header, BorderLayout.NORTH);
-        this.scrollPane = new OverlayScrollPane(this.explorer);
+        this.scrollPane = new OverlayScrollPane(tlm, this.explorer);
         contentPanel.add(this.scrollPane, BorderLayout.CENTER);
 
         tlm.addThemeChangeListener(t -> {

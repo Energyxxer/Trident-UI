@@ -9,6 +9,7 @@ import com.energyxxer.trident.ui.orderlist.CompoundActionModuleToken;
 import com.energyxxer.trident.ui.orderlist.ItemAction;
 import com.energyxxer.trident.ui.orderlist.ItemCheckboxAction;
 import com.energyxxer.trident.ui.styledcomponents.*;
+import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.Disposable;
 import com.energyxxer.util.logger.Debug;
 import com.energyxxer.xswing.ComponentResizer;
@@ -21,6 +22,8 @@ import java.util.Collections;
 import java.util.Map;
 
 public class SnippetModuleToken implements CompoundActionModuleToken, Disposable {
+    private final ThemeListenerManager tlm = new ThemeListenerManager();
+
     private final SettingsSnippets parent;
     private final StyledTextField shorthandField;
     private Snippet snippet;
@@ -39,7 +42,7 @@ public class SnippetModuleToken implements CompoundActionModuleToken, Disposable
         resizer.setResizable(true, false, false, false);
 
 
-        parent.tlm.addThemeChangeListener(t -> {
+        tlm.addThemeChangeListener(t -> {
             settingsPanel.setBackground(t.getColor(new Color(235, 235, 235), "Settings.content.background"));
         });
 
@@ -48,8 +51,8 @@ public class SnippetModuleToken implements CompoundActionModuleToken, Disposable
         summaryPanel.setOpaque(false);
         summaryPanel.setPreferredSize(new Dimension(1, 40));
         summaryPanel.add(new Padding(30));
-        summaryPanel.add(new StyledLabel("Shorthand: ", parent.tlm));
-        summaryPanel.add(shorthandField = new StyledTextField(snippet.getShorthand()) {
+        summaryPanel.add(new StyledLabel("Shorthand: ", tlm));
+        summaryPanel.add(shorthandField = new StyledTextField(snippet.getShorthand(), tlm) {
             {
                 this.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
                 this.getDocument().addUndoableEditListener(e -> {
@@ -60,8 +63,8 @@ public class SnippetModuleToken implements CompoundActionModuleToken, Disposable
             }
         });
         summaryPanel.add(new Padding(30));
-        summaryPanel.add(new StyledLabel("Description: ", parent.tlm));
-        summaryPanel.add(new StyledTextField(snippet.getDescription()) {
+        summaryPanel.add(new StyledLabel("Description: ", tlm));
+        summaryPanel.add(new StyledTextField(snippet.getDescription(), tlm) {
             {
                 this.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
                 this.getDocument().addUndoableEditListener(e -> {
@@ -79,7 +82,7 @@ public class SnippetModuleToken implements CompoundActionModuleToken, Disposable
             {
                 this.setOpaque(false);
                 this.add(new Padding(30), BorderLayout.WEST);
-                this.add(new StyledLabel("Expands into:", parent.tlm));
+                this.add(new StyledLabel("Expands into:", tlm));
             }
         }, BorderLayout.NORTH);
         editor = new TridentEditorModule(null, null);
@@ -101,13 +104,13 @@ public class SnippetModuleToken implements CompoundActionModuleToken, Disposable
                 contextResizer.setResizable(false, true, false, false);
                 this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
                 this.setOpaque(false);
-                this.add(contextLabel = new StyledLabel("Applicable in Trident: ", parent.tlm));
+                this.add(contextLabel = new StyledLabel("Applicable in Trident: ", tlm));
                 //contextLabel.setBackgroundPainted(false);
                 //contextLabel.setEditable(false);
                 contextPanel.setOpaque(false);
                 contextPanel.setBackground(new Color(0,0,0,0));
                 this.add(new Padding(15));
-                this.add(new StyledButton("Change", parent.tlm) {
+                this.add(new StyledButton("Change", tlm) {
                     private int remainingHeight;
 
                     @Override
@@ -243,6 +246,8 @@ public class SnippetModuleToken implements CompoundActionModuleToken, Disposable
 
     @Override
     public void dispose() {
+        Debug.log("Disposing of snippet");
         editor.dispose();
+        tlm.dispose();
     }
 }

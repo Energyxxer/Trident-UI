@@ -27,7 +27,6 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Document;
-import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
@@ -53,7 +52,7 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
 
     private boolean enabled = true;
 
-    private ThemeListenerManager tlm;
+    public ThemeListenerManager tlm = new ThemeListenerManager();
 
     private EditorCaret caret;
 
@@ -76,7 +75,8 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         FOLD = KeyMap.requestMapping("test.fold", KeyMap.identifierToStrokes("")).setName("Fold").setGroupName("Testing - please do not use");
     }
 
-    {
+    public AdvancedEditor() {
+        super();
         this.setStyledDocument(foldableDoc = new FoldableDocument());
         this.getDocument().putProperty(DefaultEditorKit.EndOfLineStringProperty, "\n");
 
@@ -115,8 +115,6 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
             }
         });
 
-        tlm = new ThemeListenerManager();
-
         tlm.addThemeChangeListener(t -> {
             this.setBackground(t.getColor(Color.WHITE, "Editor.background"));
             this.setBackground(this.getBackground());
@@ -141,13 +139,6 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         }
     }
 
-    public AdvancedEditor() {
-        super();
-    }
-
-    public AdvancedEditor(StyledDocument doc) {
-        super(doc);
-    }
 
     @Override
     public void keyTyped(KeyEvent e) {

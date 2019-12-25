@@ -140,6 +140,12 @@ class ProjectPropertiesAliases extends JPanel {
                     config.remove("aliases");
                 }
             });
+
+            ProjectProperties.addCloseEvent(() -> {
+                tabManager.closeAllTabs(true);
+                tabList.removeAllTabs();
+                tokens.clear();
+            });
         }
 
     }

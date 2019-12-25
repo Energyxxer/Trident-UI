@@ -70,7 +70,7 @@ public class Toolbar extends JPanel {
             buttonBar.add(createButtonForAction("COMPILE"));
         }
 
-        buttonBar.add(new ToolbarSeparator());
+        buttonBar.add(new ToolbarSeparator(tlm));
 
         {
             buttonBar.add(createButtonForAction("SAVE"));
@@ -80,11 +80,11 @@ public class Toolbar extends JPanel {
             buttonBar.add(createButtonForAction("SAVE_ALL"));
         }
 
-        buttonBar.add(new ToolbarSeparator());
+        buttonBar.add(new ToolbarSeparator(tlm));
 
         buttonBar.add(createButtonForAction("DOCUMENTATION"));
 
-        buttonBar.add(new ToolbarSeparator());
+        buttonBar.add(new ToolbarSeparator(tlm));
 
         {
             buttonBar.add(createButtonForAction("NEW_PROJECT"));

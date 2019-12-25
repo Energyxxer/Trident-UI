@@ -95,7 +95,7 @@ class SettingsAppearance extends JPanel {
                 content.add(label);
             }
             {
-                StyledTextField baseFontSizeField = new StyledTextField("","Settings.content");
+                StyledTextField baseFontSizeField = new StyledTextField("","Settings.content", tlm);
                 baseFontSizeField.setMaximumSize(new Dimension(300,25));
                 baseFontSizeField.setAlignmentX(Component.LEFT_ALIGNMENT);
                 Settings.addOpenEvent(() -> baseFontSizeField.setText("" + Preferences.getBaseFontSize()));
@@ -115,7 +115,7 @@ class SettingsAppearance extends JPanel {
                 content.add(label);
             }
             {
-                StyledTextField editorFontSizeField = new StyledTextField("","Settings.content");
+                StyledTextField editorFontSizeField = new StyledTextField("","Settings.content", tlm);
                 editorFontSizeField.setMaximumSize(new Dimension(300,25));
                 editorFontSizeField.setAlignmentX(Component.LEFT_ALIGNMENT);
                 Settings.addOpenEvent(() -> editorFontSizeField.setText("" + Preferences.getEditorFontSize()));

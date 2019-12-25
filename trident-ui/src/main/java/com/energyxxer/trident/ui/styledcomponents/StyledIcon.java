@@ -14,13 +14,7 @@ public class StyledIcon extends XIcon {
     private String iconName;
     private int width, height, hints;
 
-    private ThemeListenerManager tlm = new ThemeListenerManager();
-
-    public StyledIcon(String icon) {
-        this(icon, -1, -1, -1);
-    }
-
-    public StyledIcon(String icon, int width, int height, int hints) {
+    public StyledIcon(String icon, int width, int height, int hints, ThemeListenerManager tlm) {
         this.iconName = icon;
         this.width = width;
         this.height = height;

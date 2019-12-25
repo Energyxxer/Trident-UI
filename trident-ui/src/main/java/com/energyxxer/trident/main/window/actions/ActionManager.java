@@ -14,6 +14,7 @@ import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.main.window.sections.AboutPane;
 import com.energyxxer.trident.main.window.sections.quick_find.QuickFindDialog;
 import com.energyxxer.trident.main.window.sections.search_path.SearchPathDialog;
+import com.energyxxer.trident.main.window.sections.tools.ConsoleBoard;
 import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.commodoreresources.DefinitionUpdateProcess;
 import com.energyxxer.trident.ui.dialogs.KeyStrokeDialog;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import static com.energyxxer.trident.global.keystrokes.KeyMap.identifierToStrokes;
@@ -338,5 +340,37 @@ public class ActionManager {
             }
             if(performed) action.perform();
         }
+    }
+
+    static {
+        ConsoleBoard.registerCommandHandler("run", new ConsoleBoard.CommandHandler() {
+            @Override
+            public String getDescription() {
+                return "Performs a program action with the given key";
+            }
+
+            @Override
+            public void printHelp() {
+                Debug.log();
+                Debug.log("RUN: Performs a program action with the given key");
+                Debug.log("Valid keys: " + actions.keySet());
+            }
+
+            @Override
+            public void handle(String[] args) {
+                if(args.length <= 1) {
+                    printHelp();
+                } else {
+                    String key = args[1].toUpperCase(Locale.ENGLISH);
+                    ProgramAction action = actions.get(key);
+                    if(action == null) {
+                        Debug.log("Error: Unknown action '" + key + "'");
+                    } else {
+                        Debug.log("Performing action '" + key + "'...");
+                        action.perform();
+                    }
+                }
+            }
+        });
     }
 }

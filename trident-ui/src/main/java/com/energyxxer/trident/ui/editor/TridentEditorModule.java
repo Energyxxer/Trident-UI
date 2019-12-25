@@ -87,7 +87,7 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
 
         scrollPane.setRowHeaderView(tln);
 
-        scrollPane.setLayout(new OverlayScrollPaneLayout(scrollPane));
+        scrollPane.setLayout(new OverlayScrollPaneLayout(scrollPane, editorComponent.tlm));
 
         scrollPane.getVerticalScrollBar().setUnitIncrement(17);
         scrollPane.getHorizontalScrollBar().setUnitIncrement(17);
@@ -446,8 +446,9 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
 
     @Override
     public void dispose() {
+        this.disposeTLM();
         editorComponent.dispose();
-        searchBar.getValue().dispose();
+        if(searchBar.hasValue()) searchBar.getValue().dispose();
     }
 
     public void setEditable(boolean editable) {

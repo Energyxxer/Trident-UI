@@ -67,7 +67,7 @@ public class KeyStrokeDialog  {
             subContent.add(label);
             label.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            field = new StyledTextField();
+            field = new StyledTextField(tlm);
             field.addKeyListener(new KeyAdapter() {
                 @Override
                 public void keyTyped(KeyEvent e) {

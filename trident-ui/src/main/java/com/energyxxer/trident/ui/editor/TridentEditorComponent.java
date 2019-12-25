@@ -53,7 +53,6 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
     private Thread highlightingThread = null;
 
     TridentEditorComponent(TridentEditorModule parent) {
-        super(new DefaultStyledDocument());
         this.parent = parent;
 
         this.setPaddingEnabled(true);

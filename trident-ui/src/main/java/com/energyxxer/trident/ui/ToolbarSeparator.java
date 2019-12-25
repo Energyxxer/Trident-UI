@@ -12,12 +12,10 @@ import java.awt.Graphics;
  */
 public class ToolbarSeparator extends JComponent {
 
-	private ThemeListenerManager tlm = new ThemeListenerManager();
-
 	private Color left = Color.BLACK;
 	private Color right = Color.WHITE;
 
-	public ToolbarSeparator() {
+	public ToolbarSeparator(ThemeListenerManager tlm) {
 		this.setPreferredSize(new Dimension(15, 25));
 
 		this.setOpaque(true);

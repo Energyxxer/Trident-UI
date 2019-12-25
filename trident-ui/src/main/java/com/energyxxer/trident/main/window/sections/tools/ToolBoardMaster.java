@@ -43,7 +43,7 @@ public class ToolBoardMaster extends OverlayBorderPanel {
 
         JPanel labelWrapper = new JPanel(new BorderLayout());
         labelWrapper.setOpaque(false);
-        labelWrapper.add(new Padding(15,"ToolBoard.header.label.indentation"), BorderLayout.WEST);
+        labelWrapper.add(new Padding(15,tlm, "ToolBoard.header.label.indentation"), BorderLayout.WEST);
         labelWrapper.add(headerLabel, BorderLayout.CENTER);
         header.add(labelWrapper, BorderLayout.WEST);
 
