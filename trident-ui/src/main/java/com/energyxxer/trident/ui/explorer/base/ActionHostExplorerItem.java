@@ -321,7 +321,7 @@ public class ActionHostExplorerItem extends ExplorerElement implements ItemActio
     }
 
     private JPopupMenu generatePopup() {
-        return token.generateMenu(ModuleToken.MenuContext.EXPLORER);
+        return token.generateMenu(ModuleToken.TokenContext.EXPLORER);
     }
 
     @Override

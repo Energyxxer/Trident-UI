@@ -50,7 +50,7 @@ public class Settings {
 			sidebar.setMaximumSize(new Dimension(400, 1));
 			sidebarResizer.setResizable(false, false, false, true);
 
-			String[] sections = new String[] { "General", "Appearance", "Editor", "Snippets", "Keymap" };
+			String[] sections = new String[] { "Behavior", "Appearance", "Editor", "Snippets", "Keymap" };
 
 			StyledList<String> navigator = new StyledList<>(sections, "Settings");
 			sidebar.setBackground(navigator.getBackground());
@@ -77,15 +77,15 @@ public class Settings {
 		);
 		pane.add(contentPane, BorderLayout.CENTER);
 
-		SettingsGeneral contentGeneral = new SettingsGeneral();
-		sectionPanes.put("General", contentGeneral);
+		SettingsBehavior contentBehavior = new SettingsBehavior();
+		sectionPanes.put("Behavior", contentBehavior);
 		sectionPanes.put("Appearance", new SettingsAppearance());
-		sectionPanes.put("Editor", new JPanel());
+		sectionPanes.put("Editor", new SettingsEditor());
 		sectionPanes.put("Snippets", new SettingsSnippets());
 		sectionPanes.put("Keymap", new SettingsKeymap());
 
-		contentPane.add(contentGeneral, BorderLayout.CENTER);
-		currentSection = contentGeneral;
+		contentPane.add(contentBehavior, BorderLayout.CENTER);
+		currentSection = contentBehavior;
 
 		{
 			JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));

@@ -4,6 +4,7 @@ import com.energyxxer.trident.compiler.TridentCompiler;
 import com.energyxxer.trident.files.FileType;
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.FileManager;
+import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
 import com.energyxxer.trident.main.window.TridentWindow;
@@ -42,6 +43,10 @@ public class FileModuleToken implements ModuleToken, DraggableExplorerModuleToke
     private static final int MAX_RECENT_FILES = 16;
     public static final ArrayList<File> recentFiles = new ArrayList<>(MAX_RECENT_FILES);
 
+    public static final Preferences.SettingPref<Boolean> SHOW_EXTENSIONS_EXPLORER = new Preferences.SettingPref<>("settings.behavior.hide_extensions.explorer", true, Boolean::new);
+    public static final Preferences.SettingPref<Boolean> SHOW_EXTENSIONS_TAB = new Preferences.SettingPref<>("settings.behavior.hide_extensions.tab", true, Boolean::new);
+    public static final Preferences.SettingPref<Boolean> LOAD_PNGS = new Preferences.SettingPref<>("settings.behavior.load_pngs", true, Boolean::new);
+
     private final File file;
     private boolean isProjectRoot;
     private String overrideIconName = null;
@@ -79,8 +84,18 @@ public class FileModuleToken implements ModuleToken, DraggableExplorerModuleToke
     }
 
     @Override
-    public String getTitle() {
-        return file.getName();
+    public String getTitle(TokenContext context) {
+        if((context == TokenContext.EXPLORER && SHOW_EXTENSIONS_EXPLORER.get()) || (context == TokenContext.TAB && SHOW_EXTENSIONS_TAB.get())) {
+            return file.getName();
+        } else {
+            return getNameWithoutExtension();
+        }
+    }
+
+    private String getNameWithoutExtension() {
+        String name = file.getName();
+        if(name.lastIndexOf('.') <= 0) return name;
+        return name.substring(0, name.lastIndexOf('.'));
     }
 
     @Override
@@ -113,7 +128,7 @@ public class FileModuleToken implements ModuleToken, DraggableExplorerModuleToke
             if(file.getName().lastIndexOf(".") >= 0) {
                 extension = file.getName().substring(file.getName().lastIndexOf("."));
             }
-            if(extension.equals(".png")) {
+            if(extension.equals(".png") && LOAD_PNGS.get()) {
                 try {
                     return ImageIO.read(file);
                 } catch(IOException x) {
@@ -146,6 +161,8 @@ public class FileModuleToken implements ModuleToken, DraggableExplorerModuleToke
                     return Commons.getIcon("meta");
                 case ".nbt":
                     return Commons.getIcon("structure");
+                case ".png":
+                    return Commons.getIcon("image");
                 default: return Commons.getIcon("file");
             }
         }
@@ -168,8 +185,10 @@ public class FileModuleToken implements ModuleToken, DraggableExplorerModuleToke
                     //subToken.overrideIconName = subFile.getName().equals("datapack") ? "data" : subFile.getName().equals("resources") ? "resources" : null;
                 }
                 if (subFile.isDirectory()) {
-                    children.add(firstFileIndex, subToken);
-                    firstFileIndex++;
+                    if(!this.isProjectRoot || !subFile.getName().equals(".tdnui") || TridentWindow.projectExplorer.getFlag(ProjectExplorerMaster.SHOW_PROJECT_FILES)) {
+                        children.add(firstFileIndex, subToken);
+                        firstFileIndex++;
+                    }
                 }
                 else {
                     if(!this.isProjectRoot || !subFile.getName().equals(".tdnproj") || TridentWindow.projectExplorer.getFlag(ProjectExplorerMaster.SHOW_PROJECT_FILES)) {
@@ -222,7 +241,7 @@ public class FileModuleToken implements ModuleToken, DraggableExplorerModuleToke
     }
 
     @Override
-    public StyledPopupMenu generateMenu(@NotNull MenuContext context) {
+    public StyledPopupMenu generateMenu(@NotNull ModuleToken.TokenContext context) {
         StyledPopupMenu menu = new StyledPopupMenu();
 
         String path = getPath();
@@ -231,7 +250,7 @@ public class FileModuleToken implements ModuleToken, DraggableExplorerModuleToke
         if(file.isDirectory()) newPath = path;
         else newPath = file.getParent();
 
-        if(context == MenuContext.EXPLORER) {
+        if(context == TokenContext.EXPLORER) {
             StyledMenu newMenu = new StyledMenu("New");
 
             menu.add(newMenu);
@@ -257,7 +276,7 @@ public class FileModuleToken implements ModuleToken, DraggableExplorerModuleToke
         menu.addSeparator();
 
 
-        if(context == MenuContext.EXPLORER) {
+        if(context == TokenContext.EXPLORER) {
             List<ModuleToken> selectedTokens = TridentWindow.projectExplorer.getSelectedTokens();
             ArrayList<FileModuleToken> selectedFiles = new ArrayList<>();
             selectedFiles.add(this);

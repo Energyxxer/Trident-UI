@@ -1,5 +1,6 @@
 package com.energyxxer.trident.ui.dialogs.settings;
 
+import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.styledcomponents.*;
@@ -10,6 +11,7 @@ import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 
 class SettingsAppearance extends JPanel {
 
@@ -79,14 +81,33 @@ class SettingsAppearance extends JPanel {
                 Settings.addOpenEvent(ThemeManager::loadAll);
                 Settings.addApplyEvent(() -> ThemeManager.setGUITheme(themeDropdown.getValue().getName()));
                 content.add(themeDropdown);
+
+
+
+
+
+
+
+                content.add(new Padding(5));
+                content.add(new StyledButton("Open theme folder", tlm) {
+                    {
+                        tlm.addThemeChangeListener(t -> {
+                            this.setIcon(new ImageIcon(Commons.getIcon("explorer").getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
+                        });
+                    }
+
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        ThemeManager.THEME_DIR_PATH.resolve("gui").toFile().mkdirs();
+                        ThemeManager.THEME_DIR_PATH.resolve("syntax").toFile().mkdirs();
+                        Commons.openInExplorer(ThemeManager.THEME_DIR_PATH.resolve("gui").toString());
+                    }
+
+                });
             }
 
             {
-                JPanel padding = new JPanel();
-                padding.setOpaque(false);
-                padding.setMinimumSize(new Dimension(1,20));
-                padding.setMaximumSize(new Dimension(1,20));
-                content.add(padding);
+                content.add(new Padding(40));
             }
 
             {

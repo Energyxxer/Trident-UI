@@ -151,7 +151,7 @@ public class DependencyToken implements CompoundActionModuleToken {
     }
 
     @Override
-    public String getTitle() {
+    public String getTitle(TokenContext context) {
         return label;
     }
 
@@ -170,7 +170,7 @@ public class DependencyToken implements CompoundActionModuleToken {
     }
 
     @Override
-    public StyledPopupMenu generateMenu(@NotNull MenuContext context) {
+    public StyledPopupMenu generateMenu(@NotNull ModuleToken.TokenContext context) {
         return null;
     }
 

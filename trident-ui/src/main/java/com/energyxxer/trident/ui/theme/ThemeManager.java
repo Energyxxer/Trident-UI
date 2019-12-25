@@ -1,12 +1,14 @@
 package com.energyxxer.trident.ui.theme;
 
-import com.energyxxer.util.logger.Debug;
-import com.energyxxer.trident.global.temp.Lang;
 import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.global.Resources;
+import com.energyxxer.trident.global.temp.Lang;
 import com.energyxxer.trident.main.window.TridentWindow;
+import com.energyxxer.util.logger.Debug;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +24,8 @@ public class ThemeManager {
     private static Theme nullTheme = new Theme("null");
 
     public static Theme currentGUITheme = new Theme("null");
+
+    public static final Path THEME_DIR_PATH = Paths.get(System.getProperty("user.home")).resolve("Trident").resolve("resources").resolve("themes");
 
     public static void loadAll() {
         gui_themes.clear();
@@ -48,7 +52,7 @@ public class ThemeManager {
 
         //Read theme directory
 
-        String themeDirPath = System.getProperty("user.home") + File.separator + "Trident" + File.separator + "resources" + File.separator + "themes" + File.separator;
+        String themeDirPath = THEME_DIR_PATH.toString() + File.separator;
 
         File themeDir = new File(themeDirPath);
         if(themeDir.exists()) {

@@ -11,11 +11,14 @@ import java.util.Collection;
 import java.util.List;
 
 public interface ModuleToken {
-    enum MenuContext {
+    enum TokenContext {
         EXPLORER, TAB
     }
 
-    String getTitle();
+    default String getTitle() {
+        return getTitle(TokenContext.EXPLORER);
+    }
+    String getTitle(TokenContext context);
     default boolean ellipsisFromLeft() {return false;}
     java.awt.Image getIcon();
     String getHint();
@@ -24,7 +27,7 @@ public interface ModuleToken {
     boolean isModuleSource();
     DisplayModule createModule(Tab tab);
     void onInteract();
-    StyledPopupMenu generateMenu(@NotNull MenuContext context);
+    StyledPopupMenu generateMenu(@NotNull ModuleToken.TokenContext context);
 
     default boolean isTabCloseable() {
         return true;

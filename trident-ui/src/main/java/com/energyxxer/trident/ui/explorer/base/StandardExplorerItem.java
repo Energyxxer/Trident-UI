@@ -7,7 +7,6 @@ import com.energyxxer.trident.ui.modules.FileModuleToken;
 import com.energyxxer.trident.ui.modules.ModuleToken;
 import com.energyxxer.trident.ui.modules.NonStandardModuleToken;
 import com.energyxxer.trident.util.ImageUtil;
-import com.energyxxer.util.logger.Debug;
 
 import javax.swing.*;
 import java.awt.*;
@@ -49,7 +48,7 @@ public class StandardExplorerItem extends ExplorerElement {
         if(parent != null) this.setDetailed(parent.detailed);
         this.token = token;
 
-        this.translucent = ((token instanceof FileModuleToken) && ((FileModuleToken) token).getFile().getName().equals(".tdnproj") && FileModuleToken.isProjectRoot(((FileModuleToken) token).getFile().getParentFile()));
+        this.translucent = ((token instanceof FileModuleToken) && (((FileModuleToken) token).getFile().getName().equals(".tdnproj") || ((FileModuleToken) token).getFile().getName().equals(".tdnui")) && FileModuleToken.isProjectRoot(((FileModuleToken) token).getFile().getParentFile()));
 
         this.icon = token.getIcon();
         if(this.icon != null) this.icon = ImageUtil.fitToSize(this.icon, 16, 16);
@@ -218,7 +217,7 @@ public class StandardExplorerItem extends ExplorerElement {
     private void confirmActivationMenu(MouseEvent e) {
         if(e.isPopupTrigger()) {
             if(!this.selected) master.setSelected(this, new MouseEvent(e.getComponent(), e.getID(), e.getWhen(), 0, e.getX(), e.getY(), e.getClickCount(), e.isPopupTrigger(), MouseEvent.BUTTON1));
-            JPopupMenu menu = token.generateMenu(ModuleToken.MenuContext.EXPLORER);
+            JPopupMenu menu = token.generateMenu(ModuleToken.TokenContext.EXPLORER);
             if(menu != null) menu.show(e.getComponent(), e.getX(), e.getY());
         }
     }

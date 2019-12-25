@@ -20,7 +20,7 @@ public class AliasTabToken implements ModuleToken {
     }
 
     @Override
-    public String getTitle() {
+    public String getTitle(TokenContext context) {
         return category;
     }
 
@@ -60,7 +60,7 @@ public class AliasTabToken implements ModuleToken {
     }
 
     @Override
-    public StyledPopupMenu generateMenu(@NotNull MenuContext context) {
+    public StyledPopupMenu generateMenu(@NotNull ModuleToken.TokenContext context) {
         return null;
     }
 

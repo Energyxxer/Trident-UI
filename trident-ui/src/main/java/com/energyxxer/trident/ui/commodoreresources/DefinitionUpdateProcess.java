@@ -1,5 +1,6 @@
 package com.energyxxer.trident.ui.commodoreresources;
 
+import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.global.ProcessManager;
 import com.energyxxer.trident.global.Resources;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
@@ -32,6 +33,8 @@ public class DefinitionUpdateProcess extends AbstractProcess {
     private String lastCheckedDefCommit = null;
     private Date latestCommitDate = null;
 
+    public static Preferences.SettingPref<Boolean> CHECK_FOR_DEF_UPDATES_STARTUP = new Preferences.SettingPref<>("settings.behavior.check_def_updates_startup", true, Boolean::new);
+
     public DefinitionUpdateProcess() {
         super("Definition Update");
         initializeThread(this::checkForUpdates);
@@ -43,6 +46,7 @@ public class DefinitionUpdateProcess extends AbstractProcess {
 
     public void checkForUpdates() {
         try {
+            Debug.log("Checking for definition updates");
             updateStatus("Checking for updates");
             JsonElement lastCheckedDefCommitElement = Resources.resources.get("last-checked-definition-commit");
             lastCheckedDefCommit = null;

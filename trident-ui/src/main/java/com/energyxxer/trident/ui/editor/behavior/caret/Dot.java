@@ -1,5 +1,6 @@
 package com.energyxxer.trident.ui.editor.behavior.caret;
 
+import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.ui.editor.behavior.AdvancedEditor;
 import com.energyxxer.util.StringBounds;
 import com.energyxxer.util.logger.Debug;
@@ -25,6 +26,10 @@ public class Dot {
     public static final int RIGHT = 1;
     public static final int UP = 2;
     public static final int DOWN = 3;
+
+    public static Preferences.SettingPref<Boolean> SMART_KEYS_HOME = new Preferences.SettingPref<>("settings.editor.smart_keys.home", true, Boolean::new);
+    public static Preferences.SettingPref<Boolean> SMART_KEYS_INDENT = new Preferences.SettingPref<>("settings.editor.smart_keys.indent", true, Boolean::new);
+
 
     public Dot(int index, AdvancedEditor component) {
         this(index, index, component);
@@ -162,15 +167,12 @@ public class Dot {
     }
 
     public int getRowHome() {
-        try {
-            int rowStart = Utilities.getRowStart(component, index);
-            int pos = component.getNextWord(rowStart);
-            if(index <= pos && index > rowStart) return rowStart;
-            return pos;
-        } catch(BadLocationException ble) {
-            Debug.log(ble.getMessage(), Debug.MessageType.ERROR);
-        }
-        return index;
+        int rowStart = getRowStart();
+        if(!SMART_KEYS_HOME.get()) return rowStart;
+        int rowContentStart = getRowContentStart();
+        if(index == rowStart) return rowContentStart;
+        if(index <= rowContentStart) return rowStart;
+        return rowContentStart;
     }
 
     public int getWordStart() {
@@ -214,7 +216,12 @@ public class Dot {
     public int getRowContentStart() {
         try {
             int rowStart = Utilities.getRowStart(component, index);
-            return component.getNextWord(rowStart);
+            int rowEnd = Utilities.getRowEnd(component, index);
+            int nextWord = rowStart;
+            if(rowStart != rowEnd && Character.isWhitespace(component.getFoldableDocument().getText(rowStart, 1).charAt(0))) {
+                nextWord = component.getNextWord(rowStart);
+            }
+            return Math.min(nextWord, rowEnd);
         } catch(BadLocationException ble) {
             Debug.log(ble.getMessage(), Debug.MessageType.ERROR);
         }

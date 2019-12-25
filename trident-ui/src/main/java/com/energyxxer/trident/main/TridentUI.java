@@ -108,7 +108,7 @@ public class TridentUI {
 		TridentWindow.projectExplorer.openExplorerTree();
 		SnippetManager.load();
 
-		DefinitionUpdateProcess.tryUpdate();
+		if(DefinitionUpdateProcess.CHECK_FOR_DEF_UPDATES_STARTUP.get()) DefinitionUpdateProcess.tryUpdate();
 	}
 
 }

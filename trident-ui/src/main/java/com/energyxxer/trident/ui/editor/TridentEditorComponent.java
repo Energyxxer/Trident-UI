@@ -10,6 +10,8 @@ import com.energyxxer.enxlex.suggestions.SuggestionModule;
 import com.energyxxer.trident.compiler.lexer.summaries.TridentSummaryModule;
 import com.energyxxer.trident.compiler.util.TridentProjectSummary;
 import com.energyxxer.trident.global.Commons;
+import com.energyxxer.trident.global.Preferences;
+import com.energyxxer.trident.global.Status;
 import com.energyxxer.trident.global.temp.Lang;
 import com.energyxxer.trident.global.temp.projects.CrossbowProject;
 import com.energyxxer.trident.global.temp.projects.Project;
@@ -25,7 +27,9 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import javax.swing.text.*;
+import javax.swing.text.Style;
+import javax.swing.text.StyleContext;
+import javax.swing.text.StyledDocument;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.*;
@@ -51,6 +55,9 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
 
     private final Timer timer;
     private Thread highlightingThread = null;
+
+    public static final Preferences.SettingPref<Integer> AUTOREPARSE_DELAY = new Preferences.SettingPref<>("settings.editor.auto_reparse_delay", 500, Integer::new);
+    public static final Preferences.SettingPref<Boolean> SHOW_SUGGESTIONS = new Preferences.SettingPref<>("settings.editor.show_suggestions", true, Boolean::new);
 
     TridentEditorComponent(TridentEditorModule parent) {
         this.parent = parent;
@@ -137,6 +144,8 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
         return index;
     }
 
+    private Status errorStatus = new Status();
+
     private void highlightSyntax() {
         if(parent.syntax == null) return;
 
@@ -149,7 +158,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
         if(lang == null) return;
         Project project = parent.file != null ? ProjectManager.getAssociatedProject(parent.file) : null;
 
-        SuggestionModule suggestionModule = (lang == Lang.TRIDENT || lang == Lang.CROSSBOW) && project != null ? new SuggestionModule(this.getCaretWordPosition(), this.getCaretPosition()) : null;
+        SuggestionModule suggestionModule = SHOW_SUGGESTIONS.get() ? ((lang == Lang.TRIDENT || lang == Lang.CROSSBOW) && project != null ? new SuggestionModule(this.getCaretWordPosition(), this.getCaretPosition()) : null) : null;
         SummaryModule summaryModule = project != null ? (lang == Lang.TRIDENT ? new TridentSummaryModule() : (lang == Lang.CROSSBOW ? new CrossbowSummaryModule() : null)) : null;
 
         File file = parent.getFileForAnalyzer();
@@ -178,7 +187,8 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
         ArrayList<String> previousTokenStyles = new ArrayList<>();
 
         if(analysis.response != null && !analysis.response.matched) {
-            TridentWindow.setStatus(analysis.response.getErrorMessage() + (analysis.response.faultyToken != null ? ". (line " + analysis.response.faultyToken.loc.line + " column " + analysis.response.faultyToken.loc.column + ")" : ""));
+            errorStatus.setMessage(analysis.response.getErrorMessage() + (analysis.response.faultyToken != null ? ". (line " + analysis.response.faultyToken.loc.line + " column " + analysis.response.faultyToken.loc.column + ")" : ""));
+            TridentWindow.setStatus(errorStatus);
             if(analysis.response.faultyToken != null && analysis.response.faultyToken.value != null && analysis.response.faultyToken.loc != null) sd.setCharacterAttributes(analysis.response.faultyToken.loc.index, analysis.response.faultyToken.value.length(), TridentEditorComponent.this.getStyle("error"), true);
             if(analysis.lexer instanceof LazyLexer) return;
         }
@@ -255,6 +265,9 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
             this.inspector.insertNotices(analysis.notices);
         }
 
+
+        TridentWindow.dismissStatus(errorStatus);
+
         //sd.setCharacterAttributes(81, 119, getStyle("do_not_display"), true);
     }
 
@@ -265,7 +278,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
 
     @Override
     public void actionPerformed(ActionEvent arg0) {
-        if (lastEdit > -1 && (new Date().getTime()) - lastEdit > 500 && (parent.associatedTab == null || parent.associatedTab.isActive())) {
+        if (lastEdit > -1 && (new Date().getTime()) - lastEdit > AUTOREPARSE_DELAY.get() && (parent.associatedTab == null || parent.associatedTab.isActive())) {
             lastEdit = -1;
             if(highlightingThread != null) {
                 highlightingThread.stop();

@@ -604,7 +604,6 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
 
     @Override
     public void dispose() {
-        Debug.log("Disposing of editor");
         tlm.dispose();
     }
 

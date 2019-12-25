@@ -17,7 +17,7 @@ public class WorkspaceRootModuleToken implements ModuleToken {
     private File root;
 
     @Override
-    public String getTitle() {
+    public String getTitle(TokenContext context) {
         return "Workspace";
     }
 
@@ -66,7 +66,7 @@ public class WorkspaceRootModuleToken implements ModuleToken {
     }
 
     @Override
-    public StyledPopupMenu generateMenu(@NotNull MenuContext context) {
+    public StyledPopupMenu generateMenu(@NotNull ModuleToken.TokenContext context) {
         return null;
     }
 

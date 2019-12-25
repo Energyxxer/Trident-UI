@@ -83,7 +83,7 @@ public class FileOccurrence extends QueryResult implements NonStandardModuleToke
     }
 
     @Override
-    public String getTitle() {
+    public String getTitle(TokenContext context) {
         return linePreview;
     }
 

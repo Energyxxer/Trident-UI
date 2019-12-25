@@ -6,6 +6,7 @@ import com.energyxxer.trident.main.window.sections.tools.ConsoleBoard;
 import com.energyxxer.util.logger.Debug;
 
 import java.io.File;
+import java.util.function.Function;
 import java.util.prefs.BackingStoreException;
 
 public class Preferences {
@@ -174,5 +175,49 @@ public class Preferences {
                 }
             }
         });
+    }
+
+    public static class SettingPref<T> {
+        private T defaultValue;
+        private T value;
+        private String key;
+        private final Function<String, T> prefToVal;
+        private final Function<T, String> valToPref;
+
+        public SettingPref(String key, T defaultValue, Function<String, T> prefToVal) {
+            this(key, defaultValue, prefToVal, String::valueOf);
+        }
+
+        public SettingPref(String key, T defaultValue, Function<String, T> prefToVal, Function<T, String> valToPref) {
+            this.defaultValue = defaultValue;
+            this.key = key;
+            this.value = defaultValue;
+            this.prefToVal = prefToVal;
+            this.valToPref = valToPref;
+
+            load();
+        }
+
+        public T get() {
+            return value;
+        }
+
+        public void set(T newValue) {
+            value = newValue;
+            save();
+        }
+
+        private void save() {
+            Preferences.put(key, valToPref.apply(value));
+        }
+
+        private void load() {
+            String existing = Preferences.get(key, null);
+            if(existing != null) {
+                value = prefToVal.apply(existing);
+            } else {
+                value = defaultValue;
+            }
+        }
     }
 }

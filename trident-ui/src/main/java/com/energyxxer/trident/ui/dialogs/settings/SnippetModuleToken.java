@@ -206,7 +206,7 @@ public class SnippetModuleToken implements CompoundActionModuleToken, Disposable
     }
 
     @Override
-    public String getTitle() {
+    public String getTitle(TokenContext context) {
         return snippet.getShorthand();
     }
 
@@ -216,7 +216,7 @@ public class SnippetModuleToken implements CompoundActionModuleToken, Disposable
     }
 
     @Override
-    public StyledPopupMenu generateMenu(@NotNull MenuContext context) {
+    public StyledPopupMenu generateMenu(@NotNull ModuleToken.TokenContext context) {
         return null;
     }
 
@@ -246,7 +246,6 @@ public class SnippetModuleToken implements CompoundActionModuleToken, Disposable
 
     @Override
     public void dispose() {
-        Debug.log("Disposing of snippet");
         editor.dispose();
         tlm.dispose();
     }

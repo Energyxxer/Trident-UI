@@ -24,7 +24,7 @@ public class ProcessToken implements ModuleToken {
     }
 
     @Override
-    public String getTitle() {
+    public String getTitle(TokenContext context) {
         return process.getName();
     }
 
@@ -69,7 +69,7 @@ public class ProcessToken implements ModuleToken {
     }
 
     @Override
-    public StyledPopupMenu generateMenu(@NotNull MenuContext context) {
+    public StyledPopupMenu generateMenu(@NotNull ModuleToken.TokenContext context) {
         StyledPopupMenu menu = new StyledPopupMenu();
         StyledMenuItem stopItem = new StyledMenuItem("Kill Process");
         stopItem.addActionListener(e -> process.terminate());

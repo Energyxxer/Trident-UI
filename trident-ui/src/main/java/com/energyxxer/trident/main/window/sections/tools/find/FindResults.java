@@ -34,7 +34,7 @@ public class FindResults extends QueryResult {
     }
 
     @Override
-    public String getTitle() {
+    public String getTitle(TokenContext context) {
         return "Found Occurrences";
     }
 
@@ -84,7 +84,7 @@ public class FindResults extends QueryResult {
         }
 
         @Override
-        public String getTitle() {
+        public String getTitle(TokenContext context) {
             return projectRoot.getName();
         }
 
@@ -147,7 +147,7 @@ public class FindResults extends QueryResult {
         }
 
         @Override
-        public String getTitle() {
+        public String getTitle(TokenContext context) {
             return rootName;
         }
 
@@ -201,7 +201,7 @@ public class FindResults extends QueryResult {
         }
 
         @Override
-        public String getTitle() {
+        public String getTitle(TokenContext context) {
             return path;
         }
 
@@ -251,7 +251,7 @@ public class FindResults extends QueryResult {
         }
 
         @Override
-        public String getTitle() {
+        public String getTitle(TokenContext context) {
             return file.getTitle();
         }
 

@@ -20,7 +20,7 @@ public class AliasAddToken implements ModuleToken {
     }
 
     @Override
-    public String getTitle() {
+    public String getTitle(TokenContext context) {
         return null;
     }
 
@@ -63,7 +63,7 @@ public class AliasAddToken implements ModuleToken {
     }
 
     @Override
-    public StyledPopupMenu generateMenu(@NotNull MenuContext context) {
+    public StyledPopupMenu generateMenu(@NotNull ModuleToken.TokenContext context) {
         return null;
     }
 

@@ -52,7 +52,7 @@ public class TabItem extends TabListElement {
     }
 
     public void updateName() {
-        this.name = token.getTitle();
+        this.name = token.getTitle(ModuleToken.TokenContext.TAB);
         if(this.name != null) this.name = StringUtil.ellipsis(this.name,32);
     }
 
@@ -314,6 +314,7 @@ public class TabItem extends TabListElement {
 
     @Override
     public void themeChanged(Theme t) {
+        this.updateName();
         this.updateIcon();
     }
 

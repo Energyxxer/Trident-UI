@@ -2,6 +2,7 @@ package com.energyxxer.trident.ui.editor.behavior.editmanager.edits;
 
 import com.energyxxer.trident.ui.editor.behavior.AdvancedEditor;
 import com.energyxxer.trident.ui.editor.behavior.caret.CaretProfile;
+import com.energyxxer.trident.ui.editor.behavior.caret.Dot;
 import com.energyxxer.trident.ui.editor.behavior.caret.EditorCaret;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.Edit;
 import com.energyxxer.trident.ui.editor.folding.FoldableDocument;
@@ -65,6 +66,8 @@ public class NewlineEdit extends Edit {
                 }
                 int tabs = spaces / 4;
                 if(text.substring(lineStart, start - characterDrift).trim().endsWith("{")) tabs++;
+
+                if(!Dot.SMART_KEYS_INDENT.get()) tabs = 0;
 
                 str += StringUtil.repeat("    ", tabs);
 

@@ -41,6 +41,8 @@ public class ProjectExplorerMaster extends StyledExplorerMaster implements DropT
     private DraggableExplorerModuleToken[] draggingFiles = null;
     private ArrayList<ExplorerElement> draggingRollover = new ArrayList<>();
 
+    public static Preferences.SettingPref<Boolean> SAVE_EXPLORER_TREE = new Preferences.SettingPref<>("settings.behavior.save_explorer_tree", true, Boolean::new);
+
     public static final ExplorerFlag
             FLATTEN_EMPTY_PACKAGES = new ExplorerFlag("Flatten Empty Packages"),
             SHOW_PROJECT_FILES = new ExplorerFlag("Show Project Files");
@@ -136,6 +138,7 @@ public class ProjectExplorerMaster extends StyledExplorerMaster implements DropT
     }
 
     public void saveExplorerTree() {
+        if(!SAVE_EXPLORER_TREE.get()) return;
         StringBuilder sb = new StringBuilder();
         Collection<ModuleToken> expandedElements = this.getExpandedElements();
         for(ModuleToken elem : expandedElements) {
@@ -147,6 +150,7 @@ public class ProjectExplorerMaster extends StyledExplorerMaster implements DropT
     }
 
     public void openExplorerTree() {
+        if(!SAVE_EXPLORER_TREE.get()) return;
         String openTree = Preferences.get("open_tree",null);
         if(openTree != null) {
             Debug.log("Opening: " + openTree);

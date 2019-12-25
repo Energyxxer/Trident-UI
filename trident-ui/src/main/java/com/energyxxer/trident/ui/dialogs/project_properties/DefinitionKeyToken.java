@@ -115,7 +115,7 @@ public class DefinitionKeyToken implements CompoundActionModuleToken {
     }
 
     @Override
-    public String getTitle() {
+    public String getTitle(TokenContext context) {
         return packName != null ? packName : "DEFAULT - provided by target version";
     }
 
@@ -133,7 +133,7 @@ public class DefinitionKeyToken implements CompoundActionModuleToken {
     }
 
     @Override
-    public StyledPopupMenu generateMenu(@NotNull MenuContext context) {
+    public StyledPopupMenu generateMenu(@NotNull ModuleToken.TokenContext context) {
         return null;
     }
 

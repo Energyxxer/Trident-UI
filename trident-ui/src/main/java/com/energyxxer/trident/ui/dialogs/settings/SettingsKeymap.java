@@ -95,7 +95,7 @@ public class SettingsKeymap extends JPanel {
                     }
 
                     @Override
-                    public String getTitle() {
+                    public String getTitle(TokenContext context) {
                         return entry.getKey();
                     }
 
@@ -105,7 +105,7 @@ public class SettingsKeymap extends JPanel {
                     }
 
                     @Override
-                    public StyledPopupMenu generateMenu(@NotNull MenuContext context) {
+                    public StyledPopupMenu generateMenu(@NotNull ModuleToken.TokenContext context) {
                         return null;
                     }
 
@@ -247,7 +247,7 @@ public class SettingsKeymap extends JPanel {
         }
 
         @Override
-        public String getTitle() {
+        public String getTitle(TokenContext context) {
             return ks.getName();
         }
 
@@ -257,7 +257,7 @@ public class SettingsKeymap extends JPanel {
         }
 
         @Override
-        public StyledPopupMenu generateMenu(@NotNull MenuContext context) {
+        public StyledPopupMenu generateMenu(@NotNull ModuleToken.TokenContext context) {
             StyledPopupMenu menu = new StyledPopupMenu();
             menu.add(new StyledMenuItem("Add Shortcut") {
                 @Override

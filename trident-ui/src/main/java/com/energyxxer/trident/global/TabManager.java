@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,6 +35,9 @@ public class TabManager {
 	private final ContentSwapper moduleComponent;
 	private boolean changeWindowInfo = false;
 	private String openTabSaveKey = null;
+
+	public static Preferences.SettingPref<Boolean> SAVE_OPEN_TABS = new Preferences.SettingPref<>("settings.behavior.save_open_tabs", true, Boolean::new);
+	public static final Preferences.SettingPref<Integer> TAB_LIMIT = new Preferences.SettingPref<>("settings.behavior.tab_limit", 0, Integer::new);
 
 	public List<Tab> openTabs = Collections.synchronizedList(new ArrayList<>());
 
@@ -62,6 +66,11 @@ public class TabManager {
 				setSelectedTab(openTabs.get(i));
 				return;
 			}
+		}
+		//Have to open a new one
+		if(TAB_LIMIT.get() > 0 && openTabs.size() >= TAB_LIMIT.get()) {
+			int toClose = (openTabs.size()+1) - TAB_LIMIT.get();
+			openTabs.stream().filter(Tab::isSaved).sorted(Comparator.comparing(t -> t.openedTimeStamp)).limit(toClose).forEach(this::closeTab);
 		}
 		Tab nt = new Tab(token);
 		openTabs.add(nt);
@@ -196,6 +205,7 @@ public class TabManager {
 
 	public void saveOpenTabs() {
 		if(openTabSaveKey == null) return;
+		if(!SAVE_OPEN_TABS.get()) return;
 		StringBuilder sb = new StringBuilder();
 		for(Tab tab : openTabs) {
 			if(selectedTab != tab) {
@@ -212,6 +222,7 @@ public class TabManager {
 
 	public void openSavedTabs() {
 		if(openTabSaveKey == null) return;
+		if(!SAVE_OPEN_TABS.get()) return;
 		String savedTabs = Preferences.get(openTabSaveKey,null);
 		if(savedTabs != null) {
 			String[] identifiers = savedTabs.split(Pattern.quote(File.pathSeparator));
