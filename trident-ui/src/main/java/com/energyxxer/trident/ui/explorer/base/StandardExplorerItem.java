@@ -6,6 +6,7 @@ import com.energyxxer.trident.ui.explorer.base.elements.ExplorerElement;
 import com.energyxxer.trident.ui.modules.FileModuleToken;
 import com.energyxxer.trident.ui.modules.ModuleToken;
 import com.energyxxer.trident.ui.modules.NonStandardModuleToken;
+import com.energyxxer.trident.ui.theme.Theme;
 import com.energyxxer.trident.util.ImageUtil;
 
 import javax.swing.*;
@@ -50,12 +51,16 @@ public class StandardExplorerItem extends ExplorerElement {
 
         this.translucent = ((token instanceof FileModuleToken) && (((FileModuleToken) token).getFile().getName().equals(".tdnproj") || ((FileModuleToken) token).getFile().getName().equals(".tdnui")) && FileModuleToken.isProjectRoot(((FileModuleToken) token).getFile().getParentFile()));
 
-        this.icon = token.getIcon();
-        if(this.icon != null) this.icon = ImageUtil.fitToSize(this.icon, 16, 16);
+        updateIcon();
 
         if(toOpen != null && toOpen.contains(this.token.getIdentifier())) {
             expand(toOpen);
         }
+    }
+
+    private void updateIcon() {
+        this.icon = token.getIcon();
+        if(this.icon != null) this.icon = ImageUtil.fitToSize(this.icon, 16, 16);
     }
 
     public void expand(List<String> toOpen) {
@@ -317,6 +322,15 @@ public class StandardExplorerItem extends ExplorerElement {
                     listener.mouseExited(e);
                     break;
             }
+        }
+    }
+
+    @Override
+    public void themeChanged(Theme t) {
+        super.themeChanged(t);
+        updateIcon();
+        for(ExplorerElement element : children) {
+            element.themeChanged(t);
         }
     }
 }

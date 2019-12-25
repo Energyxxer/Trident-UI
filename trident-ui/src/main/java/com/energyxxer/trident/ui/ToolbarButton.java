@@ -43,6 +43,7 @@ public class ToolbarButton extends JButton implements MouseListener, MouseMotion
 	private boolean rollover = false;
 
 	private String icon;
+	private boolean iconDirty = false;
 	private int iconSize;
 
 	private boolean sizeValid = false;
@@ -68,6 +69,7 @@ public class ToolbarButton extends JButton implements MouseListener, MouseMotion
 			this.setForeground(t.getColor(Color.BLACK, "Toolbar.button.foreground", "General.button.foreground", "General.foreground"));
 			this.setFont(t.getFont( "Toolbar.button", "General.button", "General"));
 
+			iconDirty = true;
 			updateSize();
         });
 
@@ -172,7 +174,8 @@ public class ToolbarButton extends JButton implements MouseListener, MouseMotion
 	private void updateIcon() {
 		if(icon != null) {
 			int newIconSize = (Math.max(this.getBestSize().height,25)/25)*16;
-			if(newIconSize != iconSize) {
+			if(newIconSize != iconSize || iconDirty) {
+				iconDirty = false;
 				this.setIcon(new ImageIcon(Commons.getIcon(icon).getScaledInstance(newIconSize, newIconSize, Image.SCALE_SMOOTH)));
 				iconSize = newIconSize;
 				updateSize();

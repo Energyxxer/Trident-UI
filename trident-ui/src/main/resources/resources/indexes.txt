@@ -1,7 +1,6 @@
 GUI Themes:
--Trident Light
--Trident Dark
 -Electron Dark
+-Electron Light
 
 Syntax Themes:
 -JSON Syntax Light

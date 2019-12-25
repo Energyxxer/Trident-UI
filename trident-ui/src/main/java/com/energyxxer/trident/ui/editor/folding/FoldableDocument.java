@@ -214,4 +214,16 @@ public class FoldableDocument extends DefaultStyledDocument implements FoldableS
     public String getModelText(int offset, int length) {
         return getUnfoldedText().substring(offset, offset+length);
     }
+
+    @Override
+    public String getUnfoldedText() {
+        if(subSections.isEmpty()) {
+            try {
+                return getText(0, getLength());
+            } catch (BadLocationException e) {
+                e.printStackTrace();
+            }
+        }
+        return FoldableSection.super.getUnfoldedText();
+    }
 }
