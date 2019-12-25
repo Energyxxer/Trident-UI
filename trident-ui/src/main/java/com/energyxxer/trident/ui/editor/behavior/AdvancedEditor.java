@@ -84,12 +84,16 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         this.setCaret(this.caret = new EditorCaret(this));
         this.addKeyListener(this);
 
-        this.getDocument().addUndoableEditListener(e -> {
+        /*this.getDocument().addUndoableEditListener(e -> {
             modelLineCache.setText(getFoldableDocument().getUnfoldedText());
             viewLineCache.setText(getFoldableDocument().getFoldedText());
-        });
+        });*/
 
-        this.getDocument().addDocumentListener((UnifiedDocumentListener) e -> updateDefaultSize());
+        this.getDocument().addDocumentListener((UnifiedDocumentListener) e -> {
+            updateDefaultSize();
+            modelLineCache.textChanged(getFoldableDocument().getUnfoldedText(), getFoldableDocument().viewIndexToModel(e.getOffset()));
+            viewLineCache.textChanged(getFoldableDocument().getFoldedText(), e.getOffset());
+        });
 
         this.setTransferHandler(this.editorTransferHandler = new TransferHandler() {
             @Override
