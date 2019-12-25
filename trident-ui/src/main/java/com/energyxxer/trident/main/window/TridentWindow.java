@@ -8,7 +8,6 @@ import com.energyxxer.trident.main.TridentUI;
 import com.energyxxer.trident.main.window.actions.ActionManager;
 import com.energyxxer.trident.main.window.sections.MenuBar;
 import com.energyxxer.trident.main.window.sections.*;
-import com.energyxxer.trident.main.window.sections.quick_find.QuickFindDialog;
 import com.energyxxer.trident.main.window.sections.tools.ConsoleBoard;
 import com.energyxxer.trident.main.window.sections.tools.NoticeBoard;
 import com.energyxxer.trident.main.window.sections.tools.ToolBoardMaster;
@@ -157,9 +156,9 @@ public class TridentWindow {
 			}
 		});
 
-		jframe.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		jframe.setSize(defaultSize);
 		jframe.setPreferredSize(defaultSize);
+		jframe.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
 		List<Image> icons = new ArrayList<>();
 		icons.add(
