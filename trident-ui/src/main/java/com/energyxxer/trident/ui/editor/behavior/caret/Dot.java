@@ -215,13 +215,7 @@ public class Dot {
 
     public int getRowContentStart() {
         try {
-            int rowStart = Utilities.getRowStart(component, index);
-            int rowEnd = Utilities.getRowEnd(component, index);
-            int nextWord = rowStart;
-            if(rowStart != rowEnd && Character.isWhitespace(component.getFoldableDocument().getText(rowStart, 1).charAt(0))) {
-                nextWord = component.getNextWord(rowStart);
-            }
-            return Math.min(nextWord, rowEnd);
+            return component.getNextNonWhitespace(getRowStart());
         } catch(BadLocationException ble) {
             Debug.log(ble.getMessage(), Debug.MessageType.ERROR);
         }

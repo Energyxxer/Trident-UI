@@ -20,6 +20,7 @@ public class DeletionEdit extends Edit {
     private CaretProfile previousProfile;
     private CaretProfile nextProfile = null;
     private int deletionAmount = -1;
+    private boolean smartIndentation;
 
     public DeletionEdit(AdvancedEditor editor, int deletionAmount) {
         this(editor, deletionAmount, false);
@@ -38,6 +39,7 @@ public class DeletionEdit extends Edit {
         previousProfile = editor.getCaret().getProfile();
         this.wholeWord = wholeWord;
         this.forwards = forwards;
+        this.smartIndentation = Dot.SMART_KEYS_INDENT.get();
     }
 
     @Override
@@ -77,7 +79,7 @@ public class DeletionEdit extends Edit {
                                 start = new Dot(start, end, editor).getPositionAfter();
                             } else {
                                 Dot tempDot = new Dot(start, end, editor);
-                                if(tempDot.isInIndentation()) {
+                                if(smartIndentation && tempDot.isInIndentation()) {
                                     start = tempDot.getRowStart()-1;
                                     if(start < 0) start = 0;
                                     end = tempDot.getRowContentStart();

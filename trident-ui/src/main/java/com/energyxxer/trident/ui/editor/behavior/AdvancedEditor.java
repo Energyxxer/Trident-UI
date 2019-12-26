@@ -482,22 +482,33 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
 
     public int getNextWord(int offs) throws BadLocationException {
         Document doc = this.getDocument();
-        String text = doc.getText(0, doc.getLength());
+        String text = doc.getText(offs, doc.getLength()-offs);
 
-        int index = offs;
+        int index = 0;
         char lastChar = '\000';
-        while(index < doc.getLength()) {
+        while(index < text.length()) {
             char ch = text.charAt(index);
-            if((Character.isJavaIdentifierPart(lastChar) == Character.isJavaIdentifierPart(ch) && ch != '\n') || index == offs) {
+            if((Character.isJavaIdentifierPart(lastChar) == Character.isJavaIdentifierPart(ch) && ch != '\n') || index == 0) {
                 index++;
                 lastChar = ch;
             } else break;
         }
         char ch;
-        while(index < text.length() && ((ch = text.charAt(index)) != '\n' && Character.isWhitespace(ch))) {
+        while(index < text.length()-offs && ((ch = text.charAt(index)) != '\n' && Character.isWhitespace(ch))) {
             index++;
         }
-        return index;
+        return index+offs;
+    }
+
+    public int getNextNonWhitespace(int offs) throws BadLocationException {
+        Document doc = this.getDocument();
+        String text = doc.getText(offs, doc.getLength()-offs);
+
+        int index;
+        for(index = 0; index < text.length(); index++) {
+            if(!Character.isWhitespace(text.charAt(index))) break;
+        }
+        return index+offs;
     }
 
     private ArrayList<Consumer<Function<Integer, Integer>>> characterDriftListeners = new ArrayList<>();
