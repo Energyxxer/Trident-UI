@@ -506,7 +506,8 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
 
         int index;
         for(index = 0; index < text.length(); index++) {
-            if(!Character.isWhitespace(text.charAt(index))) break;
+            char c = text.charAt(index);
+            if(c == '\n' || !Character.isWhitespace(c)) break;
         }
         return index+offs;
     }
