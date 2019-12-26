@@ -184,10 +184,6 @@ public class NoticeGroupElement extends ExplorerElement {
             } else {
                 master.setSelected(this, e);
             }
-        } else if(e.getButton() == MouseEvent.BUTTON3) {
-            /*if(!this.selected) master.setSelected(this, new MouseEvent(e.getComponent(), e.getID(), e.getWhen(), 0, e.getX(), e.getY(), e.getClickCount(), e.isPopupTrigger(), MouseEvent.BUTTON1));
-            StyledPopupMenu menu = this.generatePopup();
-            menu.show(e.getComponent(), e.getX(), e.getY());*/
         }
     }
 

@@ -355,6 +355,7 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
     private Point rectangleStartPoint = null;
 
     private boolean clickStartInSelection = false;
+    private boolean clickStartedMouse2 = false;
 
     private boolean isInSelection(int index) {
         for(Dot dot : dots) {
@@ -382,8 +383,11 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
         bufferedDot = new Dot(index, index, editor);
         bufferedDotAdded = false;
         dragSelectMode = DragSelectMode.CHAR;
+        clickStartedMouse2 = e.getButton() == MouseEvent.BUTTON2;
 
         if(e.getButton() == MouseEvent.BUTTON2 || (e.getButton() == MouseEvent.BUTTON1 && e.isAltDown() && !e.isShiftDown())) {
+            Debug.log("Rectangle start");
+            Debug.log(e.getButton() == MouseEvent.BUTTON2);
             clickStartInSelection = false;
             if(!e.isAltDown() || !e.isShiftDown()) {
                 dots.clear();
@@ -554,7 +558,7 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
                                 }
                             }
                         }
-                        if(!e.isAltDown() || e.isShiftDown()) {
+                        if((e.isAltDown() == clickStartedMouse2) || e.isShiftDown()) {
                             dragSelectMode = DragSelectMode.CHAR;
                         }
 
@@ -567,7 +571,7 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
                     }
                     case CHAR: {
                         bufferedDot.updateX();
-                        if(e.isAltDown() && !e.isShiftDown()) {
+                        if((e.isAltDown() != clickStartedMouse2) && !e.isShiftDown()) {
                             dragSelectMode = RECTANGLE;
                             rectangleDotCursorIndex = dots.size()-1;
                         }
