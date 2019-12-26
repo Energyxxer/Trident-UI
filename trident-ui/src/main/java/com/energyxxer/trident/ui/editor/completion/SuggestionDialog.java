@@ -250,7 +250,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         if(isVisible() && activeResults != null) {
             try {
                 int cwpos = activeResults.getSuggestionIndex();
-                if(editor.getSoftCaretWordPosition() > cwpos || (activeResults.getOriginalSuggestionIndex() == cwpos && editor.getCaretWordPosition() > cwpos)) {
+                if(editor.getSoftCaretWordPosition() > cwpos || (!activeResults.changedSuggestionIndex() && editor.getCaretWordPosition() > cwpos)) {
                     dismiss(true);
                     return;
                 }

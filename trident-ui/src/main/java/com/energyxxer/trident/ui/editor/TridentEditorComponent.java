@@ -139,7 +139,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
         if(index <= 0) return 0;
         while (true) {
             char c = this.getFoldableDocument().getModelText(index-1, 1).charAt(0);
-            if (!((Character.isJavaIdentifierPart(c) && c != '$') || "#:/.".contains(c+"")) || --index <= 1)
+            if (!((Character.isJavaIdentifierPart(c) && c != '$') || "#:/.-".contains(c+"")) || --index <= 1)
                 break;
         }
         return index;
