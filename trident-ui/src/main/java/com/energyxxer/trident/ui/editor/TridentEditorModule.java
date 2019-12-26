@@ -11,6 +11,7 @@ import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.main.window.sections.editor_search.FindAndReplaceBar;
 import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.display.DisplayModule;
+import com.energyxxer.trident.ui.editor.behavior.caret.Dot;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.edits.DeletionEdit;
 import com.energyxxer.trident.ui.modules.FileModuleToken;
 import com.energyxxer.trident.ui.modules.ModuleToken;
@@ -124,12 +125,20 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
     public void showSearchBar() {
         if(!searchBarVisible) {
             this.add(searchBar.getValue(), BorderLayout.NORTH);
+            searchBar.getValue().setFindText("");
             searchBar.getValue().onReveal();
             revalidate();
             searchBarVisible = true;
 
             scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getValue() + searchBar.getValue().getHeight());
             repaint();
+        } else {
+            Dot dot = editorComponent.getCaret().getDots().get(0);
+            try {
+                searchBar.getValue().setFindText(editorComponent.getFoldableDocument().getText(dot.getMin(), dot.getMax()-dot.getMin()));
+            } catch (BadLocationException e) {
+                e.printStackTrace();
+            }
         }
         searchBar.getValue().focus();
     }

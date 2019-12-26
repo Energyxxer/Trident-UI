@@ -459,4 +459,9 @@ public class FindAndReplaceBar extends JPanel implements Disposable {
         findField.dispose();
         replaceField.dispose();
     }
+
+    public void setFindText(String text) {
+        findField.getCaret().setProfile(new CaretProfile(findField.getText().length(), 0));
+        findField.getEditManager().insertEdit(new InsertionEdit(text, findField));
+    }
 }

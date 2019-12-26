@@ -250,6 +250,10 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         if(isVisible() && activeResults != null) {
             try {
                 int cwpos = activeResults.getSuggestionIndex();
+                if(editor.getSoftCaretWordPosition() > cwpos || (activeResults.getOriginalSuggestionIndex() == cwpos && editor.getCaretWordPosition() > cwpos)) {
+                    dismiss(true);
+                    return;
+                }
                 String typed = editor.getDocument().getText(cwpos, editor.getCaretPosition() - cwpos);
 
                 anyEnabled = false;
@@ -258,7 +262,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
                     if(token.isEnabled()) anyEnabled = true;
                 }
 
-                this.explorer.setForceSelectNext(true);
+                if(anyEnabled) this.explorer.setForceSelectNext(true);
 
                 explorer.repaint();
                 relocate();
