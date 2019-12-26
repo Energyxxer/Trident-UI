@@ -125,7 +125,7 @@ public class ActionManager {
         actions.put("PROJECT_PROPERTIES",
                 new ProgramAction(
                     "Project Properties", "Edit the current project",
-                    KeyMap.requestMapping("open_project_properties", identifierToStrokes("sa+S;"+ UserKeyBind.Special.DOUBLE_SHIFT)).setGroupName("Windows"),
+                    KeyMap.requestMapping("open_project_properties", identifierToStrokes("sa+S")).setGroupName("Windows"),
                     () -> {
                         Project selectedProject = Commons.getActiveProject();
                         if(selectedProject instanceof TridentProject) ProjectProperties.show((TridentProject) selectedProject);
