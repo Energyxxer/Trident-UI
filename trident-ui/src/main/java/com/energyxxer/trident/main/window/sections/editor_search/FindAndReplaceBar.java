@@ -3,6 +3,7 @@ package com.energyxxer.trident.main.window.sections.editor_search;
 import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.global.keystrokes.KeyMap;
 import com.energyxxer.trident.main.window.TridentWindow;
+import com.energyxxer.trident.ui.HintStylizer;
 import com.energyxxer.trident.ui.ToolbarButton;
 import com.energyxxer.trident.ui.ToolbarSeparator;
 import com.energyxxer.trident.ui.editor.TridentEditorModule;
@@ -341,8 +342,9 @@ public class FindAndReplaceBar extends JPanel implements Disposable {
                 Rectangle rect = editor.editorComponent.modelToView((regions.get(0) + regions.get(1)) / 2);
                 rect.x += editor.editorComponent.getLocationOnScreen().x + 3;
                 rect.y += editor.editorComponent.getLocationOnScreen().y + 12;
+                HintStylizer.style(hint);
                 hint.setText("First match reached");
-                hint.show(new Point(rect.x, rect.y), () -> selectedIndex == -2);
+                hint.show(new Point(rect.x, rect.y), () -> this.isShowing() && !editor.editorComponent.hasFocus() && selectedIndex == -2);
             } catch (BadLocationException e1) {
                 e1.printStackTrace();
             }
@@ -366,8 +368,9 @@ public class FindAndReplaceBar extends JPanel implements Disposable {
                 Rectangle rect = editor.editorComponent.modelToView((regions.get(regions.size() - 2) + regions.get(regions.size() - 1)) / 2);
                 rect.x += editor.editorComponent.getLocationOnScreen().x + 3;
                 rect.y += editor.editorComponent.getLocationOnScreen().y + 12;
+                HintStylizer.style(hint);
                 hint.setText("Last match reached");
-                hint.show(new Point(rect.x, rect.y), () -> selectedIndex == -2);
+                hint.show(new Point(rect.x, rect.y), () -> this.isShowing() && !editor.editorComponent.hasFocus() && selectedIndex == -2);
             } catch (BadLocationException e1) {
                 e1.printStackTrace();
             }
@@ -390,10 +393,12 @@ public class FindAndReplaceBar extends JPanel implements Disposable {
                 editor.editorComponent.getCaret().setProfile(new CaretProfile(regions.get(selectedIndex+1), regions.get(selectedIndex)));
                 editor.editorComponent.getEditManager().insertEdit(new InsertionEdit(replaceField.getText(), editor.editorComponent));
             } else {
+                HintStylizer.style(hint);
                 hint.setText("No match selected");
                 hint.show(getLocationForReplacementError(), new TemporaryConfirmation());
             }
         } else {
+            HintStylizer.style(hint);
             hint.setText("Nothing to replace");
             hint.show(getLocationForReplacementError(), new TemporaryConfirmation());
         }
@@ -420,6 +425,7 @@ public class FindAndReplaceBar extends JPanel implements Disposable {
             editor.editorComponent.getCaret().setProfile(new CaretProfile(toReplace));
             editor.editorComponent.getEditManager().insertEdit(new InsertionEdit(replaceField.getText(), editor.editorComponent));
         } else {
+            HintStylizer.style(hint);
             hint.setText("Nothing to replace");
             hint.show(getLocationForReplacementError(), new TemporaryConfirmation());
         }
@@ -463,5 +469,13 @@ public class FindAndReplaceBar extends JPanel implements Disposable {
     public void setFindText(String text) {
         findField.getCaret().setProfile(new CaretProfile(findField.getText().length(), 0));
         findField.getEditManager().insertEdit(new InsertionEdit(text, findField));
+    }
+
+    public AdvancedEditor getFindField() {
+        return findField;
+    }
+
+    public AdvancedEditor getReplaceField() {
+        return replaceField;
     }
 }

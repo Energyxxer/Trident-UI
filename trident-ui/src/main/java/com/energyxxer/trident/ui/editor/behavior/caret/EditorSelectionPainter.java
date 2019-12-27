@@ -26,7 +26,7 @@ public class EditorSelectionPainter implements Highlighter.HighlightPainter {
     @Override
     public void paint(Graphics g, int p0, int p1, Shape graphicBounds, JTextComponent c) {
         AdvancedEditor editor = (AdvancedEditor) c;
-        g.setColor(editor.getSelectionColor());
+        g.setColor(editor.hasFocus() ? editor.getSelectionColor() : editor.getSelectionUnfocusedColor());
 
         ArrayList<Dot> dots = caret.getDots();
 

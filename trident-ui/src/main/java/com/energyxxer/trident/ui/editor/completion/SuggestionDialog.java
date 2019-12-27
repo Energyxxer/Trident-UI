@@ -125,7 +125,6 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
                 sb.setLength(sb.length()-2);
                 parameterLabel.setText(" <" + sb.toString() + ">");
             } else {
-                Debug.log("No parameter suggestion");
                 parameterLabel.setText("");
             }
         }
@@ -133,6 +132,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         if(any) {
             Debug.log("Received " + explorer.getTotalCount() + " suggestions");
             this.setVisible(true);
+            editor.requestFocus();
             filter();
             int shownTokens = 0;
             for(ExpandableSuggestionToken token : activeTokens) {
@@ -183,7 +183,6 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
 
     @Override
     public void keyTyped(KeyEvent e) {
-
     }
 
     @Override
@@ -250,7 +249,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         if(isVisible() && activeResults != null) {
             try {
                 int cwpos = activeResults.getSuggestionIndex();
-                if(editor.getSoftCaretWordPosition() > cwpos || (!activeResults.changedSuggestionIndex() && editor.getCaretWordPosition() > cwpos)) {
+                if(editor.getCaretPosition() < cwpos || editor.getSoftCaretWordPosition() > cwpos || (!activeResults.changedSuggestionIndex() && editor.getCaretWordPosition() > cwpos)) {
                     dismiss(true);
                     return;
                 }

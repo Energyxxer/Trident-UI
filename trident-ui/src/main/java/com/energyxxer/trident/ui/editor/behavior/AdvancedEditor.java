@@ -32,9 +32,7 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -42,7 +40,7 @@ import java.util.function.Function;
 /**
  * Created by User on 1/5/2017.
  */
-public class AdvancedEditor extends JTextPane implements KeyListener, CaretListener, Disposable {
+public class AdvancedEditor extends JTextPane implements KeyListener, CaretListener, FocusListener, Disposable {
 
     private static final float BIAS_POINT = 0.4f;
 
@@ -75,6 +73,8 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         FOLD = KeyMap.requestMapping("test.fold", KeyMap.identifierToStrokes("")).setName("Fold").setGroupName("Testing - please do not use");
     }
 
+    private Color selectionUnfocusedColor;
+
     public AdvancedEditor() {
         super();
         this.setStyledDocument(foldableDoc = new FoldableDocument());
@@ -83,11 +83,7 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         linePainter = new LinePainter(this);
         this.setCaret(this.caret = new EditorCaret(this));
         this.addKeyListener(this);
-
-        /*this.getDocument().addUndoableEditListener(e -> {
-            modelLineCache.setText(getFoldableDocument().getUnfoldedText());
-            viewLineCache.setText(getFoldableDocument().getFoldedText());
-        });*/
+        this.addFocusListener(this);
 
         this.getDocument().addDocumentListener((UnifiedDocumentListener) e -> {
             updateDefaultSize();
@@ -125,7 +121,7 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
             this.setForeground(t.getColor(Color.BLACK, "Editor.foreground","General.foreground"));
             this.setCaretColor(this.getForeground());
             this.setSelectionColor(t.getColor(new Color(50, 100, 175), "Editor.selection.background"));
-            this.setSelectedTextColor(t.getColor(this.getForeground(), "Editor.selection.foreground"));
+            this.setSelectionUnfocusedColor(t.getColor(new Color(50, 100, 175), "Editor.selection.unfocused.background"));
             this.setCurrentLineColor(t.getColor(new Color(235, 235, 235), "Editor.currentLine.background"));
             this.setFont(new Font(t.getString("Editor.font","default:monospaced"), Font.PLAIN, Preferences.getEditorFontSize()));
         });
@@ -376,6 +372,14 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         caret.addCaretPaintListener(runnable);
     }
 
+    public Color getSelectionUnfocusedColor() {
+        return selectionUnfocusedColor;
+    }
+
+    public void setSelectionUnfocusedColor(Color selectionUnfocusedColor) {
+        this.selectionUnfocusedColor = selectionUnfocusedColor;
+    }
+
     private enum CharType {
         ALPHA(true, 1), WHITESPACE(true, 0), SYMBOL(false), NULL(false);
 
@@ -616,6 +620,16 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         for(KeyListener listener : oldListeners) {
             super.addKeyListener(listener);
         }
+    }
+
+    @Override
+    public void focusGained(FocusEvent e) {
+        repaint();
+    }
+
+    @Override
+    public void focusLost(FocusEvent e) {
+        repaint();
     }
 
     @Override
