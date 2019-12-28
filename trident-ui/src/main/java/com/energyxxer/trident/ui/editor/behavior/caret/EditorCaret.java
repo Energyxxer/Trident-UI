@@ -139,6 +139,7 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
     public void mergeDots(Dot newDot) {
         if(!dots.contains(newDot)) {
             Debug.log("DOTS DO NOT CONTAIN NEWDOT, DOT WAS NOT ADDED");
+            dots.add(newDot);
         }
         boolean hasMerged = true;
         while(hasMerged) {
