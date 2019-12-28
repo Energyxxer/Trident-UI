@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
@@ -127,7 +128,12 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
         int index = this.getCaretPosition();
         if(index <= 0) return 0;
         while (true) {
-            char c = this.getFoldableDocument().getModelText(index-1, 1).charAt(0);
+            char c = 0;
+            try {
+                c = this.getDocument().getText(index-1, 1).charAt(0);
+            } catch (BadLocationException x) {
+                x.printStackTrace();
+            }
             if (!(Character.isJavaIdentifierPart(c) && c != '$') || --index <= 1)
                 break;
         }
@@ -138,7 +144,12 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
         int index = this.getCaretPosition();
         if(index <= 0) return 0;
         while (true) {
-            char c = this.getFoldableDocument().getModelText(index-1, 1).charAt(0);
+            char c = 0;
+            try {
+                c = this.getDocument().getText(index-1, 1).charAt(0);
+            } catch (BadLocationException x) {
+                x.printStackTrace();
+            }
             if (!((Character.isJavaIdentifierPart(c) && c != '$') || "#:/.-".contains(c+"")) || --index <= 1)
                 break;
         }
@@ -315,7 +326,12 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
 
     @Override
     public String getText() {
-        return getFoldableDocument().getUnfoldedText();
+        try {
+            return getDocument().getText(0, getDocument().getLength());
+        } catch (BadLocationException x) {
+            x.printStackTrace();
+        }
+        return null;
     }
 
     @Override

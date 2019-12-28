@@ -5,9 +5,10 @@ import com.energyxxer.trident.ui.editor.behavior.caret.CaretProfile;
 import com.energyxxer.trident.ui.editor.behavior.caret.Dot;
 import com.energyxxer.trident.ui.editor.behavior.caret.EditorCaret;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.Edit;
-import com.energyxxer.trident.ui.editor.folding.FoldableDocument;
 
+import javax.swing.text.AbstractDocument;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 
 /**
  * Created by User on 1/26/2017.
@@ -25,13 +26,13 @@ public class LineMoveEdit extends Edit {
 
     @Override
     public boolean redo(AdvancedEditor editor) {
-        FoldableDocument doc = editor.getFoldableDocument();
+        Document doc = editor.getDocument();
         EditorCaret caret = editor.getCaret();
 
         boolean actionPerformed = false;
 
         try {
-            String text = doc.getUnfoldedText(); //Result
+            String text = doc.getText(0, doc.getLength()); //Result
             this.previousText = text;
 
             int characterDrift = 0;
@@ -88,12 +89,16 @@ public class LineMoveEdit extends Edit {
 
     @Override
     public boolean undo(AdvancedEditor editor) {
-        FoldableDocument doc = editor.getFoldableDocument();
+        Document doc = editor.getDocument();
         EditorCaret caret = editor.getCaret();
 
         //Too complicated, just put back the text from before.
 
-        doc.replace(this.previousText);
+        try {
+            ((AbstractDocument) doc).replace(0, doc.getLength(), this.previousText, null);
+        } catch (BadLocationException x) {
+            x.printStackTrace();
+        }
         caret.setProfile(previousProfile);
         return true;
     }

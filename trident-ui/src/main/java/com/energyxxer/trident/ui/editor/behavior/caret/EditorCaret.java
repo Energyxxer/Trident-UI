@@ -17,21 +17,21 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.plaf.TextUI;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultCaret;
-import javax.swing.text.Highlighter;
-import javax.swing.text.Utilities;
+import javax.swing.text.*;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.*;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import static com.energyxxer.trident.ui.editor.behavior.caret.DragSelectMode.CHAR;
 import static com.energyxxer.trident.ui.editor.behavior.caret.DragSelectMode.RECTANGLE;
@@ -50,8 +50,11 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
                         " If this test never receives any positive results, that method will be removed."));
     }
 
-    private ArrayList<Dot> dots = new ArrayList<>();
+    private List<Dot> dots = Collections.synchronizedList(new ArrayList<>());
     private AdvancedEditor editor;
+    private Timer flasher;
+    private ActionListener flasherHandler;
+    boolean visible = true;
 
     private static Highlighter.HighlightPainter nullHighlighter = (g,p0,p1,bounds,c) -> {};
 
@@ -59,7 +62,13 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
 
     public EditorCaret(AdvancedEditor c) {
         this.editor = c;
-        this.setBlinkRate(500);
+        this.setBlinkRate(0);
+
+        this.flasher = new Timer(500, flasherHandler = a -> {
+            visible = !visible;
+            repaint();
+        });
+        this.flasher.start();
         this.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
         c.addKeyListener(new KeyAdapter() {
             @Override
@@ -97,8 +106,9 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
         Using.using(editor.getSuggestionInterface()).notIfNull().run(
                 d -> d.dismiss(false)
         );
+        visible = true;
+        flasher.restart();
         editor.repaint();
-        this.setVisible(true);
         readjustRect();
         this.fireStateChanged();
     }
@@ -107,6 +117,7 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
         dots.clear();
         bufferedDot = new Dot(pos, editor);
         addDot(bufferedDot);
+        bufferedDotAdded = true;
         update();
     }
 
@@ -120,8 +131,8 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
     public void addDot(Dot... newDots) {
         for(Dot dot : newDots) {
             dots.add(dot);
-            mergeDots(dot);
             if(dot == bufferedDot) bufferedDotAdded = true;
+            mergeDots(dot);
         }
     }
 
@@ -191,7 +202,7 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
 
                 boolean shouldPaint = !(dragSelectMode == RECTANGLE && dot == bufferedDot) && !(dragSelectMode == CHAR && dotIndex >= rectangleDotsStartIndex);
 
-                if(isVisible() && shouldPaint) {
+                if(visible && shouldPaint) {
                     r.x -= paintWidth >> 1;
                     g.fillRect(r.x, r.y, paintWidth, r.height);
                 }
@@ -264,7 +275,7 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
         if(dots.size() > 1) {
             return dots.size() + " carets";
         } else {
-            StringLocation loc = editor.getModelLocationForOffset(dots.get(0).index);
+            StringLocation loc = editor.getLocationForOffset(dots.get(0).index);
             return loc.line + ":" + loc.column;
         }
     }
@@ -331,8 +342,8 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
         Range r = new Range(0,editor.getDocument().getLength());
         for(int i = 0; i < profile.size()-1; i += 2) {
             Dot newDot = new Dot(
-                    editor.getFoldableDocument().modelIndexToView(r.clamp(profile.get(i))),
-                    editor.getFoldableDocument().modelIndexToView(r.clamp(profile.get(i+1))),
+                    r.clamp(profile.get(i)),
+                    r.clamp(profile.get(i+1)),
                     editor
             );
             if(i == 0) bufferedDot = newDot;
@@ -386,13 +397,7 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
         clickStartedMouse2 = e.getButton() == MouseEvent.BUTTON2;
 
         if(e.getButton() == MouseEvent.BUTTON2 || (e.getButton() == MouseEvent.BUTTON1 && e.isAltDown() && !e.isShiftDown())) {
-            Debug.log("Rectangle start");
-            Debug.log(e.getButton() == MouseEvent.BUTTON2);
             clickStartInSelection = false;
-            if(!e.isAltDown() || !e.isShiftDown()) {
-                dots.clear();
-            }
-
             dragSelectMode = RECTANGLE;
         } else if(e.getClickCount() == 2 && !e.isConsumed() && e.getButton() == MouseEvent.BUTTON1) {
             bufferedDot.mark = bufferedDot.getWordStart();
@@ -423,6 +428,10 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
 
         e.consume();
         update();
+
+        if(dragSelectMode == RECTANGLE) {
+            mouseDragged(e);
+        }
     }
 
     private String transferData = null;
@@ -436,10 +445,10 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
             }
         } else if(bufferedDot != null) {
             dots.remove(bufferedDot);
+            bufferedDotAdded = false;
             rectangleDotCursorIndex--;
             mergeDots();
             bufferedDot = null;
-            bufferedDotAdded = false;
         }
 
         if(bufferedDot != null) {
@@ -455,6 +464,8 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
         this.setVisible(true);
         readjustRect();
         e.consume();
+        dragSelectMode = CHAR;
+        rectangleDotsStartIndex = Integer.MAX_VALUE;
     }
 
     private void adjustFocus() {
@@ -624,7 +635,6 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
     @Override
     public void drop(DropTargetDropEvent e) {
         if(!editor.isEditable()) return;
-        Debug.log(e);
         e.acceptDrop(TransferHandler.COPY_OR_MOVE);
         if(!e.isDataFlavorSupported(DataFlavor.stringFlavor)) {
             Debug.log("Redirected to edit area");
@@ -679,5 +689,12 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
 
     public void addCaretPaintListener(@NotNull Runnable runnable) {
         caretPaintListeners.add(runnable);
+    }
+
+    @Override
+    public void deinstall(JTextComponent c) {
+        super.deinstall(c);
+        flasher.stop();
+        flasher.removeActionListener(flasherHandler);
     }
 }

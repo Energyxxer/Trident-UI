@@ -136,7 +136,7 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
 
         if(!dot.isPoint()) {
             try {
-                searchBar.getValue().setFindText(editorComponent.getFoldableDocument().getText(dot.getMin(), dot.getMax()-dot.getMin()));
+                searchBar.getValue().setFindText(editorComponent.getDocument().getText(dot.getMin(), dot.getMax()-dot.getMin()));
             } catch (BadLocationException e) {
                 e.printStackTrace();
             }

@@ -291,11 +291,4 @@ public class Dot {
         return this.getMin() <= index && index < this.getMax();
     }
 
-    public int getModelIndex() {
-        return component.getFoldableDocument().viewIndexToModel(this.index);
-    }
-
-    public int getModelMark() {
-        return component.getFoldableDocument().viewIndexToModel(this.mark);
-    }
 }

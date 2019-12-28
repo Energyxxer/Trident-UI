@@ -10,7 +10,6 @@ import com.energyxxer.trident.ui.editor.behavior.caret.EditorCaret;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.EditManager;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.edits.*;
 import com.energyxxer.trident.ui.editor.completion.SuggestionInterface;
-import com.energyxxer.trident.ui.editor.folding.FoldableDocument;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.trident.util.linepainter.LinePainter;
 import com.energyxxer.util.Disposable;
@@ -57,13 +56,11 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
     private EditManager editManager = new EditManager(this);
     private LinePainter linePainter;
 
-    private final StringLocationCache modelLineCache = new StringLocationCache();
     private final StringLocationCache viewLineCache = new StringLocationCache();
 
     private SuggestionInterface suggestionInterface;
 
     private int lineHeight = 17;
-    private FoldableDocument foldableDoc;
 
     private static UserKeyBind FOLD;
     private static UserKeyBind UNFOLD;
@@ -77,7 +74,6 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
 
     public AdvancedEditor() {
         super();
-        this.setStyledDocument(foldableDoc = new FoldableDocument());
         this.getDocument().putProperty(DefaultEditorKit.EndOfLineStringProperty, "\n");
 
         linePainter = new LinePainter(this);
@@ -86,9 +82,13 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         this.addFocusListener(this);
 
         this.getDocument().addDocumentListener((UnifiedDocumentListener) e -> {
+            try {
+                viewLineCache.textChanged(getDocument().getText(0, getDocument().getLength()), e.getOffset());
+            } catch (BadLocationException ex) {
+                ex.printStackTrace();
+            }
+
             updateDefaultSize();
-            modelLineCache.textChanged(getFoldableDocument().getUnfoldedText(), getFoldableDocument().viewIndexToModel(e.getOffset()));
-            viewLineCache.textChanged(getFoldableDocument().getFoldedText(), e.getOffset());
         });
 
         this.setTransferHandler(this.editorTransferHandler = new TransferHandler() {
@@ -200,16 +200,6 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
             editManager.insertEdit(new LineMoveEdit(this, Dot.DOWN));
         } else if(keyCode == KeyEvent.VK_ESCAPE) {
             caret.deselect();
-        } else if(FOLD.wasPerformedExact(e)) {
-            Debug.log("FOLDING");
-            foldableDoc.fold(caret.getDots().get(0).getMin(), caret.getDots().get(0).getMax());
-            caret.deselect();
-            e.consume();
-        } else if(UNFOLD.wasPerformedExact(e)) {
-            Debug.log("UNFOLDING");
-            foldableDoc.unfold();
-            caret.deselect();
-            e.consume();
         }
 
         if(e.isConsumed() && suggestionInterface != null) {
@@ -219,10 +209,6 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
 
     public EditManager getEditManager() {
         return editManager;
-    }
-
-    public StringLocation getModelLocationForOffset(int index) {
-        return modelLineCache.getLocationForOffset(foldableDoc.viewIndexToModel(index));
     }
 
     public StringLocation getLocationForOffset(int index) {
@@ -698,9 +684,5 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
     @Deprecated
     public void selectAll() {
         super.selectAll();
-    }
-
-    public FoldableDocument getFoldableDocument() {
-        return foldableDoc;
     }
 }

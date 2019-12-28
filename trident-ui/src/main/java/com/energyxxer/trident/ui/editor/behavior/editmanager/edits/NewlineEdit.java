@@ -5,7 +5,6 @@ import com.energyxxer.trident.ui.editor.behavior.caret.CaretProfile;
 import com.energyxxer.trident.ui.editor.behavior.caret.Dot;
 import com.energyxxer.trident.ui.editor.behavior.caret.EditorCaret;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.Edit;
-import com.energyxxer.trident.ui.editor.folding.FoldableDocument;
 import com.energyxxer.util.StringUtil;
 
 import javax.swing.text.BadLocationException;
@@ -35,7 +34,7 @@ public class NewlineEdit extends Edit {
 
     @Override
     public boolean redo(AdvancedEditor editor) {
-        FoldableDocument doc = editor.getFoldableDocument();
+        Document doc = editor.getDocument();
         EditorCaret caret = editor.getCaret();
 
         modificationIndices.clear();
@@ -47,7 +46,7 @@ public class NewlineEdit extends Edit {
         nextProfile = (pushCaret) ? new CaretProfile() : new CaretProfile(previousProfile);
 
         try {
-            String text = doc.getUnfoldedText(); //Result
+            String text = doc.getText(0, doc.getLength()); //Result
 
             int characterDrift = 0;
 

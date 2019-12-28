@@ -5,9 +5,9 @@ import com.energyxxer.trident.ui.editor.behavior.caret.CaretProfile;
 import com.energyxxer.trident.ui.editor.behavior.caret.Dot;
 import com.energyxxer.trident.ui.editor.behavior.caret.EditorCaret;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.Edit;
-import com.energyxxer.trident.ui.editor.folding.FoldableDocument;
 
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import java.util.ArrayList;
 
 /**
@@ -44,13 +44,13 @@ public class DeletionEdit extends Edit {
 
     @Override
     public boolean redo(AdvancedEditor editor) {
-        FoldableDocument doc = editor.getFoldableDocument();
+        Document doc = editor.getDocument();
         EditorCaret caret = editor.getCaret();
 
         boolean actionPerformed = false;
 
         try {
-            String result = doc.getUnfoldedText(); //Result
+            String result = doc.getText(0, doc.getLength()); //Result
 
             int characterDrift = 0;
 
@@ -122,13 +122,13 @@ public class DeletionEdit extends Edit {
 
     @Override
     public boolean undo(AdvancedEditor editor) {
-        FoldableDocument doc = editor.getFoldableDocument();
+        Document doc = editor.getDocument();
         EditorCaret caret = editor.getCaret();
 
         boolean actionPerformed = false;
 
         try {
-            String str = doc.getUnfoldedText();
+            String str = doc.getText(0, doc.getLength());
 
             for (int i = nextProfile.size() -2; i >= 0; i -= 2) {
                 int start = nextProfile.get(i);

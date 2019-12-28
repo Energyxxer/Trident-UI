@@ -100,7 +100,7 @@ public class TextLineNumber extends JPanel
 
 			Rectangle viewport = scrollPane.getViewport().getViewRect();
 
-			int caretPosition = component.getModelLocationForOffset(component.getCaretPosition()).line;
+			int caretPosition = component.getLocationForOffset(component.getCaretPosition()).line;
 
 			int start = component.viewToModel(new Point(0, viewport.y));
 			int maxLength = component.getDocument().getLength();
@@ -142,7 +142,7 @@ public class TextLineNumber extends JPanel
 	}
 
 	protected int getLineNumberFor(int offset) {
-		return component.getModelLocationForOffset(offset).line;
+		return component.getLocationForOffset(offset).line;
 	}
 
 	private int getOffsetX(int availableWidth, int stringWidth)
