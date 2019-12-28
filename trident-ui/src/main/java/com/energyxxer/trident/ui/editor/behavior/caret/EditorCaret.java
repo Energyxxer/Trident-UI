@@ -132,8 +132,8 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
         for(Dot dot : newDots) {
             dots.add(dot);
             if(dot == bufferedDot) bufferedDotAdded = true;
-            mergeDots(dot);
         }
+        mergeDots();
     }
 
     public void mergeDots(Dot newDot) {
@@ -157,6 +157,9 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
     }
 
     private void mergeDots() {
+        if(!isDotMergeEnabled()) {
+            return;
+        }
         for(int i = 0; i < dots.size(); i++) {
             Dot dot = dots.get(i);
             for(int j = i+1; j < dots.size(); j++) {
@@ -338,8 +341,19 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
         return nullHighlighter;
     }
 
+    private boolean dotMergeEnabled = true;
+
+    public boolean isDotMergeEnabled() {
+        return dotMergeEnabled;
+    }
+
+    public void setDotMergeEnabled(boolean dotMergeEnabled) {
+        this.dotMergeEnabled = dotMergeEnabled;
+    }
+
     public void setProfile(CaretProfile profile) {
         this.dots.clear();
+        setDotMergeEnabled(!profile.isDotMergeDisabled());
         Range r = new Range(0,editor.getDocument().getLength());
         for(int i = 0; i < profile.size()-1; i += 2) {
             Dot newDot = new Dot(
@@ -352,6 +366,7 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
         }
         removeDuplicates();
         update();
+        setDotMergeEnabled(true);
     }
 
     @Override

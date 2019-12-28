@@ -390,7 +390,7 @@ public class FindAndReplaceBar extends JPanel implements Disposable {
     private void replaceSelected() {
         if(!regions.isEmpty()) {
             if(selectedIndex != -2) {
-                editor.editorComponent.getCaret().setProfile(new CaretProfile(regions.get(selectedIndex+1), regions.get(selectedIndex)));
+                editor.editorComponent.getCaret().setProfile(new CaretProfile(regions.get(selectedIndex+1), regions.get(selectedIndex)).disableDotMerge());
                 editor.editorComponent.getEditManager().insertEdit(new InsertionEdit(replaceField.getText(), editor.editorComponent));
             } else {
                 HintStylizer.style(hint);
@@ -422,7 +422,7 @@ public class FindAndReplaceBar extends JPanel implements Disposable {
             }
         }
         if(!toReplace.isEmpty()) {
-            editor.editorComponent.getCaret().setProfile(new CaretProfile(toReplace));
+            editor.editorComponent.getCaret().setProfile(new CaretProfile(toReplace).disableDotMerge());
             editor.editorComponent.getEditManager().insertEdit(new InsertionEdit(replaceField.getText(), editor.editorComponent));
         } else {
             HintStylizer.style(hint);

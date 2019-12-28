@@ -15,6 +15,7 @@ import java.util.List;
 public class CaretProfile implements Iterable<Integer> {
 
     private ArrayList<Integer> list = new ArrayList<>();
+    private boolean dotMergeDisabled = false;
 
     public CaretProfile() {}
 
@@ -160,5 +161,14 @@ public class CaretProfile implements Iterable<Integer> {
         CaretProfile integers = (CaretProfile) o;
 
         return list.equals(integers.list);
+    }
+
+    public CaretProfile disableDotMerge() {
+        dotMergeDisabled = true;
+        return this;
+    }
+
+    public boolean isDotMergeDisabled() {
+        return dotMergeDisabled;
     }
 }
