@@ -49,7 +49,13 @@ public class FileModuleToken implements ModuleToken, DraggableExplorerModuleToke
     public static final Preferences.SettingPref<Boolean> SHOW_EXTENSIONS_EXPLORER = new Preferences.SettingPref<>("settings.behavior.hide_extensions.explorer", true, Boolean::parseBoolean);
     public static final Preferences.SettingPref<Boolean> SHOW_EXTENSIONS_TAB = new Preferences.SettingPref<>("settings.behavior.hide_extensions.tab", true, Boolean::parseBoolean);
     public static final Preferences.SettingPref<Boolean> LOAD_PNGS = new Preferences.SettingPref<>("settings.behavior.load_pngs", true, Boolean::parseBoolean);
-    public static final Preferences.SettingPref<Boolean> DELETE_MOVES_TO_TRASH = new Preferences.SettingPref<>("settings.behavior.delete_moves_to_trash", true, Boolean::parseBoolean);
+    public static final Preferences.SettingPref<Boolean> DELETE_MOVES_TO_TRASH = new Preferences.SettingPref<Boolean>("settings.behavior.delete_moves_to_trash", true, Boolean::parseBoolean) {
+        @Override
+        public Boolean get() {
+            return MOVE_TO_TRASH_VERSION_AVAILABLE && super.get();
+        }
+    };
+    public static final boolean MOVE_TO_TRASH_VERSION_AVAILABLE = !System.getProperty("java.version").startsWith("1.8.");
 
     private final File file;
     private boolean isProjectRoot;

@@ -1,10 +1,7 @@
 package com.energyxxer.trident.util;
 
-import com.energyxxer.trident.global.FileManager;
 import com.energyxxer.trident.ui.dialogs.ConfirmDialog;
-import com.energyxxer.trident.ui.modules.FileModuleToken;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -98,27 +95,6 @@ public class FileCommons {
                 return file;
             }
         }
-    }
-
-    public static boolean deleteFolder(File folder) {
-        if(FileModuleToken.DELETE_MOVES_TO_TRASH.get()) {
-            if(Desktop.getDesktop().isSupported(Desktop.Action.MOVE_TO_TRASH)) {
-                return Desktop.getDesktop().moveToTrash(folder);
-            } else if(!new ConfirmDialog("Move to Trash", "'Move to Trash' is not supported in your platform. Permanently delete '" + folder + "'?").result) {
-                return false;
-            }
-        }
-        File[] files = folder.listFiles();
-        if (files != null) {
-            for (File f : files) {
-                if (f.isDirectory()) {
-                    deleteFolder(f);
-                } else {
-                    FileManager.deleteOrTrashFile(f);
-                }
-            }
-        }
-        return folder.delete();
     }
 
     /**

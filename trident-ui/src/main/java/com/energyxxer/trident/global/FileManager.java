@@ -9,6 +9,7 @@ import com.energyxxer.util.logger.Debug;
 
 import java.awt.*;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -105,7 +106,7 @@ public class FileManager {
             File file = new File(path);
             if(!file.exists()) continue;
             if(file.isDirectory()) {
-                FileCommons.deleteFolder(file);
+                deleteFolder(file);
             } else {
                 boolean success = deleteOrTrashFile(file);
                 if(!success) Debug.log("Couldn't delete file '" + file.getName() + "'", Debug.MessageType.ERROR);
@@ -117,14 +118,45 @@ public class FileManager {
 
     public static boolean deleteOrTrashFile(File file) {
         if(FileModuleToken.DELETE_MOVES_TO_TRASH.get()) {
-            if(Desktop.getDesktop().isSupported(Desktop.Action.MOVE_TO_TRASH)) {
-                return Desktop.getDesktop().moveToTrash(file);
-            } else if(new ConfirmDialog("Move to Trash", "'Move to Trash' is not supported in your platform. Permanently delete '" + file + "'?").result) {
-                return file.delete();
+            try {
+                if(Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported((Desktop.Action) Desktop.Action.class.getField("MOVE_TO_TRASH").get(null))) {
+                    return (boolean) Desktop.class.getMethod("moveToTrash", File.class).invoke(Desktop.getDesktop(), file);
+                } else if(new ConfirmDialog("Move to Trash", "'Move to Trash' is not supported in your platform. Permanently delete '" + file + "'?").result) {
+                    return file.delete();
+                }
+            } catch (NoSuchFieldException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
             }
             return false;
         } else {
             return file.delete();
         }
+    }
+
+    public static boolean deleteFolder(File folder) {
+        if(FileModuleToken.DELETE_MOVES_TO_TRASH.get()) {
+            try {
+                if(Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported((Desktop.Action) Desktop.Action.class.getField("MOVE_TO_TRASH").get(null))) {
+                    return (boolean) Desktop.class.getMethod("moveToTrash", File.class).invoke(Desktop.getDesktop(), folder);
+                } else if(!new ConfirmDialog("Move to Trash", "'Move to Trash' is not supported in your platform. Permanently delete '" + folder + "'?").result) {
+                    return false;
+                }
+            } catch (NoSuchFieldException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+
+        File[] files = folder.listFiles();
+        if (files != null) {
+            for (File f : files) {
+                if (f.isDirectory()) {
+                    deleteFolder(f);
+                } else {
+                    FileManager.deleteOrTrashFile(f);
+                }
+            }
+        }
+        return folder.delete();
     }
 }
