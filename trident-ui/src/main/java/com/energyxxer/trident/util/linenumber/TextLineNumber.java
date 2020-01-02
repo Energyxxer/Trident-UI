@@ -103,32 +103,28 @@ public class TextLineNumber extends JPanel
 			int caretPosition = component.getLocationForOffset(component.getCaretPosition()).line;
 
 			int start = component.viewToModel(new Point(0, viewport.y));
-			int maxLength = component.getDocument().getLength();
-			int prevIndex = -1;
 			int y = -(viewport.y % lineHeight) - fontMetrics.getDescent();
+			int lineNum = component.getLocationForOffset(start).line;
+			int maxLine = getLineCount();
 
-			for(int currentIndex = start; currentIndex <= maxLength; currentIndex = Utilities.getPositionBelow(component, currentIndex, 0)) {
-				if(currentIndex == prevIndex) break;
-
-				int line = getLineNumberFor(currentIndex);
-				String label = String.valueOf(line);
+			while(y < viewport.y + viewport.height && lineNum <= maxLine) {
+				String label = String.valueOf(lineNum);
 				int stringWidth = fontMetrics.stringWidth(label);
 				int x = getOffsetX(availableWidth, stringWidth) + padding;
 				y += lineHeight;
 
-				if(line == caretPosition) {
+				if(lineNum == caretPosition) {
 					g.setColor(getCurrentLineForeground());
 				} else {
 					g.setColor(getForeground());
 				}
 
-				g.drawString(String.valueOf(line), x, y);
+				g.drawString(label, x, y);
 
-				prevIndex = currentIndex;
-				if(y >= viewport.height) break;
+
+				lineNum++;
 			}
-
-		} catch(BadLocationException e) {
+		} catch(NullPointerException | BadLocationException e) {
 			e.printStackTrace();
 		}
 	}

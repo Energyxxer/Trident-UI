@@ -123,6 +123,10 @@ public class Inspector implements Highlighter.HighlightPainter, MouseMotionListe
 
     @Override
     public void mouseMoved(MouseEvent e) {
+        if(items.isEmpty()) {
+            rolloverItem = null;
+            return;
+        }
         int index = editor.viewToModel(e.getPoint());
         for(InspectionItem item : items) {
             if(index >= item.bounds.start.index && index < item.bounds.end.index) {

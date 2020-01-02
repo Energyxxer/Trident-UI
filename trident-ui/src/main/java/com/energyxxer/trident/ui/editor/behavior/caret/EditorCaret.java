@@ -108,9 +108,11 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
         );
         visible = true;
         flasher.restart();
-        editor.repaint();
-        readjustRect();
-        this.fireStateChanged();
+        SwingUtilities.invokeLater(() -> {
+            readjustRect();
+            editor.repaint();
+            this.fireStateChanged();
+        });
     }
 
     public void setPosition(int pos) {
@@ -254,7 +256,7 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
     }
 
     @Override
-    protected synchronized void damage(Rectangle rect) {
+    protected void damage(Rectangle rect) {
         readjustRect();
         repaint();
     }
@@ -321,6 +323,9 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
         if(dragSelectMode == RECTANGLE) return dots.get(Math.min(rectangleDotCursorIndex, dots.size()-1)).index;
         int upperBound = dots.size()-1;
         if(dragSelectMode == CHAR) upperBound = rectangleDotsStartIndex -1;
+        if(dots.isEmpty()) {
+            boolean a;
+        }
         return dots.get(Math.min(upperBound, dots.size()-1)).index;
     }
 
@@ -585,7 +590,7 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
                                 }
                             }
                         }
-                        if((e.isAltDown() == clickStartedMouse2) || e.isShiftDown()) {
+                        if(e.getID() != MouseEvent.MOUSE_PRESSED && ((((e.getModifiersEx() & MouseEvent.ALT_DOWN_MASK) != 0) == clickStartedMouse2) || e.isShiftDown())) {
                             dragSelectMode = DragSelectMode.CHAR;
                         }
 
@@ -598,7 +603,7 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
                     }
                     case CHAR: {
                         bufferedDot.updateX();
-                        if((e.isAltDown() != clickStartedMouse2) && !e.isShiftDown()) {
+                        if(e.getID() != MouseEvent.MOUSE_PRESSED && (((e.getModifiersEx() & MouseEvent.ALT_DOWN_MASK) == 0) == clickStartedMouse2) && !e.isShiftDown()) {
                             dragSelectMode = RECTANGLE;
                             rectangleDotCursorIndex = dots.size()-1;
                         }

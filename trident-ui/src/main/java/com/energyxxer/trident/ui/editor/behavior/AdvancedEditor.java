@@ -22,9 +22,11 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.event.DocumentEvent;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Document;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -73,7 +75,7 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
     private Color selectionUnfocusedColor;
 
     public AdvancedEditor() {
-        super();
+        super(new DefaultStyledDocument());
         this.getDocument().putProperty(DefaultEditorKit.EndOfLineStringProperty, "\n");
 
         linePainter = new LinePainter(this);
@@ -82,6 +84,7 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         this.addFocusListener(this);
 
         this.getDocument().addDocumentListener((UnifiedDocumentListener) e -> {
+            if(e.getType() == DocumentEvent.EventType.CHANGE) return;
             try {
                 viewLineCache.textChanged(getDocument().getText(0, getDocument().getLength()), e.getOffset());
             } catch (BadLocationException ex) {
@@ -90,6 +93,12 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
 
             updateDefaultSize();
         });
+
+        /*this.getDocument().addUndoableEditListener(e -> {
+            if (e.getEdit().getPresentationName().equals("style change")) return;
+            viewLineCache.setText(this.getText());
+            updateDefaultSize();
+        });*/
 
         this.setTransferHandler(this.editorTransferHandler = new TransferHandler() {
             @Override
@@ -244,6 +253,11 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
             Debug.log(x.getMessage(), Debug.MessageType.ERROR);
             return superResult;
         }
+    }
+
+    @Override
+    public Rectangle modelToView(int pos) throws BadLocationException {
+        return super.modelToView(pos);
     }
 
     protected String getCaretInfo() {
@@ -544,8 +558,8 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
 
     private void updateDefaultSize() {
         if(defaultSize != null) {
-            int lines = getText().split("\n", -1).length;
-            Dimension size = new Dimension(defaultSize.width, (getLineHeight() * lines) + defaultSize.height - getLineHeight());
+            int lineCount = getText().split("\n", -1).length;
+            Dimension size = new Dimension(defaultSize.width, (getLineHeight() * lineCount) + defaultSize.height - getLineHeight());
             this.setPreferredSize(size);
             for(Consumer<Dimension> consumer : defaultSizeListeners) {
                 consumer.accept(size);
@@ -684,5 +698,9 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
     @Deprecated
     public void selectAll() {
         super.selectAll();
+    }
+
+    public boolean isDocumentUpToDate() {
+        return true;
     }
 }

@@ -46,8 +46,8 @@ public class Dot {
         try {
             Rectangle view = component.modelToView(index);
             if(view != null) this.x = view.x;
-        } catch (BadLocationException ble) {
-            Debug.log(ble.getMessage(), Debug.MessageType.ERROR);
+        } catch (BadLocationException x) {
+            x.printStackTrace();
         }
     }
 

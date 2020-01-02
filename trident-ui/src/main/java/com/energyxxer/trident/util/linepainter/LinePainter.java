@@ -1,15 +1,14 @@
 package com.energyxxer.trident.util.linepainter;
 
-import javax.swing.SwingUtilities;
+import com.energyxxer.trident.ui.editor.behavior.AdvancedEditor;
+
+import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Rectangle;
-import java.awt.Shape;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -22,7 +21,7 @@ import java.util.ArrayList;
 public class LinePainter
         implements Highlighter.HighlightPainter, CaretListener, MouseListener, MouseMotionListener
 {
-    private JTextComponent component;
+    private AdvancedEditor component;
 
     private Color color;
 
@@ -37,7 +36,7 @@ public class LinePainter
      *
      *  @param component  text component that requires background line painting
      */
-    public LinePainter(JTextComponent component)
+    public LinePainter(AdvancedEditor component)
     {
         this(component, null);
         setLighter(component.getSelectionColor());
@@ -49,7 +48,7 @@ public class LinePainter
      *  @param component  text component that requires background line painting
      *  @param color      the color of the background line
      */
-    public LinePainter(JTextComponent component, Color color)
+    public LinePainter(AdvancedEditor component, Color color)
     {
         this.component = component;
         setColor( color );
