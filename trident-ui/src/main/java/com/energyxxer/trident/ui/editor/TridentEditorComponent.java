@@ -177,7 +177,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
         Lang.LangAnalysisResponse analysis = file != null ? lang.analyze(file, text, suggestionModule, summaryModule) : null;
         if(analysis == null) return;
 
-        suggestionBox.setSummary(analysis.lexer.getSummaryModule());
+        if(analysis.response != null) suggestionBox.setSummary(analysis.lexer.getSummaryModule(), analysis.response.matched);
         if(analysis.lexer.getSuggestionModule() != null) {
             if(project != null) {
                 if(project instanceof TridentProject && analysis.lexer.getSummaryModule() instanceof TridentSummaryModule) {
@@ -205,6 +205,10 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
             if(analysis.lexer instanceof LazyLexer) return;
         }
 
+        if(analysis.response == null || analysis.response.matched) {
+            //sd.setCharacterAttributes(0, text.length(), defaultStyle, true);
+        }
+
         for(Token token : analysis.lexer.getStream().tokens) {
             Style style = TridentEditorComponent.this.getStyle(token.type.toString().toLowerCase());
 
@@ -212,9 +216,10 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
 
             int styleStart = token.loc.index;
 
-            sd.setCharacterAttributes(token.loc.index, token.value.length(), defaultStyle, true);
             if(style != null)
-                sd.setCharacterAttributes(token.loc.index, token.value.length(), style, false);
+                sd.setCharacterAttributes(token.loc.index, token.value.length(), style, true);
+            else
+                sd.setCharacterAttributes(token.loc.index, token.value.length(), defaultStyle, true);
 
             for(Map.Entry<String, Object> entry : token.attributes.entrySet()) {
                 if(!entry.getValue().equals(true)) continue;

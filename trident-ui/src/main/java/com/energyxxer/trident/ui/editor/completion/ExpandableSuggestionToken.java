@@ -173,4 +173,9 @@ public class ExpandableSuggestionToken implements SuggestionToken, ModuleToken {
     public int getBackspaces() {
         return backspaces;
     }
+
+    @Override
+    public String toString() {
+        return preview;
+    }
 }

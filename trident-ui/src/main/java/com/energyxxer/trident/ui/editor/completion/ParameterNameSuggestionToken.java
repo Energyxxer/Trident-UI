@@ -10,4 +10,9 @@ public class ParameterNameSuggestionToken implements SuggestionToken {
     public String getParameterName() {
         return parameterName;
     }
+
+    @Override
+    public String toString() {
+        return "Param: (" + parameterName + ")";
+    }
 }

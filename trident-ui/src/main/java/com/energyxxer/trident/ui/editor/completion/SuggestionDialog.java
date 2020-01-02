@@ -39,6 +39,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
     private ThemeListenerManager tlm = new ThemeListenerManager();
 
     private SummaryModule summary = null;
+    private SummaryModule lastSuccessfulSummary = null;
 
     private boolean locked = false;
     private boolean forceLocked = false;
@@ -131,8 +132,8 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
 
         if(any) {
             Debug.log("Received " + explorer.getTotalCount() + " suggestions");
+            //Debug.log(explorer.getChildren().stream().map(ExplorerElement::getToken).collect(Collectors.toList()));
             this.setVisible(true);
-            editor.requestFocus();
             filter();
             int shownTokens = 0;
             for(ExpandableSuggestionToken token : activeTokens) {
@@ -187,7 +188,9 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
 
     @Override
     public void keyPressed(KeyEvent e) {
+        //Debug.log("Pressed");
         if(!this.isVisible() || !anyEnabled) return;
+        if(TridentWindow.jframe.getFocusOwner() == null) editor.requestFocus();
         if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
             this.setVisible(false);
             e.consume();
@@ -230,7 +233,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
 
     @Override
     public void dismiss(boolean force) {
-        if(!forceLocked) {
+        if(isVisible() && !forceLocked) {
             if (force || !locked || (activeResults != null && editor.getCaretWordPosition() != activeResults.getSuggestionIndex() && editor.getSoftCaretWordPosition() != activeResults.getSuggestionIndex())) {
                 this.setVisible(false);
             }
@@ -312,17 +315,22 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
 
     @Override
     public void focusLost(FocusEvent e) {
-        if(e.getOppositeComponent() != this) {
+        if(e.getOppositeComponent() != null && e.getOppositeComponent() != this) {
             dismiss(true);
         }
+    }
+
+    public void setSummary(SummaryModule summary, boolean matched) {
+        this.summary = summary;
+        if(lastSuccessfulSummary == null || matched) lastSuccessfulSummary = summary;
     }
 
     public SummaryModule getSummary() {
         return summary;
     }
 
-    public void setSummary(SummaryModule summary) {
-        this.summary = summary;
+    public SummaryModule getLastSuccessfulSummary() {
+        return lastSuccessfulSummary;
     }
 
     @Override
