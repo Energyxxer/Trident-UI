@@ -3,6 +3,7 @@ package com.energyxxer.trident.ui.dialogs.project_properties;
 import com.energyxxer.trident.ui.styledcomponents.StyledCheckBox;
 import com.energyxxer.trident.ui.styledcomponents.StyledFileField;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
+import com.energyxxer.trident.ui.styledcomponents.StyledTextField;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.xswing.XFileField;
 
@@ -146,6 +147,38 @@ class ProjectPropertiesOutput extends JPanel {
 
                 content.add(exportComments);
                 content.add(new StyledLabel("         If enabled, comments in Trident functions will be exported.", "ProjectProperties.content", tlm));
+            }
+
+            {
+                JPanel margin = new JPanel();
+                margin.setMinimumSize(new Dimension(200,15));
+                margin.setMaximumSize(new Dimension(200,15));
+                margin.setOpaque(false);
+                margin.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+                content.add(margin);
+            }
+            //endregion
+
+            //region Anonymous Function Name
+            {
+                StyledLabel label = new StyledLabel("Anonymous Function Name:", "ProjectProperties.content", tlm);
+                label.setStyle(Font.BOLD);
+                content.add(label);
+            }
+            {
+                StyledLabel label = new StyledLabel("Name used for anonymous functions. The number of the anonymous function will replace asterisks (*)", "ProjectProperties.content", tlm);
+                content.add(label);
+            }
+            {
+                StyledTextField namespaceField = new StyledTextField("You shouldn't be able to see this*","ProjectProperties.content", tlm);
+                namespaceField.setPreferredSize(new Dimension(300,25));
+                namespaceField.setMaximumSize(new Dimension(200,25));
+                namespaceField.setAlignmentX(Component.LEFT_ALIGNMENT);
+                ProjectProperties.addOpenEvent(p -> namespaceField.setText(p.getAnonymousFunctionName()));
+                ProjectProperties.addApplyEvent(p -> p.setAnonymousFunctionName(namespaceField.getText()));
+
+                content.add(namespaceField);
             }
 
             {

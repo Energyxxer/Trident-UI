@@ -72,6 +72,7 @@ public class TridentProject implements Project {
         config.addProperty("export-comments", true);
         config.addProperty("strict-nbt", false);
         config.addProperty("strict-text-components", false);
+        config.addProperty("anonymous-function-name", "_anonymous*");
         JsonObject loggerObj = new JsonObject();
         loggerObj.addProperty("compact", false);
         loggerObj.addProperty("timestamp-enabled", true);
@@ -311,6 +312,19 @@ public class TridentProject implements Project {
         if(namespace.matches(Namespace.ALLOWED_NAMESPACE_REGEX)) {
             config.addProperty("default-namespace", namespace);
         }
+    }
+
+    public String getAnonymousFunctionName() {
+        if(config.has("anonymous-function-name") && config.get("anonymous-function-name").isJsonPrimitive() && config.get("anonymous-function-name").getAsJsonPrimitive().isString()) {
+            return config.get("anonymous-function-name").getAsString();
+        }
+        String defaultValue = "_anonymous*";
+        config.addProperty("anonymous-function-name", defaultValue);
+        return defaultValue;
+    }
+
+    public void setAnonymousFunctionName(String value) {
+        config.addProperty("anonymous-function-name", value);
     }
 
     public boolean isStrictNBT() {
