@@ -17,6 +17,7 @@ import com.energyxxer.trident.main.window.sections.search_path.SearchPathDialog;
 import com.energyxxer.trident.main.window.sections.tools.ConsoleBoard;
 import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.commodoreresources.DefinitionUpdateProcess;
+import com.energyxxer.trident.ui.common.ProgramUpdateProcess;
 import com.energyxxer.trident.ui.dialogs.KeyStrokeDialog;
 import com.energyxxer.trident.ui.dialogs.project_properties.ProjectProperties;
 import com.energyxxer.trident.ui.dialogs.settings.Settings;
@@ -139,6 +140,13 @@ public class ActionManager {
                         DefinitionUpdateProcess::tryUpdate
                 )
         );
+        actions.put("CHECK_FOR_PROGRAM_UPDATES",
+                new ProgramAction(
+                        "Check for Program Updates", "Check for program and language updates",
+                        KeyMap.requestMapping("program_update_check"),
+                        ProgramUpdateProcess::tryUpdate
+                )
+        );
         actions.put("CHANGE_WORKSPACE",
                 new ProgramAction(
                         "Change Workspace", "Select a directory to put projects in",
@@ -151,6 +159,18 @@ public class ActionManager {
                         "Reload Workspace", "Refresh the list of projects",
                         KeyMap.requestMapping("reload_workspace", identifierToStrokes("" + KeyEvent.VK_F5)).setGroupName("Projects"),
                         TridentWindow.projectExplorer::refresh
+                ).setIconKey("reload")
+        );
+        actions.put("CLEAR_RESOURCE_CACHE",
+                new ProgramAction(
+                        "Clear Project Resource Cache", "Force the entire resource pack to be exported on next compilation",
+                        KeyMap.requestMapping("clear_resource_cache").setGroupName("Projects"),
+                        () -> {
+                            Project project = Commons.getActiveProject();
+                            if(project instanceof TridentProject) {
+                                ((TridentProject) project).clearClientDataCache();
+                            }
+                        }
                 ).setIconKey("reload")
         );
         actions.put("UNDO",

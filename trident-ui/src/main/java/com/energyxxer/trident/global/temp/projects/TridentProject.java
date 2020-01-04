@@ -231,6 +231,7 @@ public class TridentProject implements Project {
 
     public void clearClientDataCache() {
         updateClientDataCache(new HashMap<>());
+        Debug.log("Client Data Cache for project '" + getName() + "' cleared.");
     }
 
     public void updateServerDataCache(HashMap<String, ParsingSignature> sourceCache) {

@@ -167,7 +167,7 @@ public class Sidebar extends OverlayBorderPanel {
             buttonPanel.add(expand);
         }
 
-        if(Preferences.get("explorer.expanded", "false").equals("true")) {
+        if(Preferences.get("explorer.expanded", "true").equals("true")) {
             expand();
         } else {
             collapse();
