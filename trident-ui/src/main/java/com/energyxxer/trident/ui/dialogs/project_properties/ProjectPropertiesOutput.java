@@ -122,6 +122,9 @@ class ProjectPropertiesOutput extends JPanel {
                     resourcesOut.setFile(file);
                 });
                 ProjectProperties.addApplyEvent(p -> {
+                    if(!resourcesOut.getFile().equals(p.getResourcesOut())) {
+                        p.clearClientDataCache();
+                    }
                     p.setResourcesOut(resourcesOut.getFile());
                 });
                 content.add(resourcesOut);

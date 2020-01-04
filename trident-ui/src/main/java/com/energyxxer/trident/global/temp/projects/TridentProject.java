@@ -30,6 +30,7 @@ public class TridentProject implements Project {
     public final long instantiationTime;
     private File datapackRoot;
     private File resourceRoot;
+    private final File resourceCacheFile;
     private String name;
 
     public final Lazy<CommandModule> module = new Lazy<>(() -> {
@@ -58,6 +59,7 @@ public class TridentProject implements Project {
 
         datapackRoot = rootPath.resolve("datapack").toFile();
         resourceRoot = rootPath.resolve("resources").toFile();
+        resourceCacheFile = rootDirectory.toPath().resolve(".tdnui").resolve("resource_cache").toFile();
 
         this.name = name;
         //this.prefix = StringUtil.getInitials(name).toLowerCase();
@@ -90,7 +92,7 @@ public class TridentProject implements Project {
         File config = new File(rootDirectory.getAbsolutePath() + File.separator + TridentCompiler.PROJECT_FILE_NAME);
         this.name = rootDirectory.getName();
 
-        File resourceCacheFile = rootDirectory.toPath().resolve(".tdnui").resolve("resource_cache").toFile();
+        resourceCacheFile = rootDirectory.toPath().resolve(".tdnui").resolve("resource_cache").toFile();
         if(resourceCacheFile.exists() && resourceCacheFile.isFile()) {
             try(FileReader fr = new FileReader(resourceCacheFile)) {
                 JsonObject jsonObject = new Gson().fromJson(fr, JsonObject.class);
@@ -207,7 +209,6 @@ public class TridentProject implements Project {
 
     public void updateClientDataCache(HashMap<String, ParsingSignature> resourceCache) {
         this.resourceCache = resourceCache;
-        File cache = rootDirectory.toPath().resolve(".tdnui").resolve("resource_cache").toFile();
 
         JsonObject jsonObj = new JsonObject();
         for(Map.Entry<String, ParsingSignature> entry : resourceCache.entrySet()) {
@@ -215,17 +216,21 @@ public class TridentProject implements Project {
         }
 
         try {
-            cache.getParentFile().mkdirs();
-            cache.createNewFile();
+            resourceCacheFile.getParentFile().mkdirs();
+            resourceCacheFile.createNewFile();
         } catch(IOException x) {
             Debug.log(x.getMessage());
         }
 
-        try(PrintWriter writer = new PrintWriter(cache, "UTF-8")) {
+        try(PrintWriter writer = new PrintWriter(resourceCacheFile, "UTF-8")) {
             writer.print(new GsonBuilder().setPrettyPrinting().create().toJson(jsonObj));
         } catch (IOException x) {
             Debug.log(x.getMessage());
         }
+    }
+
+    public void clearClientDataCache() {
+        updateClientDataCache(new HashMap<>());
     }
 
     public void updateServerDataCache(HashMap<String, ParsingSignature> sourceCache) {

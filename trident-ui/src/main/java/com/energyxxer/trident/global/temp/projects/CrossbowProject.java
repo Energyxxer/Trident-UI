@@ -30,6 +30,7 @@ public class CrossbowProject implements Project {
     private File rootDirectory;
 
     private String name;
+    private final File resourceCacheFile;
 
     public final Lazy<BedrockModule> module = new Lazy<>(() -> {
         try {
@@ -52,6 +53,7 @@ public class CrossbowProject implements Project {
     public CrossbowProject(String name) {
         Path rootPath = Paths.get(ProjectManager.getWorkspaceDir()).resolve(name);
         this.rootDirectory = rootPath.toFile();
+        resourceCacheFile = rootDirectory.toPath().resolve(".tdnui").resolve("resource_cache").toFile();
 
         this.name = name;
         //this.prefix = StringUtil.getInitials(name).toLowerCase();
@@ -77,7 +79,7 @@ public class CrossbowProject implements Project {
         File config = new File(rootDirectory.getAbsolutePath() + File.separator + CrossbowCompiler.PROJECT_FILE_NAME);
         this.name = rootDirectory.getName();
 
-        File resourceCacheFile = rootDirectory.toPath().resolve(".tdnui").resolve("resource_cache").toFile();
+        resourceCacheFile = rootDirectory.toPath().resolve(".tdnui").resolve("resource_cache").toFile();
         if(resourceCacheFile.exists() && resourceCacheFile.isFile()) {
             try(FileReader fr = new FileReader(resourceCacheFile)) {
                 JsonObject jsonObject = new Gson().fromJson(fr, JsonObject.class);
@@ -162,7 +164,6 @@ public class CrossbowProject implements Project {
 
     public void updateClientDataCache(HashMap<String, ParsingSignature> resourceCache) {
         this.resourceCache = resourceCache;
-        File cache = rootDirectory.toPath().resolve(".tdnui").resolve("resource_cache").toFile();
 
         JsonObject jsonObj = new JsonObject();
         for(Map.Entry<String, ParsingSignature> entry : resourceCache.entrySet()) {
@@ -170,13 +171,13 @@ public class CrossbowProject implements Project {
         }
 
         try {
-            cache.getParentFile().mkdirs();
-            cache.createNewFile();
+            resourceCacheFile.getParentFile().mkdirs();
+            resourceCacheFile.createNewFile();
         } catch(IOException x) {
             Debug.log(x.getMessage());
         }
 
-        try(PrintWriter writer = new PrintWriter(cache, "UTF-8")) {
+        try(PrintWriter writer = new PrintWriter(resourceCacheFile, "UTF-8")) {
             writer.print(new GsonBuilder().setPrettyPrinting().create().toJson(jsonObj));
         } catch (IOException x) {
             Debug.log(x.getMessage());
