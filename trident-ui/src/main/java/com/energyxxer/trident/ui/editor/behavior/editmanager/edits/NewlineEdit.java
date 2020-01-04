@@ -64,7 +64,8 @@ public class NewlineEdit extends Edit {
                     else break;
                 }
                 int tabs = spaces / 4;
-                if(text.substring(lineStart, start - characterDrift).trim().endsWith("{")) tabs++;
+                String beforeCaret = text.substring(lineStart, start - characterDrift);
+                if(beforeCaret.trim().endsWith("{") || beforeCaret.trim().endsWith("[")) tabs++;
 
                 if(!Dot.SMART_KEYS_INDENT.get()) tabs = 0;
 

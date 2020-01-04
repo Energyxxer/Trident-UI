@@ -139,8 +139,13 @@ public class NoticeItem extends ExplorerElement {
     @Override
     public void mouseClicked(MouseEvent e) {
         if(e.getButton() == MouseEvent.BUTTON1 && !isPlatformControlDown(e) && e.getClickCount() % 2 == 0 && notice.getFilePath() != null) {
-            TridentWindow.tabManager.openTab(new FileModuleToken(new File(notice.getFilePath())), notice.getLocationIndex(), notice.getLocationLength());
+            interact();
         }
+    }
+
+    @Override
+    public void interact() {
+        TridentWindow.tabManager.openTab(new FileModuleToken(new File(notice.getFilePath())), notice.getLocationIndex(), notice.getLocationLength());
     }
 
     @Override

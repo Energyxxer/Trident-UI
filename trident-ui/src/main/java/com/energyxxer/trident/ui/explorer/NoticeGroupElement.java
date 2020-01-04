@@ -143,6 +143,12 @@ public class NoticeGroupElement extends ExplorerElement {
         master.repaint();
     }
 
+    @Override
+    public void interact() {
+        if(expanded) collapse();
+        else expand();
+    }
+
     private void collapse() {
         this.propagateCollapse();
         this.children.clear();
