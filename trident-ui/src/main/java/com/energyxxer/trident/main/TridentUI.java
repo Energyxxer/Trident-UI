@@ -16,7 +16,9 @@ import com.energyxxer.util.logger.Debug;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class TridentUI {
 	public static final String LICENSE = "MIT License\n" +
@@ -50,7 +52,7 @@ public class TridentUI {
 
 	static {
 		try {
-			RUNNING_PATH = new File(TridentUI.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+			RUNNING_PATH = new File(URLDecoder.decode(TridentUI.class.getProtectionDomain().getCodeSource().getLocation().getPath(), StandardCharsets.UTF_8.name()));
 		} catch(Exception x) {
 			x.printStackTrace();
 			RUNNING_PATH = null;

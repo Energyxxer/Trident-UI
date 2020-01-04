@@ -109,7 +109,7 @@ public class ProgramUpdateProcess extends AbstractProcess {
                     JsonArray assets = latestReleaseSummary.getAsJsonArray("assets");
                     for(JsonElement elem : assets) {
                         if(elem instanceof JsonObject && ((JsonObject) elem).get("name").getAsString().endsWith(".jar")) {
-                            Path newJar = TridentUI.RUNNING_PATH.getParentFile().toPath().resolve("Trident-UI " + name.replace('.','_') + ".jar");
+                            Path newJar = TridentUI.RUNNING_PATH.getParentFile().toPath().resolve("Trident-UI " + name + ".jar");
 
                             Preferences.put("meta.delete_old_jar", TridentUI.RUNNING_PATH.getPath());
 
