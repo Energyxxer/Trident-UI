@@ -164,8 +164,10 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
         }
         for(int i = 0; i < dots.size(); i++) {
             Dot dot = dots.get(i);
+            if(dot == bufferedDot) continue;
             for(int j = i+1; j < dots.size(); j++) {
                 Dot otherDot = dots.get(j);
+                if(otherDot == bufferedDot) continue;
                 if(dot.intersects(otherDot)) {
                     dot.absorb(otherDot);
                     dots.remove(j);
@@ -334,9 +336,14 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
     }
 
     public CaretProfile getProfile() {
-        if(bufferedDot != null && bufferedDotAdded) mergeDots(bufferedDot);
+        if(bufferedDot != null && bufferedDotAdded && dragSelectMode != RECTANGLE) mergeDots(bufferedDot);
         CaretProfile profile = new CaretProfile();
-        profile.addAllDots(dots);
+        if(dragSelectMode != RECTANGLE) profile.addAllDots(dots);
+        else {
+            for(Dot dot : dots) {
+                if(dot != bufferedDot) profile.add(dot);
+            }
+        }
         profile.sort();
         return profile;
     }
@@ -357,7 +364,13 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
     }
 
     public void setProfile(CaretProfile profile) {
-        this.dots.clear();
+        if(dragSelectMode != RECTANGLE) {
+            this.dots.clear();
+        } else {
+            this.dots.clear();
+            this.dots.add(bufferedDot);
+            rectangleDotsStartIndex = rectangleDotCursorIndex = dots.size();
+        }
         setDotMergeEnabled(!profile.isDotMergeDisabled());
         Range r = new Range(0,editor.getDocument().getLength());
         for(int i = 0; i < profile.size()-1; i += 2) {
@@ -366,7 +379,7 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
                     r.clamp(profile.get(i+1)),
                     editor
             );
-            if(i == 0) bufferedDot = newDot;
+            if(i == 0 && dragSelectMode != RECTANGLE) bufferedDot = newDot;
             addDot(newDot);
         }
         removeDuplicates();
@@ -467,7 +480,6 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
         } else if(bufferedDot != null) {
             dots.remove(bufferedDot);
             bufferedDotAdded = false;
-            rectangleDotCursorIndex--;
             mergeDots();
             bufferedDot = null;
         }
@@ -481,12 +493,12 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
             bufferedDot = null;
             bufferedDotAdded = false;
         }
-        editor.repaint();
         this.setVisible(true);
-        readjustRect();
         e.consume();
         dragSelectMode = CHAR;
+        rectangleDotCursorIndex = Integer.MAX_VALUE;
         rectangleDotsStartIndex = Integer.MAX_VALUE;
+        update();
     }
 
     private void adjustFocus() {
@@ -548,7 +560,6 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
                         break;
                     }
                     case RECTANGLE: {
-                        bufferedDotAdded = false;
                         rectangleDotCursorIndex = Math.max(0, rectangleDotsStartIndex -1);
                         while(dots.size() > rectangleDotsStartIndex) {
                             dots.remove(rectangleDotsStartIndex);

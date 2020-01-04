@@ -1,13 +1,11 @@
 package com.energyxxer.trident.ui.scrollbar;
 
+import com.energyxxer.trident.main.window.actions.ActionManager;
+import com.energyxxer.trident.ui.dialogs.ConfirmDialog;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneLayout;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Insets;
-import java.awt.Rectangle;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Created by User on 12/13/2016.
@@ -38,7 +36,13 @@ public class OverlayScrollPaneLayout extends ScrollPaneLayout {
     @Override
     public void layoutContainer(Container parent) {
 
-        super.layoutContainer(parent);
+        try {
+            super.layoutContainer(parent);
+        } catch (NullPointerException x) {
+            if(new ConfirmDialog("Crash", "An unexpected error has occurred. Save all open tabs?").result) {
+                ActionManager.getAction("SAVE_ALL").perform();
+            }
+        }
 
         Rectangle availR = parent.getBounds();
         if(this.rowHead != null) this.rowHead.setSize(this.rowHead.getWidth(),availR.height);
