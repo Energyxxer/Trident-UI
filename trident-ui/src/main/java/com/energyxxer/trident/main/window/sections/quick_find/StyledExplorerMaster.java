@@ -6,8 +6,12 @@ import com.energyxxer.trident.ui.explorer.base.ExplorerMaster;
 import com.energyxxer.trident.ui.explorer.base.elements.ExplorerElement;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.Disposable;
+import com.energyxxer.util.logger.Debug;
 
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.function.Predicate;
 
 public class StyledExplorerMaster extends ExplorerMaster implements Disposable {
@@ -149,6 +153,47 @@ public class StyledExplorerMaster extends ExplorerMaster implements Disposable {
         }
 
         explorerFlags.put(ExplorerFlag.DYNAMIC_ROW_HEIGHT, false);
+
+
+        this.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "explorer.down");
+        this.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "explorer.up");
+        this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "explorer.select");
+        this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), "explorer.select");
+        this.getActionMap().put("explorer.down", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                scrollToItemVisible(getFirstSelectedIndex()+1);
+                setSelectedIndex(getFirstSelectedIndex()+1);
+            }
+        });
+        this.getActionMap().put("explorer.up", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                scrollToItemVisible(getFirstSelectedIndex()+1);
+                setSelectedIndex(getFirstSelectedIndex()-1);
+            }
+        });
+        this.getActionMap().put("explorer.select", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                for(ExplorerElement element : getSelectedItems()) {
+                    element.interact();
+                    scrollToItemVisible(getFirstSelectedIndex());
+                    break;
+                }
+            }
+        });
+    }
+
+    private void scrollToItemVisible(int index) {
+        if(this.getParent() instanceof JViewport) {
+            JViewport viewport = ((JViewport) this.getParent());
+            Rectangle rect = getVisibleRect(index);
+            rect.y -= viewport.getViewRect().y;
+            viewport.scrollRectToVisible(rect);
+        } else {
+            Debug.log("Could not scroll. Parent is: " + this.getParent());
+        }
     }
 
     public void addElement(ExplorerElement elem) {

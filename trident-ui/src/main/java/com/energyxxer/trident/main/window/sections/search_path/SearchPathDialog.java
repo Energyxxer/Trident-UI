@@ -7,6 +7,7 @@ import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.main.window.sections.quick_find.StyledExplorerMaster;
 import com.energyxxer.trident.main.window.sections.tools.find.*;
 import com.energyxxer.trident.ui.editor.TridentEditorModule;
+import com.energyxxer.trident.ui.editor.behavior.caret.CaretProfile;
 import com.energyxxer.trident.ui.scrollbar.OverlayScrollPane;
 import com.energyxxer.trident.ui.styledcomponents.*;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
@@ -355,6 +356,7 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
         highlighter.addRegion(start, start+length);
         try {
             editorModule.editorComponent.getHighlighter().addHighlight(0, 0, highlighter);
+            editorModule.editorComponent.getCaret().setProfile(new CaretProfile(start, start+length));
         } catch (BadLocationException x) {
             x.printStackTrace(); //wtf exception
         }

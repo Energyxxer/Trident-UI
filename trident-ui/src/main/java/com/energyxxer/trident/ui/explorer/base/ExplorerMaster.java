@@ -8,9 +8,7 @@ import com.energyxxer.xswing.hints.TextHint;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 import java.util.List;
 import java.util.*;
 
@@ -56,6 +54,7 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
 
         explorerFlags.put(ExplorerFlag.DYNAMIC_ROW_HEIGHT, false);
         explorerFlags.put(ExplorerFlag.DEBUG_WIDTH, false);
+
     }
 
     public void refresh() {}
@@ -278,6 +277,10 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
             if(path != null) list.add(path);
         });
         return list;
+    }
+
+    public List<ExplorerElement> getSelectedItems() {
+        return selectedItems;
     }
 
     public void triggerDragStart(MouseEvent e) {

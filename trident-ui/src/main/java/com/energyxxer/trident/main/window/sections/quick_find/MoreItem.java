@@ -64,6 +64,8 @@ public class MoreItem extends ExplorerElement {
         g.setFont(originalFont);
 
         master.setContentWidth(Math.max(master.getContentWidth(), x));
+
+        master.renderOffset(this.getHeight());
     }
 
     @Override
@@ -78,6 +80,11 @@ public class MoreItem extends ExplorerElement {
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        interact();
+    }
+
+    @Override
+    public void interact() {
         parent.maxShown += delta;
         master.repaint();
     }

@@ -95,6 +95,13 @@ public class QuickFindDialog extends JDialog implements WindowFocusListener, Act
             }
         });
         this.field.getDocument().addDocumentListener((UnifiedDocumentListener) e -> updateLastEdit());
+
+        this.field.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "explorer.down");
+        this.field.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "explorer.up");
+        this.field.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "explorer.select");
+        this.field.getActionMap().put("explorer.down", explorer.getActionMap().get("explorer.down"));
+        this.field.getActionMap().put("explorer.up", explorer.getActionMap().get("explorer.up"));
+        this.field.getActionMap().put("explorer.select", explorer.getActionMap().get("explorer.select"));
         header.add(this.field, BorderLayout.SOUTH);
         contentPanel.add(header, BorderLayout.NORTH);
         this.scrollPane = new OverlayScrollPane(tlm, this.explorer);
@@ -123,6 +130,8 @@ public class QuickFindDialog extends JDialog implements WindowFocusListener, Act
         this.explorer.addElement(recentFilesCategory);
         this.explorer.addElement(filesCategory);
         this.explorer.addElement(actionsCategory);
+
+        this.explorer.setMultipleSelectionsEnabled(false);
 
 
         Timer timer = new Timer(20, this);

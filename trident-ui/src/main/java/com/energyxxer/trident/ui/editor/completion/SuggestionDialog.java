@@ -315,7 +315,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
 
     @Override
     public void focusLost(FocusEvent e) {
-        if(e.getOppositeComponent() != null && e.getOppositeComponent() != this) {
+        if(e.getOppositeComponent() != null && e.getOppositeComponent() != this && e.getOppositeComponent() != explorer) {
             dismiss(true);
         }
     }

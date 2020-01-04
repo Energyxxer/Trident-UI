@@ -75,6 +75,8 @@ public abstract class ExplorerElement implements MouseListener, MouseMotionListe
         return new Point(0, 0);
     }
 
+    public void interact() {}
+
     @Override
     public void themeChanged(Theme t) {
     }

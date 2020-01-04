@@ -209,7 +209,7 @@ public class StandardExplorerItem extends ExplorerElement {
         master.popIndentation();
     }
 
-    private void open() {
+    public void interact() {
         this.token.onInteract();
         if(token.isExpandable()) {
             if(expanded) collapse();
@@ -243,7 +243,7 @@ public class StandardExplorerItem extends ExplorerElement {
     @Override
     public void mouseClicked(MouseEvent e) {
         if(e.getButton() == MouseEvent.BUTTON1 && !isPlatformControlDown(e) && e.getClickCount() % 2 == 0 && (!token.isExpandable() || e.getX() < x || e.getX() > x + master.getRowHeight())) {
-            this.open();
+            this.interact();
         }
         dispatchMouseEvent(e);
     }
