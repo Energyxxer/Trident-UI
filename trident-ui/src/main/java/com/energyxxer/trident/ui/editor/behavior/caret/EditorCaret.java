@@ -23,10 +23,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.*;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,7 +51,7 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
     private AdvancedEditor editor;
     private Timer flasher;
     private ActionListener flasherHandler;
-    boolean visible = true;
+    boolean visible = false;
 
     private static Highlighter.HighlightPainter nullHighlighter = (g,p0,p1,bounds,c) -> {};
 
@@ -74,6 +71,18 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
             @Override
             public void keyPressed(KeyEvent e) {
                 handleEvent(e);
+            }
+        });
+        c.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                flasher.restart();
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                flasher.stop();
+                visible = false;
             }
         });
 
