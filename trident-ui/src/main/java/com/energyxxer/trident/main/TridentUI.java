@@ -75,7 +75,15 @@ public class TridentUI {
         }
 		Debug.log("Running on Java " + System.getProperty("java.version"));
 
-		JFrame splash = new JFrame();
+		SwingUtilities.invokeLater(TridentUI::showSplash);
+		Resources.load();
+		SwingUtilities.invokeLater(TridentUI::start);
+	}
+
+	private static JFrame splash = null;
+
+	private static void showSplash() {
+		splash = new JFrame();
 		splash.setSize(new Dimension(700, 410));
 		Point center = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
 		center.x -= 700/2;
@@ -98,8 +106,9 @@ public class TridentUI {
 		});
 		splash.revalidate();
 		splash.setIconImage(ImageManager.load("/assets/logo/logo.png").getScaledInstance(32, 32, Image.SCALE_SMOOTH));
+	}
 
-		Resources.load();
+	private static void start() {
 
 		trident = new TridentUI();
 		System.setErr(new PrintStream(new OutputStream() {
@@ -131,14 +140,15 @@ public class TridentUI {
 
 		TridentWindow.setVisible(true);
 
-        splash.setVisible(false);
-        splash.dispose();
+		splash.setVisible(false);
+		splash.dispose();
+		splash = null;
 
-        if(Preferences.get("workspace_dir", null) == null) {
-            WorkspaceDialog.prompt();
-        }
+		if(Preferences.get("workspace_dir", null) == null) {
+			WorkspaceDialog.prompt();
+		}
 
-        ProjectManager.loadWorkspace();
+		ProjectManager.loadWorkspace();
 
 		TridentWindow.welcomePane.tipScreen.start(1000);
 		TridentWindow.tabManager.openSavedTabs();
@@ -166,11 +176,8 @@ public class TridentUI {
 			}
 		});
 
-
 		Debug.log("java path: " + System.getProperty("java.home")
 				+ File.separator + "bin" + File.separator + "java");
-		//C:\Program Files\Java\jdk-13.0.1\bin\java (via intellij)
-		//C:\Program Files\Java\jdk-11.0.4\bin\java
 	}
 
 }

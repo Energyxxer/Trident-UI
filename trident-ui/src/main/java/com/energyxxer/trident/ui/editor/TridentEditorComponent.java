@@ -177,115 +177,117 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
         Lang.LangAnalysisResponse analysis = file != null ? lang.analyze(file, text, suggestionModule, summaryModule) : null;
         if(analysis == null) return;
 
-        if(analysis.response != null) suggestionBox.setSummary(analysis.lexer.getSummaryModule(), analysis.response.matched);
-        if(analysis.lexer.getSuggestionModule() != null) {
-            if(project != null) {
-                if(project instanceof TridentProject && analysis.lexer.getSummaryModule() instanceof TridentSummaryModule) {
-                    ((TridentSummaryModule) analysis.lexer.getSummaryModule()).setParentSummary((TridentProjectSummary) project.getSummary());
-                    if(project.getSummary() != null) {
-                        ((TridentSummaryModule) analysis.lexer.getSummaryModule()).setFileLocation(((TridentProject)project).getSummary().getLocationForFile(parent.file));
-                    }
-                } else if(project instanceof CrossbowProject && analysis.lexer.getSummaryModule() instanceof CrossbowSummaryModule) {
-                    ((CrossbowSummaryModule) analysis.lexer.getSummaryModule()).setParentSummary((CrossbowProjectSummary) project.getSummary());
-                    if(project.getSummary() != null) {
-                        ((CrossbowSummaryModule) analysis.lexer.getSummaryModule()).setFileLocation(((CrossbowProject)project).getSummary().getLocationForFile(parent.file));
+        SwingUtilities.invokeLater(() -> {
+            if(analysis.response != null) suggestionBox.setSummary(analysis.lexer.getSummaryModule(), analysis.response.matched);
+            if(analysis.lexer.getSuggestionModule() != null) {
+                if(project != null) {
+                    if(project instanceof TridentProject && analysis.lexer.getSummaryModule() instanceof TridentSummaryModule) {
+                        ((TridentSummaryModule) analysis.lexer.getSummaryModule()).setParentSummary((TridentProjectSummary) project.getSummary());
+                        if(project.getSummary() != null) {
+                            ((TridentSummaryModule) analysis.lexer.getSummaryModule()).setFileLocation(((TridentProject)project).getSummary().getLocationForFile(parent.file));
+                        }
+                    } else if(project instanceof CrossbowProject && analysis.lexer.getSummaryModule() instanceof CrossbowSummaryModule) {
+                        ((CrossbowSummaryModule) analysis.lexer.getSummaryModule()).setParentSummary((CrossbowProjectSummary) project.getSummary());
+                        if(project.getSummary() != null) {
+                            ((CrossbowSummaryModule) analysis.lexer.getSummaryModule()).setFileLocation(((CrossbowProject)project).getSummary().getLocationForFile(parent.file));
+                        }
                     }
                 }
-            }
-            suggestionBox.showSuggestions(analysis.lexer.getSuggestionModule());
-        }
-
-        Token prevToken = null;
-        ArrayList<String> previousTokenStyles = new ArrayList<>();
-
-        if(analysis.response != null && !analysis.response.matched) {
-            errorStatus.setMessage(analysis.response.getErrorMessage() + (analysis.response.faultyToken != null ? ". (line " + analysis.response.faultyToken.loc.line + " column " + analysis.response.faultyToken.loc.column + ")" : ""));
-            TridentWindow.setStatus(errorStatus);
-            if(analysis.response.faultyToken != null && analysis.response.faultyToken.value != null && analysis.response.faultyToken.loc != null) sd.setCharacterAttributes(analysis.response.faultyToken.loc.index, analysis.response.faultyToken.value.length(), TridentEditorComponent.this.getStyle("error"), true);
-            if(analysis.lexer instanceof LazyLexer) return;
-        }
-
-        if(analysis.response == null || analysis.response.matched) {
-            //sd.setCharacterAttributes(0, text.length(), defaultStyle, true);
-        }
-
-        for(Token token : analysis.lexer.getStream().tokens) {
-            Style style = TridentEditorComponent.this.getStyle(token.type.toString().toLowerCase());
-
-            int previousTokenStylesIndex = previousTokenStyles.size();
-
-            int styleStart = token.loc.index;
-
-            if(style != null)
-                sd.setCharacterAttributes(token.loc.index, token.value.length(), style, true);
-            else
-                sd.setCharacterAttributes(token.loc.index, token.value.length(), defaultStyle, true);
-
-            for(Map.Entry<String, Object> entry : token.attributes.entrySet()) {
-                if(!entry.getValue().equals(true)) continue;
-                Style attrStyle = TridentEditorComponent.this.getStyle("~" + entry.getKey().toLowerCase());
-                if(attrStyle == null) continue;
-
-                if(prevToken != null && previousTokenStyles.contains(entry.getKey().toLowerCase())) {
-                    styleStart = prevToken.loc.index + prevToken.value.length();
-                }
-                previousTokenStyles.add(entry.getKey().toLowerCase());
-
-                sd.setCharacterAttributes(styleStart, token.value.length() + (token.loc.index - styleStart), attrStyle, false);
-            }
-            for(Map.Entry<TokenSection, String> entry : token.subSections.entrySet()) {
-                TokenSection section = entry.getKey();
-                Style attrStyle = TridentEditorComponent.this.getStyle("~" + entry.getValue().toLowerCase());
-                if(attrStyle == null) continue;
-
-                sd.setCharacterAttributes(token.loc.index + section.start, section.length, attrStyle, false);
-            }
-            for(String tag : token.tags) {
-                Style attrStyle = TridentEditorComponent.this.getStyle("$" + tag.toLowerCase());
-                if(attrStyle == null) continue;
-
-                if(prevToken != null && previousTokenStyles.contains(tag.toLowerCase())) {
-                    styleStart = prevToken.loc.index + prevToken.value.length();
-                }
-                previousTokenStyles.add(tag.toLowerCase());
-
-                sd.setCharacterAttributes(styleStart, token.value.length() + (token.loc.index - styleStart), attrStyle, false);
+                suggestionBox.showSuggestions(analysis.lexer.getSuggestionModule());
             }
 
-            if(analysis.response != null) {
-                ps: for(Map.Entry<String, String[]> entry : Collections.synchronizedSet(parent.parserStyles.entrySet())) {
-                    String[] tagList = entry.getValue();
-                    int startIndex = token.tags.indexOf(tagList[0]);
-                    if(startIndex < 0) continue;
-                    for(int i = 0; i < tagList.length; i++) {
-                        if(startIndex+i >= token.tags.size() || !tagList[i].equalsIgnoreCase(token.tags.get(startIndex+i))) continue ps;
-                    }
-                    Style attrStyle = TridentEditorComponent.this.getStyle(entry.getKey());
+            Token prevToken = null;
+            ArrayList<String> previousTokenStyles = new ArrayList<>();
+
+            if(analysis.response != null && !analysis.response.matched) {
+                errorStatus.setMessage(analysis.response.getErrorMessage() + (analysis.response.faultyToken != null ? ". (line " + analysis.response.faultyToken.loc.line + " column " + analysis.response.faultyToken.loc.column + ")" : ""));
+                TridentWindow.setStatus(errorStatus);
+                if(analysis.response.faultyToken != null && analysis.response.faultyToken.value != null && analysis.response.faultyToken.loc != null) sd.setCharacterAttributes(analysis.response.faultyToken.loc.index, analysis.response.faultyToken.value.length(), TridentEditorComponent.this.getStyle("error"), true);
+                if(analysis.lexer instanceof LazyLexer) return;
+            }
+
+            if(analysis.response == null || analysis.response.matched) {
+                //sd.setCharacterAttributes(0, text.length(), defaultStyle, true);
+            }
+
+            for(Token token : analysis.lexer.getStream().tokens) {
+                Style style = TridentEditorComponent.this.getStyle(token.type.toString().toLowerCase());
+
+                int previousTokenStylesIndex = previousTokenStyles.size();
+
+                int styleStart = token.loc.index;
+
+                if(style != null)
+                    sd.setCharacterAttributes(token.loc.index, token.value.length(), style, true);
+                else
+                    sd.setCharacterAttributes(token.loc.index, token.value.length(), defaultStyle, true);
+
+                for(Map.Entry<String, Object> entry : token.attributes.entrySet()) {
+                    if(!entry.getValue().equals(true)) continue;
+                    Style attrStyle = TridentEditorComponent.this.getStyle("~" + entry.getKey().toLowerCase());
                     if(attrStyle == null) continue;
-                    if(prevToken != null && previousTokenStyles.contains(entry.getKey())) {
+
+                    if(prevToken != null && previousTokenStyles.contains(entry.getKey().toLowerCase())) {
                         styleStart = prevToken.loc.index + prevToken.value.length();
                     }
-                    previousTokenStyles.add(entry.getKey());
+                    previousTokenStyles.add(entry.getKey().toLowerCase());
+
                     sd.setCharacterAttributes(styleStart, token.value.length() + (token.loc.index - styleStart), attrStyle, false);
                 }
+                for(Map.Entry<TokenSection, String> entry : token.subSections.entrySet()) {
+                    TokenSection section = entry.getKey();
+                    Style attrStyle = TridentEditorComponent.this.getStyle("~" + entry.getValue().toLowerCase());
+                    if(attrStyle == null) continue;
+
+                    sd.setCharacterAttributes(token.loc.index + section.start, section.length, attrStyle, false);
+                }
+                for(String tag : token.tags) {
+                    Style attrStyle = TridentEditorComponent.this.getStyle("$" + tag.toLowerCase());
+                    if(attrStyle == null) continue;
+
+                    if(prevToken != null && previousTokenStyles.contains(tag.toLowerCase())) {
+                        styleStart = prevToken.loc.index + prevToken.value.length();
+                    }
+                    previousTokenStyles.add(tag.toLowerCase());
+
+                    sd.setCharacterAttributes(styleStart, token.value.length() + (token.loc.index - styleStart), attrStyle, false);
+                }
+
+                if(analysis.response != null) {
+                    ps: for(Map.Entry<String, String[]> entry : Collections.synchronizedSet(parent.parserStyles.entrySet())) {
+                        String[] tagList = entry.getValue();
+                        int startIndex = token.tags.indexOf(tagList[0]);
+                        if(startIndex < 0) continue;
+                        for(int i = 0; i < tagList.length; i++) {
+                            if(startIndex+i >= token.tags.size() || !tagList[i].equalsIgnoreCase(token.tags.get(startIndex+i))) continue ps;
+                        }
+                        Style attrStyle = TridentEditorComponent.this.getStyle(entry.getKey());
+                        if(attrStyle == null) continue;
+                        if(prevToken != null && previousTokenStyles.contains(entry.getKey())) {
+                            styleStart = prevToken.loc.index + prevToken.value.length();
+                        }
+                        previousTokenStyles.add(entry.getKey());
+                        sd.setCharacterAttributes(styleStart, token.value.length() + (token.loc.index - styleStart), attrStyle, false);
+                    }
+                }
+                while(previousTokenStylesIndex > 0) {
+                    previousTokenStyles.remove(0);
+                    previousTokenStylesIndex--;
+                }
+                prevToken = token;
             }
-            while(previousTokenStylesIndex > 0) {
-                previousTokenStyles.remove(0);
-                previousTokenStylesIndex--;
+            previousTokenStyles.clear();
+
+            if(this.inspector != null) {
+                this.inspector.inspect(analysis.lexer.getStream());
+                this.inspector.insertNotices(analysis.notices);
             }
-            prevToken = token;
-        }
-        previousTokenStyles.clear();
-
-        if(this.inspector != null) {
-            this.inspector.inspect(analysis.lexer.getStream());
-            this.inspector.insertNotices(analysis.notices);
-        }
 
 
-        TridentWindow.dismissStatus(errorStatus);
+            TridentWindow.dismissStatus(errorStatus);
 
-        //sd.setCharacterAttributes(81, 119, getStyle("do_not_display"), true);
+            //sd.setCharacterAttributes(81, 119, getStyle("do_not_display"), true);
+        });
     }
 
     void highlight() {
@@ -300,7 +302,14 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
             if(highlightingThread != null) {
                 highlightingThread.stop();
             }
-            highlightingThread = new Thread(this::highlightSyntax,"Text Highlighter");
+            highlightingThread = new Thread(new SwingWorker<Object, Object>() {
+                @Override
+                protected Object doInBackground() {
+                    highlightSyntax();
+                    return null;
+                }
+            },"Text Highlighter");
+            //highlightingThread = new Thread(this::highlightSyntax,"Text Highlighter");
             highlightingThread.start();
 
             Project project = ProjectManager.getAssociatedProject(parent.file);
