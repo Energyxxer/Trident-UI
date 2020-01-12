@@ -6,6 +6,7 @@ import com.energyxxer.trident.compiler.util.TridentProjectSummarizer;
 import com.energyxxer.trident.global.temp.projects.CrossbowProject;
 import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.global.temp.projects.TridentProject;
+import com.energyxxer.trident.ui.commodoreresources.DefinitionPacks;
 import com.energyxxer.util.logger.Debug;
 import com.energyxxer.util.processes.AbstractProcess;
 
@@ -19,7 +20,11 @@ public class IndexingProcess extends AbstractProcess {
         super("Indexing");
         this.project = project;
         if(project instanceof TridentProject) {
-            summarizer = new TridentProjectSummarizer(project.getRootDirectory());
+            summarizer = new TridentProjectSummarizer(
+                    project.getRootDirectory(),
+                    DefinitionPacks.pickPacksForVersion(((TridentProject) project).getTargetVersion()),
+                    DefinitionPacks.getAliasMap()
+            );
             summarizer.setSourceCache(project.getSourceCache());
             summarizer.addCompletionListener(() -> {
                 Debug.log("Finished indexing project: " + project.getName());
