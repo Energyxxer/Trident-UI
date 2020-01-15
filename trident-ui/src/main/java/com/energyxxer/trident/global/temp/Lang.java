@@ -32,32 +32,61 @@ import com.energyxxer.util.Factory;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
  * Created by User on 2/9/2017.
  */
-public enum Lang {
-    JSON(JSONLexerProfile::new, "json", "mcmeta", TridentCompiler.PROJECT_FILE_NAME.substring(1), CrossbowCompiler.PROJECT_FILE_NAME.substring(1)),
-    PROPERTIES(PropertiesLexerProfile::new, "properties", "lang"),
-    MCFUNCTION(MCFunctionLexerProfile::new, () -> MCFunctionProductions.FILE, "mcfunction"),
-    TRIDENT(TridentLexerProfile.INSTANCE::getValue, Commons::getActiveTridentProductions, "tdn"),
-    CROSSBOW(CrossbowLexerProfile.INSTANCE::getValue, Commons::getActiveCrossbowProductions, "cbw"),
-    NBTTM(() -> new NBTTMLexerProfile(StandardDefinitionPacks.MINECRAFT_JAVA_LATEST_SNAPSHOT), () -> NBTTMProductions.FILE, "nbttm"),
-    SNIPPET(SnippetLexerProfile::new);
+public class Lang {
+    private static final ArrayList<Lang> registeredLanguages = new ArrayList<>();
 
-    Factory<LexerProfile> factory;
-    Factory<GeneralTokenPatternMatch> parserProduction;
-    List<String> extensions;
+    public static final Lang JSON = new Lang("JSON",
+            JSONLexerProfile::new,
+            "json", "mcmeta", TridentCompiler.PROJECT_FILE_NAME.substring(1), CrossbowCompiler.PROJECT_FILE_NAME.substring(1)
+    );
+    public static final Lang PROPERTIES = new Lang("PROPERTIES",
+            PropertiesLexerProfile::new,
+            "properties", "lang"
+    );
+    public static final Lang MCFUNCTION = new Lang("MCFUNCTION",
+            MCFunctionLexerProfile::new,
+            () -> MCFunctionProductions.FILE,
+            "mcfunction"
+    );
+    public static final Lang TRIDENT = new Lang("TRIDENT",
+            TridentLexerProfile.INSTANCE::getValue,
+            Commons::getActiveTridentProductions,
+            "tdn"
+    );
+    public static final Lang CROSSBOW = new Lang("CROSSBOW",
+            CrossbowLexerProfile.INSTANCE::getValue,
+            Commons::getActiveCrossbowProductions,
+            "cbw"
+    );
+    public static final Lang NBTTM = new Lang("NBTTM",
+            () -> new NBTTMLexerProfile(StandardDefinitionPacks.MINECRAFT_JAVA_LATEST_SNAPSHOT),
+            () -> NBTTMProductions.FILE,
+            "nbttm"
+    );
+    public static final Lang SNIPPET = new Lang("SNIPPET", SnippetLexerProfile::new);
 
-    Lang(Factory<LexerProfile> factory, String... extensions) {
-        this(factory, null, extensions);
+    private final String name;
+    private final Factory<LexerProfile> factory;
+    private final Factory<GeneralTokenPatternMatch> parserProduction;
+    private final List<String> extensions;
+
+    Lang(String name, Factory<LexerProfile> factory, String... extensions) {
+        this(name, factory, null, extensions);
     }
 
-    Lang(Factory<LexerProfile> factory, Factory<GeneralTokenPatternMatch> parserProduction, String... extensions) {
+    Lang(String name, Factory<LexerProfile> factory, Factory<GeneralTokenPatternMatch> parserProduction, String... extensions) {
+        this.name = name;
         this.factory = factory;
         this.parserProduction = parserProduction;
         this.extensions = Arrays.asList(extensions);
+
+        registeredLanguages.add(this);
     }
 
     public List<String> getExtensions() {
@@ -130,7 +159,16 @@ public enum Lang {
         return new LangAnalysisResponse(lexer, response, tokens, notices);
     }
 
-    public class LangAnalysisResponse {
+    @Override
+    public String toString() {
+        return name;
+    }
+
+    public static Collection<Lang> values() {
+        return registeredLanguages;
+    }
+
+    public static class LangAnalysisResponse {
         public Lexer lexer;
         public TokenMatchResponse response;
         public ArrayList<Token> tokens;
