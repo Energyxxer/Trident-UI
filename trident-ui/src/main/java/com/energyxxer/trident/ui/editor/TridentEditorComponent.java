@@ -150,7 +150,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
             } catch (BadLocationException x) {
                 x.printStackTrace();
             }
-            if (!((Character.isJavaIdentifierPart(c) && c != '$') || "#:/.-".contains(c+"")) || --index <= 1)
+            if (!((Character.isJavaIdentifierPart(c) && c != '$') || "$#:/.-".contains(c+"")) || --index <= 1)
                 break;
         }
         return index;
