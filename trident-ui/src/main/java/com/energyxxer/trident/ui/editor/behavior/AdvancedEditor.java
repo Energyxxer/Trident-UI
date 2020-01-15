@@ -174,6 +174,9 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         } else if(KeyMap.REDO.wasPerformedExact(e)) {
             editManager.redo();
             e.consume();
+        } else if(KeyMap.COMMENT.wasPerformedExact(e)) {
+            e.consume();
+            editManager.insertEdit(new CommentEdit(this));
         } else if(keyCode == KeyEvent.VK_TAB) {
             e.consume();
 

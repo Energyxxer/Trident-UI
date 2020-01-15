@@ -171,4 +171,8 @@ public class CaretProfile implements Iterable<Integer> {
     public boolean isDotMergeDisabled() {
         return dotMergeDisabled;
     }
+
+    public void set(int index, int pos) {
+        list.set(index, pos);
+    }
 }

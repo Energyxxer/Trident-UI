@@ -19,6 +19,7 @@ public class KeyMap {
 
     public static final UserKeyBind UNDO = new UserKeyBind("undo", identifierToStrokes("c+Z")).setGroupName("Editor");
     public static final UserKeyBind REDO = new UserKeyBind("redo", identifierToStrokes("c+Y")).setGroupName("Editor");
+    public static final UserKeyBind COMMENT = new UserKeyBind("comment", identifierToStrokes("c+"+KeyEvent.VK_SLASH)).setGroupName("Editor");
 
     public static final UserKeyBind SUGGESTION_SELECT = new UserKeyBind("Expand Suggestion", "editor.suggestion.select", identifierToStrokes("" + KeyEvent.VK_TAB)).setGroupName("Editor");
 
