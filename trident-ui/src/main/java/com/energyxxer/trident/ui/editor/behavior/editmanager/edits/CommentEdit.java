@@ -1,5 +1,9 @@
 package com.energyxxer.trident.ui.editor.behavior.editmanager.edits;
 
+import com.energyxxer.trident.global.Status;
+import com.energyxxer.trident.global.temp.Lang;
+import com.energyxxer.trident.main.window.TridentWindow;
+import com.energyxxer.trident.ui.editor.TridentEditorComponent;
 import com.energyxxer.trident.ui.editor.behavior.AdvancedEditor;
 import com.energyxxer.trident.ui.editor.behavior.caret.CaretProfile;
 import com.energyxxer.trident.ui.editor.behavior.caret.Dot;
@@ -20,15 +24,28 @@ public class CommentEdit extends Edit {
      * Every index contains the position in the document where comment markers were added/removed.
      * */
     private ArrayList<Integer> modifications = new ArrayList<>();
-    private final String commentMarker = "#";
+    private final String commentMarker;
     private boolean uncomment = false;
 
     public CommentEdit(AdvancedEditor editor) {
         previousProfile = editor.getCaret().getProfile();
+        if(editor instanceof TridentEditorComponent) {
+            Lang language = ((TridentEditorComponent) editor).getParentModule().getLanguage();
+            if(language == null) {
+                TridentWindow.setStatus(new Status("Unknown language, don't know how to comment it out."));
+                commentMarker = null;
+            } else {
+                commentMarker = language.getProperty("line_comment_marker");
+                if(commentMarker == null) TridentWindow.setStatus(new Status("Language '" + language + "' has no comments"));
+            }
+        } else {
+            commentMarker = null;
+        }
     }
 
     @Override
     public boolean redo(AdvancedEditor editor) {
+        if(commentMarker == null) return false;
         Document doc = editor.getDocument();
         EditorCaret caret = editor.getCaret();
 
@@ -60,7 +77,7 @@ public class CommentEdit extends Edit {
 
                 boolean firstLineOfSelection = true;
 
-                for(int l = lineStart; l < lineEnd; previousL = l, l = new Dot(l, editor).getPositionBelow()) {
+                for(int l = lineStart; l <= lineEnd; previousL = l, l = new Dot(l, editor).getPositionBelow()) {
                     if(l == previousL) {
                         if(firstLineOfSelection) {
                             firstLineOfSelection = false;

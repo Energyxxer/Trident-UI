@@ -364,4 +364,8 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
     public void focusLost(FocusEvent e) {
 
     }
+
+    public TridentEditorModule getParentModule() {
+        return parent;
+    }
 }

@@ -30,10 +30,7 @@ import com.energyxxer.trident.ui.dialogs.settings.SnippetLexerProfile;
 import com.energyxxer.util.Factory;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by User on 2/9/2017.
@@ -48,33 +45,34 @@ public class Lang {
     public static final Lang PROPERTIES = new Lang("PROPERTIES",
             PropertiesLexerProfile::new,
             "properties", "lang"
-    );
+    ) {{this.putProperty("line_comment_marker","#");}};
     public static final Lang MCFUNCTION = new Lang("MCFUNCTION",
             MCFunctionLexerProfile::new,
             () -> MCFunctionProductions.FILE,
             "mcfunction"
-    );
+    ) {{this.putProperty("line_comment_marker","#");}};
     public static final Lang TRIDENT = new Lang("TRIDENT",
             TridentLexerProfile.INSTANCE::getValue,
             Commons::getActiveTridentProductions,
             "tdn"
-    );
+    ) {{this.putProperty("line_comment_marker","#");}};
     public static final Lang CROSSBOW = new Lang("CROSSBOW",
             CrossbowLexerProfile.INSTANCE::getValue,
             Commons::getActiveCrossbowProductions,
             "cbw"
-    );
+    ) {{this.putProperty("line_comment_marker","#");}};
     public static final Lang NBTTM = new Lang("NBTTM",
             () -> new NBTTMLexerProfile(StandardDefinitionPacks.MINECRAFT_JAVA_LATEST_SNAPSHOT),
             () -> NBTTMProductions.FILE,
             "nbttm"
-    );
+    ) {{this.putProperty("line_comment_marker","#");}};
     public static final Lang SNIPPET = new Lang("SNIPPET", SnippetLexerProfile::new);
 
     private final String name;
     private final Factory<LexerProfile> factory;
     private final Factory<GeneralTokenPatternMatch> parserProduction;
     private final List<String> extensions;
+    private final HashMap<String, String> properties = new HashMap<>();
 
     Lang(String name, Factory<LexerProfile> factory, String... extensions) {
         this(name, factory, null, extensions);
@@ -166,6 +164,14 @@ public class Lang {
 
     public static Collection<Lang> values() {
         return registeredLanguages;
+    }
+
+    public String getProperty(String key) {
+        return properties.get(key);
+    }
+
+    public void putProperty(String key, String value) {
+        properties.put(key, value);
     }
 
     public static class LangAnalysisResponse {
