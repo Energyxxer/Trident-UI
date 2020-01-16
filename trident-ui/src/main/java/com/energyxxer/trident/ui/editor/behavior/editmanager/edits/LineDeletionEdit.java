@@ -70,7 +70,6 @@ public class LineDeletionEdit extends Edit {
                 doc.remove(lineStart + characterDrift, (lineEnd+characterDrift)-(lineStart+characterDrift));
                 characterDrift -= lineEnd-lineStart;
             }
-            Debug.log(modificationLines);
 
             caret.setProfile(nextProfile);
         } catch(BadLocationException x) {
