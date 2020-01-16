@@ -177,6 +177,12 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         } else if(KeyMap.COMMENT.wasPerformedExact(e)) {
             e.consume();
             editManager.insertEdit(new CommentEdit(this));
+        } else if(KeyMap.TEXT_DELETE_LINE.wasPerformedExact(e)) {
+            e.consume();
+            editManager.insertEdit(new LineDeletionEdit(this));
+        } else if(KeyMap.TEXT_DUPLICATE_LINE.wasPerformedExact(e)) {
+            e.consume();
+            editManager.insertEdit(new LineDuplicationEdit(this));
         } else if(keyCode == KeyEvent.VK_TAB) {
             e.consume();
 

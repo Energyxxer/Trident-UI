@@ -16,7 +16,6 @@ import java.util.ArrayList;
 
 public class CommentEdit extends Edit {
 
-
     private CaretProfile previousProfile;
     /**
      * ArrayList containing information about how to undo the edit.
@@ -54,55 +53,43 @@ public class CommentEdit extends Edit {
             this.modifications.clear();
             this.uncomment = true;
 
-            int characterDrift = 0;
 
             CaretProfile nextProfile = new CaretProfile(previousProfile);
 
-            int previousL = -1;
-
             //First, make a list of all line starts and decide whether to comment or uncomment.
 
-            for(int i = 0; i < previousProfile.size()-1; i+= 2) {
-                int selectionStart = previousProfile.get(i) + characterDrift;
-                int selectionEnd = previousProfile.get(i + 1) + characterDrift;
+            EditUtils.fetchSelectedLines(previousProfile, editor, modifications, new EditUtils.Configuration() {
+                {
+                    fetchEnd = false;
+                    lineHandler = (start, end, index) -> {
+                        if(!text.startsWith(commentMarker, start)) uncomment = false;
+                    };
+                }
+            });
 
-                int lineStart = new Dot(Math.min(selectionStart,selectionEnd),editor).getRowStart();
-                int lineEnd = new Dot(Math.max(selectionStart,selectionEnd),editor).getRowEnd();
+            for(int i = 0; i < previousProfile.size()-1; i+= 2) {
+                int selectionStart = previousProfile.get(i);
+                int selectionEnd = previousProfile.get(i + 1);
 
                 if(selectionStart == selectionEnd) {
                     int below = new Dot(selectionStart, editor).getPositionBelow();
                     nextProfile.set(i>>1, below);
                     nextProfile.set((i>>1)+1, below);
                 }
-
-                boolean firstLineOfSelection = true;
-
-                for(int l = lineStart; l <= lineEnd; previousL = l, l = new Dot(l, editor).getPositionBelow()) {
-                    if(l == previousL) {
-                        if(firstLineOfSelection) {
-                            firstLineOfSelection = false;
-                            continue;
-                        } else break;
-                    }
-                    firstLineOfSelection = false;
-                    modifications.add(l);
-                    if(uncomment && !text.startsWith(commentMarker, l)) uncomment = false;
-                }
-
             }
 
             //List done, start adding/removing comment markers
 
-            int drift = 0;
+            int characterDrift = 0;
             for(int lineStart : modifications) {
                 if(uncomment) {
-                    doc.remove(lineStart+drift, commentMarker.length());
-                    nextProfile.pushFrom(lineStart+drift+commentMarker.length(), -commentMarker.length());
-                    drift -= commentMarker.length();
+                    doc.remove(lineStart+characterDrift, commentMarker.length());
+                    nextProfile.pushFrom(lineStart+characterDrift+commentMarker.length(), -commentMarker.length());
+                    characterDrift -= commentMarker.length();
                 } else {
-                    doc.insertString(lineStart+drift, commentMarker, null);
-                    nextProfile.pushFrom(lineStart+drift, commentMarker.length());
-                    drift += commentMarker.length();
+                    doc.insertString(lineStart+characterDrift, commentMarker, null);
+                    nextProfile.pushFrom(lineStart+characterDrift, commentMarker.length());
+                    characterDrift += commentMarker.length();
                 }
             }
 

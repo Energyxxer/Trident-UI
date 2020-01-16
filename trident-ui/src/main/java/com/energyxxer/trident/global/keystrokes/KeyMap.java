@@ -26,6 +26,8 @@ public class KeyMap {
     public static final UserKeyBind TEXT_SELECT_ALL = new UserKeyBind("Select All Text", "text.select_all", identifierToStrokes("c+A")).setGroupName("Editor");
     public static final UserKeyBind TEXT_MOVE_LINE_UP = new UserKeyBind("Move Line Up", "text.move_line_up", identifierToStrokes("a+" + KeyEvent.VK_UP)).setGroupName("Editor");
     public static final UserKeyBind TEXT_MOVE_LINE_DOWN = new UserKeyBind("Move Line Down", "text.move_line_down", identifierToStrokes("a+" + KeyEvent.VK_DOWN)).setGroupName("Editor");
+    public static final UserKeyBind TEXT_DELETE_LINE = new UserKeyBind("text.delete_line", identifierToStrokes("c+D")).setGroupName("Editor");
+    public static final UserKeyBind TEXT_DUPLICATE_LINE = new UserKeyBind("text.duplicate_line", identifierToStrokes("ca+"+KeyEvent.VK_DOWN)).setGroupName("Editor");
 
     public static final UserKeyBind FIND_NEXT = new UserKeyBind("find.next", identifierToStrokes(KeyEvent.VK_ENTER + ";" + KeyEvent.VK_F3)).setGroupName("Editor");
     public static final UserKeyBind FIND_PREVIOUS = new UserKeyBind("find.previous", identifierToStrokes("s+" + KeyEvent.VK_ENTER + ";s+" + KeyEvent.VK_F3)).setGroupName("Editor");
