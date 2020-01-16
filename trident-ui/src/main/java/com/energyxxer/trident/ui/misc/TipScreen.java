@@ -1,18 +1,17 @@
 package com.energyxxer.trident.ui.misc;
 
 import com.energyxxer.trident.global.Resources;
+import com.energyxxer.trident.global.keystrokes.KeyMap;
+import com.energyxxer.util.logger.Debug;
 
-import javax.swing.JComponent;
-import java.awt.AlphaComposite;
-import java.awt.Dimension;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TipScreen extends JComponent {
     private Timer timer;
@@ -81,7 +80,12 @@ public class TipScreen extends JComponent {
             shuffleList();
             currentTipIndex = 0;
         }
-        currentTip = tipList.get(currentTipIndex);
+        currentTip = getTipText(tipList.get(currentTipIndex));
+        if(currentTip == null) {
+            currentTip = "";
+            Debug.log("Skipping tip '" + tipList.get(currentTipIndex) + "'");
+            showNext();
+        }
     }
 
     @Override
@@ -118,5 +122,19 @@ public class TipScreen extends JComponent {
             tipList.remove(index);
             tipList.add(i, tip);
         }
+    }
+
+    private String getTipText(String tip) {
+        Pattern pat = Pattern.compile("\\$\\{keybind.([^\\s}]+)}");
+        Matcher matcher = pat.matcher(tip);
+        StringBuffer sb = new StringBuffer(tip.length());
+        while (matcher.find()) {
+            String text = matcher.group(1);
+            text = KeyMap.getByKey(text).getReadableKeyStroke();
+            if(text.isEmpty()) return null;
+            matcher.appendReplacement(sb, Matcher.quoteReplacement(text));
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
     }
 }

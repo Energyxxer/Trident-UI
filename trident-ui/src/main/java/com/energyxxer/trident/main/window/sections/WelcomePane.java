@@ -53,9 +53,16 @@ public class WelcomePane extends JPanel {
             buttonPanel.add(wrapper);
         }
         {
-            ToolbarButton button = new ToolbarButton(null, tlm);
-            button.setText("Getting Started");
-            button.setHintText("A guide on how to begin your Trident project");
+            ToolbarButton button = new ToolbarButton("trident_file", tlm);
+            button.setText("Trident Website");
+            button.setHintText("Go to the official Trident Website");
+            button.addActionListener(e -> {
+                try {
+                    Desktop.getDesktop().browse(new URI("http://energyxxer.com/trident"));
+                } catch (IOException | URISyntaxException ex) {
+                    ex.printStackTrace();
+                }
+            });
             JPanel wrapper = new JPanel(new FlowLayout(FlowLayout.LEFT));
             wrapper.setOpaque(false);
             wrapper.add(button);

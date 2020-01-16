@@ -12,8 +12,8 @@ public class UserKeyBind {
         DOUBLE_SHIFT("Shift+Shift","*ss");
 
         final String humanReadableKeystroke;
-        final String identifier;
 
+        final String identifier;
         Special(String humanReadableKeystroke, String identifier) {
             this.humanReadableKeystroke = humanReadableKeystroke;
             this.identifier = identifier;
@@ -26,15 +26,15 @@ public class UserKeyBind {
         public String getIdentifier() {
             return identifier;
         }
-    }
 
+    }
     private String name;
+
     private UserMapping[] defaultMappings;
     private UserMapping[] mappings;
     private ArrayList<UserMapping> newMappings = null;
     private final String key;
     private String groupName = "Miscellaneous";
-
     public UserKeyBind(String key, UserMapping... defaultMappings) {
         this(null, key, defaultMappings);
     }
@@ -147,5 +147,9 @@ public class UserKeyBind {
     public UserKeyBind setGroupName(String groupName) {
         this.groupName = groupName;
         return this;
+    }
+
+    public String getKey() {
+        return key;
     }
 }

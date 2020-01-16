@@ -4,7 +4,6 @@ import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.ToolbarButton;
 import com.energyxxer.trident.ui.explorer.ProjectExplorerMaster;
-import com.energyxxer.trident.ui.explorer.base.ExplorerFlag;
 import com.energyxxer.trident.ui.scrollbar.OverlayScrollPaneLayout;
 import com.energyxxer.trident.ui.styledcomponents.Padding;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
@@ -79,7 +78,7 @@ public class Sidebar extends OverlayBorderPanel {
             configure.setHintText("Configure");
 
             configure.addActionListener(e -> {
-                StyledPopupMenu menu = new StyledPopupMenu("What is supposed to go here?");
+                StyledPopupMenu menu = new StyledPopupMenu("What is supposed to go here?");/*
 
                 {
                     StyledMenuItem item = new StyledMenuItem("Flatten Empty Packages", "checkmark");
@@ -93,7 +92,7 @@ public class Sidebar extends OverlayBorderPanel {
                     });
 
                     menu.add(item);
-                }
+                }*/
 
                 {
                     StyledMenuItem item = new StyledMenuItem("Show Project Files", "checkmark");
@@ -108,7 +107,7 @@ public class Sidebar extends OverlayBorderPanel {
                     menu.add(item);
                 }
 
-                {
+                /*{
                     StyledMenuItem item = new StyledMenuItem("Debug Width", "checkmark");
                     item.setIconName(TridentWindow.projectExplorer.getFlag(ExplorerFlag.DEBUG_WIDTH) ? "checkmark" : "blank");
 
@@ -118,7 +117,7 @@ public class Sidebar extends OverlayBorderPanel {
                         Preferences.put("explorer.debug_width",Boolean.toString(TridentWindow.projectExplorer.getFlag(ExplorerFlag.DEBUG_WIDTH)));
                     });
                     menu.add(item);
-                }
+                }*/
 
                 menu.show(configure, configure.getWidth()/2, configure.getHeight());
 

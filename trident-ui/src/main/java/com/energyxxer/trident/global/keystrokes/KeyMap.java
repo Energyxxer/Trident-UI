@@ -135,6 +135,15 @@ public class KeyMap {
         return allKeyBinds;
     }
 
+    public static UserKeyBind getByKey(String key) {
+        for(UserKeyBind kb : allKeyBinds) {
+            if(key.equals(kb.getKey())) {
+                return kb;
+            }
+        }
+        return null;
+    }
+
     public static UserKeyBind requestMapping(String key, UserMapping... defaultMappings) {
         UserKeyBind keyBind = new UserKeyBind(key, defaultMappings);
         allKeyBinds.add(keyBind);
