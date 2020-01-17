@@ -68,8 +68,10 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
     private static UserKeyBind UNFOLD;
 
     static {
-        UNFOLD = KeyMap.requestMapping("test.unfold", KeyMap.identifierToStrokes("")).setName("Unfold").setGroupName("Testing - please do not use");
-        FOLD = KeyMap.requestMapping("test.fold", KeyMap.identifierToStrokes("")).setName("Fold").setGroupName("Testing - please do not use");
+        if(Preferences.get("debug","false").equals("true")) {
+            UNFOLD = KeyMap.requestMapping("test.unfold", KeyMap.identifierToStrokes("")).setName("Unfold").setGroupName("Testing - please do not use");
+            FOLD = KeyMap.requestMapping("test.fold", KeyMap.identifierToStrokes("")).setName("Fold").setGroupName("Testing - please do not use");
+        }
     }
 
     private Color selectionUnfocusedColor;
