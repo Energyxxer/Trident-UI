@@ -25,6 +25,7 @@ import com.energyxxer.util.logger.Debug;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.BadLocationException;
@@ -35,10 +36,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.*;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -254,20 +252,25 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
                 }
 
                 if(analysis.response != null) {
-                    ps: for(Map.Entry<String, String[]> entry : Collections.synchronizedSet(parent.parserStyles.entrySet())) {
+                    for (Map.Entry<String, String[]> entry : Collections.synchronizedSet(parent.parserStyles.entrySet())) {
                         String[] tagList = entry.getValue();
-                        int startIndex = token.tags.indexOf(tagList[0]);
-                        if(startIndex < 0) continue;
-                        for(int i = 0; i < tagList.length; i++) {
-                            if(startIndex+i >= token.tags.size() || !tagList[i].equalsIgnoreCase(token.tags.get(startIndex+i))) continue ps;
-                        }
-                        Style attrStyle = TridentEditorComponent.this.getStyle(entry.getKey());
-                        if(attrStyle == null) continue;
-                        if(prevToken != null && previousTokenStyles.contains(entry.getKey())) {
-                            styleStart = prevToken.loc.index + prevToken.value.length();
-                        }
-                        previousTokenStyles.add(entry.getKey());
-                        sd.setCharacterAttributes(styleStart, token.value.length() + (token.loc.index - styleStart), attrStyle, false);
+                        int startIndex = -1;
+                        tgs:
+                        do {
+                            startIndex = indexOf(token.tags, tagList[0], startIndex + 1);
+                            if (startIndex < 0) break;
+                            for (int i = 0; i < tagList.length; i++) {
+                                if (startIndex + i >= token.tags.size() || !tagList[i].equalsIgnoreCase(token.tags.get(startIndex + i)))
+                                    continue tgs;
+                            }
+                            Style attrStyle = TridentEditorComponent.this.getStyle(entry.getKey());
+                            if (attrStyle == null) continue;
+                            if (prevToken != null && previousTokenStyles.contains(entry.getKey())) {
+                                styleStart = prevToken.loc.index + prevToken.value.length();
+                            }
+                            previousTokenStyles.add(entry.getKey());
+                            sd.setCharacterAttributes(styleStart, token.value.length() + (token.loc.index - styleStart), attrStyle, false);
+                        } while (true);
                     }
                 }
                 while(previousTokenStylesIndex > 0) {
@@ -288,6 +291,13 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
 
             //sd.setCharacterAttributes(81, 119, getStyle("do_not_display"), true);
         });
+    }
+
+    private static <T> int indexOf(ArrayList<T> arr, T value, int fromIndex) {
+        for(int i = fromIndex; i < arr.size(); i++) {
+            if(Objects.equals(arr.get(i), value)) return i;
+        }
+        return -1;
     }
 
     void highlight() {
