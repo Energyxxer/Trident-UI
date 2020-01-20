@@ -6,6 +6,7 @@ import com.energyxxer.trident.ui.editor.behavior.caret.Dot;
 import com.energyxxer.trident.ui.editor.behavior.caret.EditorCaret;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.Edit;
 import com.energyxxer.util.StringUtil;
+import com.energyxxer.util.logger.Debug;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -56,20 +57,38 @@ public class NewlineEdit extends Edit {
 
                 String str = "\n";
 
-                int lineStart = Math.max(0, text.lastIndexOf('\n',start - characterDrift - 1)+1);
 
-                int spaces = 0;
-                for(int j = lineStart; j < start; j++) {
-                    if(text.charAt(j) == ' ') spaces++;
-                    else break;
+
+                String beforeCaret = text.substring(0, start - characterDrift).trim();
+                String afterCaret = text.substring(start - characterDrift);
+                char beforeCaretChar = '\0';
+                if(!beforeCaret.isEmpty()) {
+                    beforeCaretChar = beforeCaret.charAt(beforeCaret.length()-1);
                 }
-                int tabs = spaces / 4;
-                String beforeCaret = text.substring(lineStart, start - characterDrift);
-                if(beforeCaret.trim().endsWith("{") || beforeCaret.trim().endsWith("[")) tabs++;
+                char afterCaretChar = '\0';
+                for(char c : afterCaret.toCharArray()) {
+                    if(!Character.isWhitespace(c) || c == '\n') {
+                        afterCaretChar = c;
+                        break;
+                    }
+                }
+                String placeAfterCaret = "";
+                int tabs = editor.getIndentationLevelAt(start - characterDrift);
 
-                if(!Dot.SMART_KEYS_INDENT.get()) tabs = 0;
+                if(Dot.SMART_KEYS_INDENT.get() && !afterCaret.isEmpty()) {
+                    if("}])".indexOf(afterCaretChar) == "{[(".indexOf(beforeCaretChar) && "}])".indexOf(afterCaretChar) >= 0) {
+                        placeAfterCaret = "\n" + StringUtil.repeat("    ", Math.max(tabs-1, 0));
+                    } else if("}])".indexOf(afterCaret.charAt(0)) >= 0) {
+                        tabs--;
+                    }
+                } else {
+                    tabs = 0;
+                }
+
+                Debug.log(beforeCaretChar + "|" + afterCaretChar);
 
                 str += StringUtil.repeat("    ", tabs);
+                str += placeAfterCaret;
 
                 modificationIndices.add(start);
                 previousValues.add(text.substring(start - characterDrift, end - characterDrift));
@@ -79,13 +98,16 @@ public class NewlineEdit extends Edit {
                 doc.insertString(start, str, null);
                 actionPerformed = true;
 
-                if(pushCaret) nextProfile.add(start + str.length(), start + str.length());
-                else nextProfile.pushFrom(start+1, str.length());
+                if(pushCaret) {
+                    int dot = start + str.length() - placeAfterCaret.length();
+                    nextProfile.add(dot, dot);
+                } else nextProfile.pushFrom(start+1, str.length());
                 characterDrift += (end - start) + (tabs * 4) + 1;
 
                 int ftabs = tabs;
 
                 editor.registerCharacterDrift(o -> (o >= start) ? ((o <= end) ? start + (ftabs * 4) + 1 : o + (ftabs * 4) + 1 - (end - start)) : o);
+
             }
         } catch(BadLocationException x) {
             x.printStackTrace();

@@ -2,10 +2,15 @@ package com.energyxxer.trident.ui.editor.behavior.editmanager.edits;
 
 import com.energyxxer.trident.ui.editor.behavior.AdvancedEditor;
 import com.energyxxer.trident.ui.editor.behavior.caret.CaretProfile;
+import com.energyxxer.trident.ui.editor.behavior.caret.Dot;
 import com.energyxxer.trident.ui.editor.behavior.caret.EditorCaret;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.Edit;
+import com.energyxxer.util.StringUtil;
 
-import javax.swing.text.*;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.StyledDocument;
 import java.util.ArrayList;
 
 /**
@@ -13,7 +18,9 @@ import java.util.ArrayList;
  */
 public class InsertionEdit extends Edit {
     private String value;
+    private ArrayList<Integer> undoIndices = new ArrayList<>();
     private ArrayList<String> previousValues = new ArrayList<>();
+    private ArrayList<String> writingValues = new ArrayList<>();
     private CaretProfile previousProfile;
 
     public InsertionEdit(String value, AdvancedEditor editor) {
@@ -32,30 +39,56 @@ public class InsertionEdit extends Edit {
             int characterDrift = 0;
 
             previousValues.clear();
+            undoIndices.clear();
+            writingValues.clear();
             CaretProfile nextProfile = new CaretProfile();
 
             for (int i = 0; i < previousProfile.size() - 1; i += 2) {
                 int start = previousProfile.get(i) + characterDrift;
                 int end = previousProfile.get(i + 1) + characterDrift;
-                if(end < start) {
+                if (end < start) {
                     int temp = start;
                     start = end;
                     end = temp;
                 }
+
+                String valueToWrite = value;
+                if (Dot.SMART_KEYS_INDENT.get() && valueToWrite.length() == 1 && "}])".contains(valueToWrite) && start <= new Dot(start, start, editor).getRowContentStart()) {
+                    int rowStart = new Dot(start, start, editor).getRowStart();
+                    int whitespace = start - rowStart;
+                    int properWhitespace = 4 * Math.max(editor.getIndentationLevelAt(start) - 1, 0);
+                    int diff = properWhitespace - whitespace;
+                    start += diff;
+                    if(end < start) {
+                        valueToWrite = StringUtil.repeat(" ", start - end) + valueToWrite;
+                        start = end;
+                    }
+                }
+                int caretOffset = 0;
+                if(valueToWrite.length() == 1 && "{[(".contains(valueToWrite) && editor.getIndentationManager().isBalanced()) {
+                    valueToWrite += "}])".charAt("{[(".indexOf(valueToWrite));
+                    caretOffset--;
+                } else if(valueToWrite.length() == 1 && "}])".contains(valueToWrite) && result.startsWith(valueToWrite,start) && editor.getIndentationManager().isBalanced()) {
+                    valueToWrite = "";
+                    caretOffset++;
+                }
+
+                undoIndices.add(start);
                 previousValues.add(result.substring(start, end));
-                result = result.substring(0, start) + value + result.substring(end);
+                writingValues.add(valueToWrite);
+                result = result.substring(0, start) + valueToWrite + result.substring(end);
 
-                nextProfile.add(start+value.length(),start+value.length());
+                nextProfile.add(start + valueToWrite.length()+caretOffset, start + valueToWrite.length()+caretOffset);
 
-                ((AbstractDocument) doc).replace(start, end - start, value, null);
+                ((AbstractDocument) doc).replace(start, end - start, valueToWrite, null);
 
-                characterDrift += value.length() - (end - start);
+                characterDrift += valueToWrite.length() - (end - start);
 
                 final int fstart = start;
                 final int fend = end;
-                final int flen = value.length();
+                final int flen = valueToWrite.length();
 
-                editor.registerCharacterDrift(o -> (o >= fstart) ? ((o <= fend) ? fstart + flen : o + value.length() - (fend - fstart)): o);
+                editor.registerCharacterDrift(o -> (o >= fstart) ? ((o <= fend) ? fstart + flen : o + flen - (fend - fstart)) : o);
             }
             caret.setProfile(nextProfile);
 
@@ -71,25 +104,16 @@ public class InsertionEdit extends Edit {
         Document doc = editor.getDocument();
         EditorCaret caret = editor.getCaret();
         try {
-            String str = doc.getText(0, doc.getLength()); //Result
+            for (int i = 0; i < undoIndices.size(); i++) {
+                int start = undoIndices.get(i);
+                int resultEnd = start + writingValues.get(i).length();
 
-            for (int i = 0; i < previousProfile.size() - 1; i += 2) {
-                int start = Math.min(previousProfile.get(i), previousProfile.get(i+1));
-                int resultEnd = start + value.length();
-                if(resultEnd < start) {
-                    int temp = start;
-                    start = resultEnd;
-                    resultEnd = temp;
-                }
-
-                String previousValue = previousValues.get(i / 2);
-
-                str = str.substring(0, start) + previousValue + str.substring(resultEnd);
+                String previousValue = previousValues.get(i);
 
                 ((AbstractDocument) doc).replace(start, resultEnd - start, previousValue, null);
 
                 final int fstart = start;
-                final int flen = value.length();
+                final int flen = resultEnd - start;
                 final int fplen = previousValue.length();
 
                 editor.registerCharacterDrift(o -> (o >= fstart) ? ((o <= fstart + flen) ? fstart + fplen : o + (fplen - flen)): o);

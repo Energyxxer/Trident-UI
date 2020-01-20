@@ -59,6 +59,7 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
     private LinePainter linePainter;
 
     private final StringLocationCache viewLineCache = new StringLocationCache();
+    private final IndentationManager indentationManager = new IndentationManager(this);
 
     private SuggestionInterface suggestionInterface;
 
@@ -67,13 +68,13 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
     private static UserKeyBind FOLD;
     private static UserKeyBind UNFOLD;
 
+
     static {
         if(Preferences.get("debug","false").equals("true")) {
             UNFOLD = KeyMap.requestMapping("test.unfold", KeyMap.identifierToStrokes("")).setName("Unfold").setGroupName("Testing - please do not use");
             FOLD = KeyMap.requestMapping("test.fold", KeyMap.identifierToStrokes("")).setName("Fold").setGroupName("Testing - please do not use");
         }
     }
-
     private Color selectionUnfocusedColor;
 
     public AdvancedEditor() {
@@ -88,7 +89,9 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         this.getDocument().addDocumentListener((UnifiedDocumentListener) e -> {
             if(e.getType() == DocumentEvent.EventType.CHANGE) return;
             try {
-                viewLineCache.textChanged(getDocument().getText(0, getDocument().getLength()), e.getOffset());
+                String text = getDocument().getText(0, getDocument().getLength());
+                viewLineCache.textChanged(text, e.getOffset());
+                indentationManager.textChanged(text, e.getOffset());
             } catch (BadLocationException ex) {
                 ex.printStackTrace();
             }
@@ -391,6 +394,10 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         this.selectionUnfocusedColor = selectionUnfocusedColor;
     }
 
+    public IndentationManager getIndentationManager() {
+        return indentationManager;
+    }
+
     private enum CharType {
         ALPHA(true, 1), WHITESPACE(true, 0), SYMBOL(false), NULL(false);
 
@@ -594,7 +601,11 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         this.suggestionInterface = suggestionInterface;
     }
 
-    public int getIndentationAt(int index) {
+    public int getIndentationLevelAt(int index) {
+        return indentationManager.getSuggestedIndentationLevelAt(index);
+    }
+
+    public int getDocumentIndentationAt(int index) {
         try {
             String text = this.getDocument().getText(0, index);
             int lineStart = Math.max(0, text.lastIndexOf('\n', index - 1)+1);

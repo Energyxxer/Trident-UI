@@ -24,7 +24,7 @@ public class JSONLexerProfile extends LexerProfile {
 
     private static final Pattern numberRegex = Pattern.compile("(-?\\d+(\\.\\d+)?)");
 
-    private static final TokenType
+    public static final TokenType
             BRACE = new TokenType("BRACE"), // (, ), {, }...
             COMMA = new TokenType("COMMA"), // ,
             COLON = new TokenType("COLON"), // :

@@ -157,7 +157,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
 
         int endIndex = -1;
         if(suggestion instanceof SnippetSuggestion) {
-            text = text.replace("\n", "\n" + StringUtil.repeat("    ", editor.getIndentationAt(editor.getCaretPosition())));
+            text = text.replace("\n", "\n" + StringUtil.repeat("    ", editor.getDocumentIndentationAt(editor.getCaretPosition())));
             endIndex = text.indexOf("$END$");
             text = text.replaceFirst("\\$END\\$", "");
         }

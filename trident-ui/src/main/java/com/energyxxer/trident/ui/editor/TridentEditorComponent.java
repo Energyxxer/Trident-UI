@@ -7,25 +7,28 @@ import com.energyxxer.enxlex.lexical_analysis.summary.SummaryModule;
 import com.energyxxer.enxlex.lexical_analysis.token.Token;
 import com.energyxxer.enxlex.lexical_analysis.token.TokenSection;
 import com.energyxxer.enxlex.suggestions.SuggestionModule;
+import com.energyxxer.trident.compiler.lexer.TridentTokens;
 import com.energyxxer.trident.compiler.lexer.summaries.TridentSummaryModule;
 import com.energyxxer.trident.compiler.util.TridentProjectSummary;
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.global.Status;
 import com.energyxxer.trident.global.temp.Lang;
+import com.energyxxer.trident.global.temp.lang_defaults.presets.JSONLexerProfile;
 import com.energyxxer.trident.global.temp.projects.CrossbowProject;
 import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
 import com.energyxxer.trident.global.temp.projects.TridentProject;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.editor.behavior.AdvancedEditor;
+import com.energyxxer.trident.ui.editor.behavior.IndentationManager;
 import com.energyxxer.trident.ui.editor.completion.SuggestionDialog;
 import com.energyxxer.trident.ui.editor.inspector.Inspector;
 import com.energyxxer.util.logger.Debug;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
 import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.BadLocationException;
@@ -277,6 +280,11 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
                     previousTokenStyles.remove(0);
                     previousTokenStylesIndex--;
                 }
+
+                if((token.value.contains("{") || token.value.contains("[") || token.value.contains("(") || token.value.contains("}") || token.value.contains("]") || token.value.contains(")")) && !(token.type == TridentTokens.BRACE || token.type == JSONLexerProfile.BRACE)) {
+                    sd.setCharacterAttributes(token.loc.index, token.value.length(), getStyle(IndentationManager.NULLIFY_BRACE_STYLE), false);
+                }
+
                 prevToken = token;
             }
             previousTokenStyles.clear();

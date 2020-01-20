@@ -89,6 +89,10 @@ public class DeletionEdit extends Edit {
                             }
                         }
                     }
+
+                    if(deletionAmount == -1 && end-start == 1 && end < result.length() && editor.getIndentationManager().isBalanced() && "{[(".indexOf(result.charAt(start)) == "}])".indexOf(result.charAt(end)) && "{[(".indexOf(result.charAt(start)) >= 0) {
+                        end++;
+                    }
                 }
                 if(end < start) {
                     int temp = start;
