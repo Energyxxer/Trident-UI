@@ -1,7 +1,5 @@
 package com.energyxxer.trident.ui.editor.behavior;
 
-import com.energyxxer.util.logger.Debug;
-
 import java.util.ArrayList;
 import java.util.Stack;
 
@@ -31,8 +29,6 @@ public class IndentationManager {
 
     public int getSuggestedIndentationLevelAt(int index) {
         populate();
-
-        Debug.log(indents);
 
         int level = 0;
         for(IndentationChange indent : indents) {
@@ -97,6 +93,46 @@ public class IndentationManager {
     public char getMatchingBraceChar(char ch) {
         if(isOpeningBrace(ch)) return closingChars.charAt(openingChars.indexOf(ch));
         return openingChars.charAt(closingChars.indexOf(ch));
+    }
+
+    public boolean isBrace(char ch) {
+        return isOpeningBrace(ch) || isClosingBrace(ch);
+    }
+
+    private int binarySearchBraceIndex(int index) {
+        int min = 0;
+        int max = indents.size()-1;
+        while(true) {
+
+            if(min >= max) {
+                if(!indents.isEmpty() && indents.get(min).index == index) return min;
+                return -1;
+            }
+
+            int pivotIndex = (min + max) / 2;
+            IndentationChange pivot = indents.get(pivotIndex);
+            if(index == pivot.index) return pivotIndex;
+            else if(index < pivot.index) {
+                max = pivotIndex-1;
+            } else {
+                min = pivotIndex+1;
+            }
+        }
+    }
+
+    public int getMatchingBraceIndex(int braceCheckIndex) {
+        populate();
+        int indentIndex = binarySearchBraceIndex(braceCheckIndex);
+        if(indentIndex == -1) return -1;
+        IndentationChange brace = indents.get(indentIndex);
+        int level = 1;
+        for(int i = indentIndex + brace.change; i >= 0 && i < indents.size(); i += brace.change) {
+            IndentationChange next = indents.get(i);
+            if(editor.getStyledDocument().getCharacterElement(next.index).getAttributes().containsAttributes(editor.getStyle(NULLIFY_BRACE_STYLE))) continue;
+            level += next.change * brace.change;
+            if(level == 0) return next.index;
+        }
+        return -1;
     }
 
     private static class IndentationChange {

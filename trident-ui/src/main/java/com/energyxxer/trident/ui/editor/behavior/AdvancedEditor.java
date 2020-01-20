@@ -75,6 +75,7 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         }
     }
     private Color selectionUnfocusedColor;
+    private Color braceHighlightColor;
 
     public AdvancedEditor() {
         super(new DefaultStyledDocument());
@@ -137,6 +138,7 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
             this.setSelectionUnfocusedColor(t.getColor(new Color(50, 100, 175), "Editor.selection.unfocused.background"));
             this.setCurrentLineColor(t.getColor(new Color(235, 235, 235), "Editor.currentLine.background"));
             this.setFont(new Font(t.getString("Editor.font","default:monospaced"), Font.PLAIN, Preferences.getEditorFontSize()));
+            this.setBraceHighlightColor(t.getColor(Color.YELLOW, "Editor.braceHighlight.background"));
         });
     }
 
@@ -397,6 +399,14 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         return indentationManager;
     }
 
+    public Color getBraceHighlightColor() {
+        return braceHighlightColor;
+    }
+
+    private void setBraceHighlightColor(Color color) {
+        braceHighlightColor = color;
+    }
+
     private enum CharType {
         ALPHA(true, 1), WHITESPACE(true, 0), SYMBOL(false), NULL(false);
 
@@ -531,6 +541,18 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
             if(c == '\n' || !Character.isWhitespace(c)) break;
         }
         return index+offs;
+    }
+
+    public int getPreviousNonWhitespace(int offs) throws BadLocationException {
+        Document doc = this.getDocument();
+        String text = doc.getText(0, offs);
+
+        int index;
+        for(index = offs-1; index >= 0; index--) {
+            char c = text.charAt(index);
+            if(c == '\n' || !Character.isWhitespace(c)) break;
+        }
+        return index;
     }
 
     private ArrayList<Consumer<Function<Integer, Integer>>> characterDriftListeners = new ArrayList<>();

@@ -93,6 +93,7 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
 
         try {
             c.getHighlighter().addHighlight(0,0,new EditorSelectionPainter(this));
+            c.getHighlighter().addHighlight(0,0,new BracePairHighlighter(editor, this));
         } catch(BadLocationException x) {
             Debug.log(x.getMessage(), Debug.MessageType.ERROR);
         }
@@ -117,11 +118,9 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
         );
         visible = true;
         flasher.restart();
-        SwingUtilities.invokeLater(() -> {
-            readjustRect();
-            editor.repaint();
-            this.fireStateChanged();
-        });
+        readjustRect();
+        editor.repaint();
+        this.fireStateChanged();
     }
 
     public void setPosition(int pos) {
