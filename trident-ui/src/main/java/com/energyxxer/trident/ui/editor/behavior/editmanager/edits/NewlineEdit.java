@@ -6,7 +6,6 @@ import com.energyxxer.trident.ui.editor.behavior.caret.Dot;
 import com.energyxxer.trident.ui.editor.behavior.caret.EditorCaret;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.Edit;
 import com.energyxxer.util.StringUtil;
-import com.energyxxer.util.logger.Debug;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -76,16 +75,16 @@ public class NewlineEdit extends Edit {
                 int tabs = editor.getIndentationLevelAt(start - characterDrift);
 
                 if(Dot.SMART_KEYS_INDENT.get() && !afterCaret.isEmpty()) {
-                    if("}])".indexOf(afterCaretChar) == "{[(".indexOf(beforeCaretChar) && "}])".indexOf(afterCaretChar) >= 0) {
+                    if(editor.getIndentationManager().match(beforeCaretChar, afterCaretChar)) {
                         placeAfterCaret = "\n" + StringUtil.repeat("    ", Math.max(tabs-1, 0));
-                    } else if("}])".indexOf(afterCaret.charAt(0)) >= 0) {
+                    } else if(editor.getIndentationManager().isClosingBrace(afterCaret.charAt(0))) {
                         tabs--;
                     }
                 } else {
                     tabs = 0;
                 }
 
-                Debug.log(beforeCaretChar + "|" + afterCaretChar);
+                //Debug.log(beforeCaretChar + "|" + afterCaretChar);
 
                 str += StringUtil.repeat("    ", tabs);
                 str += placeAfterCaret;

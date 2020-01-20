@@ -22,7 +22,7 @@ public class IndentationManager {
         editor.getStyledDocument().addStyle(NULLIFY_BRACE_STYLE, null);
     }
 
-    public void textChanged(String newText, int offset) {
+    public void textChanged(String newText) {
         this.text = newText;
         dirty = true;
         indents.clear();
@@ -70,20 +70,38 @@ public class IndentationManager {
         return getSuggestedIndentationLevelAt(text.length()) == 0;
     }
 
-    public void disableRegion(int start, int end) {
-        populate();
-        for(IndentationChange indent : indents) {
-            if(start <= indent.index && indent.index <= end) {
-                indent.enabled = false;
-            }
-            if(indent.index > end) return;
-        }
+    public boolean match(char opening, char closing) {
+        return isOpeningBrace(opening) && openingChars.indexOf(opening) == closingChars.indexOf(closing);
+    }
+
+    public boolean isOpeningBrace(String str) {
+        return str.length() == 1 && isOpeningBrace(str.charAt(0));
+    }
+
+    public boolean isOpeningBrace(char ch) {
+        return openingChars.indexOf(ch) >= 0;
+    }
+
+    public boolean isClosingBrace(String str) {
+        return str.length() == 1 && isClosingBrace(str.charAt(0));
+    }
+
+    public boolean isClosingBrace(char ch) {
+        return closingChars.indexOf(ch) >= 0;
+    }
+
+    public char getMatchingBraceChar(String str) {
+        return getMatchingBraceChar(str.charAt(0));
+    }
+
+    public char getMatchingBraceChar(char ch) {
+        if(isOpeningBrace(ch)) return closingChars.charAt(openingChars.indexOf(ch));
+        return openingChars.charAt(closingChars.indexOf(ch));
     }
 
     private static class IndentationChange {
         int index;
-        int change = 0;
-        boolean enabled = true;
+        int change;
 
         public IndentationChange(int index, int change) {
             this.index = index;

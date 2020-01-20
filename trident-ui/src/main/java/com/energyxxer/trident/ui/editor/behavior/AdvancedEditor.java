@@ -68,7 +68,6 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
     private static UserKeyBind FOLD;
     private static UserKeyBind UNFOLD;
 
-
     static {
         if(Preferences.get("debug","false").equals("true")) {
             UNFOLD = KeyMap.requestMapping("test.unfold", KeyMap.identifierToStrokes("")).setName("Unfold").setGroupName("Testing - please do not use");
@@ -91,7 +90,7 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
             try {
                 String text = getDocument().getText(0, getDocument().getLength());
                 viewLineCache.textChanged(text, e.getOffset());
-                indentationManager.textChanged(text, e.getOffset());
+                indentationManager.textChanged(text);
             } catch (BadLocationException ex) {
                 ex.printStackTrace();
             }

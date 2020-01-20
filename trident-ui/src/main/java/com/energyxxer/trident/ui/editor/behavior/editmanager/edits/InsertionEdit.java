@@ -53,7 +53,7 @@ public class InsertionEdit extends Edit {
                 }
 
                 String valueToWrite = value;
-                if (Dot.SMART_KEYS_INDENT.get() && valueToWrite.length() == 1 && "}])".contains(valueToWrite) && start <= new Dot(start, start, editor).getRowContentStart()) {
+                if (Dot.SMART_KEYS_INDENT.get() && valueToWrite.length() == 1 && editor.getIndentationManager().isClosingBrace(valueToWrite) && start <= new Dot(start, start, editor).getRowContentStart()) {
                     int rowStart = new Dot(start, start, editor).getRowStart();
                     int whitespace = start - rowStart;
                     int properWhitespace = 4 * Math.max(editor.getIndentationLevelAt(start) - 1, 0);
@@ -65,10 +65,10 @@ public class InsertionEdit extends Edit {
                     }
                 }
                 int caretOffset = 0;
-                if(valueToWrite.length() == 1 && "{[(".contains(valueToWrite) && editor.getIndentationManager().isBalanced()) {
-                    valueToWrite += "}])".charAt("{[(".indexOf(valueToWrite));
+                if(valueToWrite.length() == 1 && editor.getIndentationManager().isOpeningBrace(valueToWrite) && editor.getIndentationManager().isBalanced()) {
+                    valueToWrite += editor.getIndentationManager().getMatchingBraceChar(valueToWrite);
                     caretOffset--;
-                } else if(valueToWrite.length() == 1 && "}])".contains(valueToWrite) && result.startsWith(valueToWrite,start) && editor.getIndentationManager().isBalanced()) {
+                } else if(valueToWrite.length() == 1 && editor.getIndentationManager().isClosingBrace(valueToWrite) && result.startsWith(valueToWrite,start) && editor.getIndentationManager().isBalanced()) {
                     valueToWrite = "";
                     caretOffset++;
                 }
