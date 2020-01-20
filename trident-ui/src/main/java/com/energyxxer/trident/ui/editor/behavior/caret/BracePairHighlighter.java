@@ -80,7 +80,7 @@ public class BracePairHighlighter implements Highlighter.HighlightPainter {
             g.setColor(editor.getBraceHighlightColor());
 
             g.fillRect(nearRectangle.x, nearRectangle.y, nearRectangle.width, nearRectangle.height);
-            if(farRectangle != null) g.fillRect(farRectangle.x, farRectangle.y, farRectangle.width, farRectangle.height);
+            g.fillRect(farRectangle.x, farRectangle.y, farRectangle.width, farRectangle.height);
         }
     }
 }

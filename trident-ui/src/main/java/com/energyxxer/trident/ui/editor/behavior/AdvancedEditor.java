@@ -383,6 +383,39 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         }
     }
 
+    public void jumpToMatchingBrace() {
+        try {
+            int dot = this.getCaret().getDot();
+            int afterIndex = 0;
+            afterIndex = this.getNextNonWhitespace(dot);
+            char afterChar = '\0';
+            if(afterIndex < this.getDocument().getLength()) {
+                afterChar = this.getDocument().getText(afterIndex, 1).charAt(0);
+            }
+
+            int braceCheckIndex = afterIndex;
+
+            if(!this.getIndentationManager().isBrace(afterChar)) {
+                int beforeIndex = this.getPreviousNonWhitespace(dot);
+                char beforeChar = '\0';
+                if(beforeIndex >= 0 && beforeIndex < this.getDocument().getLength()) {
+                    beforeChar = this.getDocument().getText(beforeIndex, 1).charAt(0);
+                }
+                if(!this.getIndentationManager().isBrace(beforeChar)) return;
+                braceCheckIndex = beforeIndex;
+            }
+
+            int matchingIndex = this.getIndentationManager().getMatchingBraceIndex(braceCheckIndex);
+
+            if(matchingIndex == -1) return;
+            if(matchingIndex > braceCheckIndex) matchingIndex++;
+
+            caret.setPosition(matchingIndex);
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void addCaretPaintListener(@NotNull Runnable runnable) {
         caret.addCaretPaintListener(runnable);
     }

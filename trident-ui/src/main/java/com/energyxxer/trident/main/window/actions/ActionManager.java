@@ -102,6 +102,13 @@ public class ActionManager {
                     Resources::load
                 ).setIconKey("reload")
         );
+        actions.put("JUMP_TO_MATCHING_BRACE",
+                new ProgramAction(
+                        "Jump to Matching Brace", "Set caret position to the selected brace's match",
+                        KeyMap.requestMapping("editor.jump_to_matching_brace", identifierToStrokes("cs+P")).setGroupName("Editor"),
+                        "editor.jump_to_matching_brace"
+                )
+        );
         actions.put("EDITOR_FIND",
                 new ProgramAction(
                     "Find in Editor", "Find all occurrences of a query in the current editor tab",

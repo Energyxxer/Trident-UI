@@ -169,6 +169,10 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
                 reloadFromDisk();
                 break;
             }
+            case "editor.jump_to_matching_brace": {
+                editorComponent.jumpToMatchingBrace();
+                break;
+            }
             case "undo": {
                 editorComponent.getEditManager().undo();
                 break;
