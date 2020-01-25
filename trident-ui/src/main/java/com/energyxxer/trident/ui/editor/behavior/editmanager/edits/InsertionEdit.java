@@ -104,8 +104,9 @@ public class InsertionEdit extends Edit {
         Document doc = editor.getDocument();
         EditorCaret caret = editor.getCaret();
         try {
+            int characterDrift = 0;
             for (int i = 0; i < undoIndices.size(); i++) {
-                int start = undoIndices.get(i);
+                int start = undoIndices.get(i) + characterDrift;
                 int resultEnd = start + writingValues.get(i).length();
 
                 String previousValue = previousValues.get(i);
@@ -115,6 +116,7 @@ public class InsertionEdit extends Edit {
                 final int fstart = start;
                 final int flen = resultEnd - start;
                 final int fplen = previousValue.length();
+                characterDrift += fplen-flen;
 
                 editor.registerCharacterDrift(o -> (o >= fstart) ? ((o <= fstart + flen) ? fstart + fplen : o + (fplen - flen)): o);
             }

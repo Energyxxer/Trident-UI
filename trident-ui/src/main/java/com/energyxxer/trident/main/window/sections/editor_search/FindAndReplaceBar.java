@@ -10,6 +10,7 @@ import com.energyxxer.trident.ui.editor.TridentEditorModule;
 import com.energyxxer.trident.ui.editor.behavior.AdvancedEditor;
 import com.energyxxer.trident.ui.editor.behavior.caret.CaretProfile;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.edits.InsertionEdit;
+import com.energyxxer.trident.ui.editor.behavior.editmanager.edits.PasteEdit;
 import com.energyxxer.trident.ui.scrollbar.OverlayScrollBarUI;
 import com.energyxxer.trident.ui.scrollbar.OverlayScrollPaneLayout;
 import com.energyxxer.trident.ui.styledcomponents.*;
@@ -388,19 +389,35 @@ public class FindAndReplaceBar extends JPanel implements Disposable {
     }
 
     private void replaceSelected() {
-        if(!regions.isEmpty()) {
-            if(selectedIndex != -2) {
-                editor.editorComponent.getCaret().setProfile(new CaretProfile(regions.get(selectedIndex+1), regions.get(selectedIndex)).disableDotMerge());
-                editor.editorComponent.getEditManager().insertEdit(new InsertionEdit(replaceField.getText(), editor.editorComponent));
+        try {
+            if(!regions.isEmpty()) {
+                if(selectedIndex != -2) {
+                    String str;
+                    if(regex) {
+                        str = editor.editorComponent.getDocument().getText(regions.get(selectedIndex), regions.get(selectedIndex+1)-regions.get(selectedIndex));
+                        Pattern pattern = Pattern.compile(findField.getText());
+                        str = pattern.matcher(str).replaceAll(replaceField.getText());
+                    } else {
+                        str = replaceField.getText();
+                    }
+                    editor.editorComponent.getCaret().setProfile(new CaretProfile(regions.get(selectedIndex+1), regions.get(selectedIndex)).disableDotMerge());
+                    editor.editorComponent.getEditManager().insertEdit(new PasteEdit(str, editor.editorComponent));
+                } else {
+                    HintStylizer.style(hint);
+                    hint.setText("No match selected");
+                    hint.show(getLocationForReplacementError(), new TemporaryConfirmation());
+                }
             } else {
                 HintStylizer.style(hint);
-                hint.setText("No match selected");
+                hint.setText("Nothing to replace");
                 hint.show(getLocationForReplacementError(), new TemporaryConfirmation());
             }
-        } else {
+        } catch(IndexOutOfBoundsException | PatternSyntaxException x) {
             HintStylizer.style(hint);
-            hint.setText("Nothing to replace");
+            hint.setText("Regex error: " + x.getMessage());
             hint.show(getLocationForReplacementError(), new TemporaryConfirmation());
+        } catch (BadLocationException e) {
+            e.printStackTrace();
         }
     }
 
@@ -412,22 +429,43 @@ public class FindAndReplaceBar extends JPanel implements Disposable {
     }
 
     private void replaceAll(boolean inSelection) {
-        ArrayList<Integer> toReplace = new ArrayList<>();
-        for (int i = 0; i < regions.size() - 1; i += 2) {
-            int first = regions.get(i);
-            int second = regions.get(i+1);
-            if (!excluded.contains(first) && (!inSelection || editor.editorComponent.getCaret().getProfile().contains(first, second))) {
-                toReplace.add(first);
-                toReplace.add(second);
+        try {
+            ArrayList<Integer> toReplace = new ArrayList<>();
+            ArrayList<String> replacementValues = new ArrayList<>();
+            Pattern pattern = null;
+            String replaceWith = replaceField.getText();
+            for (int i = 0; i < regions.size() - 1; i += 2) {
+                int first = regions.get(i);
+                int second = regions.get(i+1);
+                if (!excluded.contains(first) && (!inSelection || editor.editorComponent.getCaret().getProfile().contains(first, second))) {
+                    toReplace.add(first);
+                    toReplace.add(second);
+                    String str;
+                    if(regex) {
+                        str = editor.editorComponent.getDocument().getText(Math.min(first, second), Math.abs(second-first));
+                        if(pattern == null) pattern = Pattern.compile(findField.getText());
+                        str = pattern.matcher(str).replaceAll(replaceWith);
+                    } else {
+                        str = replaceField.getText();
+                    }
+                    replacementValues.add(str);
+                }
             }
-        }
-        if(!toReplace.isEmpty()) {
-            editor.editorComponent.getCaret().setProfile(new CaretProfile(toReplace).disableDotMerge());
-            editor.editorComponent.getEditManager().insertEdit(new InsertionEdit(replaceField.getText(), editor.editorComponent));
-        } else {
+            if(!toReplace.isEmpty()) {
+                CaretProfile profile = new CaretProfile(toReplace).disableDotMerge();
+                editor.editorComponent.getCaret().setProfile(profile);
+                editor.editorComponent.getEditManager().insertEdit(new PasteEdit(replacementValues.toArray(new String[0]), editor.editorComponent));
+            } else {
+                HintStylizer.style(hint);
+                hint.setText("Nothing to replace");
+                hint.show(getLocationForReplacementError(), new TemporaryConfirmation());
+            }
+        } catch(IndexOutOfBoundsException | PatternSyntaxException x) {
             HintStylizer.style(hint);
-            hint.setText("Nothing to replace");
+            hint.setText("Regex error: " + x.getMessage());
             hint.show(getLocationForReplacementError(), new TemporaryConfirmation());
+        } catch (BadLocationException e) {
+            e.printStackTrace();
         }
     }
 

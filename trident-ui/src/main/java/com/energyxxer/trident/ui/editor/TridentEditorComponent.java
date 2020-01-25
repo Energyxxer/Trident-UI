@@ -7,6 +7,7 @@ import com.energyxxer.enxlex.lexical_analysis.summary.SummaryModule;
 import com.energyxxer.enxlex.lexical_analysis.token.Token;
 import com.energyxxer.enxlex.lexical_analysis.token.TokenSection;
 import com.energyxxer.enxlex.suggestions.SuggestionModule;
+import com.energyxxer.nbtmapper.parser.NBTTMTokens;
 import com.energyxxer.trident.compiler.lexer.TridentTokens;
 import com.energyxxer.trident.compiler.lexer.summaries.TridentSummaryModule;
 import com.energyxxer.trident.compiler.util.TridentProjectSummary;
@@ -281,7 +282,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
                     previousTokenStylesIndex--;
                 }
 
-                if((token.value.contains("{") || token.value.contains("[") || token.value.contains("(") || token.value.contains("}") || token.value.contains("]") || token.value.contains(")")) && !(token.type == TridentTokens.BRACE || token.type == JSONLexerProfile.BRACE)) {
+                if((token.value.contains("{") || token.value.contains("[") || token.value.contains("(") || token.value.contains("}") || token.value.contains("]") || token.value.contains(")")) && !(token.type == TridentTokens.BRACE || token.type == JSONLexerProfile.BRACE || token.type == NBTTMTokens.BRACE)) {
                     sd.setCharacterAttributes(token.loc.index, token.value.length(), getStyle(IndentationManager.NULLIFY_BRACE_STYLE), false);
                 }
 

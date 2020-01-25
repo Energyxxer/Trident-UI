@@ -63,7 +63,7 @@ public class IndentationManager {
     }
 
     public boolean isBalanced() {
-        return getSuggestedIndentationLevelAt(text.length()) == 0;
+        return text == null || getSuggestedIndentationLevelAt(text.length()) == 0;
     }
 
     public boolean match(char opening, char closing) {
