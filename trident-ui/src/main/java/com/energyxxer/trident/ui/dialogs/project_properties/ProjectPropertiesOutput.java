@@ -90,6 +90,17 @@ class ProjectPropertiesOutput extends JPanel {
                 });
                 content.add(datapackOut);
             }
+            //endregion
+
+            //region Clear Data Output
+            {
+                StyledCheckBox exportComments = new StyledCheckBox("Delete data pack output before compiling","ProjectProperties.content");
+                exportComments.setAlignmentX(Component.LEFT_ALIGNMENT);
+                ProjectProperties.addOpenEvent(p -> exportComments.setSelected(p.isClearData()));
+                ProjectProperties.addApplyEvent(p -> p.setClearData(exportComments.isSelected()));
+
+                content.add(exportComments);
+            }
 
             {
                 JPanel margin = new JPanel();
@@ -128,6 +139,17 @@ class ProjectPropertiesOutput extends JPanel {
                     p.setResourcesOut(resourcesOut.getFile());
                 });
                 content.add(resourcesOut);
+            }
+            //endregion
+
+            //region Clear Resource Pack Output
+            {
+                StyledCheckBox exportComments = new StyledCheckBox("Delete resource pack output before compiling","ProjectProperties.content");
+                exportComments.setAlignmentX(Component.LEFT_ALIGNMENT);
+                ProjectProperties.addOpenEvent(p -> exportComments.setSelected(p.isClearResources()));
+                ProjectProperties.addApplyEvent(p -> p.setClearResources(exportComments.isSelected()));
+
+                content.add(exportComments);
             }
 
             {

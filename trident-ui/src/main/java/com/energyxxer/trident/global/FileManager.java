@@ -10,6 +10,7 @@ import com.energyxxer.util.logger.Debug;
 import java.awt.*;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 
@@ -117,6 +118,7 @@ public class FileManager {
     }
 
     public static boolean deleteOrTrashFile(File file) {
+        if(!Files.isWritable(file.toPath())) return false;
         if(FileModuleToken.DELETE_MOVES_TO_TRASH.get()) {
             try {
                 if(Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported((Desktop.Action) Desktop.Action.class.getField("MOVE_TO_TRASH").get(null))) {
@@ -134,6 +136,7 @@ public class FileManager {
     }
 
     public static boolean deleteFolder(File folder) {
+        if(!Files.isWritable(folder.toPath())) return false;
         if(FileModuleToken.DELETE_MOVES_TO_TRASH.get()) {
             try {
                 if(Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported((Desktop.Action) Desktop.Action.class.getField("MOVE_TO_TRASH").get(null))) {

@@ -403,6 +403,30 @@ public class TridentProject implements Project {
         config.addProperty("export-comments", strict);
     }
 
+    public boolean isClearData() {
+        if(config.has("clear-datapack-output") && config.get("clear-datapack-output").isJsonPrimitive() && config.get("clear-datapack-output").getAsJsonPrimitive().isBoolean()) {
+            return config.get("clear-datapack-output").getAsBoolean();
+        }
+        config.addProperty("clear-datapack-output", false);
+        return false;
+    }
+
+    public void setClearData(boolean clear) {
+        config.addProperty("clear-datapack-output", clear);
+    }
+
+    public boolean isClearResources() {
+        if(config.has("clear-resources-output") && config.get("clear-resources-output").isJsonPrimitive() && config.get("clear-resources-output").getAsJsonPrimitive().isBoolean()) {
+            return config.get("clear-resources-output").getAsBoolean();
+        }
+        config.addProperty("clear-resources-output", false);
+        return false;
+    }
+
+    public void setClearResources(boolean clear) {
+        config.addProperty("clear-resources-output", clear);
+    }
+
     public JsonObject getConfig() {
         return config;
     }
