@@ -44,7 +44,7 @@ public class TridentUI {
 			"SOFTWARE.\n";
 
 	public static TridentUI trident;
-	public static final String UI_VERSION = "1.0.0";
+	public static final String UI_VERSION = "1.1.0";
 	public static final String MIXED_VERSION = "u" + UI_VERSION + "c" + TridentCompiler.TRIDENT_LANGUAGE_VERSION;
 	public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
