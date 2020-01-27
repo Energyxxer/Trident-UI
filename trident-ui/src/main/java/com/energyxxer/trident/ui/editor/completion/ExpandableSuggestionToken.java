@@ -136,6 +136,8 @@ public class ExpandableSuggestionToken implements SuggestionToken, ModuleToken {
             return "feature";
         } else if(tags.contains(TridentSuggestionTags.TAG_CUSTOM_ENTITY)) {
             return "custom_entity";
+        } else if(tags.contains(TridentSuggestionTags.TAG_ENTITY_EVENT)) {
+            return "entity_event";
         } else if(tags.contains(TridentSuggestionTags.TAG_CUSTOM_ITEM)) {
             return "custom_item";
         } else if(tags.contains(TridentSuggestionTags.TAG_ITEM)) {
