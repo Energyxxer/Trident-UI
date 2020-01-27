@@ -292,6 +292,7 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
             return dots.size() + " carets";
         } else {
             StringLocation loc = editor.getLocationForOffset(dots.get(0).index);
+            if(loc == null) return "-:-";
             return loc.line + ":" + loc.column;
         }
     }

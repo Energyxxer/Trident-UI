@@ -48,7 +48,7 @@ public class TextLineNumber extends JPanel
 		this.scrollPane = scrollPane;
 		this.minimumDigits = minimumDigits;
 		digitAlignment = RIGHT;
-		setPadding(5);
+		setPadding(10);
 		component.getDocument().addDocumentListener(this);
 		component.addCaretListener( this );
 		component.addCaretPaintListener(this::repaint);
@@ -75,6 +75,8 @@ public class TextLineNumber extends JPanel
 			int width = padding + (digitWidth * digits) + padding;
 
 			setPreferredSize(new Dimension(width, 0));
+
+			lastDigits = digits;
 		}
 	}
 
@@ -239,6 +241,7 @@ public class TextLineNumber extends JPanel
 	{
 		//  View of the component has not been updated at the time
 		//  the DocumentEvent is fired
+		updateWidth();
 		repaint();/*
 		SwingUtilities.invokeLater(new Runnable()
 		{
