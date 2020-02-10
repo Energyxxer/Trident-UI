@@ -31,7 +31,7 @@ public class ProjectPropertiesDefinitions extends JPanel {
 
     private ThemeListenerManager tlm = new ThemeListenerManager();
 
-    private LinkedHashMap<String, DefinitionKeyToken> possiblePacks = new LinkedHashMap<>();
+    private LinkedHashMap<String, ProjectResourceKeyToken> possiblePacks = new LinkedHashMap<>();
 
     private final OrderListMaster master;
 
@@ -108,7 +108,7 @@ public class ProjectPropertiesDefinitions extends JPanel {
                 addBtn.addActionListener(e -> {
                     StyledPopupMenu menu = new StyledPopupMenu("What is supposed to go here?");
 
-                    for(DefinitionKeyToken token : getUnassignedPacks()) {
+                    for(ProjectResourceKeyToken token : getUnassignedPacks()) {
                         StyledMenuItem item = new StyledMenuItem(token.getTitle(), token.getIconName());
 
                         item.addActionListener(aa -> {
@@ -182,7 +182,7 @@ public class ProjectPropertiesDefinitions extends JPanel {
 
             ProjectProperties.addApplyEvent(p -> {
                 List<String> entries = master.getAllElements().stream()
-                        .map(e -> ((DefinitionKeyToken) ((StandardOrderListItem) e).getToken()))
+                        .map(e -> ((ProjectResourceKeyToken) ((StandardOrderListItem) e).getToken()))
                         .map(t -> t.getPackName() == null ? "DEFAULT" : t.getPackName())
                         .collect(Collectors.toList());
 
@@ -207,16 +207,16 @@ public class ProjectPropertiesDefinitions extends JPanel {
         }
     }
 
-    private DefinitionKeyToken getTokenForPack(String packName) {
-        DefinitionKeyToken known = possiblePacks.get(packName);
-        if(known == null) known = new DefinitionKeyToken(packName, DefinitionKeyToken.DefinitionSource.UNKNOWN);
+    private ProjectResourceKeyToken getTokenForPack(String packName) {
+        ProjectResourceKeyToken known = possiblePacks.get(packName);
+        if(known == null) known = new ProjectResourceKeyToken(ProjectResourceKeyToken.Type.DEFINITION_PACK, packName, ProjectResourceKeyToken.Source.UNKNOWN);
         return known;
     }
 
     private void collectPossiblePacks(TridentProject project) {
         possiblePacks.clear();
 
-        possiblePacks.put("DEFAULT", new DefinitionKeyToken(null, DefinitionKeyToken.DefinitionSource.UNKNOWN));
+        possiblePacks.put("DEFAULT", new ProjectResourceKeyToken(ProjectResourceKeyToken.Type.DEFINITION_PACK, null, ProjectResourceKeyToken.Source.UNKNOWN));
 
         //Collect in project
         File inProjectDir = new File(project.getRootDirectory().getPath() + File.separator + "defpacks" + File.separator);
@@ -228,7 +228,7 @@ public class ProjectPropertiesDefinitions extends JPanel {
                     if(packRoot.isFile() && packName.endsWith(".zip")) {
                         packName = packName.substring(0, packName.length() - ".zip".length());
                     }
-                    DefinitionKeyToken token = new DefinitionKeyToken(packName, DefinitionKeyToken.DefinitionSource.PROJECT);
+                    ProjectResourceKeyToken token = new ProjectResourceKeyToken(ProjectResourceKeyToken.Type.DEFINITION_PACK, packName, ProjectResourceKeyToken.Source.PROJECT);
                     possiblePacks.putIfAbsent(packName, token);
                 }
             }
@@ -236,12 +236,12 @@ public class ProjectPropertiesDefinitions extends JPanel {
 
         //Collect from memory
         for(String packName : DefinitionPacks.getAliasMap().keySet()) {
-            possiblePacks.putIfAbsent(packName, new DefinitionKeyToken(packName, DefinitionKeyToken.DefinitionSource.IDE));
+            possiblePacks.putIfAbsent(packName, new ProjectResourceKeyToken(ProjectResourceKeyToken.Type.DEFINITION_PACK, packName, ProjectResourceKeyToken.Source.IDE));
         }
     }
 
-    private Collection<DefinitionKeyToken> getUnassignedPacks() {
-        ArrayList<DefinitionKeyToken> unassignedPacks = new ArrayList<>(possiblePacks.values());
+    private Collection<ProjectResourceKeyToken> getUnassignedPacks() {
+        ArrayList<ProjectResourceKeyToken> unassignedPacks = new ArrayList<>(possiblePacks.values());
         for(OrderListElement elem : master.getAllElements()) {
             unassignedPacks.removeIf(t -> t == ((StandardOrderListItem) elem).getToken());
         }

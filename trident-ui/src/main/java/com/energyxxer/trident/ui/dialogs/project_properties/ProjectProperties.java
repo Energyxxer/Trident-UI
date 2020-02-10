@@ -2,6 +2,7 @@ package com.energyxxer.trident.ui.dialogs.project_properties;
 
 import com.energyxxer.trident.global.temp.projects.TridentProject;
 import com.energyxxer.trident.main.window.TridentWindow;
+import com.energyxxer.trident.main.window.actions.ActionManager;
 import com.energyxxer.trident.ui.styledcomponents.StyledButton;
 import com.energyxxer.trident.ui.styledcomponents.StyledList;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
@@ -54,7 +55,7 @@ public class ProjectProperties {
 			sidebar.setMaximumSize(new Dimension(400, 1));
 			resizer.setResizable(false, false, false, true);
 
-			String[] sections = new String[] { "General", "Output", "Definitions", "Type Aliases", "Dependencies", "Game Logger" };
+			String[] sections = new String[] { "General", "Output", "Definitions", "Type Aliases", "Dependencies", "Game Logger", "Plugins" };
 
 			StyledList<String> navigator = new StyledList<>(sections, "ProjectProperties");
 			sidebar.setBackground(navigator.getBackground());
@@ -89,6 +90,7 @@ public class ProjectProperties {
 		sectionPanes.put("Type Aliases", new ProjectPropertiesAliases());
 		sectionPanes.put("Dependencies", new ProjectPropertiesDependencies());
 		sectionPanes.put("Game Logger", new ProjectPropertiesGameLogger());
+		sectionPanes.put("Plugins", new ProjectPropertiesPlugins());
 
 		contentPane.add(contentGeneral, BorderLayout.CENTER);
 		currentSection = contentGeneral;
@@ -108,6 +110,7 @@ public class ProjectProperties {
 					applyEvents.forEach(ae -> ae.accept(project));
 					project.updateConfig();
 					closeEvents.forEach(Runnable::run);
+					ActionManager.getAction("RELOAD_WORKSPACE").perform();
 				});
 			}
 
@@ -135,6 +138,8 @@ public class ProjectProperties {
 
 				apply.addActionListener(e -> {
 					applyEvents.forEach(ae -> ae.accept(project));
+					project.updateConfig();
+					ActionManager.getAction("RELOAD_WORKSPACE").perform();
 				});
 			}
 

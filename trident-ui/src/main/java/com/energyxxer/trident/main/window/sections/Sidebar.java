@@ -2,6 +2,7 @@ package com.energyxxer.trident.main.window.sections;
 
 import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.main.window.TridentWindow;
+import com.energyxxer.trident.main.window.actions.ActionManager;
 import com.energyxxer.trident.ui.ToolbarButton;
 import com.energyxxer.trident.ui.explorer.ProjectExplorerMaster;
 import com.energyxxer.trident.ui.scrollbar.OverlayScrollPaneLayout;
@@ -68,7 +69,7 @@ public class Sidebar extends OverlayBorderPanel {
             ToolbarButton refresh = new ToolbarButton("reload", tlm);
             refresh.setHintText("Refresh Explorer");
 
-            refresh.addActionListener(e -> TridentWindow.projectExplorer.refresh());
+            refresh.addActionListener(e -> ActionManager.getAction("RELOAD_WORKSPACE").perform());
 
             buttonPanel.add(refresh);
         }

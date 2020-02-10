@@ -6,6 +6,7 @@ import com.energyxxer.trident.compiler.TridentCompilerResources;
 import com.energyxxer.trident.global.temp.projects.TridentProject;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.commodoreresources.DefinitionPacks;
+import com.energyxxer.trident.ui.commodoreresources.TridentPlugins;
 import com.energyxxer.trident.ui.commodoreresources.TypeMaps;
 import com.energyxxer.util.out.Console;
 import com.energyxxer.util.processes.AbstractProcess;
@@ -25,6 +26,7 @@ public class TridentCompilerWrapper extends AbstractProcess {
         resources.definitionPacks = DefinitionPacks.pickPacksForVersion(project.getTargetVersion());
         resources.featureMap = VersionFeatureManager.getFeaturesForVersion(project.getTargetVersion());
         resources.definitionPackAliases = DefinitionPacks.getAliasMap();
+        resources.pluginAliases = TridentPlugins.getAliasMap();
         resources.rawTypeMaps = TypeMaps.pickTypeMapsForVersion(project.getTargetVersion());
 
         compiler.setResources(resources);

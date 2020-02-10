@@ -11,6 +11,7 @@ import com.energyxxer.trident.compiler.TridentProjectWorker;
 import com.energyxxer.trident.compiler.lexer.TridentProductions;
 import com.energyxxer.trident.compiler.util.TridentProjectSummary;
 import com.energyxxer.trident.ui.commodoreresources.DefinitionPacks;
+import com.energyxxer.trident.ui.commodoreresources.TridentPlugins;
 import com.energyxxer.util.Lazy;
 import com.energyxxer.util.StringUtil;
 import com.energyxxer.util.logger.Debug;
@@ -41,6 +42,7 @@ public class TridentProject implements Project {
             TridentCompilerResources resources = new TridentCompilerResources();
             resources.definitionPacks = DefinitionPacks.pickPacksForVersion(getTargetVersion());
             resources.definitionPackAliases = DefinitionPacks.getAliasMap();
+            resources.pluginAliases = TridentPlugins.getAliasMap();
 
             TridentProjectWorker worker = new TridentProjectWorker(rootDirectory);
             worker.setup.setupProductions = true;

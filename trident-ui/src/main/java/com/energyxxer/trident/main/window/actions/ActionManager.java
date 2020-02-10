@@ -17,6 +17,7 @@ import com.energyxxer.trident.main.window.sections.search_path.SearchPathDialog;
 import com.energyxxer.trident.main.window.sections.tools.ConsoleBoard;
 import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.commodoreresources.DefinitionUpdateProcess;
+import com.energyxxer.trident.ui.commodoreresources.TridentPlugins;
 import com.energyxxer.trident.ui.common.ProgramUpdateProcess;
 import com.energyxxer.trident.ui.dialogs.KeyStrokeDialog;
 import com.energyxxer.trident.ui.dialogs.project_properties.ProjectProperties;
@@ -165,7 +166,10 @@ public class ActionManager {
                 new ProgramAction(
                         "Reload Workspace", "Refresh the list of projects",
                         KeyMap.requestMapping("reload_workspace", identifierToStrokes("" + KeyEvent.VK_F5)).setGroupName("Projects"),
-                        TridentWindow.projectExplorer::refresh
+                        () -> {
+                            TridentWindow.projectExplorer.refresh();
+                            TridentPlugins.loadAll();
+                        }
                 ).setIconKey("reload")
         );
         actions.put("CLEAR_RESOURCE_CACHE",

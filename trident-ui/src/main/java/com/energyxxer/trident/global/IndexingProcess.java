@@ -8,6 +8,7 @@ import com.energyxxer.trident.global.temp.projects.CrossbowProject;
 import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.global.temp.projects.TridentProject;
 import com.energyxxer.trident.ui.commodoreresources.DefinitionPacks;
+import com.energyxxer.trident.ui.commodoreresources.TridentPlugins;
 import com.energyxxer.util.logger.Debug;
 import com.energyxxer.util.processes.AbstractProcess;
 
@@ -24,6 +25,7 @@ public class IndexingProcess extends AbstractProcess {
             TridentCompilerResources resources = new TridentCompilerResources();
             resources.definitionPacks = DefinitionPacks.pickPacksForVersion(((TridentProject) project).getTargetVersion());
             resources.definitionPackAliases = DefinitionPacks.getAliasMap();
+            resources.pluginAliases = TridentPlugins.getAliasMap();
             summarizer = new TridentProjectSummarizer(
                     project.getRootDirectory(),
                     resources
