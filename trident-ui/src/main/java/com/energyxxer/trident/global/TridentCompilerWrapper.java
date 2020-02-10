@@ -2,6 +2,7 @@ package com.energyxxer.trident.global;
 
 import com.energyxxer.commodore.versioning.compatibility.VersionFeatureManager;
 import com.energyxxer.trident.compiler.TridentCompiler;
+import com.energyxxer.trident.compiler.TridentCompilerResources;
 import com.energyxxer.trident.global.temp.projects.TridentProject;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.commodoreresources.DefinitionPacks;
@@ -20,11 +21,14 @@ public class TridentCompilerWrapper extends AbstractProcess {
         this.project = project;
 
         compiler = new TridentCompiler(project.getRootDirectory());
-        compiler.setStartingDefinitionPacks(DefinitionPacks.pickPacksForVersion(project.getTargetVersion()));
-        compiler.setStartingFeatureMap(VersionFeatureManager.getFeaturesForVersion(project.getTargetVersion()));
-        compiler.setStartingRawTypeMaps(TypeMaps.pickTypeMapsForVersion(project.getTargetVersion()));
+        TridentCompilerResources resources = new TridentCompilerResources();
+        resources.definitionPacks = DefinitionPacks.pickPacksForVersion(project.getTargetVersion());
+        resources.featureMap = VersionFeatureManager.getFeaturesForVersion(project.getTargetVersion());
+        resources.definitionPackAliases = DefinitionPacks.getAliasMap();
+        resources.rawTypeMaps = TypeMaps.pickTypeMapsForVersion(project.getTargetVersion());
 
-        compiler.setDefinitionPackAliases(DefinitionPacks.getAliasMap());
+        compiler.setResources(resources);
+
         compiler.setSourceCache(project.getSourceCache());
         compiler.setInResourceCache(project.getResourceCache());
         compiler.addCompletionListener((process, success) -> {

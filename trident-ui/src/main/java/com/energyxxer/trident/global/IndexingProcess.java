@@ -2,6 +2,7 @@ package com.energyxxer.trident.global;
 
 import com.energyxxer.crossbow.compiler.util.CrossbowProjectSummarizer;
 import com.energyxxer.enxlex.lexical_analysis.summary.ProjectSummarizer;
+import com.energyxxer.trident.compiler.TridentCompilerResources;
 import com.energyxxer.trident.compiler.util.TridentProjectSummarizer;
 import com.energyxxer.trident.global.temp.projects.CrossbowProject;
 import com.energyxxer.trident.global.temp.projects.Project;
@@ -20,10 +21,12 @@ public class IndexingProcess extends AbstractProcess {
         super("Indexing");
         this.project = project;
         if(project instanceof TridentProject) {
+            TridentCompilerResources resources = new TridentCompilerResources();
+            resources.definitionPacks = DefinitionPacks.pickPacksForVersion(((TridentProject) project).getTargetVersion());
+            resources.definitionPackAliases = DefinitionPacks.getAliasMap();
             summarizer = new TridentProjectSummarizer(
                     project.getRootDirectory(),
-                    DefinitionPacks.pickPacksForVersion(((TridentProject) project).getTargetVersion()),
-                    DefinitionPacks.getAliasMap()
+                    resources
             );
             summarizer.setSourceCache(project.getSourceCache());
             summarizer.addCompletionListener(() -> {

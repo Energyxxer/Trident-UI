@@ -10,6 +10,7 @@ import com.energyxxer.enxlex.suggestions.SuggestionModule;
 import com.energyxxer.nbtmapper.parser.NBTTMTokens;
 import com.energyxxer.trident.compiler.lexer.TridentTokens;
 import com.energyxxer.trident.compiler.lexer.summaries.TridentSummaryModule;
+import com.energyxxer.trident.compiler.lexer.syntaxlang.TDNMetaLexerProfile;
 import com.energyxxer.trident.compiler.util.TridentProjectSummary;
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.Preferences;
@@ -70,7 +71,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
         sd = this.getStyledDocument();
 
         //if(Lang.getLangForFile(parent.associatedTab.path) != null) this.inspector = new Inspector(this);
-        if(parent.file != null && parent.getLanguage() == Lang.TRIDENT) {
+        if(parent.file != null && parent.getLanguage() != null && parent.getLanguage().getParserProduction() != null) {
             this.inspector = new Inspector(this);
         }
 
@@ -201,6 +202,11 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
             Token prevToken = null;
             ArrayList<String> previousTokenStyles = new ArrayList<>();
 
+            if(this.inspector != null) {
+                this.inspector.inspect(analysis.lexer.getStream());
+                this.inspector.insertNotices(analysis.notices);
+            }
+
             if(analysis.response != null && !analysis.response.matched) {
                 errorStatus.setMessage(analysis.response.getErrorMessage() + (analysis.response.faultyToken != null ? ". (line " + analysis.response.faultyToken.loc.line + " column " + analysis.response.faultyToken.loc.column + ")" : ""));
                 TridentWindow.setStatus(errorStatus);
@@ -282,7 +288,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
                     previousTokenStylesIndex--;
                 }
 
-                if((token.value.contains("{") || token.value.contains("[") || token.value.contains("(") || token.value.contains("}") || token.value.contains("]") || token.value.contains(")")) && !(token.type == TridentTokens.BRACE || token.type == JSONLexerProfile.BRACE || token.type == NBTTMTokens.BRACE)) {
+                if((token.value.contains("{") || token.value.contains("[") || token.value.contains("(") || token.value.contains("}") || token.value.contains("]") || token.value.contains(")")) && !(token.type == TridentTokens.BRACE || token.type == JSONLexerProfile.BRACE || token.type == NBTTMTokens.BRACE || token.type == TDNMetaLexerProfile.BRACE)) {
                     sd.setCharacterAttributes(token.loc.index, token.value.length(), getStyle(IndentationManager.NULLIFY_BRACE_STYLE), false);
                 }
 
@@ -290,13 +296,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
             }
             previousTokenStyles.clear();
 
-            if(this.inspector != null) {
-                this.inspector.inspect(analysis.lexer.getStream());
-                this.inspector.insertNotices(analysis.notices);
-            }
-
-
-            TridentWindow.dismissStatus(errorStatus);
+            if(analysis.response == null || analysis.response.matched) TridentWindow.dismissStatus(errorStatus);
 
             //sd.setCharacterAttributes(81, 119, getStyle("do_not_display"), true);
         });

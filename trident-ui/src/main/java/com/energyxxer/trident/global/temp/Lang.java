@@ -21,6 +21,8 @@ import com.energyxxer.nbtmapper.parser.NBTTMLexerProfile;
 import com.energyxxer.nbtmapper.parser.NBTTMProductions;
 import com.energyxxer.trident.compiler.TridentCompiler;
 import com.energyxxer.trident.compiler.lexer.TridentLexerProfile;
+import com.energyxxer.trident.compiler.lexer.syntaxlang.TDNMetaLexerProfile;
+import com.energyxxer.trident.compiler.lexer.syntaxlang.TDNMetaProductions;
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.temp.lang_defaults.parsing.MCFunctionProductions;
 import com.energyxxer.trident.global.temp.lang_defaults.presets.JSONLexerProfile;
@@ -56,6 +58,11 @@ public class Lang {
             Commons::getActiveTridentProductions,
             "tdn"
     ) {{this.putProperty("line_comment_marker","#");}};
+    public static final Lang TRIDENT_META = new Lang("TRIDENT_META",
+            TDNMetaLexerProfile::new,
+            () -> TDNMetaProductions.FILE,
+            "tdnmeta"
+    ) {{this.putProperty("line_comment_marker","//");}};
     public static final Lang CROSSBOW = new Lang("CROSSBOW",
             CrossbowLexerProfile.INSTANCE::getValue,
             Commons::getActiveCrossbowProductions,
@@ -143,6 +150,7 @@ public class Lang {
 
             tokens = new ArrayList<>(lexer.getStream().tokens);
             tokens.remove(0);
+            tokens.removeIf(token -> !token.type.isSignificant());
 
             if(patternMatch != null) {
 
@@ -154,7 +162,7 @@ public class Lang {
             }
         }
 
-        return new LangAnalysisResponse(lexer, response, tokens, notices);
+        return new LangAnalysisResponse(lexer, response, lexer.getStream().tokens, notices);
     }
 
     @Override

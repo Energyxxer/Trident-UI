@@ -1,15 +1,15 @@
 package com.energyxxer.trident.global.temp.projects;
 
-import com.energyxxer.commodore.module.CommandModule;
 import com.energyxxer.commodore.module.Namespace;
 import com.energyxxer.commodore.versioning.JavaEditionVersion;
 import com.energyxxer.enxlex.lexical_analysis.summary.ProjectSummary;
 import com.energyxxer.enxlex.pattern_matching.ParsingSignature;
 import com.energyxxer.enxlex.pattern_matching.matching.lazy.LazyTokenPatternMatch;
 import com.energyxxer.trident.compiler.TridentCompiler;
+import com.energyxxer.trident.compiler.TridentCompilerResources;
+import com.energyxxer.trident.compiler.TridentProjectWorker;
 import com.energyxxer.trident.compiler.lexer.TridentProductions;
 import com.energyxxer.trident.compiler.util.TridentProjectSummary;
-import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.ui.commodoreresources.DefinitionPacks;
 import com.energyxxer.util.Lazy;
 import com.energyxxer.util.StringUtil;
@@ -17,7 +17,10 @@ import com.energyxxer.util.logger.Debug;
 import com.google.gson.*;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -33,16 +36,23 @@ public class TridentProject implements Project {
     private final File resourceCacheFile;
     private String name;
 
-    public final Lazy<CommandModule> module = new Lazy<>(() -> {
+    private final Lazy<TridentProductions> productions = new Lazy<>(() -> {
         try {
-            return TridentCompiler.createModuleForProject(getName(), rootDirectory, DefinitionPacks.pickPacksForVersion(getTargetVersion()), DefinitionPacks.getAliasMap());
+            TridentCompilerResources resources = new TridentCompilerResources();
+            resources.definitionPacks = DefinitionPacks.pickPacksForVersion(getTargetVersion());
+            resources.definitionPackAliases = DefinitionPacks.getAliasMap();
+
+            TridentProjectWorker worker = new TridentProjectWorker(rootDirectory);
+            worker.setup.setupProductions = true;
+            worker.setResources(resources);
+            worker.work();
+            return worker.output.productions;
         } catch(IOException x) {
             Debug.log("Exception while creating module: " + x.toString(), Debug.MessageType.ERROR);
+            x.printStackTrace();
+            return null;
         }
-        return Commons.getDefaultModule();
     });
-
-    private final Lazy<TridentProductions> productions = new Lazy<>(() -> new TridentProductions(module.getValue()));
 
     private JsonObject config;
     private JavaEditionVersion targetVersion = null;
