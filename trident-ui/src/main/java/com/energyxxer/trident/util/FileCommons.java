@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,15 +53,21 @@ public class FileCommons {
     }
 
     public static boolean copyFiles(File[] filesToCopy, File destination) {
+        return copyFiles(filesToCopy, destination, new HashSet<>());
+    }
+
+    public static boolean copyFiles(File[] filesToCopy, File destination, HashSet<File> copiedTo) {
         if(filesToCopy == null) return true;
         try {
             for(File file : filesToCopy) {
+                if(copiedTo.contains(file)) continue;
                 Path destinationFile = createCopyFileName(destination.toPath().resolve(file.getName()).toFile()).toPath();
+                copiedTo.add(destinationFile.toFile());
 
                 Files.copy(file.toPath(), destinationFile);
 
                 if(file.isDirectory()) {
-                    copyFiles(file.listFiles(), destinationFile.toFile());
+                    copyFiles(file.listFiles(), destinationFile.toFile(), copiedTo);
                 }
             }
         } catch (IOException x) {
