@@ -1,8 +1,7 @@
 package com.energyxxer.trident.main;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Paths;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 
 public class TestEntry {
 
@@ -26,17 +25,8 @@ public class TestEntry {
     }
 
     public static void main(String[] args) {
-        System.out.println(System.getProperty("java.version"));
-        System.out.println(getJavaVersion() == 8);
 
+        System.out.println(new Gson().fromJson("", JsonElement.class));
 
-        String javaPath = System.getProperty("java.home")
-                + File.separator + "bin" + File.separator + "java";
-        ProcessBuilder pb = new ProcessBuilder(javaPath, "-jar", Paths.get("C:\\Users\\PC\\Desktop\\temp\\Trident-UI u0_1_0c0_5_0-beta.jar").toString());
-        try {
-            pb.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

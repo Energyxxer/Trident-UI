@@ -77,7 +77,7 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
             i.render(g);
         }
 
-        Dimension newSize = new Dimension(contentWidth, offsetY + rowHeight);
+        Dimension newSize = new Dimension(contentWidth, offsetY);
         if(!newSize.equals(this.getPreferredSize())) {
             this.setPreferredSize(newSize);
             this.getParent().revalidate();
