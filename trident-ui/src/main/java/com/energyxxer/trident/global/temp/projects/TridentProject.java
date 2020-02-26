@@ -10,6 +10,7 @@ import com.energyxxer.trident.compiler.TridentCompilerResources;
 import com.energyxxer.trident.compiler.TridentProjectWorker;
 import com.energyxxer.trident.compiler.lexer.TridentProductions;
 import com.energyxxer.trident.compiler.util.TridentProjectSummary;
+import com.energyxxer.trident.main.TridentUI;
 import com.energyxxer.trident.ui.commodoreresources.DefinitionPacks;
 import com.energyxxer.trident.ui.commodoreresources.TridentPlugins;
 import com.energyxxer.util.Lazy;
@@ -18,10 +19,7 @@ import com.energyxxer.util.logger.Debug;
 import com.google.gson.*;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -106,8 +104,8 @@ public class TridentProject implements Project {
 
         resourceCacheFile = rootDirectory.toPath().resolve(".tdnui").resolve("resource_cache").toFile();
         if(resourceCacheFile.exists() && resourceCacheFile.isFile()) {
-            try(FileReader fr = new FileReader(resourceCacheFile)) {
-                JsonObject jsonObject = new Gson().fromJson(fr, JsonObject.class);
+            try(InputStreamReader isr = new InputStreamReader(new FileInputStream(resourceCacheFile), TridentUI.DEFAULT_CHARSET)) {
+                JsonObject jsonObject = new Gson().fromJson(isr, JsonObject.class);
                 if(jsonObject != null) {
                     for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
                         try {
@@ -123,8 +121,8 @@ public class TridentProject implements Project {
         }
 
         if(config.exists() && config.isFile()) {
-            try(FileReader fr = new FileReader(config)) {
-                this.config = new Gson().fromJson(fr, JsonObject.class);
+            try(InputStreamReader isr = new InputStreamReader(new FileInputStream(config), TridentUI.DEFAULT_CHARSET)) {
+                this.config = new Gson().fromJson(isr, JsonObject.class);
 
                 if(this.config.has("target-version") && this.config.get("target-version").isJsonArray()) {
                     JsonArray arr = this.config.getAsJsonArray("target-version");
