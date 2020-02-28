@@ -10,6 +10,7 @@ import com.energyxxer.xswing.XFileField;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.nio.file.InvalidPathException;
 
 class ProjectPropertiesOutput extends JPanel {
 
@@ -81,7 +82,12 @@ class ProjectPropertiesOutput extends JPanel {
                 datapackOut.setMaximumSize(new Dimension(datapackOut.getMaximumSize().width,25));
                 datapackOut.setAlignmentX(Component.LEFT_ALIGNMENT);
                 ProjectProperties.addOpenEvent(p -> {
-                    File file = p.getDataOut();
+                    File file;
+                    try {
+                        file = p.getDataOut();
+                    } catch(InvalidPathException x) {
+                        file = null;
+                    }
                     if(file == null) file = new File(System.getProperty("user.home") + File.separator + "Trident" + File.separator + "out" + File.separator + p.getName());
                     datapackOut.setFile(file);
                 });
@@ -128,7 +134,12 @@ class ProjectPropertiesOutput extends JPanel {
                 resourcesOut.setMaximumSize(new Dimension(resourcesOut.getMaximumSize().width,25));
                 resourcesOut.setAlignmentX(Component.LEFT_ALIGNMENT);
                 ProjectProperties.addOpenEvent(p -> {
-                    File file = p.getResourcesOut();
+                    File file;
+                    try {
+                        file = p.getResourcesOut();
+                    } catch(InvalidPathException x) {
+                        file = null;
+                    }
                     if(file == null) file = new File(System.getProperty("user.home") + File.separator + "Trident" + File.separator + "out" + File.separator + p.getName() + "-resources.zip");
                     resourcesOut.setFile(file);
                 });

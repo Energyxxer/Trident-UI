@@ -370,7 +370,7 @@ public class TridentProject implements Project {
     public File getDataOut() {
         if(config.has("datapack-output") && config.get("datapack-output").isJsonPrimitive() && config.get("datapack-output").getAsJsonPrimitive().isString()) {
             String path = config.get("datapack-output").getAsString();
-            return new File(path);
+            return TridentCompiler.newFileObject(path, rootDirectory);
         }
         config.remove("datapack-output");
         return null;
@@ -387,7 +387,7 @@ public class TridentProject implements Project {
     public File getResourcesOut() {
         if(config.has("resources-output") && config.get("resources-output").isJsonPrimitive() && config.get("resources-output").getAsJsonPrimitive().isString()) {
             String path = config.get("resources-output").getAsString();
-            return new File(path);
+            return TridentCompiler.newFileObject(path, rootDirectory);
         }
         config.remove("resources-output");
         return null;
