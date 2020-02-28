@@ -199,7 +199,7 @@ public class QuickFindDialog extends JDialog implements WindowFocusListener, Act
                     if(child.isDirectory()) searchInFile(query, child);
                 }
             }
-        } else throw new IllegalArgumentException("file");
+        } else if(file.exists()) throw new IllegalArgumentException("file");
     }
 
     private void addFileResult(File file) {
