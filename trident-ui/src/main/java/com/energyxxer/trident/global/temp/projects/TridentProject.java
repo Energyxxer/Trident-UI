@@ -76,7 +76,15 @@ public class TridentProject implements Project {
 
         Path outFolder = Paths.get(System.getProperty("user.home"), "Trident", "out");
 
+        JavaEditionVersion latestVersion = DefinitionPacks.getLatestKnownJavaVersion();
+        if(latestVersion == null) latestVersion = new JavaEditionVersion(1, 13, 0);
+        JsonArray latestVersionArr = new JsonArray(3);
+        latestVersionArr.add(latestVersion.getMajor());
+        latestVersionArr.add(latestVersion.getMinor());
+        latestVersionArr.add(latestVersion.getPatch());
+
         config = new JsonObject();
+        config.add("target-version", latestVersionArr);
         config.addProperty("default-namespace", StringUtil.getInitials(name).toLowerCase());
         config.addProperty("language-level", 1);
         config.addProperty("datapack-output", outFolder.resolve(name).toString());

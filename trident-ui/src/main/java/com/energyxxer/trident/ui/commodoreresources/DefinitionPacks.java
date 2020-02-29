@@ -125,6 +125,14 @@ public class DefinitionPacks {
         return latestMatch != null ? new DefinitionPack[] {latestMatch.getValue()} : null;
     }
 
+    public static JavaEditionVersion getLatestKnownJavaVersion() {
+        return latestKnownJavaVersion;
+    }
+
+    public static BedrockEditionVersion getLatestKnownBedrockVersion() {
+        return latestKnownBedrockVersion;
+    }
+
     public static Map<String, DefinitionPack> getAliasMap() {
         return loadedDefinitionPacks;
     }

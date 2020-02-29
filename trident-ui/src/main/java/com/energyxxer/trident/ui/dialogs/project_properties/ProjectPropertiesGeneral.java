@@ -1,7 +1,6 @@
 package com.energyxxer.trident.ui.dialogs.project_properties;
 
 import com.energyxxer.commodore.versioning.JavaEditionVersion;
-import com.energyxxer.commodore.versioning.Version;
 import com.energyxxer.trident.ui.commodoreresources.DefinitionPacks;
 import com.energyxxer.trident.ui.styledcomponents.*;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
@@ -74,11 +73,8 @@ class ProjectPropertiesGeneral extends JPanel {
             }
             {
                 JavaEditionVersion[] knownVersions = DefinitionPacks.getKnownJavaVersions();
-                JavaEditionVersion[] shownVersions = new JavaEditionVersion[knownVersions.length+1];
-                shownVersions[0] = new UnsetVersion();
-                System.arraycopy(knownVersions, 0, shownVersions, 1, knownVersions.length);
 
-                StyledDropdownMenu<JavaEditionVersion> versionDropdown = new StyledDropdownMenu<>(shownVersions, "ProjectProperties");
+                StyledDropdownMenu<JavaEditionVersion> versionDropdown = new StyledDropdownMenu<>(knownVersions, "ProjectProperties");
                 versionDropdown.setPopupFactory(StyledPopupMenu::new);
                 versionDropdown.setPopupItemFactory(StyledMenuItem::new);
                 ProjectProperties.addOpenEvent(p -> {
@@ -86,11 +82,7 @@ class ProjectPropertiesGeneral extends JPanel {
                 });
                 ProjectProperties.addApplyEvent(p -> {
                     JavaEditionVersion value = versionDropdown.getValue();
-                    if(value instanceof UnsetVersion) {
-                        p.setTargetVersion(null);
-                    } else {
-                        p.setTargetVersion(value);
-                    }
+                    p.setTargetVersion(value);
                 });
                 content.add(versionDropdown);
             }
@@ -225,21 +217,5 @@ class ProjectPropertiesGeneral extends JPanel {
 
     ProjectPropertiesGeneral() {
         super(new BorderLayout());
-    }
-
-    private static class UnsetVersion extends JavaEditionVersion {
-        public UnsetVersion() {
-            super(0, 0, 0);
-        }
-
-        @Override
-        public boolean isComparableWith(Version other) {
-            return false;
-        }
-
-        @Override
-        public String toString() {
-            return "Unset";
-        }
     }
 }
