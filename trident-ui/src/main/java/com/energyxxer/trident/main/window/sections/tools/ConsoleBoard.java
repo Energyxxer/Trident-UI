@@ -238,6 +238,12 @@ public class ConsoleBoard extends ToolBoard {
     }
 
     @Override
+    public void open() {
+        super.open();
+        inputField.requestFocus();
+    }
+
+    @Override
     public String getName() {
         return "Console";
     }
