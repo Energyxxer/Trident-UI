@@ -62,6 +62,23 @@ public class ProjectExplorerMaster extends StyledExplorerMaster implements DropT
             @NotNull
             @Override
             protected Transferable createTransferable(JComponent c) {
+                if(pressConsumed) return new Transferable() {
+                    @Override
+                    public DataFlavor[] getTransferDataFlavors() {
+                        return new DataFlavor[0];
+                    }
+
+                    @Override
+                    public boolean isDataFlavorSupported(DataFlavor flavor) {
+                        return false;
+                    }
+
+                    @NotNull
+                    @Override
+                    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+                        throw new UnsupportedFlavorException(flavor);
+                    }
+                };
                 Collection<DraggableExplorerModuleToken> tokens = selectedItems.stream().filter(i -> i.getToken() instanceof DraggableExplorerModuleToken).map(i -> ((DraggableExplorerModuleToken) i.getToken())).collect(Collectors.toList());
                 Object[] rawFlavors = tokens.stream().map(DraggableExplorerModuleToken::getDataFlavor).distinct().toArray();
                 DataFlavor[] flavors = Arrays.copyOf(rawFlavors, rawFlavors.length, DataFlavor[].class);

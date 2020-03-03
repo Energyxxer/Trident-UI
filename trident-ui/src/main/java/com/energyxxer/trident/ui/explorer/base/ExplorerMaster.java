@@ -32,6 +32,7 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
 
     protected MouseEvent pressedEvent = null;
     protected ExplorerElement dragStart = null;
+    protected boolean pressConsumed = false;
     protected boolean transferStarted = false;
 
     private ArrayList<ModuleToken> expandedElements = new ArrayList<>();
@@ -139,6 +140,7 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
             repaint();
         }
         transferStarted = false;
+        pressConsumed = e.isConsumed();
     }
 
     @Override
@@ -148,6 +150,7 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
         dragStart = null;
         pressedEvent = null;
         transferStarted = false;
+        pressConsumed = false;
     }
 
     @Override
