@@ -13,6 +13,7 @@ import com.energyxxer.trident.ui.styledcomponents.Padding;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.Disposable;
+import com.energyxxer.xswing.ScalableDimension;
 import com.energyxxer.xswing.hints.Hint;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,13 +36,13 @@ public class SettingsSnippets extends JPanel implements ContentSwapper {
     {
         {
             JPanel header = new JPanel(new BorderLayout());
-            header.setPreferredSize(new Dimension(0,40));
+            header.setPreferredSize(new ScalableDimension(0,40));
             this.add(header, BorderLayout.NORTH);
 
             {
                 JPanel padding = new JPanel();
                 padding.setOpaque(false);
-                padding.setPreferredSize(new Dimension(25,25));
+                padding.setPreferredSize(new ScalableDimension(25,25));
                 header.add(padding, BorderLayout.WEST);
             }
 
@@ -73,9 +74,9 @@ public class SettingsSnippets extends JPanel implements ContentSwapper {
             controls.add(new ToolbarButton("add", tlm) {
                 {
                     this.setHintText("Add");
-                    this.setPreferredSize(new Dimension(24, 24));
-                    this.setMinimumSize(new Dimension(24, 24));
-                    this.setMaximumSize(new Dimension(24, 24));
+                    this.setPreferredSize(new ScalableDimension(24, 24));
+                    this.setMinimumSize(new ScalableDimension(24, 24));
+                    this.setMaximumSize(new ScalableDimension(24, 24));
                     this.setPreferredHintPos(Hint.LEFT);
                 }
 
@@ -93,9 +94,9 @@ public class SettingsSnippets extends JPanel implements ContentSwapper {
             controls.add(new ToolbarButton("toggle", tlm) {
                 {
                     this.setHintText("Remove");
-                    this.setPreferredSize(new Dimension(24, 24));
-                    this.setMinimumSize(new Dimension(24, 24));
-                    this.setMaximumSize(new Dimension(24, 24));
+                    this.setPreferredSize(new ScalableDimension(24, 24));
+                    this.setMinimumSize(new ScalableDimension(24, 24));
+                    this.setMaximumSize(new ScalableDimension(24, 24));
                     this.setPreferredHintPos(Hint.LEFT);
                 }
 
@@ -117,9 +118,9 @@ public class SettingsSnippets extends JPanel implements ContentSwapper {
             controls.add(new ToolbarButton("copy", tlm) {
                 {
                     this.setHintText("Duplicate");
-                    this.setPreferredSize(new Dimension(24, 24));
-                    this.setMinimumSize(new Dimension(24, 24));
-                    this.setMaximumSize(new Dimension(24, 24));
+                    this.setPreferredSize(new ScalableDimension(24, 24));
+                    this.setMinimumSize(new ScalableDimension(24, 24));
+                    this.setMaximumSize(new ScalableDimension(24, 24));
                     this.setPreferredHintPos(Hint.LEFT);
                 }
 

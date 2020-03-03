@@ -5,10 +5,7 @@ import com.energyxxer.trident.ui.styledcomponents.StyledButton;
 import com.energyxxer.trident.ui.styledcomponents.StyledList;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.ImageManager;
-import com.energyxxer.xswing.ComponentResizer;
-import com.energyxxer.xswing.OverlayBorderLayout;
-import com.energyxxer.xswing.OverlayBorderPanel;
-import com.energyxxer.xswing.Padding;
+import com.energyxxer.xswing.*;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -34,7 +31,7 @@ public class Settings {
 
 	static {
 		JPanel pane = new JPanel(new OverlayBorderLayout());
-		pane.setPreferredSize(new Dimension(900,600));
+		pane.setPreferredSize(new ScalableDimension(900,600));
 		tlm.addThemeChangeListener(t ->
 				pane.setBackground(t.getColor(new Color(235, 235, 235), "Settings.background"))
 		);
@@ -46,8 +43,8 @@ public class Settings {
 			JPanel sidebar = new OverlayBorderPanel(new BorderLayout(), new Insets(0, 0, 0, ComponentResizer.DIST));
 
 			ComponentResizer sidebarResizer = new ComponentResizer(sidebar);
-			sidebar.setMinimumSize(new Dimension(25, 1));
-			sidebar.setMaximumSize(new Dimension(400, 1));
+			sidebar.setMinimumSize(new ScalableDimension(25, 1));
+			sidebar.setMaximumSize(new ScalableDimension(400, 1));
 			sidebarResizer.setResizable(false, false, false, true);
 
 			String[] sections = new String[] { "Behavior", "Appearance", "Editor", "Snippets", "Keymap" };
@@ -58,7 +55,7 @@ public class Settings {
 					sidebar.setBorder(new CompoundBorder(BorderFactory.createEmptyBorder(0, 0, 0, ComponentResizer.DIST), BorderFactory.createMatteBorder(0, 0, 0, Math.max(t.getInteger(1,"Settings.content.border.thickness"),0), t.getColor(new Color(200, 200, 200), "Settings.content.border.color"))))
 			);
 			sidebar.setOpaque(false);
-			navigator.setPreferredSize(new Dimension(200,500));
+			navigator.setPreferredSize(new ScalableDimension(200,500));
 
 			navigator.addListSelectionListener(o -> {
 				contentPane.remove(currentSection);
@@ -89,12 +86,12 @@ public class Settings {
 
 		{
 			JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-			buttons.setPreferredSize(new Dimension(0,60));
+			buttons.setPreferredSize(new ScalableDimension(0,60));
 			tlm.addThemeChangeListener(t -> buttons.setBackground(contentPane.getBackground()));
 
 			{
 				StyledButton okay = new StyledButton("OK", "Settings.okButton", tlm);
-				tlm.addThemeChangeListener(t -> okay.setPreferredSize(new Dimension(Math.max(t.getInteger(75,"Settings.okButton.width"),10), Math.max(t.getInteger(25,"Settings.okButton.height"),10))));
+				tlm.addThemeChangeListener(t -> okay.setPreferredSize(new ScalableDimension(Math.max(t.getInteger(75,"Settings.okButton.width"),10), Math.max(t.getInteger(25,"Settings.okButton.height"),10))));
 				buttons.add(okay);
 
 				okay.addActionListener(e -> {
@@ -106,7 +103,7 @@ public class Settings {
 
 			{
 				StyledButton cancel = new StyledButton("Cancel", "Settings.cancelButton", tlm);
-				tlm.addThemeChangeListener(t -> cancel.setPreferredSize(new Dimension(Math.max(t.getInteger(75,"Settings.cancelButton.width"),10), Math.max(t.getInteger(25,"Settings.cancelButton.height"),10))));
+				tlm.addThemeChangeListener(t -> cancel.setPreferredSize(new ScalableDimension(Math.max(t.getInteger(75,"Settings.cancelButton.width"),10), Math.max(t.getInteger(25,"Settings.cancelButton.height"),10))));
 				buttons.add(cancel);
 
 				pane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");
@@ -122,7 +119,7 @@ public class Settings {
 
 			{
 				StyledButton apply = new StyledButton("Apply", "Settings.applyButton", tlm);
-				tlm.addThemeChangeListener(t -> apply.setPreferredSize(new Dimension(Math.max(t.getInteger(75,"Settings.applyButton.width"),10), Math.max(t.getInteger(25,"Settings.applyButton.height"),10))));
+				tlm.addThemeChangeListener(t -> apply.setPreferredSize(new ScalableDimension(Math.max(t.getInteger(75,"Settings.applyButton.width"),10), Math.max(t.getInteger(25,"Settings.applyButton.height"),10))));
 				buttons.add(apply);
 
 				apply.addActionListener(e -> {

@@ -8,6 +8,7 @@ import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
 import com.energyxxer.trident.ui.theme.Theme;
 import com.energyxxer.trident.util.ImageUtil;
 import com.energyxxer.util.StringUtil;
+import com.energyxxer.xswing.ScalableGraphics2D;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -72,7 +73,7 @@ public class TabItem extends TabListElement {
 
         this.x = master.getOffsetX();
         this.lastRecordedOffset = x;
-        int h = master.getHeight();
+        int h = (int)Math.floor(master.getHeight() / ScalableGraphics2D.SCALE_FACTOR);
         int w = iconOnly ? (Math.max(32, h)) + (token.isTabCloseable() ? 16 : 0) : 8 + 16 + 2 + fm.stringWidth(this.name) + 10 + 6 + 15;
 
         /*
@@ -120,7 +121,7 @@ public class TabItem extends TabListElement {
             }
         }
 
-        if(icon != null) g.drawImage(icon, offsetX + (iconOnly ? h/2 : 16) - icon.getWidth(null)/2, (h-16)/2 + 8 - icon.getHeight(null)/2, null);
+        if(icon != null) g.drawImage(icon, offsetX + (iconOnly ? h/2 : 16) - 16/2, (h-16)/2 + 8 - 16/2, 16, 16, null);
         if(iconOnly) {
             offsetX += 24;
         } else {

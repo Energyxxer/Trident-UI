@@ -21,6 +21,7 @@ import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenuItem;
 import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
+import com.energyxxer.xswing.ScalableDimension;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -39,13 +40,13 @@ public class SettingsKeymap extends JPanel {
     {
         {
             JPanel header = new JPanel(new BorderLayout());
-            header.setPreferredSize(new Dimension(0,40));
+            header.setPreferredSize(new ScalableDimension(0,40));
             this.add(header, BorderLayout.NORTH);
 
             {
                 JPanel padding = new JPanel();
                 padding.setOpaque(false);
-                padding.setPreferredSize(new Dimension(25,25));
+                padding.setPreferredSize(new ScalableDimension(25,25));
                 header.add(padding, BorderLayout.WEST);
             }
 

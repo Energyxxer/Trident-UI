@@ -24,7 +24,7 @@ public class XFileField extends JPanel {
 		setOpaque(false);
 		field = new XTextField();
 		button = new XButton("Browse...");
-		button.setPreferredSize(new Dimension(100,25));
+		button.setPreferredSize(new ScalableDimension(100,25));
 
 		button.addActionListener(e -> {
 

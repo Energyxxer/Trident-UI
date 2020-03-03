@@ -8,6 +8,7 @@ import com.energyxxer.trident.ui.modules.ModuleToken;
 import com.energyxxer.trident.ui.modules.NonStandardModuleToken;
 import com.energyxxer.trident.ui.theme.Theme;
 import com.energyxxer.trident.util.ImageUtil;
+import com.energyxxer.xswing.ScalableGraphics2D;
 
 import javax.swing.*;
 import java.awt.*;
@@ -100,16 +101,18 @@ public class StandardExplorerItem extends ExplorerElement {
 
         this.x = master.getIndentation() * master.getIndentPerLevel() + master.getInitialIndent();
 
+        int w = (int)(master.getWidth() / ScalableGraphics2D.SCALE_FACTOR);
+
         int x = this.x;
 
         g.setColor((this.rollover || this.selected) ? master.getColors().get("item.rollover.background") : master.getColors().get("item.background"));
-        g.fillRect(0, master.getOffsetY(), master.getWidth(), master.getRowHeight());
+        g.fillRect(0, master.getOffsetY(), w, master.getRowHeight());
         if(this.selected) {
             g.setColor(master.getColors().get("item.selected.background"));
 
             switch(master.getSelectionStyle()) {
                 case "FULL": {
-                    g.fillRect(0, master.getOffsetY(), master.getWidth(), master.getRowHeight());
+                    g.fillRect(0, master.getOffsetY(), w, master.getRowHeight());
                     break;
                 }
                 case "LINE_LEFT": {
@@ -117,15 +120,15 @@ public class StandardExplorerItem extends ExplorerElement {
                     break;
                 }
                 case "LINE_RIGHT": {
-                    g.fillRect(master.getWidth() - master.getSelectionLineThickness(), master.getOffsetY(), master.getSelectionLineThickness(), master.getRowHeight());
+                    g.fillRect(w - master.getSelectionLineThickness(), master.getOffsetY(), master.getSelectionLineThickness(), master.getRowHeight());
                     break;
                 }
                 case "LINE_TOP": {
-                    g.fillRect(0, master.getOffsetY(), master.getWidth(), master.getSelectionLineThickness());
+                    g.fillRect(0, master.getOffsetY(), w, master.getSelectionLineThickness());
                     break;
                 }
                 case "LINE_BOTTOM": {
-                    g.fillRect(0, master.getOffsetY() + master.getRowHeight() - master.getSelectionLineThickness(), master.getWidth(), master.getSelectionLineThickness());
+                    g.fillRect(0, master.getOffsetY() + master.getRowHeight() - master.getSelectionLineThickness(), w, master.getSelectionLineThickness());
                     break;
                 }
             }
@@ -137,16 +140,16 @@ public class StandardExplorerItem extends ExplorerElement {
         //Expand/Collapse button
         if (token.isExpandable()) {
             if (expanded) {
-                g.drawImage(master.getAssetMap().get("collapse"), x, y + margin, 16, 16, new Color(0, 0, 0, 0), null);
+                g.drawImage(master.getAssetMap().get("collapse"), x, y + margin, 16, 16, null);
             } else {
-                g.drawImage(master.getAssetMap().get("expand"), x, y + margin, 16, 16, new Color(0, 0, 0, 0), null);
+                g.drawImage(master.getAssetMap().get("expand"), x, y + margin, 16, 16, null);
             }
         }
 
         //File Icon
         if (icon != null) {
             x += 23;
-            g.drawImage(this.icon, x + 8 - icon.getWidth(null) / 2, y + margin + 8 - icon.getHeight(null) / 2, null);
+            g.drawImage(this.icon, x + 8 - 16 / 2, y + margin + 8 - 16 / 2, 16, 16, null);
         }
 
         //File Name
@@ -177,8 +180,8 @@ public class StandardExplorerItem extends ExplorerElement {
             File projectRoot = token.getAssociatedProjectRoot();
             if(projectRoot != null) {
                 String projectName = projectRoot.getName();
-                int projectNameX = master.getWidth() - metrics.stringWidth(projectName) - 24;
-                g.drawImage(Commons.getProjectIcon(), projectNameX - 16 - 8, y + margin + 8 - 8, null);
+                int projectNameX = w - metrics.stringWidth(projectName) - 24;
+                g.drawImage(Commons.getProjectIcon(), projectNameX - 16 - 8, y + margin + 8 - 8, 16, 16, null);
                 g.drawString(projectName, projectNameX, master.getOffsetY() + metrics.getAscent() + ((master.getRowHeight() - metrics.getHeight())/2));
             }
 

@@ -5,6 +5,7 @@ import com.energyxxer.trident.ui.styledcomponents.StyledButton;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.xswing.Padding;
+import com.energyxxer.xswing.ScalableDimension;
 
 import javax.swing.*;
 import java.awt.*;
@@ -45,7 +46,7 @@ public class ConfirmDialog {
             {
                 JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
                 buttons.setOpaque(false);
-                buttons.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+                buttons.setMaximumSize(new ScalableDimension(Integer.MAX_VALUE, 30));
 
                 StyledButton okButton = new StyledButton("Yes", tlm);
                 okButton.addActionListener(e -> {
@@ -90,7 +91,7 @@ public class ConfirmDialog {
 
         dialog.setContentPane(pane);
 
-        pane.setPreferredSize(new Dimension(Math.max(pane.getPreferredSize().width, WIDTH), Math.max(pane.getPreferredSize().height, HEIGHT)));
+        pane.setPreferredSize(new ScalableDimension(Math.max(pane.getPreferredSize().width, WIDTH), Math.max(pane.getPreferredSize().height, HEIGHT)));
 
         dialog.pack();
 

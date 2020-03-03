@@ -21,6 +21,7 @@ import com.energyxxer.trident.ui.styledcomponents.ButtonHintHandler;
 import com.energyxxer.trident.ui.styledcomponents.Padding;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.StringBounds;
+import com.energyxxer.xswing.ScalableDimension;
 import com.energyxxer.xswing.hints.Hint;
 
 import javax.swing.*;
@@ -66,7 +67,7 @@ public class TodoBoard extends ToolBoard {
     public TodoBoard(ToolBoardMaster parent) {
         super(parent);
         this.setLayout(new BorderLayout());
-        this.setPreferredSize(new Dimension(10, 200));
+        this.setPreferredSize(new ScalableDimension(10, 200));
         scrollPane.setViewportView(explorer);
         this.add(scrollPane);
         JPanel filterPanel = new JPanel(new BorderLayout());

@@ -1,10 +1,12 @@
 package com.energyxxer.trident.ui.dialogs.project_properties;
 
+import com.energyxxer.trident.ui.scrollbar.OverlayScrollPane;
 import com.energyxxer.trident.ui.styledcomponents.StyledCheckBox;
 import com.energyxxer.trident.ui.styledcomponents.StyledFileField;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.styledcomponents.StyledTextField;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
+import com.energyxxer.xswing.ScalableDimension;
 import com.energyxxer.xswing.XFileField;
 
 import javax.swing.*;
@@ -19,13 +21,13 @@ class ProjectPropertiesOutput extends JPanel {
     {
         {
             JPanel header = new JPanel(new BorderLayout());
-            header.setPreferredSize(new Dimension(0,40));
+            header.setPreferredSize(new ScalableDimension(0,40));
             this.add(header, BorderLayout.NORTH);
 
             {
                 JPanel padding = new JPanel();
                 padding.setOpaque(false);
-                padding.setPreferredSize(new Dimension(25,25));
+                padding.setPreferredSize(new ScalableDimension(25,25));
                 header.add(padding, BorderLayout.WEST);
             }
 
@@ -42,13 +44,13 @@ class ProjectPropertiesOutput extends JPanel {
         {
             JPanel padding_left = new JPanel();
             padding_left.setOpaque(false);
-            padding_left.setPreferredSize(new Dimension(50,25));
+            padding_left.setPreferredSize(new ScalableDimension(50,25));
             this.add(padding_left, BorderLayout.WEST);
         }
         {
             JPanel padding_right = new JPanel();
             padding_right.setOpaque(false);
-            padding_right.setPreferredSize(new Dimension(50,25));
+            padding_right.setPreferredSize(new ScalableDimension(50,25));
             this.add(padding_right, BorderLayout.EAST);
         }
 
@@ -57,13 +59,13 @@ class ProjectPropertiesOutput extends JPanel {
             JPanel content = new JPanel();
             content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
             content.setOpaque(false);
-            this.add(content, BorderLayout.CENTER);
+            this.add(new OverlayScrollPane(tlm, content), BorderLayout.CENTER);
 
             {
                 JPanel padding = new JPanel();
                 padding.setOpaque(false);
-                padding.setMinimumSize(new Dimension(1,20));
-                padding.setMaximumSize(new Dimension(1,20));
+                padding.setMinimumSize(new ScalableDimension(1,20));
+                padding.setMaximumSize(new ScalableDimension(1,20));
                 content.add(padding);
             }
 
@@ -79,7 +81,7 @@ class ProjectPropertiesOutput extends JPanel {
                 StyledFileField datapackOut = new StyledFileField(null, "ProjectProperties.content");
                 datapackOut.setDialogTitle("Select Data Pack Output...");
                 datapackOut.setOperation(XFileField.SAVE);
-                datapackOut.setMaximumSize(new Dimension(datapackOut.getMaximumSize().width,25));
+                datapackOut.setMaximumSize(new ScalableDimension(datapackOut.getMaximumSize().width,25));
                 datapackOut.setAlignmentX(Component.LEFT_ALIGNMENT);
                 ProjectProperties.addOpenEvent(p -> {
                     File file;
@@ -110,8 +112,8 @@ class ProjectPropertiesOutput extends JPanel {
 
             {
                 JPanel margin = new JPanel();
-                margin.setMinimumSize(new Dimension(200,15));
-                margin.setMaximumSize(new Dimension(200,15));
+                margin.setMinimumSize(new ScalableDimension(200,15));
+                margin.setMaximumSize(new ScalableDimension(200,15));
                 margin.setOpaque(false);
                 margin.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -131,7 +133,7 @@ class ProjectPropertiesOutput extends JPanel {
                 StyledFileField resourcesOut = new StyledFileField(null, "ProjectProperties.content");
                 resourcesOut.setDialogTitle("Select Resource Pack Output...");
                 resourcesOut.setOperation(XFileField.SAVE);
-                resourcesOut.setMaximumSize(new Dimension(resourcesOut.getMaximumSize().width,25));
+                resourcesOut.setMaximumSize(new ScalableDimension(resourcesOut.getMaximumSize().width,25));
                 resourcesOut.setAlignmentX(Component.LEFT_ALIGNMENT);
                 ProjectProperties.addOpenEvent(p -> {
                     File file;
@@ -165,8 +167,8 @@ class ProjectPropertiesOutput extends JPanel {
 
             {
                 JPanel margin = new JPanel();
-                margin.setMinimumSize(new Dimension(200,15));
-                margin.setMaximumSize(new Dimension(200,15));
+                margin.setMinimumSize(new ScalableDimension(200,15));
+                margin.setMaximumSize(new ScalableDimension(200,15));
                 margin.setOpaque(false);
                 margin.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -187,8 +189,8 @@ class ProjectPropertiesOutput extends JPanel {
 
             {
                 JPanel margin = new JPanel();
-                margin.setMinimumSize(new Dimension(200,15));
-                margin.setMaximumSize(new Dimension(200,15));
+                margin.setMinimumSize(new ScalableDimension(200,15));
+                margin.setMaximumSize(new ScalableDimension(200,15));
                 margin.setOpaque(false);
                 margin.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -208,8 +210,8 @@ class ProjectPropertiesOutput extends JPanel {
             }
             {
                 StyledTextField namespaceField = new StyledTextField("You shouldn't be able to see this*","ProjectProperties.content", tlm);
-                namespaceField.setPreferredSize(new Dimension(300,25));
-                namespaceField.setMaximumSize(new Dimension(200,25));
+                namespaceField.setPreferredSize(new ScalableDimension(300,25));
+                namespaceField.setMaximumSize(new ScalableDimension(200,25));
                 namespaceField.setAlignmentX(Component.LEFT_ALIGNMENT);
                 ProjectProperties.addOpenEvent(p -> namespaceField.setText(p.getAnonymousFunctionName()));
                 ProjectProperties.addApplyEvent(p -> p.setAnonymousFunctionName(namespaceField.getText()));
@@ -219,8 +221,8 @@ class ProjectPropertiesOutput extends JPanel {
 
             {
                 JPanel margin = new JPanel();
-                margin.setMinimumSize(new Dimension(200,15));
-                margin.setMaximumSize(new Dimension(200,15));
+                margin.setMinimumSize(new ScalableDimension(200,15));
+                margin.setMaximumSize(new ScalableDimension(200,15));
                 margin.setOpaque(false);
                 margin.setAlignmentX(Component.LEFT_ALIGNMENT);
 

@@ -4,6 +4,7 @@ import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.HintStylizer;
 import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
+import com.energyxxer.xswing.ScalableGraphics2D;
 import com.energyxxer.xswing.hints.TextHint;
 
 import javax.swing.*;
@@ -13,6 +14,8 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import static com.energyxxer.xswing.ScalableDimension.descaleEvent;
 
 public class TabListMaster extends JComponent implements MouseListener, MouseMotionListener {
     ArrayList<TabListElement> children = new ArrayList<>();
@@ -66,10 +69,10 @@ public class TabListMaster extends JComponent implements MouseListener, MouseMot
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         g.setColor(colors.get("background"));
         g.fillRect(0,0,this.getWidth(), this.getHeight());
+        g = new ScalableGraphics2D(g);
 
         this.x = 0;
 
@@ -84,7 +87,7 @@ public class TabListMaster extends JComponent implements MouseListener, MouseMot
             this.x += element.getWidth();
         }
 
-        Dimension newSize = new Dimension(this.x, height);
+        Dimension newSize = new Dimension(this.x, (int)Math.ceil(height * ScalableGraphics2D.SCALE_FACTOR));
 
         if(!newSize.equals(this.getPreferredSize())) {
             this.setPreferredSize(newSize);
@@ -132,12 +135,14 @@ public class TabListMaster extends JComponent implements MouseListener, MouseMot
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        e = descaleEvent(e);
         TabListElement element = getElementAtMousePos(e);
         if(element != null) element.mouseClicked(e);
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
+        e = descaleEvent(e);
         TabListElement element = getElementAtMousePos(e);
 
         if(mayRearrange && e.getButton() == MouseEvent.BUTTON1) {
@@ -165,6 +170,7 @@ public class TabListMaster extends JComponent implements MouseListener, MouseMot
 
     @Override
     public void mouseReleased(MouseEvent e) {
+        e = descaleEvent(e);
         dragPoint = null;
         draggedElement = null;
         dragPivot = -1;
@@ -179,6 +185,7 @@ public class TabListMaster extends JComponent implements MouseListener, MouseMot
 
     @Override
     public void mouseExited(MouseEvent e) {
+        e = descaleEvent(e);
         if(rolloverElement != null) {
             rolloverElement.setRollover(false);
             rolloverElement.mouseExited(e);
@@ -189,6 +196,7 @@ public class TabListMaster extends JComponent implements MouseListener, MouseMot
 
     @Override
     public void mouseDragged(MouseEvent e) {
+        e = descaleEvent(e);
         if(draggedElement != null) {
             draggedElement.mouseDragged(e);
             dragPoint = e.getPoint();
@@ -214,6 +222,7 @@ public class TabListMaster extends JComponent implements MouseListener, MouseMot
 
     @Override
     public void mouseMoved(MouseEvent e) {
+        e = descaleEvent(e);
         TabListElement element = getElementAtMousePos(e);
         if(rolloverElement != null) {
             rolloverElement.setRollover(false);
@@ -229,7 +238,7 @@ public class TabListMaster extends JComponent implements MouseListener, MouseMot
                 if(text != null && (rolloverElement != null || !hint.isShowing())) {
                     hint.setText(text);
                     HintStylizer.style(hint);
-                    hint.show(new Point(this.getLocationOnScreen().x+element.getLastRecordedOffset()+element.getWidth()/2,this.getLocationOnScreen().y+this.getHeight()/2), () -> rolloverElement == element);
+                    hint.show(new Point((int)(this.getLocationOnScreen().x+(element.getLastRecordedOffset()+element.getWidth()/2)*ScalableGraphics2D.SCALE_FACTOR),this.getLocationOnScreen().y+this.getHeight()), () -> rolloverElement == element);
                 }
             }
             element.mouseMoved(e);

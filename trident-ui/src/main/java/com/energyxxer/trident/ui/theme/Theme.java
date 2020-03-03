@@ -132,8 +132,8 @@ public class Theme {
 
 		String name = this.getString(names);
 		if(name == null) name = defaultValue.getName();
-		int size = Math.round(Preferences.getBaseFontSize() * this.getFloat(1, sizes));
-		if(size < 0) size = Preferences.getBaseFontSize();
+		int size = Math.round(Preferences.getModifiedFontSize() * this.getFloat(1, sizes));
+		if(size < 0) size = Preferences.getModifiedFontSize();
 		boolean bold = this.getBoolean(defaultValue.isBold(), bolds);
 		boolean italic = this.getBoolean(defaultValue.isItalic(), italics);
 

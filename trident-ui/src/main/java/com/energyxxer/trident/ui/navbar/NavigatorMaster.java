@@ -2,6 +2,8 @@ package com.energyxxer.trident.ui.navbar;
 
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.util.Constant;
+import com.energyxxer.xswing.ScalableDimension;
+import com.energyxxer.xswing.ScalableGraphics2D;
 import com.energyxxer.xswing.hints.TextHint;
 
 import javax.swing.*;
@@ -11,6 +13,8 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import static com.energyxxer.xswing.ScalableDimension.descaleEvent;
 
 public class NavigatorMaster extends JComponent implements MouseListener, MouseMotionListener {
 
@@ -41,7 +45,7 @@ public class NavigatorMaster extends JComponent implements MouseListener, MouseM
         this.addMouseListener(this);
         this.addMouseMotionListener(this);
 
-        this.setPreferredSize(new Dimension(30, 30));
+        this.setPreferredSize(new ScalableDimension(30, 30));
     }
 
     public Constant getOrientation() {
@@ -60,6 +64,8 @@ public class NavigatorMaster extends JComponent implements MouseListener, MouseM
         g.setColor(colors.get("background"));
         g.fillRect(0,0,getWidth(),getHeight());
 
+        g = new ScalableGraphics2D(g);
+
         Rectangle rect = null;
         Point p = new Point();
 
@@ -77,7 +83,7 @@ public class NavigatorMaster extends JComponent implements MouseListener, MouseM
             }
         }
 
-        Dimension size = (rect != null) ? new Dimension(rect.width+2*rect.x,rect.height+2*rect.y) : new Dimension();
+        Dimension size = (rect != null) ? new ScalableDimension(rect.width+2*rect.x,rect.height+2*rect.y) : new ScalableDimension();
 
         if(size.width < 5) size.width = 5;
         if(size.height < 5) size.height = 5;
@@ -124,18 +130,21 @@ public class NavigatorMaster extends JComponent implements MouseListener, MouseM
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        e = descaleEvent(e);
         NavigationElement element = getElementAtPos(e.getPoint());
         if(element != null) element.mouseClicked(e);
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
+        e = descaleEvent(e);
         NavigationElement element = getElementAtPos(e.getPoint());
         if(element != null) element.mousePressed(e);
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
+        e = descaleEvent(e);
         NavigationElement element = getElementAtPos(e.getPoint());
         if(element != null) element.mouseReleased(e);
     }
@@ -147,6 +156,7 @@ public class NavigatorMaster extends JComponent implements MouseListener, MouseM
 
     @Override
     public void mouseExited(MouseEvent e) {
+        e = descaleEvent(e);
         if(rolloverElement != null) rolloverElement.mouseExited(e);
         setRollover(null);
     }
@@ -158,6 +168,7 @@ public class NavigatorMaster extends JComponent implements MouseListener, MouseM
 
     @Override
     public void mouseMoved(MouseEvent e) {
+        e = descaleEvent(e);
         NavigationElement element = getElementAtPos(e.getPoint());
         if(rolloverElement != element) {
             if(rolloverElement != null) rolloverElement.mouseExited(e);

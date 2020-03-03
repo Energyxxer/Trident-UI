@@ -4,6 +4,8 @@ import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.HintStylizer;
 import com.energyxxer.trident.ui.explorer.base.StyleProvider;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
+import com.energyxxer.xswing.ScalableDimension;
+import com.energyxxer.xswing.ScalableGraphics2D;
 import com.energyxxer.xswing.hints.TextHint;
 
 import javax.swing.*;
@@ -96,10 +98,10 @@ public class OrderListMaster extends JComponent implements MouseListener, MouseM
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         g.setColor(colors.get("background"));
         g.fillRect(0,0,this.getWidth(), this.getHeight());
+        g = new ScalableGraphics2D(g);
 
         this.y = 0;
 
@@ -114,7 +116,7 @@ public class OrderListMaster extends JComponent implements MouseListener, MouseM
             this.y += element.getHeight();
         }
 
-        Dimension newSize = new Dimension(this.getWidth(), this.y);
+        Dimension newSize = new Dimension(this.getWidth(), (int)(this.y / ScalableGraphics2D.SCALE_FACTOR));
 
         if(!newSize.equals(this.getPreferredSize())) {
             this.setPreferredSize(newSize);
@@ -170,12 +172,14 @@ public class OrderListMaster extends JComponent implements MouseListener, MouseM
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        e = ScalableDimension.descaleEvent(e);
         OrderListElement element = getElementAtMousePos(e);
         if(element != null) element.mouseClicked(e);
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
+        e = ScalableDimension.descaleEvent(e);
         OrderListElement element = getElementAtMousePos(e);
 
         if(e.getButton() == MouseEvent.BUTTON1 && element != null && element.select(e)) {
@@ -207,6 +211,7 @@ public class OrderListMaster extends JComponent implements MouseListener, MouseM
 
     @Override
     public void mouseReleased(MouseEvent e) {
+        e = ScalableDimension.descaleEvent(e);
         dragPoint = null;
         draggedElement = null;
         dragPivot = -1;
@@ -221,6 +226,7 @@ public class OrderListMaster extends JComponent implements MouseListener, MouseM
 
     @Override
     public void mouseExited(MouseEvent e) {
+        e = ScalableDimension.descaleEvent(e);
         if(rolloverElement != null) {
             rolloverElement.setRollover(false);
             rolloverElement.mouseExited(e);
@@ -231,6 +237,7 @@ public class OrderListMaster extends JComponent implements MouseListener, MouseM
 
     @Override
     public void mouseDragged(MouseEvent e) {
+        e = ScalableDimension.descaleEvent(e);
         if(draggedElement != null) {
             draggedElement.mouseDragged(e);
             dragPoint = e.getPoint();
@@ -256,6 +263,7 @@ public class OrderListMaster extends JComponent implements MouseListener, MouseM
 
     @Override
     public void mouseMoved(MouseEvent e) {
+        e = ScalableDimension.descaleEvent(e);
         OrderListElement element = getElementAtMousePos(e);
         if(rolloverElement != null) {
             rolloverElement.setRollover(false);

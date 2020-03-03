@@ -8,6 +8,7 @@ import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.theme.change.ThemeChangeListener;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.xswing.Padding;
+import com.energyxxer.xswing.ScalableDimension;
 import com.energyxxer.xswing.XFileField;
 
 import javax.swing.*;
@@ -42,7 +43,7 @@ public class WorkspaceDialog {
     private static boolean valid = false;
 
     private static void initialize() {
-        pane.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        pane.setPreferredSize(new ScalableDimension(WIDTH, HEIGHT));
         pane.add(new Padding(10),BorderLayout.NORTH);
         pane.add(new Padding(25),BorderLayout.WEST);
         pane.add(new Padding(25),BorderLayout.EAST);

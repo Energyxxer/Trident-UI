@@ -2,6 +2,7 @@ package com.energyxxer.trident.ui.styledcomponents;
 
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
+import com.energyxxer.xswing.ScalableDimension;
 import com.energyxxer.xswing.XToggleButton;
 
 import java.awt.*;
@@ -19,7 +20,7 @@ public class StyledToggleButton extends XToggleButton {
     public StyledToggleButton(String iconName, String namespace) {
         if(namespace != null) this.setNamespace(namespace);
 
-        this.setPreferredSize(new Dimension(24, 24));
+        this.setPreferredSize(new ScalableDimension(24, 24));
 
         tlm.addThemeChangeListener(t -> {
             if(this.namespace != null) {

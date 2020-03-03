@@ -525,7 +525,7 @@ public class OverlayBorderLayout implements LayoutManager2,
      */
     public Dimension minimumLayoutSize(Container target) {
         synchronized (target.getTreeLock()) {
-            Dimension dim = new Dimension(0, 0);
+            Dimension dim = new ScalableDimension(0, 0);
 
             boolean ltr = target.getComponentOrientation().isLeftToRight();
             Component c = null;
@@ -581,7 +581,7 @@ public class OverlayBorderLayout implements LayoutManager2,
      */
     public Dimension preferredLayoutSize(Container target) {
         synchronized (target.getTreeLock()) {
-            Dimension dim = new Dimension(0, 0);
+            Dimension dim = new ScalableDimension(0, 0);
 
             boolean ltr = target.getComponentOrientation().isLeftToRight();
             Component c = null;
@@ -629,7 +629,7 @@ public class OverlayBorderLayout implements LayoutManager2,
      * @see #preferredLayoutSize
      */
     public Dimension maximumLayoutSize(Container target) {
-        return new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        return new ScalableDimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
 
     /**

@@ -4,15 +4,20 @@ import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.HintStylizer;
 import com.energyxxer.trident.ui.explorer.base.elements.ExplorerElement;
 import com.energyxxer.trident.ui.modules.ModuleToken;
+import com.energyxxer.xswing.ScalableDimension;
+import com.energyxxer.xswing.ScalableGraphics2D;
 import com.energyxxer.xswing.hints.TextHint;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.List;
 import java.util.*;
 
 import static com.energyxxer.trident.ui.editor.behavior.AdvancedEditor.isPlatformControlDown;
+import static com.energyxxer.xswing.ScalableDimension.descaleEvent;
 
 /**
  * Created by User on 2/7/2017.
@@ -62,7 +67,6 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         contentWidth = 0;
         offsetY = 0;
@@ -71,13 +75,15 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
         g.setColor(colors.get("background"));
         g.fillRect(0,0,this.getWidth(), this.getHeight());
 
+        g = new ScalableGraphics2D(g);
+
         ArrayList<ExplorerElement> toRender = new ArrayList<>(children);
 
         for(ExplorerElement i : toRender) {
             i.render(g);
         }
 
-        Dimension newSize = new Dimension(contentWidth, offsetY);
+        Dimension newSize = new ScalableDimension(contentWidth, offsetY);
         if(!newSize.equals(this.getPreferredSize())) {
             this.setPreferredSize(newSize);
             this.getParent().revalidate();
@@ -115,12 +121,14 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        e = descaleEvent(e);
         ExplorerElement element = getElementAtMousePos(e);
         if(element != null) element.mouseClicked(e);
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
+        e = descaleEvent(e);
         this.requestFocus();
         ExplorerElement element = getElementAtMousePos(e);
         dragStart = element;
@@ -135,6 +143,7 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
 
     @Override
     public void mouseReleased(MouseEvent e) {
+        e = descaleEvent(e);
         if(dragStart != null) dragStart.mouseReleased(e);
         dragStart = null;
         pressedEvent = null;
@@ -147,6 +156,7 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
 
     @Override
     public void mouseExited(MouseEvent e) {
+        e = descaleEvent(e);
         if(rolloverItem != null) {
             rolloverItem.setRollover(false);
             repaint();
@@ -156,6 +166,7 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
 
     @Override
     public void mouseDragged(MouseEvent e) {
+        e = descaleEvent(e);
         if(dragStart != null) {
             dragStart.mouseDragged(e);
         }
@@ -166,6 +177,7 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
 
     @Override
     public void mouseMoved(MouseEvent e) {
+        e = descaleEvent(e);
         ExplorerElement element = getElementAtMousePos(e);
         if(rolloverItem != null) {
             rolloverItem.setRollover(false);

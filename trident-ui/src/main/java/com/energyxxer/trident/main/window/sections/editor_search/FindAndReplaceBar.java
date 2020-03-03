@@ -17,6 +17,7 @@ import com.energyxxer.trident.ui.styledcomponents.*;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.Disposable;
 import com.energyxxer.util.logger.Debug;
+import com.energyxxer.xswing.ScalableDimension;
 import com.energyxxer.xswing.TemporaryConfirmation;
 import com.energyxxer.xswing.UnifiedDocumentListener;
 import com.energyxxer.xswing.hints.TextHint;
@@ -63,7 +64,7 @@ public class FindAndReplaceBar extends JPanel implements Disposable {
         this.highlighter = new SearchHighlighter(this, editor.editorComponent);
         infoLabel = new StyledLabel("", tlm);
         infoLabel.setStyle(Font.BOLD);
-        //this.setPreferredSize(new Dimension(0, 60));
+        //this.setPreferredSize(new ScalableDimension(0, 60));
 
         matchCase = Preferences.get("editor.search.match_case","false").equals("true");
         wordsOnly = Preferences.get("editor.search.words","false").equals("true");
@@ -260,7 +261,7 @@ public class FindAndReplaceBar extends JPanel implements Disposable {
         } else {
             this.replaceField = field;
         }
-        field.setDefaultSize(new Dimension(400, 23));
+        field.setDefaultSize(new ScalableDimension(400, 23));
         field.setSelectedLineEnabled(false);
         if(!replace) {
             field.addKeyListener(new KeyListener() {

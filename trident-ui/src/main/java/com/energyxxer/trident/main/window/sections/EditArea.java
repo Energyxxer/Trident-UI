@@ -8,6 +8,7 @@ import com.energyxxer.trident.ui.scrollbar.InvisibleScrollPaneLayout;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.logger.Debug;
 import com.energyxxer.xswing.Padding;
+import com.energyxxer.xswing.ScalableDimension;
 import com.energyxxer.xswing.hints.Hint;
 
 import javax.swing.*;
@@ -46,13 +47,13 @@ public class EditArea extends JPanel {
 
     {
         this.setLayout(new BorderLayout());
-        this.setPreferredSize(new Dimension(500, 500));
+        this.setPreferredSize(new ScalableDimension(500, 500));
         tlm.addThemeChangeListener(t -> this.setBackground(t.getColor(new Color(215, 215, 215), "Editor.background")));
 
         JPanel tabListHolder = new JPanel(new BorderLayout());
         tlm.addThemeChangeListener(t -> {
             tabListHolder.setBackground(t.getColor(new Color(200, 202, 205), "TabList.background"));
-            tabListHolder.setPreferredSize(new Dimension(1, t.getInteger(30, "TabList.height")));
+            tabListHolder.setPreferredSize(new ScalableDimension(1, t.getInteger(30, "TabList.height")));
         });
 
         JPanel tabActionPanel = new JPanel(new GridBagLayout());
@@ -63,7 +64,6 @@ public class EditArea extends JPanel {
             ToolbarButton more = new ToolbarButton("more", tlm);
             more.setHintText("View all tabs");
             more.setPreferredHintPos(Hint.LEFT);
-            more.setPreferredSize(new Dimension(25,25));
             tabActionPanel.add(more);
 
             more.addActionListener(e -> TridentWindow.tabManager.getMenu().show(more, more.getWidth()/2, more.getHeight()));
@@ -77,7 +77,7 @@ public class EditArea extends JPanel {
         tabList = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         tlm.addThemeChangeListener(t -> {
             tabList.setBackground(t.getColor(new Color(200, 202, 205), "TabList.background"));
-            tabList.setPreferredSize(new Dimension(1, t.getInteger(30, "TabList.height")));
+            tabList.setPreferredSize(new ScalableDimension(1, t.getInteger(30, "TabList.height")));
             tabList.setBorder(BorderFactory.createMatteBorder(0, 0, Math.max(t.getInteger(1,"TabList.border.thickness"),0), 0, t.getColor(new Color(200, 200, 200), "TabList.border.color")));
         });
 

@@ -5,20 +5,10 @@ import com.energyxxer.trident.ui.styledcomponents.StyledButton;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.xswing.Padding;
+import com.energyxxer.xswing.ScalableDimension;
 
-import javax.swing.AbstractAction;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dialog;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GraphicsEnvironment;
-import java.awt.Point;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
@@ -38,7 +28,7 @@ public class OptionDialog {
         JDialog dialog = new JDialog(TridentWindow.jframe);
 
         JPanel pane = new JPanel(new BorderLayout());
-        pane.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        pane.setPreferredSize(new ScalableDimension(WIDTH, HEIGHT));
         tlm.addThemeChangeListener(t ->
                 pane.setBackground(t.getColor(new Color(235, 235, 235), "OptionDialog.background"))
         );
@@ -59,7 +49,7 @@ public class OptionDialog {
             {
                 JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
                 buttons.setOpaque(false);
-                buttons.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+                buttons.setMaximumSize(new ScalableDimension(Integer.MAX_VALUE, 30));
 
                 for(String option : options) {
                     StyledButton button = new StyledButton(option,"OptionDialog", tlm);

@@ -1,11 +1,11 @@
 package com.energyxxer.trident.ui;
 
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
+import com.energyxxer.xswing.ScalableDimension;
+import com.energyxxer.xswing.ScalableGraphics2D;
 
-import javax.swing.JComponent;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * It's literally just a line.
@@ -16,12 +16,12 @@ public class ToolbarSeparator extends JComponent {
 	private Color right = Color.WHITE;
 
 	public ToolbarSeparator(ThemeListenerManager tlm) {
-		this.setPreferredSize(new Dimension(15, 25));
 
 		this.setOpaque(true);
 		this.setBackground(new Color(0,0,0,0));
 
 		tlm.addThemeChangeListener(t -> {
+			this.setPreferredSize(new ScalableDimension(15, 25));
 			left = t.getColor(new Color(150, 150, 150), "Toolbar.separator.dark");
 			right = t.getColor(new Color(235, 235, 235), "Toolbar.separator.light");
 		});
@@ -32,6 +32,7 @@ public class ToolbarSeparator extends JComponent {
 		super.paintComponent(g);
 
 		int x = this.getWidth()/2-1;
+		g = new ScalableGraphics2D(g);
 
 		g.setColor(left);
 		g.fillRect(x,2,1,this.getHeight()-4);

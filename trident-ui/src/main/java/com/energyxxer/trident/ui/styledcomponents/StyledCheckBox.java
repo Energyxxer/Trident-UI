@@ -2,6 +2,7 @@ package com.energyxxer.trident.ui.styledcomponents;
 
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
+import com.energyxxer.xswing.ScalableGraphics2D;
 import com.energyxxer.xswing.XCheckBox;
 
 import java.awt.*;
@@ -37,7 +38,7 @@ public class StyledCheckBox extends XCheckBox {
                 setRolloverColor    (t.getColor(new Color(200, 202, 205), this.namespace + ".checkbox.hover.background","General.checkbox.hover.background"));
                 setPressedColor     (t.getColor(Color.WHITE, this.namespace + ".checkbox.pressed.background","General.checkbox.pressed.background"));
                 setFont(t.getFont(this.namespace+".checkbox","General.checkbox","General"));
-                setCheckMarkIcon(Commons.getIcon("checkmark"));
+                setCheckMarkIcon(Commons.getScaledIcon("checkmark", 16, 16));
             } else {
                 setBackground       (t.getColor(new Color(215, 215, 215), "General.checkbox.background"));
                 setForeground       (t.getColor(Color.BLACK, "General.checkbox.foreground","General.foreground"));
@@ -45,11 +46,13 @@ public class StyledCheckBox extends XCheckBox {
                 setRolloverColor    (t.getColor(new Color(200, 202, 205), "General.checkbox.hover.background"));
                 setPressedColor     (t.getColor(Color.WHITE, "General.checkbox.pressed.background"));
                 setFont(t.getFont("General.checkbox","General"));
-                setCheckMarkIcon(Commons.getIcon("checkmark"));
+                setCheckMarkIcon(Commons.getScaledIcon("checkmark", 16, 16));
             }
+            this.setCheckBoxSize((int) (16 * ScalableGraphics2D.SCALE_FACTOR));
+            this.setIconTextGap((int) (4 * ScalableGraphics2D.SCALE_FACTOR));
+            revalidate();
         });
-        this.setCheckBoxSize(16);
-        this.setIconTextGap(8);
+
     }
 
     public void setNamespace(String namespace) {

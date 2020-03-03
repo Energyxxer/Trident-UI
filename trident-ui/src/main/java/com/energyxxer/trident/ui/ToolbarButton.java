@@ -4,21 +4,13 @@ import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.Constant;
+import com.energyxxer.xswing.ScalableDimension;
+import com.energyxxer.xswing.ScalableGraphics2D;
 import com.energyxxer.xswing.hints.Hint;
 import com.energyxxer.xswing.hints.TextHint;
 
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import java.awt.Color;
-import java.awt.Composite;
-import java.awt.Dimension;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.RenderingHints;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 
 /**
@@ -48,6 +40,11 @@ public class ToolbarButton extends JButton implements MouseListener, MouseMotion
 
 	private boolean sizeValid = false;
 
+	private int stringWidth = 0;
+	private int fontHeight = 0;
+	private int fontAscent = 0;
+	private int fontDescent = 0;
+
 	public ToolbarButton(String icon, ThemeListenerManager tlm) {
 		this.setContentAreaFilled(false);
 		this.setOpaque(false);
@@ -55,10 +52,11 @@ public class ToolbarButton extends JButton implements MouseListener, MouseMotion
 
 		this.icon = icon;
 
-		//this.setPreferredSize(new Dimension(25, 25));
+		//this.setPreferredSize(new ScalableDimension(25, 25));
 		this.setBorder(BorderFactory.createEmptyBorder());
 
 		tlm.addThemeChangeListener(t -> {
+            this.setPreferredSize(new ScalableDimension(25,25));
             this.background = t.getColor(Color.GRAY, "Toolbar.button.background", "General.button.background");
             this.rolloverBackground = t.getColor(Color.GRAY, "Toolbar.button.hover.background", "General.button.hover.background", "Toolbar.button.background", "General.button.background");
             this.pressedBackground = t.getColor(Color.GRAY, "Toolbar.button.pressed.background", "General.button.pressed.background", "Toolbar.button.hover.background", "General.button.hover.background", "Toolbar.button.background", "General.button.background");
@@ -84,12 +82,6 @@ public class ToolbarButton extends JButton implements MouseListener, MouseMotion
 
 	@Override
 	protected void paintComponent(Graphics g) {
-		if(!sizeValid) {
-			updateSize();
-			this.getParent().revalidate();
-			this.repaint();
-			return;
-		}
 		Graphics2D g2 = (Graphics2D) g;
 
 		Composite previousComposite = g2.getComposite();
@@ -107,6 +99,24 @@ public class ToolbarButton extends JButton implements MouseListener, MouseMotion
 		g2.setComposite(previousComposite);
 
 		super.paintComponent(g);
+
+		g = new ScalableGraphics2D(g);
+
+		if(this.getText() != null && !this.getText().isEmpty()) {
+			FontMetrics fm = g.getFontMetrics();
+			stringWidth = fm.stringWidth(this.getText());
+			fontHeight = fm.getHeight();
+			fontAscent = fm.getAscent();
+			fontDescent = fm.getDescent();
+		} else {
+			stringWidth = 0;
+		}
+
+		if(!sizeValid) {
+			updateSize();
+			this.getParent().revalidate();
+			this.repaint();
+		}
 	}
 
 	public String getHintText() {
@@ -126,7 +136,7 @@ public class ToolbarButton extends JButton implements MouseListener, MouseMotion
 		this.preferredHintPos = preferredPos;
 	}
 
-	@Override
+    @Override
 	public void setText(String text) {
 		super.setText(text);
 		updateSize();
@@ -141,46 +151,42 @@ public class ToolbarButton extends JButton implements MouseListener, MouseMotion
 		int width = 0;
 		int height = 0;
 
-		if(this.getGraphics() == null) {
-			sizeValid = false;
-			return this.getPreferredSize();
-		}
-
-		FontMetrics metrics = this.getGraphics().getFontMetrics(this.getFont());
-
-		width += iconSize;
+		if(icon != null) width += 16;
 		width += 9;
+
+		sizeValid = true;
 
 		String text = this.getText();
 		if(text != null && text.length() > 0) {
 			width += 6;
-			width += metrics.stringWidth(getText());
+			width += stringWidth;
 
-			height += Math.max(metrics.getHeight() + metrics.getAscent() + metrics.getDescent(),iconSize+9);
+			if(stringWidth <= 0) sizeValid = false;
+
+			height += 25;
 		} else {
-			height += iconSize;
+			height += 16;
 			height += 9;
 		}
 
-		sizeValid = true;
 		return new Dimension(width, height);
 	}
 
 	private void updateSize() {
-		this.setPreferredSize(adjustSize(getBestSize()));
+		//First, resize icon.
+		if(this.icon != null) {
+			this.setIcon(new ImageIcon(Commons.getScaledIcon(icon, 16, 16)));
+		} else {
+			this.setIcon(null);
+		}
+
+		//text is probably already resized
+
+		this.setPreferredSize(new ScalableDimension(getBestSize()));
 		updateIcon();
 	}
 
 	private void updateIcon() {
-		if(icon != null) {
-			int newIconSize = (Math.max(this.getBestSize().height,25)/25)*16;
-			if(newIconSize != iconSize || iconDirty) {
-				iconDirty = false;
-				this.setIcon(new ImageIcon(Commons.getIcon(icon).getScaledInstance(newIconSize, newIconSize, Image.SCALE_SMOOTH)));
-				iconSize = newIconSize;
-				updateSize();
-			}
-		}
 	}
 
 	private static Dimension adjustSize(Dimension size) {
@@ -188,7 +194,7 @@ public class ToolbarButton extends JButton implements MouseListener, MouseMotion
 		size.height = Math.max(size.height,25);
 		size.height /= 25;
 		size.height *= 25;
-		return size;
+		return new ScalableDimension(size);
 	}
 
 	@Override

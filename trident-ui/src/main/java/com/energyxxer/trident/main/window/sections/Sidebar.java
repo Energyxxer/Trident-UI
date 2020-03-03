@@ -13,6 +13,7 @@ import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.xswing.ComponentResizer;
 import com.energyxxer.xswing.OverlayBorderPanel;
+import com.energyxxer.xswing.ScalableDimension;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -35,10 +36,11 @@ public class Sidebar extends OverlayBorderPanel {
     }
 
     {
-        expanded.setPreferredSize(new Dimension(350, 5));
-        expanded.setMinimumSize(new Dimension(50, 0));
-        expanded.setMaximumSize(new Dimension(700, 0));
+        expanded.setPreferredSize(new ScalableDimension(350, 5));
+
         tlm.addThemeChangeListener(t -> {
+            expanded.setMinimumSize(new ScalableDimension(50, 0));
+            expanded.setMaximumSize(new ScalableDimension(700, 0));
             expanded.setBackground(t.getColor(Color.WHITE, "Explorer.background"));
             expanded.setBorder(new CompoundBorder(BorderFactory.createEmptyBorder(0, 0, 0, ComponentResizer.DIST), BorderFactory.createMatteBorder(0, 0, 0, Math.max(t.getInteger(1, "Explorer.border.thickness"), 0), t.getColor(new Color(200, 200, 200), "Explorer.border.color"))));
             expanded.setOpaque(false);
@@ -48,14 +50,14 @@ public class Sidebar extends OverlayBorderPanel {
 
         StyledLabel label = new StyledLabel("Project Explorer", "Explorer.header", tlm);
         label.setFontSize(14);
-        label.setPreferredSize(new Dimension(500, 25));
+        label.setPreferredSize(new ScalableDimension(500, 25));
         header.add(new Padding(15, tlm, "Explorer.header.indent"), BorderLayout.WEST);
         header.add(label, BorderLayout.CENTER);
 
         tlm.addThemeChangeListener(t -> {
             header.setBackground(t.getColor(this.getBackground(), "Explorer.header.background"));
-            header.setPreferredSize(new Dimension(500, t.getInteger(25, "Explorer.header.height")));
-            label.setPreferredSize(new Dimension(500, t.getInteger(25, "Explorer.header.height")));
+            header.setPreferredSize(new ScalableDimension(500, t.getInteger(25, "Explorer.header.height")));
+            label.setPreferredSize(new ScalableDimension(500, t.getInteger(25, "Explorer.header.height")));
         });
 
         JPanel buttonPanel = new JPanel(new GridBagLayout());
@@ -147,8 +149,8 @@ public class Sidebar extends OverlayBorderPanel {
     }
     {
 
-        collapsed.setPreferredSize(new Dimension(29, 50));
         tlm.addThemeChangeListener(t -> {
+            collapsed.setPreferredSize(new ScalableDimension(29, 50));
             collapsed.setBackground(t.getColor(Color.WHITE, "Explorer.background"));
             collapsed.setBorder(BorderFactory.createMatteBorder(0, 0, 0, Math.max(t.getInteger(1, "Explorer.border.thickness"), 0), t.getColor(new Color(200, 200, 200), "Explorer.border.color")));
         });

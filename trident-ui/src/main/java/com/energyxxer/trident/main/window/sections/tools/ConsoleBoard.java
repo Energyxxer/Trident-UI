@@ -9,6 +9,7 @@ import com.energyxxer.trident.ui.styledcomponents.StyledTextField;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.logger.Debug;
 import com.energyxxer.util.out.ConsoleOutputStream;
+import com.energyxxer.xswing.ScalableDimension;
 
 import javax.swing.*;
 import javax.swing.text.AttributeSet;
@@ -43,7 +44,7 @@ public class ConsoleBoard extends ToolBoard {
     public ConsoleBoard(ToolBoardMaster parent) {
         super(parent);
         this.setLayout(new BorderLayout());
-        this.setPreferredSize(new Dimension(0, CONSOLE_HEIGHT));
+        this.setPreferredSize(new ScalableDimension(0, CONSOLE_HEIGHT));
 
         JTextPane console = new JTextPane();
         console.setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
@@ -130,9 +131,9 @@ public class ConsoleBoard extends ToolBoard {
         fieldPane.add(fieldLabel = new StyledLabel("",tlm), BorderLayout.WEST);
         fieldLabel.setIconName("console_input");
         fieldPane.add(inputField = new StyledTextField("", "Console", tlm));
-        inputField.setPreferredSize(new Dimension(1, 24));
 
         tlm.addThemeChangeListener(t -> {
+            inputField.setPreferredSize(new ScalableDimension(1, 24));
             fieldPane.setBackground(inputField.getBackground());
             consoleScrollPane.setBackground(console.getBackground());
             consoleScrollPane.setBorder(BorderFactory.createMatteBorder(Math.max(t.getInteger("Console.header.border.thickness"),0), 0, 0, 0, t.getColor(new Color(200, 200, 200), "Console.header.border.color")));

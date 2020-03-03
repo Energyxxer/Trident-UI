@@ -15,9 +15,11 @@ import com.energyxxer.trident.ui.modules.ModuleToken;
 import com.energyxxer.trident.ui.modules.WorkspaceRootModuleToken;
 import com.energyxxer.trident.util.FileCommons;
 import com.energyxxer.util.logger.Debug;
+import com.energyxxer.xswing.ScalableGraphics2D;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -174,7 +176,10 @@ public class ProjectExplorerMaster extends StyledExplorerMaster implements DropT
 
         clearDragRollover();
 
-        ExplorerElement targetElement = getElementAtMousePos(e.getLocation());
+        Point location = e.getLocation();
+        location.setLocation(location.x / ScalableGraphics2D.SCALE_FACTOR, location.y / ScalableGraphics2D.SCALE_FACTOR);
+
+        ExplorerElement targetElement = getElementAtMousePos(location);
         boolean canImport = false;
         if(targetElement != null && targetElement.getToken() instanceof FileModuleToken) {
             FileModuleToken rolloverToken = ((FileModuleToken) targetElement.getToken());
@@ -244,8 +249,10 @@ public class ProjectExplorerMaster extends StyledExplorerMaster implements DropT
 
         Transferable t = e.getTransferable();
 
+        Point location = e.getLocation();
+        location.setLocation(location.x / ScalableGraphics2D.SCALE_FACTOR, location.y / ScalableGraphics2D.SCALE_FACTOR);
 
-        ExplorerElement targetElement = getElementAtMousePos(e.getLocation());
+        ExplorerElement targetElement = getElementAtMousePos(location);
         if(targetElement == null) return;
         FileModuleToken rolloverToken = ((FileModuleToken) targetElement.getToken());
         Path destination = rolloverToken.getDragDestination().toPath();

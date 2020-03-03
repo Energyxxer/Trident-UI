@@ -119,7 +119,7 @@ public class FileOccurrenceExplorerItem extends StandardExplorerItem {
             if (!rollover || master.getWidth() - metrics.stringWidth(fileName) - 24 - 16 - 8 >= x) {
                 if (this.icon != null) {
                     int projectNameX = master.getWidth() - metrics.stringWidth(fileName) - 24;
-                    g.drawImage(this.icon, projectNameX - 16 - 8, y + margin + 8 - 8, null);
+                    g.drawImage(this.icon, projectNameX - 16 - 8, y + margin + 8 - 8, 16, 16, null);
                     g.drawString(fileName, projectNameX, master.getOffsetY() + metrics.getAscent() + ((master.getRowHeight() - metrics.getHeight()) / 2));
                 }
             }

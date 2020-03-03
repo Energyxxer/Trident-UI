@@ -77,11 +77,11 @@ public class StyledExplorerMaster extends ExplorerMaster implements Disposable {
                 indentPerLevel = Math.max(t.getInteger(20, "Explorer.item.indent"), 0);
                 initialIndent = Math.max(t.getInteger(0, "Explorer.item.initialIndent"), 0);
 
-                assets.put("expand", Commons.getIcon("triangle_right").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
-                assets.put("collapse", Commons.getIcon("triangle_down").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
-                assets.put("info", Commons.getIcon("info").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
-                assets.put("warning", Commons.getIcon("warn").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
-                assets.put("error", Commons.getIcon("error").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
+                assets.put("expand", Commons.getIcon("triangle_right"));
+                assets.put("collapse", Commons.getIcon("triangle_down"));
+                assets.put("info", Commons.getIcon("info"));
+                assets.put("warning", Commons.getIcon("warn"));
+                assets.put("error", Commons.getIcon("error"));
 
                 colors.put("item.find.background", t.getColor(Color.YELLOW.darker(), "Explorer.item.find.background"));
 
@@ -140,11 +140,11 @@ public class StyledExplorerMaster extends ExplorerMaster implements Disposable {
                 indentPerLevel = Math.max(t.getInteger(20, namespace + ".item.indent", "Explorer.item.indent"), 0);
                 initialIndent = Math.max(t.getInteger(0, namespace + ".item.initialIndent", "Explorer.item.initialIndent"), 0);
 
-                assets.put("expand", Commons.getIcon("triangle_right").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
-                assets.put("collapse", Commons.getIcon("triangle_down").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
-                assets.put("info", Commons.getIcon("info").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
-                assets.put("warning", Commons.getIcon("warn").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
-                assets.put("error", Commons.getIcon("error").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
+                assets.put("expand", Commons.getIcon("triangle_right"));
+                assets.put("collapse", Commons.getIcon("triangle_down"));
+                assets.put("info", Commons.getIcon("info"));
+                assets.put("warning", Commons.getIcon("warn"));
+                assets.put("error", Commons.getIcon("error"));
 
                 colors.put("item.find.background", t.getColor(Color.YELLOW.darker(), namespace + ".item.find.background", "Explorer.item.find.background"));
 

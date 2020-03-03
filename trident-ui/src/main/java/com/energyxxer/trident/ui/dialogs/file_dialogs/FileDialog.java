@@ -11,6 +11,7 @@ import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.trident.util.FileCommons;
 import com.energyxxer.util.logger.Debug;
 import com.energyxxer.xswing.Padding;
+import com.energyxxer.xswing.ScalableDimension;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -48,7 +49,7 @@ public class FileDialog {
 
     static {
         pane = new JPanel(new BorderLayout());
-        pane.setPreferredSize(new Dimension(WIDTH,HEIGHT));
+        pane.setPreferredSize(new ScalableDimension(WIDTH,HEIGHT));
         tlm.addThemeChangeListener(t ->
                 pane.setBackground(t.getColor(new Color(235, 235, 235), "NewFileDialog.background"))
         );
@@ -56,7 +57,7 @@ public class FileDialog {
         //<editor-fold desc="Icon">
         JPanel iconPanel = new JPanel(new BorderLayout());
         iconPanel.setOpaque(false);
-        iconPanel.setPreferredSize(new Dimension(73, 48));
+        iconPanel.setPreferredSize(new ScalableDimension(73, 48));
         iconPanel.add(new Padding(25), BorderLayout.WEST);
         iconPanel.setBorder(new EmptyBorder(0, 0, 0, 2));
         iconPanel.add(icon = new StyledIcon("file", 48, 48, Image.SCALE_SMOOTH, tlm));
@@ -78,7 +79,7 @@ public class FileDialog {
 
             JPanel entry = new JPanel(new BorderLayout());
             entry.setOpaque(false);
-            entry.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
+            entry.setMaximumSize(new ScalableDimension(Integer.MAX_VALUE, 25));
 
             nameLabel = new StyledLabel("Enter new file name:", "NewFileDialog", tlm);
             nameLabel.setStyle(Font.PLAIN);
@@ -91,7 +92,7 @@ public class FileDialog {
         {
             JPanel entry = new JPanel(new BorderLayout());
             entry.setOpaque(false);
-            entry.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
+            entry.setMaximumSize(new ScalableDimension(Integer.MAX_VALUE, 25));
 
             nameField = new StyledTextField("", "NewFileDialog", tlm);
             nameField.getDocument().addUndoableEditListener(e -> validateInput());
@@ -104,16 +105,16 @@ public class FileDialog {
         {
             errorPanel = new JPanel();
             errorPanel.setOpaque(false);
-            errorPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 0));
+            errorPanel.setMaximumSize(new ScalableDimension(Integer.MAX_VALUE, 0));
 
             errorLabel = new StyledLabel("", "NewFileDialog.error", tlm);
             errorLabel.setStyle(Font.BOLD);
-            errorLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, errorLabel.getPreferredSize().height));
+            errorLabel.setMaximumSize(new ScalableDimension(Integer.MAX_VALUE, errorLabel.getPreferredSize().height));
             errorPanel.add(errorLabel);
 
             warningLabel = new StyledLabel("", "NewFileDialog.warning", tlm);
             warningLabel.setStyle(Font.BOLD);
-            warningLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, warningLabel.getPreferredSize().height));
+            warningLabel.setMaximumSize(new ScalableDimension(Integer.MAX_VALUE, warningLabel.getPreferredSize().height));
             errorPanel.add(warningLabel);
 
             content.add(errorPanel);
@@ -124,7 +125,7 @@ public class FileDialog {
         {
             JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
             buttons.setOpaque(false);
-            buttons.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+            buttons.setMaximumSize(new ScalableDimension(Integer.MAX_VALUE, 30));
 
             okButton = new StyledButton("OK", tlm);
             okButton.addActionListener(e -> submit());
@@ -256,13 +257,13 @@ public class FileDialog {
 
     private static void displayError(String message) {
         if(message == null) {
-            pane.setPreferredSize(new Dimension(WIDTH, HEIGHT));
-            errorPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 0));
+            pane.setPreferredSize(new ScalableDimension(WIDTH, HEIGHT));
+            errorPanel.setMaximumSize(new ScalableDimension(Integer.MAX_VALUE, 0));
             errorLabel.setText("");
             dialog.pack();
         } else {
-            pane.setPreferredSize(new Dimension(WIDTH, HEIGHT_ERR));
-            errorPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+            pane.setPreferredSize(new ScalableDimension(WIDTH, HEIGHT_ERR));
+            errorPanel.setMaximumSize(new ScalableDimension(Integer.MAX_VALUE, 30));
             errorLabel.setText(message);
             dialog.pack();
         }
@@ -270,13 +271,13 @@ public class FileDialog {
 
     private static void displayWarning(String message) {
         if(message == null) {
-            pane.setPreferredSize(new Dimension(WIDTH, HEIGHT));
-            errorPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 0));
+            pane.setPreferredSize(new ScalableDimension(WIDTH, HEIGHT));
+            errorPanel.setMaximumSize(new ScalableDimension(Integer.MAX_VALUE, 0));
             warningLabel.setText("");
             dialog.pack();
         } else {
-            pane.setPreferredSize(new Dimension(WIDTH, HEIGHT_ERR));
-            errorPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+            pane.setPreferredSize(new ScalableDimension(WIDTH, HEIGHT_ERR));
+            errorPanel.setMaximumSize(new ScalableDimension(Integer.MAX_VALUE, 30));
             warningLabel.setText(message);
             dialog.pack();
         }

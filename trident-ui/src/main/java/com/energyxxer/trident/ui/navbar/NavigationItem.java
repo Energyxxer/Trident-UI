@@ -55,7 +55,7 @@ public class NavigationItem extends NavigationElement {
             }
         }
 
-        if(icon != null) g.drawImage(Commons.getIcon(icon).getScaledInstance(16, 16, Image.SCALE_SMOOTH), p.x+(width-16)/2, p.y+(height-16)/2, null);
+        if(icon != null) g.drawImage(Commons.getIcon(icon), p.x+(width-16)/2, p.y+(height-16)/2, 16, 16, null);
         this.setBounds(new Rectangle(p.x,p.y,width,height));
         return this.getBounds();
     }

@@ -10,6 +10,7 @@ import com.energyxxer.trident.ui.styledcomponents.*;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.xswing.KeyInputUtils;
 import com.energyxxer.xswing.Padding;
+import com.energyxxer.xswing.ScalableDimension;
 import com.energyxxer.xswing.hints.Hint;
 
 import javax.swing.*;
@@ -45,7 +46,7 @@ public class KeyStrokeDialog  {
         this.warningFunction = warningFunction;
 
         JPanel pane = new JPanel(new BorderLayout());
-        pane.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        pane.setPreferredSize(new ScalableDimension(WIDTH, HEIGHT));
 
         tlm.addThemeChangeListener(t -> pane.setBackground(t.getColor(new Color(235, 235, 235), "PromptDialog.background")));
 
@@ -82,18 +83,18 @@ public class KeyStrokeDialog  {
                     }
                 }
             });
-            field.setPreferredSize(new Dimension(1,30));
+            field.setPreferredSize(new ScalableDimension(1,30));
 
             JPanel fieldPanel = new JPanel(new BorderLayout());
-            fieldPanel.setMinimumSize(new Dimension(1,30));
-            fieldPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE,30));
+            fieldPanel.setMinimumSize(new ScalableDimension(1,30));
+            fieldPanel.setMaximumSize(new ScalableDimension(Integer.MAX_VALUE,30));
             fieldPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
             fieldPanel.setOpaque(false);
             subContent.add(fieldPanel);
 
             fieldPanel.add(field);
             ToolbarButton extraBtn = new ToolbarButton("add", tlm);
-            extraBtn.setPreferredSize(new Dimension(30, 30));
+            extraBtn.setPreferredSize(new ScalableDimension(30, 30));
             extraBtn.setHintText("Set shortcut to");
             extraBtn.setPreferredHintPos(Hint.ABOVE);
             extraBtn.addActionListener(e -> {
@@ -160,7 +161,7 @@ public class KeyStrokeDialog  {
                 JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
                 buttons.setAlignmentX(Component.LEFT_ALIGNMENT);
                 buttons.setOpaque(false);
-                buttons.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+                buttons.setMaximumSize(new ScalableDimension(Integer.MAX_VALUE, 30));
 
                 okButton = new StyledButton("OK", tlm);
                 okButton.addActionListener(e -> {
@@ -232,7 +233,7 @@ public class KeyStrokeDialog  {
                 warningLabel.setIconName(null);
                 warningLabel.setText("");
             }
-            dialog.getContentPane().setPreferredSize(new Dimension(WIDTH, HEIGHT + warningLabel.getPreferredSize().height*2));
+            dialog.getContentPane().setPreferredSize(new ScalableDimension(WIDTH, HEIGHT + warningLabel.getPreferredSize().height*2));
         }
         dialog.pack();
         dialog.repaint();

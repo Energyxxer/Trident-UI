@@ -39,6 +39,8 @@ public class TextLineNumber extends JPanel
 	private int lastHeight = 0;
 	private int lastLine = -1;
 
+	private int zeroWidth = 4;
+
 	public TextLineNumber(AdvancedEditor component, JScrollPane scrollPane) {
 		this(component, scrollPane, 3);
 	}
@@ -71,8 +73,7 @@ public class TextLineNumber extends JPanel
 		int digits = Math.max(String.valueOf(getLineCount()).length(), minimumDigits);
 
 		if(digits != lastDigits) {
-			int digitWidth = this.getFontMetrics(this.getFont()).charWidth('0');
-			int width = padding + (digitWidth * digits) + padding;
+			int width = padding + (zeroWidth * digits) + padding;
 
 			setPreferredSize(new Dimension(width, 0));
 
@@ -96,7 +97,17 @@ public class TextLineNumber extends JPanel
 		g.fillRect(0,0,this.getWidth(),this.getHeight());
 
 		try {
-			FontMetrics fontMetrics = component.getFontMetrics( component.getFont() );
+			FontMetrics fontMetrics = g.getFontMetrics();
+			int currentZeroWidth = fontMetrics.charWidth('0');
+			if(zeroWidth != currentZeroWidth) {
+				lastDigits = -1;
+				zeroWidth = currentZeroWidth;
+				updateWidth();
+				revalidate();
+				repaint();
+				return;
+			}
+			((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			int lineHeight = component.modelToView(0).height;
 			int availableWidth = getSize().width - (2 * padding);
 
@@ -234,7 +245,7 @@ public class TextLineNumber extends JPanel
 
 	@Override
 	public void changedUpdate(DocumentEvent e) {
-		documentChanged();
+
 	}
 
 	private void documentChanged()

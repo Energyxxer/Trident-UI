@@ -6,6 +6,7 @@ import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.styledcomponents.StyledTextField;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.xswing.Padding;
+import com.energyxxer.xswing.ScalableDimension;
 
 import javax.swing.*;
 import java.awt.*;
@@ -34,7 +35,7 @@ public class PromptDialog {
         dialog = new JDialog(TridentWindow.jframe);
 
         JPanel pane = new JPanel(new BorderLayout());
-        pane.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        pane.setPreferredSize(new ScalableDimension(WIDTH, HEIGHT));
 
         tlm.addThemeChangeListener(t -> pane.setBackground(t.getColor(new Color(235, 235, 235), "PromptDialog.background")));
 
@@ -57,7 +58,7 @@ public class PromptDialog {
             label.setAlignmentX(Component.LEFT_ALIGNMENT);
 
             field = new StyledTextField(defaultText, tlm);
-            field.setMaximumSize(new Dimension(Integer.MAX_VALUE,30));
+            field.setMaximumSize(new ScalableDimension(Integer.MAX_VALUE,30));
             field.setAlignmentX(Component.LEFT_ALIGNMENT);
             field.getDocument().addUndoableEditListener(l -> revalidate(field.getText()));
 
@@ -66,7 +67,7 @@ public class PromptDialog {
             {
                 JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
                 buttons.setOpaque(false);
-                buttons.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+                buttons.setMaximumSize(new ScalableDimension(Integer.MAX_VALUE, 30));
 
                 okButton = new StyledButton("OK", tlm);
                 okButton.addActionListener(e -> {

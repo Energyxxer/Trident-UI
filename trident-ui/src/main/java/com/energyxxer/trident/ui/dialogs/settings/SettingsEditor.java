@@ -2,11 +2,13 @@ package com.energyxxer.trident.ui.dialogs.settings;
 
 import com.energyxxer.trident.ui.editor.TridentEditorComponent;
 import com.energyxxer.trident.ui.editor.behavior.caret.Dot;
+import com.energyxxer.trident.ui.scrollbar.OverlayScrollPane;
 import com.energyxxer.trident.ui.styledcomponents.StyledCheckBox;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.styledcomponents.StyledTextField;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.xswing.Padding;
+import com.energyxxer.xswing.ScalableDimension;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,13 +20,13 @@ public class SettingsEditor extends JPanel {
     {
         {
             JPanel header = new JPanel(new BorderLayout());
-            header.setPreferredSize(new Dimension(0,40));
+            header.setPreferredSize(new ScalableDimension(0,40));
             this.add(header, BorderLayout.NORTH);
 
             {
                 JPanel padding = new JPanel();
                 padding.setOpaque(false);
-                padding.setPreferredSize(new Dimension(25,25));
+                padding.setPreferredSize(new ScalableDimension(25,25));
                 header.add(padding, BorderLayout.WEST);
             }
 
@@ -41,13 +43,13 @@ public class SettingsEditor extends JPanel {
         {
             JPanel paddingLeft = new JPanel();
             paddingLeft.setOpaque(false);
-            paddingLeft.setPreferredSize(new Dimension(50,25));
+            paddingLeft.setPreferredSize(new ScalableDimension(50,25));
             this.add(paddingLeft, BorderLayout.WEST);
         }
         {
             JPanel paddingRight = new JPanel();
             paddingRight.setOpaque(false);
-            paddingRight.setPreferredSize(new Dimension(50,25));
+            paddingRight.setPreferredSize(new ScalableDimension(50,25));
             this.add(paddingRight, BorderLayout.EAST);
         }
 
@@ -56,7 +58,7 @@ public class SettingsEditor extends JPanel {
             JPanel content = new JPanel();
             content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
             content.setOpaque(false);
-            this.add(content, BorderLayout.CENTER);
+            this.add(new OverlayScrollPane(tlm, content), BorderLayout.CENTER);
 
 
             {
@@ -71,7 +73,7 @@ public class SettingsEditor extends JPanel {
             }
             {
                 StyledTextField autoreparseDelayField = new StyledTextField("","Settings.content", tlm);
-                autoreparseDelayField.setMaximumSize(new Dimension(300,25));
+                autoreparseDelayField.setMaximumSize(new ScalableDimension(300,25));
                 autoreparseDelayField.setAlignmentX(Component.LEFT_ALIGNMENT);
                 Settings.addOpenEvent(() -> autoreparseDelayField.setText("" + TridentEditorComponent.AUTOREPARSE_DELAY.get()));
                 Settings.addApplyEvent(() -> {

@@ -26,6 +26,7 @@ import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.ImageManager;
 import com.energyxxer.util.logger.Debug;
 import com.energyxxer.xswing.OverlayBorderLayout;
+import com.energyxxer.xswing.ScalableDimension;
 import com.energyxxer.xswing.hints.HintManager;
 
 import javax.swing.*;
@@ -46,7 +47,7 @@ import static com.energyxxer.xswing.KeyInputUtils.*;
  * Literally what it sounds like.
  */
 public class TridentWindow {
-	private static final Dimension defaultSize = new Dimension(1200, 800);
+	private static final Dimension defaultSize = new ScalableDimension(1200, 800);
 	public static final Font defaultFont = new JLabel().getFont();
 
 	public static JFrame jframe;

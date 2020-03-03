@@ -8,12 +8,14 @@ import com.energyxxer.trident.ui.ToolbarButton;
 import com.energyxxer.trident.ui.orderlist.OrderListElement;
 import com.energyxxer.trident.ui.orderlist.OrderListMaster;
 import com.energyxxer.trident.ui.orderlist.StandardOrderListItem;
+import com.energyxxer.trident.ui.scrollbar.OverlayScrollPane;
 import com.energyxxer.trident.ui.scrollbar.OverlayScrollPaneLayout;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenuItem;
 import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.xswing.Padding;
+import com.energyxxer.xswing.ScalableDimension;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -21,6 +23,8 @@ import com.google.gson.JsonObject;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
@@ -28,6 +32,8 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 
 public class ProjectPropertiesDependencies extends JPanel {
 
@@ -42,13 +48,13 @@ public class ProjectPropertiesDependencies extends JPanel {
 
         {
             JPanel header = new JPanel(new BorderLayout());
-            header.setPreferredSize(new Dimension(0,40));
+            header.setPreferredSize(new ScalableDimension(0,40));
             this.add(header, BorderLayout.NORTH);
 
             {
                 JPanel padding = new JPanel();
                 padding.setOpaque(false);
-                padding.setPreferredSize(new Dimension(25,25));
+                padding.setPreferredSize(new ScalableDimension(25,25));
                 header.add(padding, BorderLayout.WEST);
             }
 
@@ -65,13 +71,13 @@ public class ProjectPropertiesDependencies extends JPanel {
         {
             JPanel padding_left = new JPanel();
             padding_left.setOpaque(false);
-            padding_left.setPreferredSize(new Dimension(50,25));
+            padding_left.setPreferredSize(new ScalableDimension(50,25));
             this.add(padding_left, BorderLayout.WEST);
         }
         {
             JPanel padding_right = new JPanel();
             padding_right.setOpaque(false);
-            padding_right.setPreferredSize(new Dimension(50,25));
+            padding_right.setPreferredSize(new ScalableDimension(50,25));
             this.add(padding_right, BorderLayout.EAST);
         }
 
@@ -80,7 +86,17 @@ public class ProjectPropertiesDependencies extends JPanel {
 
             JPanel content = new JPanel(new BorderLayout());
             content.setOpaque(false);
-            this.add(content, BorderLayout.CENTER);
+            OverlayScrollPane scrollPane = new OverlayScrollPane(tlm, content);
+            scrollPane.setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
+            this.add(scrollPane, BorderLayout.CENTER);
+
+            this.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    master.setPreferredSize(null);
+                    master.revalidate();
+                }
+            });
 
             {
                 JPanel aboveContent = new JPanel(new BorderLayout());
@@ -157,11 +173,11 @@ public class ProjectPropertiesDependencies extends JPanel {
 
                 JPanel tableHead = new JPanel(new BorderLayout());
                 tableHead.setAlignmentX(LEFT_ALIGNMENT);
-                tableHead.setPreferredSize(new Dimension(1, 16));
+                tableHead.setPreferredSize(new ScalableDimension(1, 16));
 
                 JPanel exportHead = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
                 exportHead.setOpaque(false);
-                exportHead.setPreferredSize(new Dimension(38, 16));
+                exportHead.setPreferredSize(new ScalableDimension(38, 16));
                 tableHead.add(exportHead, BorderLayout.WEST);
 
                 StyledLabel exportHeadLabel = new StyledLabel("Export", "ProjectProperties.tablehead", tlm);
@@ -170,13 +186,13 @@ public class ProjectPropertiesDependencies extends JPanel {
 
                 JPanel rightHead = new JPanel(new BorderLayout());
                 rightHead.setOpaque(false);
-                rightHead.setPreferredSize(new Dimension(108+72, 16));
+                rightHead.setPreferredSize(new ScalableDimension(108+72, 16));
                 tableHead.add(rightHead, BorderLayout.EAST);
 
 
                 JPanel modeHead = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
                 modeHead.setOpaque(false);
-                modeHead.setPreferredSize(new Dimension(72, 16));
+                modeHead.setPreferredSize(new ScalableDimension(72, 16));
                 rightHead.add(modeHead, BorderLayout.WEST);
 
                 StyledLabel modeHeadLabel = new StyledLabel("Mode", "ProjectProperties.tablehead", tlm);

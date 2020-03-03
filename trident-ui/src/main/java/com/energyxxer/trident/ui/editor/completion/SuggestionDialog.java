@@ -19,6 +19,7 @@ import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.Lazy;
 import com.energyxxer.util.StringUtil;
 import com.energyxxer.util.logger.Debug;
+import com.energyxxer.xswing.ScalableDimension;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -279,7 +280,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         for(ExpandableSuggestionToken token : activeTokens) {
             if(token.isEnabled()) shownTokens += 1;
         }
-        this.setSize(new Dimension(400, Math.min(300, explorer.getRowHeight() * shownTokens + 2 + parameterLabel.getPreferredSize().height)));
+        this.setSize(new ScalableDimension(400, Math.min(300, explorer.getRowHeight() * shownTokens + 2 + parameterLabel.getPreferredSize().height)));
     }
 
     private void relocate(int index) {

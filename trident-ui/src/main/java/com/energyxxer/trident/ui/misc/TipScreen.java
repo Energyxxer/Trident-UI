@@ -3,6 +3,8 @@ package com.energyxxer.trident.ui.misc;
 import com.energyxxer.trident.global.Resources;
 import com.energyxxer.trident.global.keystrokes.KeyMap;
 import com.energyxxer.util.logger.Debug;
+import com.energyxxer.xswing.ScalableDimension;
+import com.energyxxer.xswing.ScalableGraphics2D;
 
 import javax.swing.*;
 import java.awt.*;
@@ -36,7 +38,7 @@ public class TipScreen extends JComponent {
 
         timer = new Timer();
 
-        this.setPreferredSize(new Dimension(800, 100));
+        this.setPreferredSize(new ScalableDimension(800, 100));
     }
 
     public void start() {
@@ -91,6 +93,7 @@ public class TipScreen extends JComponent {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        g = new ScalableGraphics2D(g);
 
         Graphics2D g2d = ((Graphics2D) g);
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);

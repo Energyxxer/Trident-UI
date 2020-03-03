@@ -7,10 +7,7 @@ import com.energyxxer.trident.ui.styledcomponents.StyledButton;
 import com.energyxxer.trident.ui.styledcomponents.StyledList;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.ImageManager;
-import com.energyxxer.xswing.ComponentResizer;
-import com.energyxxer.xswing.OverlayBorderLayout;
-import com.energyxxer.xswing.OverlayBorderPanel;
-import com.energyxxer.xswing.Padding;
+import com.energyxxer.xswing.*;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -42,7 +39,7 @@ public class ProjectProperties {
 		//JButton okay = new JButton("OK");
 		//JButton cancel = new JButton("Cancel");
 		
-		pane.setPreferredSize(new Dimension(900,600));
+		pane.setPreferredSize(new ScalableDimension(900,600));
 
 		JPanel contentPane = new JPanel(new BorderLayout());
 		HashMap<String, JPanel> sectionPanes = new HashMap<>();
@@ -51,8 +48,6 @@ public class ProjectProperties {
 			JPanel sidebar = new OverlayBorderPanel(new BorderLayout(), new Insets(0, 0, 0, ComponentResizer.DIST));
 
 			ComponentResizer resizer = new ComponentResizer(sidebar);
-			sidebar.setMinimumSize(new Dimension(25, 1));
-			sidebar.setMaximumSize(new Dimension(400, 1));
 			resizer.setResizable(false, false, false, true);
 
 			String[] sections = new String[] { "General", "Output", "Definitions", "Type Aliases", "Dependencies", "Game Logger", "Plugins" };
@@ -60,7 +55,6 @@ public class ProjectProperties {
 			StyledList<String> navigator = new StyledList<>(sections, "ProjectProperties");
 			sidebar.setBackground(navigator.getBackground());
 			sidebar.setOpaque(false);
-			navigator.setPreferredSize(new Dimension(200,500));
 
 			navigator.addListSelectionListener(o -> {
 				contentPane.remove(currentSection);
@@ -74,6 +68,9 @@ public class ProjectProperties {
 			pane.add(sidebar, BorderLayout.WEST);
 
 			tlm.addThemeChangeListener(t -> {
+				sidebar.setMinimumSize(new ScalableDimension(25, 1));
+				sidebar.setMaximumSize(new ScalableDimension(400, 1));
+				navigator.setPreferredSize(new ScalableDimension(200,500));
 				pane.setBackground(t.getColor(new Color(235, 235, 235), "ProjectProperties.background"));
 				contentPane.setBackground(t.getColor(new Color(235, 235, 235), "ProjectProperties.content.background"));
 				sidebar.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 0, ComponentResizer.DIST), BorderFactory.createMatteBorder(0, 0, 0, Math.max(t.getInteger(1,"ProjectProperties.content.border.thickness"),0), t.getColor(new Color(200, 200, 200), "ProjectProperties.content.border.color"))));
@@ -97,12 +94,12 @@ public class ProjectProperties {
 
 		{
 			JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-			buttons.setPreferredSize(new Dimension(0,60));
+			buttons.setPreferredSize(new ScalableDimension(0,60));
 			tlm.addThemeChangeListener(t -> buttons.setBackground(contentPane.getBackground()));
 
 			{
 				StyledButton okay = new StyledButton("OK", "ProjectProperties.okButton", tlm);
-				tlm.addThemeChangeListener(t -> okay.setPreferredSize(new Dimension(Math.max(t.getInteger(75,"ProjectProperties.okButton.width"),10), Math.max(t.getInteger(25,"ProjectProperties.okButton.height"),10))));
+				tlm.addThemeChangeListener(t -> okay.setPreferredSize(new ScalableDimension(Math.max(t.getInteger(75,"ProjectProperties.okButton.width"),10), Math.max(t.getInteger(25,"ProjectProperties.okButton.height"),10))));
 				buttons.add(okay);
 
 				okay.addActionListener(e -> {
@@ -116,7 +113,7 @@ public class ProjectProperties {
 
 			{
 				StyledButton cancel = new StyledButton("Cancel", "ProjectProperties.cancelButton", tlm);
-				tlm.addThemeChangeListener(t -> cancel.setPreferredSize(new Dimension(Math.max(t.getInteger(75,"ProjectProperties.cancelButton.width"),10), Math.max(t.getInteger(25,"ProjectProperties.cancelButton.height"),10))));
+				tlm.addThemeChangeListener(t -> cancel.setPreferredSize(new ScalableDimension(Math.max(t.getInteger(75,"ProjectProperties.cancelButton.width"),10), Math.max(t.getInteger(25,"ProjectProperties.cancelButton.height"),10))));
 				buttons.add(cancel);
 
 
@@ -133,7 +130,7 @@ public class ProjectProperties {
 
 			{
 				StyledButton apply = new StyledButton("Apply", "ProjectProperties.applyButton", tlm);
-				tlm.addThemeChangeListener(t -> apply.setPreferredSize(new Dimension(Math.max(t.getInteger(75,"ProjectProperties.applyButton.width"),10), Math.max(t.getInteger(25,"ProjectProperties.applyButton.height"),10))));
+				tlm.addThemeChangeListener(t -> apply.setPreferredSize(new ScalableDimension(Math.max(t.getInteger(75,"ProjectProperties.applyButton.width"),10), Math.max(t.getInteger(25,"ProjectProperties.applyButton.height"),10))));
 				buttons.add(apply);
 
 				apply.addActionListener(e -> {

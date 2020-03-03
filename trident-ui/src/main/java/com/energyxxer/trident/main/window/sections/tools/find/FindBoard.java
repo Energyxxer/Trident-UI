@@ -9,6 +9,7 @@ import com.energyxxer.trident.ui.styledcomponents.ButtonHintHandler;
 import com.energyxxer.trident.ui.styledcomponents.Padding;
 import com.energyxxer.trident.ui.styledcomponents.StyledToggleButton;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
+import com.energyxxer.xswing.ScalableDimension;
 import com.energyxxer.xswing.hints.Hint;
 
 import javax.swing.*;
@@ -29,7 +30,7 @@ public class FindBoard extends ToolBoard implements FindExplorerFilter {
         super(parent);
         this.setLayout(new BorderLayout());
 
-        this.setPreferredSize(new Dimension(1, 300));
+        this.setPreferredSize(new ScalableDimension(1, 300));
 
         this.add(new OverlayScrollPane(tlm, explorer), BorderLayout.CENTER);
         JPanel filterPanel = new JPanel(new BorderLayout());

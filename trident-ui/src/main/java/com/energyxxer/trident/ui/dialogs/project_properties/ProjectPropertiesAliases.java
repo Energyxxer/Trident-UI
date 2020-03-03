@@ -2,11 +2,13 @@ package com.energyxxer.trident.ui.dialogs.project_properties;
 
 import com.energyxxer.trident.global.TabManager;
 import com.energyxxer.trident.ui.Tab;
+import com.energyxxer.trident.ui.scrollbar.OverlayScrollPane;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.tablist.TabItem;
 import com.energyxxer.trident.ui.tablist.TabListMaster;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.xswing.Padding;
+import com.energyxxer.xswing.ScalableDimension;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -29,13 +31,13 @@ class ProjectPropertiesAliases extends JPanel {
     {
         {
             JPanel header = new JPanel(new BorderLayout());
-            header.setPreferredSize(new Dimension(0,40));
+            header.setPreferredSize(new ScalableDimension(0,40));
             this.add(header, BorderLayout.NORTH);
 
             {
                 JPanel padding = new JPanel();
                 padding.setOpaque(false);
-                padding.setPreferredSize(new Dimension(25,25));
+                padding.setPreferredSize(new ScalableDimension(25,25));
                 header.add(padding, BorderLayout.WEST);
             }
 
@@ -52,13 +54,13 @@ class ProjectPropertiesAliases extends JPanel {
         {
             JPanel padding_left = new JPanel();
             padding_left.setOpaque(false);
-            padding_left.setPreferredSize(new Dimension(50,25));
+            padding_left.setPreferredSize(new ScalableDimension(50,25));
             this.add(padding_left, BorderLayout.WEST);
         }
         {
             JPanel padding_right = new JPanel();
             padding_right.setOpaque(false);
-            padding_right.setPreferredSize(new Dimension(50,25));
+            padding_right.setPreferredSize(new ScalableDimension(50,25));
             this.add(padding_right, BorderLayout.EAST);
         }
 
@@ -66,7 +68,7 @@ class ProjectPropertiesAliases extends JPanel {
 
             JPanel content = new JPanel(new BorderLayout());
             content.setOpaque(false);
-            this.add(content, BorderLayout.CENTER);
+            this.add(new OverlayScrollPane(tlm, content), BorderLayout.CENTER);
 
             {
                 JPanel preContent = new JPanel();

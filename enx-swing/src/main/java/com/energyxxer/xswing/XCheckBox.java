@@ -12,6 +12,8 @@ public class XCheckBox extends JCheckBox {
 
     protected int checkBoxSize = 12;
 
+    protected int realIconTextGap = 5;
+
     protected Image checkMarkIcon = null;
 
     {
@@ -37,7 +39,7 @@ public class XCheckBox extends JCheckBox {
     protected void paintComponent(Graphics g) {
         g.setColor(this.getBorderColor());
         Rectangle checkBoxRect = new Rectangle();
-        checkBoxRect.x = (this.getHeight() - checkBoxSize) / 2;
+        checkBoxRect.x = 0;
         checkBoxRect.y = (this.getHeight() - checkBoxSize) / 2;
         checkBoxRect.width = checkBoxSize;
         checkBoxRect.height = checkBoxSize;
@@ -54,7 +56,7 @@ public class XCheckBox extends JCheckBox {
         g.setFont(this.getFont());
         ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         FontMetrics metrics = g.getFontMetrics(this.getFont());
-        g.drawString(this.getText(), checkBoxRect.x + checkBoxRect.width + this.getIconTextGap(), this.getHeight()/2 - metrics.getHeight()/2 + metrics.getAscent());
+        g.drawString(this.getText(), checkBoxRect.x + checkBoxRect.width + realIconTextGap, this.getHeight()/2 - metrics.getHeight()/2 + metrics.getAscent());
 
         if(this.isSelected() && this.getCheckMarkIcon() != null) {
             g.drawImage(this.getCheckMarkIcon(), checkBoxRect.x, checkBoxRect.y, checkBoxRect.width, checkBoxRect.height, null);
@@ -105,5 +107,11 @@ public class XCheckBox extends JCheckBox {
 
     public void setCheckBoxSize(int checkBoxSize) {
         this.checkBoxSize = checkBoxSize;
+    }
+
+    @Override
+    public void setIconTextGap(int iconTextGap) {
+        realIconTextGap = iconTextGap;
+        super.setIconTextGap(realIconTextGap + checkBoxSize - 12);
     }
 }

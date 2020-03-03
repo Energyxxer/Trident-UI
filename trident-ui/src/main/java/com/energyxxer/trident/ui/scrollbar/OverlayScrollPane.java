@@ -21,6 +21,8 @@ public class OverlayScrollPane extends JScrollPane {
     }
 
     private void setup() {
+        this.setOpaque(false);
+        this.getViewport().setOpaque(false);
         this.setLayout(new OverlayScrollPaneLayout(this, tlm));
         this.setBorder(BorderFactory.createEmptyBorder());
     }

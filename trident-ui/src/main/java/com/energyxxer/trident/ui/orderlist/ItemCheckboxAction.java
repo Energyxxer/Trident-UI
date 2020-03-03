@@ -40,7 +40,7 @@ public abstract class ItemCheckboxAction implements ItemAction {
             g.setColor(styleProvider.getColors().get("checkbox" + styleKeyVariation + ".background"));
             g.fillRect(x, y + buttonVGap, buttonSize, buttonSize);
         }
-        if(checked) g.drawImage(Commons.getIcon("checkmark").getScaledInstance(16, 16, Image.SCALE_SMOOTH), x + iconMargin, y + buttonVGap + iconMargin, null);
+        if(checked) g.drawImage(Commons.getIcon("checkmark"), x + iconMargin, y + buttonVGap + iconMargin, 16, 16, null);
     }
 
     @Override

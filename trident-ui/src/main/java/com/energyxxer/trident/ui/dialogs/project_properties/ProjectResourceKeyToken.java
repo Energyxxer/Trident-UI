@@ -50,7 +50,7 @@ public class ProjectResourceKeyToken implements CompoundActionModuleToken {
         list.add(new ItemButtonAction() {
             @Override
             public Image getIcon() {
-                return Commons.getIcon("clear").getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+                return Commons.getIcon("clear");
             }
 
             @Override
@@ -66,7 +66,7 @@ public class ProjectResourceKeyToken implements CompoundActionModuleToken {
         list.add(new ItemButtonAction() {
             @Override
             public Image getIcon() {
-                return Commons.getIcon("triangle_down").getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+                return Commons.getIcon("triangle_down");
             }
 
             @Override
@@ -82,7 +82,7 @@ public class ProjectResourceKeyToken implements CompoundActionModuleToken {
         list.add(new ItemButtonAction() {
             @Override
             public Image getIcon() {
-                return Commons.getIcon("triangle_up").getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+                return Commons.getIcon("triangle_up");
             }
 
             @Override
@@ -99,7 +99,7 @@ public class ProjectResourceKeyToken implements CompoundActionModuleToken {
             list.add(new ItemButtonAction() {
                 @Override
                 public Image getIcon() {
-                    return Commons.getIcon("explorer").getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+                    return Commons.getIcon("explorer");
                 }
 
                 @Override

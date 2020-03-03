@@ -5,6 +5,7 @@ import com.energyxxer.trident.ui.styledcomponents.StyledMenuItem;
 import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
 import com.energyxxer.util.Factory;
 import com.energyxxer.xswing.ChoiceListener;
+import com.energyxxer.xswing.ScalableDimension;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -156,7 +157,7 @@ public class ItemDropdownAction<T> implements ItemAction {
             width = Math.max(width, item.getPreferredSize().width);
         }
 
-        pm.setPreferredSize(new Dimension(Math.max(lastRenderedWidth, width),height));
+        pm.setPreferredSize(new ScalableDimension(Math.max(lastRenderedWidth, width),height));
         pm.show(parent.getComponent(), lastRenderedX - 1, lastRenderedY + lastRenderedHeight - 4);
     }
 
@@ -215,7 +216,7 @@ public class ItemDropdownAction<T> implements ItemAction {
         x += iconMargin;
 
         if(this.icon != null) {
-            g.drawImage(this.icon.getImage(), x + iconMargin, y + buttonVGap + iconMargin, null);
+            g.drawImage(this.icon.getImage(), x + iconMargin, y + buttonVGap + iconMargin, 16, 16, null);
             x += 16;
             x += iconMargin;
         }

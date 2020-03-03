@@ -13,10 +13,7 @@ import com.energyxxer.trident.ui.styledcomponents.StyledDropdownMenu;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.styledcomponents.StyledTextField;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
-import com.energyxxer.xswing.ComponentResizer;
-import com.energyxxer.xswing.DragHandler;
-import com.energyxxer.xswing.OverlayBorderPanel;
-import com.energyxxer.xswing.UnifiedDocumentListener;
+import com.energyxxer.xswing.*;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -58,8 +55,6 @@ public class QuickFindDialog extends JDialog implements WindowFocusListener, Act
 
         this.setContentPane(contentPanel);
         contentPanel.setOpaque(false);
-        contentPanel.setMinimumSize(new Dimension(400, 150));
-        contentPanel.setPreferredSize(new Dimension(800, 600));
         JPanel header = new JPanel(new BorderLayout());
 
         JPanel titleBar = new JPanel(new BorderLayout());
@@ -74,7 +69,7 @@ public class QuickFindDialog extends JDialog implements WindowFocusListener, Act
         this.rootPicker.addChoiceListener(l -> updateLastEdit());
         titleBar.add(controlsPanel, BorderLayout.EAST);
         header.add(titleBar, BorderLayout.NORTH);
-        titleBar.setPreferredSize(new Dimension(1, 35));
+        titleBar.setPreferredSize(new ScalableDimension(1, 35));
 
 
 
@@ -84,7 +79,6 @@ public class QuickFindDialog extends JDialog implements WindowFocusListener, Act
 
 
         this.field = new StyledTextField("", "QuickAccess", tlm);
-        field.setPreferredSize(new Dimension(1, 28));
         this.field.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -108,10 +102,13 @@ public class QuickFindDialog extends JDialog implements WindowFocusListener, Act
         contentPanel.add(this.scrollPane, BorderLayout.CENTER);
 
         tlm.addThemeChangeListener(t -> {
+            contentPanel.setMinimumSize(new ScalableDimension(400, 150));
+            contentPanel.setPreferredSize(new ScalableDimension(800, 600));
+            field.setPreferredSize(new ScalableDimension(1, 28));
             titleBar.setBackground(t.getColor(new Color(230, 230, 230), "QuickAccess.header.background"));
             int thickness = Math.max(t.getInteger(1,"QuickAccess.border.thickness"),0);
             contentPanel.setBorder(new CompoundBorder(new EmptyBorder(ComponentResizer.DIST, ComponentResizer.DIST, ComponentResizer.DIST, ComponentResizer.DIST), BorderFactory.createMatteBorder(thickness, thickness, thickness, thickness, t.getColor(new Color(200, 200, 200), "QuickAccess.border.color"))));
-            field.setBorder(BorderFactory.createMatteBorder(0, 28, 0, 0, new ImageIcon(Commons.getIcon("search_28"))));
+            field.setBorder(BorderFactory.createMatteBorder(0, (int)(28 * ScalableGraphics2D.SCALE_FACTOR), 0, 0, new ImageIcon(Commons.getScaledIcon("search_28", 28, 28))));
         });
 
         //this.addMouseListener(this);

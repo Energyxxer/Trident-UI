@@ -2,6 +2,7 @@ package com.energyxxer.trident.main.window.sections;
 
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
+import com.energyxxer.xswing.ScalableDimension;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,7 +17,7 @@ public class ExtendedStatusBar extends JPanel {
 
     {
         this.setLayout(new FlowLayout(FlowLayout.RIGHT, 20,5));
-        this.setPreferredSize(new Dimension(500, 25));
+        this.setPreferredSize(new ScalableDimension(500, 25));
 
         this.setOpaque(false);
         this.setBackground(new Color(0,0,0,0));

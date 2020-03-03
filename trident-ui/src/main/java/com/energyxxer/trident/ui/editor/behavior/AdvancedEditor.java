@@ -16,6 +16,7 @@ import com.energyxxer.util.Disposable;
 import com.energyxxer.util.StringLocation;
 import com.energyxxer.util.StringLocationCache;
 import com.energyxxer.util.logger.Debug;
+import com.energyxxer.xswing.ScalableDimension;
 import com.energyxxer.xswing.UnifiedDocumentListener;
 import org.jetbrains.annotations.NotNull;
 
@@ -137,7 +138,7 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
             this.setSelectionColor(t.getColor(new Color(50, 100, 175), "Editor.selection.background"));
             this.setSelectionUnfocusedColor(t.getColor(new Color(50, 100, 175), "Editor.selection.unfocused.background"));
             this.setCurrentLineColor(t.getColor(new Color(235, 235, 235), "Editor.currentLine.background"));
-            this.setFont(new Font(t.getString("Editor.font","default:monospaced"), Font.PLAIN, Preferences.getEditorFontSize()));
+            this.setFont(new Font(t.getString("Editor.font","default:monospaced"), Font.PLAIN, Preferences.getModifiedEditorFontSize()));
             this.setBraceHighlightColor(t.getColor(Color.YELLOW, "Editor.braceHighlight.background"));
         });
     }
@@ -631,7 +632,7 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
     private void updateDefaultSize() {
         if(defaultSize != null) {
             int lineCount = getText().split("\n", -1).length;
-            Dimension size = new Dimension(defaultSize.width, (getLineHeight() * lineCount) + defaultSize.height - getLineHeight());
+            Dimension size = new ScalableDimension(defaultSize.width, (getLineHeight() * lineCount) + defaultSize.height - getLineHeight());
             this.setPreferredSize(size);
             for(Consumer<Dimension> consumer : defaultSizeListeners) {
                 consumer.accept(size);

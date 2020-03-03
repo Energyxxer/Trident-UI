@@ -141,7 +141,7 @@ public class XDropdownMenu<T> extends XButton {
             width = Math.max(width, item.getPreferredSize().width);
         }
 
-        pm.setPreferredSize(new Dimension(Math.max(this.getWidth(), width),height));
+        pm.setPreferredSize(new ScalableDimension(Math.max(this.getWidth(), width),height));
         pm.show(this,0 ,this.getHeight()-1);
     }
 }

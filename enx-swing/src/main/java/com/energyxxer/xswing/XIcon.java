@@ -28,7 +28,7 @@ public class XIcon extends JPanel {
 
     public void setImage(BufferedImage image) {
         this.image = image;
-        this.setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
+        this.setPreferredSize(new ScalableDimension(image.getWidth(), image.getHeight()));
     }
 
     @Override

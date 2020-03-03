@@ -107,9 +107,11 @@ public class StyledLabel extends JLabel implements ThemeChangeListener {
             setFont(font);
         }
         if (icon != null) {
-            this.setIcon(new ImageIcon(Commons.getIcon(icon).getScaledInstance(16, 16, Image.SCALE_SMOOTH)));
+            this.setIcon(new ImageIcon(Commons.getScaledIcon(icon, 16, 16)));
         } else {
             this.setIcon(null);
         }
+
+        this.setPreferredSize(null);
     }
 }

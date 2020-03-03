@@ -5,11 +5,13 @@ import com.energyxxer.trident.ui.commodoreresources.DefinitionUpdateProcess;
 import com.energyxxer.trident.ui.common.ProgramUpdateProcess;
 import com.energyxxer.trident.ui.explorer.ProjectExplorerMaster;
 import com.energyxxer.trident.ui.modules.FileModuleToken;
+import com.energyxxer.trident.ui.scrollbar.OverlayScrollPane;
 import com.energyxxer.trident.ui.styledcomponents.StyledCheckBox;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.styledcomponents.StyledTextField;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.xswing.Padding;
+import com.energyxxer.xswing.ScalableDimension;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,13 +23,13 @@ class SettingsBehavior extends JPanel {
     {
         {
             JPanel header = new JPanel(new BorderLayout());
-            header.setPreferredSize(new Dimension(0,40));
+            header.setPreferredSize(new ScalableDimension(0,40));
             this.add(header, BorderLayout.NORTH);
 
             {
                 JPanel padding = new JPanel();
                 padding.setOpaque(false);
-                padding.setPreferredSize(new Dimension(25,25));
+                padding.setPreferredSize(new ScalableDimension(25,25));
                 header.add(padding, BorderLayout.WEST);
             }
 
@@ -44,13 +46,13 @@ class SettingsBehavior extends JPanel {
         {
             JPanel paddingLeft = new JPanel();
             paddingLeft.setOpaque(false);
-            paddingLeft.setPreferredSize(new Dimension(50,25));
+            paddingLeft.setPreferredSize(new ScalableDimension(50,25));
             this.add(paddingLeft, BorderLayout.WEST);
         }
         {
             JPanel paddingRight = new JPanel();
             paddingRight.setOpaque(false);
-            paddingRight.setPreferredSize(new Dimension(50,25));
+            paddingRight.setPreferredSize(new ScalableDimension(50,25));
             this.add(paddingRight, BorderLayout.EAST);
         }
 
@@ -59,13 +61,13 @@ class SettingsBehavior extends JPanel {
             JPanel content = new JPanel();
             content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
             content.setOpaque(false);
-            this.add(content, BorderLayout.CENTER);
+            this.add(new OverlayScrollPane(tlm, content), BorderLayout.CENTER);
 
             {
                 JPanel padding = new JPanel();
                 padding.setOpaque(false);
-                padding.setMinimumSize(new Dimension(1,20));
-                padding.setMaximumSize(new Dimension(1,20));
+                padding.setMinimumSize(new ScalableDimension(1,20));
+                padding.setMaximumSize(new ScalableDimension(1,20));
                 content.add(padding);
             }
 
@@ -179,7 +181,7 @@ class SettingsBehavior extends JPanel {
             }
             {
                 StyledTextField tabLimitField = new StyledTextField("","Settings.content", tlm);
-                tabLimitField.setMaximumSize(new Dimension(300,25));
+                tabLimitField.setMaximumSize(new ScalableDimension(300,25));
                 tabLimitField.setAlignmentX(Component.LEFT_ALIGNMENT);
                 Settings.addOpenEvent(() -> tabLimitField.setText("" + TabManager.TAB_LIMIT.get()));
                 Settings.addApplyEvent(() -> {

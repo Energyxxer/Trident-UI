@@ -8,6 +8,7 @@ import com.energyxxer.trident.ui.scrollbar.OverlayScrollPane;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.logger.Debug;
 import com.energyxxer.util.processes.AbstractProcess;
+import com.energyxxer.xswing.ScalableDimension;
 
 import java.awt.*;
 import java.util.ConcurrentModificationException;
@@ -20,7 +21,7 @@ public class ProcessBoard extends ToolBoard {
     public ProcessBoard(ToolBoardMaster parent) {
         super(parent);
         this.setLayout(new BorderLayout());
-        this.setPreferredSize(new Dimension(10, 200));
+        this.setPreferredSize(new ScalableDimension(10, 200));
         scrollPane.setViewportView(explorer);
         this.add(scrollPane);
     }

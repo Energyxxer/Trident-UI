@@ -2,6 +2,7 @@ package com.energyxxer.trident.main.window.sections;
 
 import com.energyxxer.trident.files.FileType;
 import com.energyxxer.trident.global.Preferences;
+import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.ToolbarButton;
 import com.energyxxer.trident.ui.dialogs.settings.Settings;
 import com.energyxxer.trident.ui.misc.TipScreen;
@@ -98,7 +99,10 @@ public class WelcomePane extends JPanel {
             ToolbarButton button = new ToolbarButton("cog", tlm);
             button.setText("Settings");
             button.setHintText("Manage settings");
-            button.addActionListener(e -> Settings.show());
+            button.addActionListener(e -> {
+                TridentWindow.toolbar.hint.dismiss();
+                Settings.show();
+            });
             JPanel wrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT));
             wrapper.setOpaque(false);
             wrapper.add(button);

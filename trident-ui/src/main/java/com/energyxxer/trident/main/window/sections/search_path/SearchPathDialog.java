@@ -9,12 +9,11 @@ import com.energyxxer.trident.main.window.sections.tools.find.*;
 import com.energyxxer.trident.ui.editor.TridentEditorModule;
 import com.energyxxer.trident.ui.editor.behavior.caret.CaretProfile;
 import com.energyxxer.trident.ui.scrollbar.OverlayScrollPane;
+import com.energyxxer.trident.ui.styledcomponents.Padding;
 import com.energyxxer.trident.ui.styledcomponents.*;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.logger.Debug;
-import com.energyxxer.xswing.ComponentResizer;
-import com.energyxxer.xswing.DragHandler;
-import com.energyxxer.xswing.UnifiedDocumentListener;
+import com.energyxxer.xswing.*;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -71,9 +70,9 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
         this.setBackground(new Color(0,0,0,1));
 
         this.setContentPane(contentPanel);
-        contentPanel.setMinimumSize(new Dimension(600, 200));
+        contentPanel.setMinimumSize(new ScalableDimension(600, 200));
         contentPanel.setOpaque(false);
-        contentPanel.setPreferredSize(new Dimension(800, 600));
+        contentPanel.setPreferredSize(new ScalableDimension(800, 600));
         JPanel header = new JPanel(new BorderLayout());
 
         JPanel titleBar = new JPanel(new BorderLayout());
@@ -94,7 +93,7 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
         controlsPanel.add(this.fileMaskEnabled);
 
         this.fileMask = new StyledTextField("", "FindInPath.header", tlm);
-        this.fileMask.setPreferredSize(new Dimension(60, 24));
+        this.fileMask.setPreferredSize(new ScalableDimension(60, 24));
         this.fileMask.setText("*.tdn");
         controlsPanel.add(this.fileMask);
 
@@ -106,7 +105,7 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
 
         titleBar.add(controlsPanel, BorderLayout.EAST);
         header.add(titleBar, BorderLayout.NORTH);
-        titleBar.setPreferredSize(new Dimension(1, 35));
+        titleBar.setPreferredSize(new ScalableDimension(1, 35));
 
 
 
@@ -116,7 +115,7 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
 
 
         this.field = new StyledTextField("", "FindInPath", tlm);
-        field.setPreferredSize(new Dimension(1, 28));
+        field.setPreferredSize(new ScalableDimension(1, 28));
         this.field.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -178,7 +177,7 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
 
         previewPanel = new JPanel(new BorderLayout());
         previewLabel = new StyledLabel("", "FindInPath.preview.header", tlm);
-        previewLabel.setPreferredSize(new Dimension(1, 26));
+        previewLabel.setPreferredSize(new ScalableDimension(1, 26));
         previewPanel.add(previewLabel, BorderLayout.NORTH);
 
         footerPanel = new JPanel(new BorderLayout());
@@ -207,7 +206,7 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
             titleBar.setBackground(t.getColor(new Color(230, 230, 230), "FindInPath.header.background"));
             int thickness = Math.max(t.getInteger(1,"FindInPath.border.thickness"),0);
             contentPanel.setBorder(new CompoundBorder(new EmptyBorder(ComponentResizer.DIST, ComponentResizer.DIST, ComponentResizer.DIST, ComponentResizer.DIST), BorderFactory.createMatteBorder(thickness, thickness, thickness, thickness, t.getColor(new Color(200, 200, 200), "FindInPath.border.color"))));
-            field.setBorder(BorderFactory.createMatteBorder(0, 28, 0, 0, new ImageIcon(Commons.getIcon("search_28"))));
+            field.setBorder(BorderFactory.createMatteBorder(0, (int)(28 * ScalableGraphics2D.SCALE_FACTOR), 0, 0, new ImageIcon(Commons.getScaledIcon("search_28", 28, 28))));
             previewPanel.setBackground(t.getColor(new Color(230, 230, 230), "FindInPath.preview.header.background", "FindInPath.header.background"));
             footerPanel.setBackground(t.getColor(new Color(230, 230, 230), "FindInPath.preview.footer.background", "FindInPath.footer.background", "FindInPath.preview.header.background", "FindInPath.header.background"));
             thickness = Math.max(t.getInteger(1,"FindInPath.preview.footer.border.thickness", "FindInPath.preview.header.border.thickness"),0);
@@ -346,7 +345,7 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
         }
         editorModule = new TridentEditorModule(null, file);
         editorModule.setEditable(false);
-        editorModule.setPreferredSize(new Dimension(1, 300));
+        editorModule.setPreferredSize(new ScalableDimension(1, 300));
         highlighter = new FixedHighlighter(editorModule.editorComponent);
         tlmHighlighter = new ThemeListenerManager();
         tlm.addThemeChangeListener(t -> {

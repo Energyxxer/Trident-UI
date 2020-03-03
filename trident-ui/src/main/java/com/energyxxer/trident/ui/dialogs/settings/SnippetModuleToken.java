@@ -13,6 +13,7 @@ import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.Disposable;
 import com.energyxxer.util.logger.Debug;
 import com.energyxxer.xswing.ComponentResizer;
+import com.energyxxer.xswing.ScalableDimension;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -35,8 +36,8 @@ public class SnippetModuleToken implements CompoundActionModuleToken, Disposable
         this.snippet = snippet;
         this.parent = parent;
         settingsPanel = new JPanel(new BorderLayout());
-        settingsPanel.setMinimumSize(new Dimension(1, 100));
-        settingsPanel.setPreferredSize(new Dimension(1, 200));
+        settingsPanel.setMinimumSize(new ScalableDimension(1, 100));
+        settingsPanel.setPreferredSize(new ScalableDimension(1, 200));
         ComponentResizer resizer = new ComponentResizer(settingsPanel);
         resizer.setEnabled(true);
         resizer.setResizable(true, false, false, false);
@@ -49,12 +50,12 @@ public class SnippetModuleToken implements CompoundActionModuleToken, Disposable
         JPanel summaryPanel = new JPanel();
         summaryPanel.setLayout(new BoxLayout(summaryPanel, BoxLayout.X_AXIS));
         summaryPanel.setOpaque(false);
-        summaryPanel.setPreferredSize(new Dimension(1, 40));
+        summaryPanel.setPreferredSize(new ScalableDimension(1, 40));
         summaryPanel.add(new Padding(30));
         summaryPanel.add(new StyledLabel("Shorthand: ", tlm));
         summaryPanel.add(shorthandField = new StyledTextField(snippet.getShorthand(), tlm) {
             {
-                this.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
+                this.setMaximumSize(new ScalableDimension(Integer.MAX_VALUE, 25));
                 this.getDocument().addUndoableEditListener(e -> {
                     Debug.log(this.getText());
                     snippet.setShorthand(this.getText());
@@ -66,7 +67,7 @@ public class SnippetModuleToken implements CompoundActionModuleToken, Disposable
         summaryPanel.add(new StyledLabel("Description: ", tlm));
         summaryPanel.add(new StyledTextField(snippet.getDescription(), tlm) {
             {
-                this.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
+                this.setMaximumSize(new ScalableDimension(Integer.MAX_VALUE, 25));
                 this.getDocument().addUndoableEditListener(e -> {
                     snippet.setDescription(this.getText());
                     parent.repaint();
@@ -97,8 +98,8 @@ public class SnippetModuleToken implements CompoundActionModuleToken, Disposable
             StyledLabel contextLabel;
             {
                 JPanel contextPanel = this;
-                this.setPreferredSize(new Dimension(200, 1));
-                this.setMinimumSize(new Dimension(200, 1));
+                this.setPreferredSize(new ScalableDimension(200, 1));
+                this.setMinimumSize(new ScalableDimension(200, 1));
                 ComponentResizer contextResizer = new ComponentResizer(contextPanel);
                 contextResizer.setEnabled(true);
                 contextResizer.setResizable(false, true, false, false);
@@ -125,7 +126,7 @@ public class SnippetModuleToken implements CompoundActionModuleToken, Disposable
                             menu.add(new StyledMenuItem(context.name()) {
                                 {
                                     this.setIconName(snippet.getContexts().get(context) ? "checkmark" : "blank");
-                                    this.setPreferredSize(new Dimension(contextPanel.getWidth()-2, this.getPreferredSize().height));
+                                    this.setPreferredSize(new ScalableDimension(contextPanel.getWidth()-2, this.getPreferredSize().height));
                                     remainingHeight -= this.getPreferredSize().height;
                                 }
 
@@ -140,15 +141,10 @@ public class SnippetModuleToken implements CompoundActionModuleToken, Disposable
                         if(remainingHeight >= 1) {
                             menu.add(new JMenuItem() {
                                 {
-                                    this.setPreferredSize(new Dimension(contextPanel.getWidth()-2, remainingHeight));
+                                    this.setPreferredSize(new ScalableDimension(contextPanel.getWidth()-2, remainingHeight));
                                     this.setOpaque(false);
                                     this.setContentAreaFilled(false);
                                     this.setBorderPainted(false);
-                                }
-
-                                @Override
-                                protected void paintComponent(Graphics g) {
-
                                 }
                             });
                         }

@@ -34,7 +34,7 @@ public class XToggleButton extends JCheckBox {
             }
             g.fillRect(borderThickness, borderThickness, this.getWidth()-2* borderThickness, this.getHeight()-2* borderThickness);
         }
-        Dimension iconSize = new Dimension(toggleIcon.getWidth(null), toggleIcon.getHeight(null));
+        Dimension iconSize = new ScalableDimension(toggleIcon.getWidth(null), toggleIcon.getHeight(null));
         g.drawImage(toggleIcon, (this.getWidth()-iconSize.width)/2, (this.getHeight()-iconSize.height)/2, null);
     }
 

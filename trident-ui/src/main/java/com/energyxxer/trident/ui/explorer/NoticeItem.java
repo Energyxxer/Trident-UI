@@ -85,7 +85,7 @@ public class NoticeItem extends ExplorerElement {
         //File Icon
         {
             int margin = ((master.getRowHeight() - 16) / 2);
-            g.drawImage(master.getAssetMap().get(notice.getType().name().toLowerCase()),x,y + margin,16, 16,new Color(0,0,0,0),null);
+            g.drawImage(master.getAssetMap().get(notice.getType().name().toLowerCase()),x,y + margin,16, 16,null);
         }
         x += 25;
 

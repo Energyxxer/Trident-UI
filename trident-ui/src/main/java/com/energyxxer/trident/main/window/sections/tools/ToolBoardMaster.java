@@ -7,6 +7,7 @@ import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.xswing.ComponentResizer;
 import com.energyxxer.xswing.OverlayBorderPanel;
+import com.energyxxer.xswing.ScalableDimension;
 import com.energyxxer.xswing.hints.Hint;
 
 import javax.swing.*;
@@ -36,7 +37,7 @@ public class ToolBoardMaster extends OverlayBorderPanel {
         this.setBorder(new EmptyBorder(ComponentResizer.DIST, 0, 0, 0));
 
         tlm.addThemeChangeListener(t -> {
-            header.setPreferredSize(new Dimension(0, Math.max(5, t.getInteger(29, "ToolBoard.header.height"))));
+            header.setPreferredSize(new ScalableDimension(0, Math.max(5, t.getInteger(29, "ToolBoard.header.height"))));
             header.setBackground(t.getColor(Color.WHITE, "ToolBoard.header.background"));
             header.setBorder(BorderFactory.createMatteBorder(Math.max(t.getInteger(1, "ToolBoard.header.border.top.thickness", "ToolBoard.header.border.thickness"),0), 0, Math.max(t.getInteger(1, "ToolBoard.header.border.bottom.thickness", "ToolBoard.header.border.thickness"),0), 0, t.getColor(new Color(200, 200, 200), "ToolBoard.header.border.color")));
         });

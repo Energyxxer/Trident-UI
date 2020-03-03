@@ -11,6 +11,7 @@ import com.energyxxer.trident.ui.styledcomponents.StyledTextField;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.trident.util.FileCommons;
 import com.energyxxer.xswing.Padding;
+import com.energyxxer.xswing.ScalableDimension;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -44,7 +45,7 @@ public class ProjectDialog {
 
     static {
         pane = new JPanel(new BorderLayout());
-        pane.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        pane.setPreferredSize(new ScalableDimension(WIDTH, HEIGHT));
         tlm.addThemeChangeListener(t ->
                 pane.setBackground(t.getColor(new Color(235, 235, 235), "NewProjectDialog.background","Dialog.background"))
         );
@@ -52,7 +53,7 @@ public class ProjectDialog {
         //<editor-fold desc="Icon">
         JPanel iconPanel = new JPanel(new BorderLayout());
         iconPanel.setOpaque(false);
-        iconPanel.setPreferredSize(new Dimension(73, 48));
+        iconPanel.setPreferredSize(new ScalableDimension(73, 48));
         iconPanel.add(new Padding(25), BorderLayout.WEST);
         iconPanel.setBorder(new EmptyBorder(0, 0, 0, 2));
         iconPanel.add(new StyledIcon("project", 48, 48, Image.SCALE_SMOOTH, tlm));
@@ -73,7 +74,7 @@ public class ProjectDialog {
         {
             JPanel entry = new JPanel(new BorderLayout());
             entry.setOpaque(false);
-            entry.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
+            entry.setMaximumSize(new ScalableDimension(Integer.MAX_VALUE, 25));
 
             StyledLabel instructionsLabel = new StyledLabel("Enter new project name:", "NewProjectDialog", tlm);
             instructionsLabel.setStyle(Font.PLAIN);
@@ -86,7 +87,7 @@ public class ProjectDialog {
         {
             JPanel entry = new JPanel(new BorderLayout());
             entry.setOpaque(false);
-            entry.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
+            entry.setMaximumSize(new ScalableDimension(Integer.MAX_VALUE, 25));
 
             nameField = new StyledTextField("", "NewProjectDialog", tlm);
             nameField.getDocument().addUndoableEditListener(e -> validateInput());
@@ -99,11 +100,11 @@ public class ProjectDialog {
         {
             errorPanel = new JPanel();
             errorPanel.setOpaque(false);
-            errorPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 0));
+            errorPanel.setMaximumSize(new ScalableDimension(Integer.MAX_VALUE, 0));
 
             errorLabel = new StyledLabel("", "NewProjectDialog.error", tlm);
             errorLabel.setStyle(Font.BOLD);
-            errorLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, errorLabel.getPreferredSize().height));
+            errorLabel.setMaximumSize(new ScalableDimension(Integer.MAX_VALUE, errorLabel.getPreferredSize().height));
             errorPanel.add(errorLabel);
 
             content.add(errorPanel);
@@ -114,7 +115,7 @@ public class ProjectDialog {
         {
             JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
             buttons.setOpaque(false);
-            buttons.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+            buttons.setMaximumSize(new ScalableDimension(Integer.MAX_VALUE, 30));
 
             okButton = new StyledButton("OK", tlm);
             okButton.addActionListener(e -> submit());
@@ -213,13 +214,13 @@ public class ProjectDialog {
 
     private static void displayError(String message) {
         if(message == null) {
-            pane.setPreferredSize(new Dimension(WIDTH, HEIGHT));
-            errorPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 0));
+            pane.setPreferredSize(new ScalableDimension(WIDTH, HEIGHT));
+            errorPanel.setMaximumSize(new ScalableDimension(Integer.MAX_VALUE, 0));
             errorLabel.setText("");
             dialog.pack();
         } else {
-            pane.setPreferredSize(new Dimension(WIDTH, HEIGHT_ERR));
-            errorPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+            pane.setPreferredSize(new ScalableDimension(WIDTH, HEIGHT_ERR));
+            errorPanel.setMaximumSize(new ScalableDimension(Integer.MAX_VALUE, 30));
             errorLabel.setText(message);
             dialog.pack();
         }

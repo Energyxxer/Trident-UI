@@ -275,7 +275,7 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
             }
         }
 
-        //nullPanel.setPreferredSize(new Dimension(1,-17));
+        //nullPanel.setPreferredSize(new ScalableDimension(1,-17));
 
         Style doNotDisplay = editorComponent.addStyle("do_not_display", null);
         //StyleConstants.setIcon(doNotDisplay, new ImageIcon(Commons.getIcon("package")));
@@ -380,7 +380,7 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
                         )
                 )
         );
-        tln.setFont(new Font(t.getString("Editor.lineNumber.font","default:monospaced"),Font.PLAIN, Preferences.getEditorFontSize()));
+        tln.setFont(new Font(t.getString("Editor.lineNumber.font","default:monospaced"),Font.PLAIN, Preferences.getModifiedEditorFontSize()));
 
         updateSyntax(t);
     }

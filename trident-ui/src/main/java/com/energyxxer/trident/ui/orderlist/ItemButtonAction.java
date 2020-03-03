@@ -41,7 +41,7 @@ public abstract class ItemButtonAction implements ItemAction {
             g.fillRect(x, y + buttonVGap, buttonSize, buttonSize);
         }
         if(!actionEnabled) ((Graphics2D) g).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
-        g.drawImage(getIcon(), x + iconMargin, y + buttonVGap + iconMargin, null);
+        g.drawImage(getIcon(), x + iconMargin, y + buttonVGap + iconMargin, 16, 16, null);
         ((Graphics2D) g).setComposite(originalComposite);
     }
 

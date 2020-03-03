@@ -8,6 +8,7 @@ import com.energyxxer.trident.ui.orderlist.ItemActionHost;
 import com.energyxxer.trident.ui.theme.Theme;
 import com.energyxxer.trident.util.ImageUtil;
 import com.energyxxer.util.StringUtil;
+import com.energyxxer.xswing.ScalableGraphics2D;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -62,16 +63,16 @@ public class ActionHostExplorerItem extends ExplorerElement implements ItemActio
         int x = master.getIndentation() * master.getIndentPerLevel() + master.getInitialIndent();
         this.y = master.getOffsetY();
         this.lastRecordedOffset = y;
-        int w = master.getWidth();
+        int w = (int)(master.getWidth() / ScalableGraphics2D.SCALE_FACTOR);
         int h = master.getRowHeight();
 
         this.height = h;
-        toolTipLocation.y = (int) (height * 0.65);
+        toolTipLocation.y = (int) (height * 0.8);
 
         int offsetY = y;
 
         g.setColor((this.rollover || this.selected) ? master.getColors().get("item.rollover.background") : master.getColors().get("item.background"));
-        g.fillRect(0, offsetY, master.getWidth(), h);
+        g.fillRect(0, offsetY, w, h);
         if(this.selected) {
             g.setColor(master.getColors().get("item.selected.background"));
 
@@ -85,7 +86,7 @@ public class ActionHostExplorerItem extends ExplorerElement implements ItemActio
                     break;
                 }
                 case "LINE_RIGHT": {
-                    g.fillRect(master.getWidth() - master.getSelectionLineThickness(), offsetY, master.getSelectionLineThickness(), h);
+                    g.fillRect(w - master.getSelectionLineThickness(), offsetY, master.getSelectionLineThickness(), h);
                     break;
                 }
                 case "LINE_TOP": {
@@ -93,14 +94,14 @@ public class ActionHostExplorerItem extends ExplorerElement implements ItemActio
                     break;
                 }
                 case "LINE_BOTTOM": {
-                    g.fillRect(0, offsetY + h - master.getSelectionLineThickness(), master.getWidth(), master.getSelectionLineThickness());
+                    g.fillRect(0, offsetY + h - master.getSelectionLineThickness(), w, master.getSelectionLineThickness());
                     break;
                 }
             }
         }
 
         int leftX = 6 + x;
-        int rightX = master.getWidth() - 6;
+        int rightX = w - 6;
         {
 
             if(master.getSelectionStyle().equals("LINE_LEFT")) {
@@ -128,7 +129,7 @@ public class ActionHostExplorerItem extends ExplorerElement implements ItemActio
 
         //File Icon
         if (icon != null) {
-            g.drawImage(this.icon, x + 8 - icon.getWidth(null) / 2, offsetY + margin + 8 - icon.getHeight(null) / 2, null);
+            g.drawImage(this.icon, x + 8 - 16 / 2, offsetY + margin + 8 - 16 / 2, 16, 16, null);
             x += 24;
         }
 
@@ -188,13 +189,14 @@ public class ActionHostExplorerItem extends ExplorerElement implements ItemActio
     }
 
     private int getActionRolloverIndex(MouseEvent e, boolean update) {
+        int w = (int)(master.getWidth() / ScalableGraphics2D.SCALE_FACTOR);
         if(update) {
             toolTipLocation.x = master.getWidth() / 2;
             actionRolloverIndex = -1;
         }
 
         int leftX = 6;
-        int rightX = master.getWidth() - 6;
+        int rightX = w - 6;
 
         if(master.getSelectionStyle().equals("LINE_LEFT")) {
             leftX += master.getSelectionLineThickness();
@@ -204,11 +206,11 @@ public class ActionHostExplorerItem extends ExplorerElement implements ItemActio
 
         for(int i = 0; i < actions.size(); i++) {
             ItemAction action = actions.get(i);
-            if(action.intersects(new Point(action.isLeftAligned() ? (e.getX() - leftX) : (rightX - e.getX()), e.getY() - lastRecordedOffset), master.getWidth(), getHeight())) {
+            if(action.intersects(new Point(action.isLeftAligned() ? (e.getX() - leftX) : (rightX - e.getX()), e.getY() - lastRecordedOffset), w, getHeight())) {
                 if(isActionEnabled(i)) {
                     if(update) {
                         actionRolloverIndex = i;
-                        toolTipLocation.x = (action.isLeftAligned() ? leftX : (rightX - action.getRenderedWidth())) + action.getHintOffset();
+                        toolTipLocation.x = (int)(((action.isLeftAligned() ? leftX : (rightX - action.getRenderedWidth())) + action.getHintOffset()) * ScalableGraphics2D.SCALE_FACTOR);
                     }
                     return i;
                 } else {

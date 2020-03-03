@@ -7,6 +7,7 @@ import com.energyxxer.trident.ui.common.MenuItems;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenu;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenuItem;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
+import com.energyxxer.xswing.ScalableDimension;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,9 +24,9 @@ public class MenuBar extends JMenuBar {
         tlm.addThemeChangeListener(t -> {
             this.setBackground(t.getColor(new Color(215, 215, 215), "MenuBar.background"));
             this.setBorder(BorderFactory.createMatteBorder(0, 0, Math.max(t.getInteger(1,"MenuBar.border.thickness"),0), 0, t.getColor(new Color(150, 150, 150), "MenuBar.border.color")));
+            this.setPreferredSize(new ScalableDimension(0, 20));
         });
 
-        this.setPreferredSize(new Dimension(0, 20));
 
         {
             StyledMenu menu = new StyledMenu(" File ");

@@ -5,6 +5,7 @@ import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.theme.Theme;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
+import com.energyxxer.xswing.ScalableDimension;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -31,10 +32,11 @@ public class StatusBar extends JPanel implements MouseListener {
 
     {
         this.setLayout(new BorderLayout());
-        this.setPreferredSize(new Dimension(1, 25));
 
         tlm.addThemeChangeListener(t ->
             SwingUtilities.invokeLater(() -> {
+                this.setPreferredSize(new ScalableDimension(1, 25));
+                this.revalidate();
                 this.setBackground(t.getColor(new Color(235, 235, 235), "Status.background"));
                 this.setBorder(
                     new CompoundBorder(
@@ -54,7 +56,7 @@ public class StatusBar extends JPanel implements MouseListener {
 
         progressBar = new ProgressBar();
         progressBar.setVisible(false);
-        progressBar.setPreferredSize(new Dimension(200, 5));
+        progressBar.setPreferredSize(new ScalableDimension(200, 5));
         progressWrapper.add(progressBar, BorderLayout.EAST);
 
         this.add(extension,BorderLayout.EAST);

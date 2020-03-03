@@ -49,8 +49,8 @@ public class XList<T> extends JPanel {
 			normalStyle.applyStyle(option);
 			
 			option.setPreferredSize(null);
-			option.setMinimumSize(new Dimension(this.getWidth(),option.getPreferredSize().height));
-			option.setMaximumSize(new Dimension(this.getWidth(),option.getPreferredSize().height));
+			option.setMinimumSize(new ScalableDimension(this.getWidth(),option.getPreferredSize().height));
+			option.setMaximumSize(new ScalableDimension(this.getWidth(),option.getPreferredSize().height));
 			
 			this.add(option);
 		}
@@ -60,15 +60,15 @@ public class XList<T> extends JPanel {
 	
 	@Override
 	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
 		int width = this.getWidth();
 		if(width != lastPaintedWidth) {
 			for(Component c : this.getComponents()) {
-				c.setMinimumSize(new Dimension(width,c.getPreferredSize().height));
-				c.setMaximumSize(new Dimension(width,c.getPreferredSize().height));
+				c.setMinimumSize(new ScalableDimension(width,c.getPreferredSize().height));
+				c.setMaximumSize(new ScalableDimension(width,c.getPreferredSize().height));
 			}
 			revalidate();
 		}
-		super.paintComponent(g);
 	}
 	
 	public void setForeground(Color c) {
@@ -256,14 +256,19 @@ class XListItem extends JPanel implements MouseListener {
 	 * 
 	 */
 	private static final long serialVersionUID = -13039223639668919L;
-	
+
+	JLabel label;
 	private int index;
 	private XList<?> parent;
 	
 	XListItem(String labelText, int index, XList<?> parent) {
+		super();
 		this.index = index;
 		this.parent = parent;
-		JLabel label = new JLabel(labelText);
+		label = new JLabel(labelText);
+		label.setVerticalAlignment(SwingConstants.CENTER);
+		label.setHorizontalAlignment(SwingConstants.CENTER);
+
 		this.add(label);
 
 		this.addMouseListener(this);

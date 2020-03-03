@@ -18,7 +18,7 @@ public class Padding extends JPanel {
 
     public Padding(int width, int height) {
         this();
-        Dimension dim = new Dimension(width, height);
+        Dimension dim = new ScalableDimension(width, height);
         this.setPreferredSize(dim);
         this.setMaximumSize(dim);
     }

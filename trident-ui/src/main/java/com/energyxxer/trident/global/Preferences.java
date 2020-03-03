@@ -2,8 +2,11 @@ package com.energyxxer.trident.global;
 
 import com.energyxxer.commodore.CommandUtils;
 import com.energyxxer.trident.main.WorkspaceDialog;
+import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.main.window.sections.tools.ConsoleBoard;
+import com.energyxxer.trident.ui.theme.change.ThemeChangeListener;
 import com.energyxxer.util.logger.Debug;
+import com.energyxxer.xswing.ScalableGraphics2D;
 
 import java.io.File;
 import java.util.function.Function;
@@ -18,6 +21,7 @@ public class Preferences {
 
     private static int baseFontSize = 12;
     private static int editorFontSize = 12;
+    private static double globalScaleFactor = 2;
 
     static {
         LOG_FILE_PATH = System.getProperty("user.home") + File.separator + "Trident" + File.separator + "latest.log";
@@ -31,6 +35,7 @@ public class Preferences {
         if(prefs.get("base_font_size",null) == null) prefs.put("base_font_size", "12");
         editorFontSize = Integer.parseInt(prefs.get("editor_font_size","12"));
         if(prefs.get("editor_font_size",null) == null) prefs.put("editor_font_size", "12");
+        setGlobalScaleFactor(Double.parseDouble(prefs.get("global_scale_factor","1")));
     }
 
     public static void promptWorkspace() {
@@ -65,8 +70,16 @@ public class Preferences {
         return baseFontSize;
     }
 
+    public static int getModifiedFontSize() {
+        return (int)Math.floor(baseFontSize * globalScaleFactor);
+    }
+
     public static int getEditorFontSize() {
         return editorFontSize;
+    }
+
+    public static int getModifiedEditorFontSize() {
+        return (int)Math.floor(editorFontSize * globalScaleFactor);
     }
 
     public static void setBaseFontSize(int fontSize) {
@@ -81,6 +94,19 @@ public class Preferences {
             editorFontSize = fontSize;
             prefs.put("editor_font_size", ""+fontSize);
         }
+    }
+
+    public static void setGlobalScaleFactor(double factor) {
+        if(factor > 0.2) {
+            globalScaleFactor = factor;
+            ScalableGraphics2D.SCALE_FACTOR = factor;
+            prefs.put("global_scale_factor", ""+factor);
+            ThemeChangeListener.dispatchThemeChange(TridentWindow.getTheme());
+        }
+    }
+
+    public static double getGlobalScaleFactor() {
+        return globalScaleFactor;
     }
 
     static {
@@ -172,6 +198,30 @@ public class Preferences {
                         }
                     }
                     printHelp();
+                }
+            }
+        });
+        ConsoleBoard.registerCommandHandler("gscale", new ConsoleBoard.CommandHandler() {
+            @Override
+            public String getDescription() {
+                return "Changes the global scale";
+            }
+
+            @Override
+            public void printHelp() {
+                Debug.log();
+                Debug.log("GSCALE: Changes the global GUI scale factor");
+                Debug.log();
+                Debug.log("Available subcommands:");
+                Debug.log("  > gscale <scale>                     (sets the scale to the given value)");
+            }
+
+            @Override
+            public void handle(String[] args) {
+                if(args.length <= 1) {
+                    printHelp();
+                } else {
+                    setGlobalScaleFactor(Double.parseDouble(args[1]));
                 }
             }
         });

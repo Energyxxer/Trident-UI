@@ -37,7 +37,7 @@ public class NoticeGroupElement extends ExplorerElement {
             if (iconName == null) {
                 iconName = "file";
             }
-            this.icon = Commons.getIcon(iconName).getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+            this.icon = Commons.getIcon(iconName);
         }
 
         this.x = master.getInitialIndent() + (indentation * master.getIndentPerLevel());
@@ -83,9 +83,9 @@ public class NoticeGroupElement extends ExplorerElement {
         {
             int margin = ((master.getRowHeight() - 16) / 2);
             if(expanded) {
-                g.drawImage(master.getAssetMap().get("collapse"),x,y + margin,16, 16,new Color(0,0,0,0),null);
+                g.drawImage(master.getAssetMap().get("collapse"),x,y + margin,16, 16,null);
             } else {
-                g.drawImage(master.getAssetMap().get("expand"),x,y + margin,16, 16,new Color(0,0,0,0),null);
+                g.drawImage(master.getAssetMap().get("expand"),x,y + margin,16, 16,null);
             }
         }
         x += 23;
@@ -93,7 +93,7 @@ public class NoticeGroupElement extends ExplorerElement {
         //File Icon
         {
             int margin = ((master.getRowHeight() - 16) / 2);
-            g.drawImage(this.icon,x,y + margin,16, 16,new Color(0,0,0,0),null);
+            g.drawImage(this.icon,x,y + margin,16, 16,null);
         }
         x += 25;
 

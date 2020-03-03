@@ -16,6 +16,7 @@ import com.energyxxer.trident.ui.theme.change.ThemeChangeListener;
 import com.energyxxer.util.ImageManager;
 import com.energyxxer.util.Lazy;
 import com.energyxxer.util.logger.Debug;
+import com.energyxxer.xswing.ScalableGraphics2D;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -183,6 +184,15 @@ public class Commons {
     }
 
     public static Image getProjectIcon() {
-        return Commons.getIcon("project").getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+        return Commons.getIcon("project");
+    }
+
+    public static Image getScaledIcon(String icon, int width, int height) {
+        width = (int) (width * ScalableGraphics2D.SCALE_FACTOR);
+        height = (int) (height * ScalableGraphics2D.SCALE_FACTOR);
+        Image image = getIcon(icon);
+        int scaling = Image.SCALE_FAST;
+        if(width < image.getWidth(null)) scaling = Image.SCALE_SMOOTH;
+        return image.getScaledInstance(width, height, scaling);
     }
 }

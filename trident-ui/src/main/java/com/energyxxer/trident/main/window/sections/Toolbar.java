@@ -9,6 +9,7 @@ import com.energyxxer.trident.ui.ToolbarSeparator;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.xswing.Padding;
+import com.energyxxer.xswing.ScalableDimension;
 import com.energyxxer.xswing.hints.TextHint;
 
 import javax.swing.*;
@@ -40,7 +41,7 @@ public class Toolbar extends JPanel {
 
         int defaultHeight = 29;
 
-        this.setPreferredSize(new Dimension(1, defaultHeight));
+        this.setPreferredSize(new ScalableDimension(1, defaultHeight));
         this.setLayout(new BorderLayout());
 
         JPanel projectIndicator = new JPanel(new GridBagLayout());
@@ -61,7 +62,7 @@ public class Toolbar extends JPanel {
 
             int height = t.getInteger(29, "Toolbar.height");
 
-            this.setPreferredSize(new Dimension(1, height));
+            this.setPreferredSize(new ScalableDimension(1, height));
         });
         buttonBar.setOpaque(false);
         this.add(buttonBar, BorderLayout.EAST);
