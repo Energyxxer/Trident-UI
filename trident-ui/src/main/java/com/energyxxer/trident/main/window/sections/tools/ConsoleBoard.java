@@ -31,6 +31,7 @@ import java.util.Map;
 public class ConsoleBoard extends ToolBoard {
 
     private static final int CONSOLE_HEIGHT = 300;
+    private final OverlayScrollPane consoleScrollPane;
     private final StyledTextField inputField;
 
     private ThemeListenerManager tlm = new ThemeListenerManager();
@@ -112,7 +113,7 @@ public class ConsoleBoard extends ToolBoard {
 
         JPanel consoleWrapper = new JPanel(new BorderLayout());
         consoleWrapper.add(console);
-        OverlayScrollPane consoleScrollPane = new OverlayScrollPane(tlm, consoleWrapper);
+        consoleScrollPane = new OverlayScrollPane(tlm, consoleWrapper);
 
 
         this.add(consoleScrollPane, BorderLayout.CENTER);
@@ -232,6 +233,8 @@ public class ConsoleBoard extends ToolBoard {
     public void open() {
         super.open();
         inputField.requestFocus();
+        consoleScrollPane.getHorizontalScrollBar().setValue(0);
+        consoleScrollPane.getVerticalScrollBar().setValue(consoleScrollPane.getViewport().getViewSize().height);
     }
 
     @Override
