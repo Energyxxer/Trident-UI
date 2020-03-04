@@ -157,7 +157,7 @@ class SettingsAppearance extends JPanel {
             }
 
             {
-                StyledLabel label = new StyledLabel("Global Scale Factor:","Settings.content", tlm);
+                StyledLabel label = new StyledLabel("Global Scale Factor (%):","Settings.content", tlm);
                 label.setStyle(Font.BOLD);
                 content.add(label);
                 content.add(new StyledLabel("Changes the scale of all GUI elements.", "Settings.content", tlm));
@@ -167,10 +167,10 @@ class SettingsAppearance extends JPanel {
                 StyledTextField globalScaleField = new StyledTextField("","Settings.content", tlm);
                 globalScaleField.setMaximumSize(new ScalableDimension(300,25));
                 globalScaleField.setAlignmentX(Component.LEFT_ALIGNMENT);
-                Settings.addOpenEvent(() -> globalScaleField.setText("" + Preferences.getGlobalScaleFactor()));
+                Settings.addOpenEvent(() -> globalScaleField.setText("" + (Preferences.getGlobalScaleFactor() * 100)));
                 Settings.addApplyEvent(() -> {
                     try {
-                        double fontSize = Double.parseDouble(globalScaleField.getText());
+                        double fontSize = Double.parseDouble(globalScaleField.getText()) / 100d;
                         Preferences.setGlobalScaleFactor(fontSize);
                     } catch(NumberFormatException ignore) {}
                 });
