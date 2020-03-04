@@ -11,8 +11,7 @@ import com.energyxxer.trident.ui.editor.behavior.AdvancedEditor;
 import com.energyxxer.trident.ui.editor.behavior.caret.CaretProfile;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.edits.InsertionEdit;
 import com.energyxxer.trident.ui.editor.behavior.editmanager.edits.PasteEdit;
-import com.energyxxer.trident.ui.scrollbar.OverlayScrollBarUI;
-import com.energyxxer.trident.ui.scrollbar.OverlayScrollPaneLayout;
+import com.energyxxer.trident.ui.scrollbar.OverlayScrollPane;
 import com.energyxxer.trident.ui.styledcomponents.*;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.Disposable;
@@ -323,11 +322,7 @@ public class FindAndReplaceBar extends JPanel implements Disposable {
                 }
             });
         }
-        JScrollPane scrollPane = new JScrollPane(field);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        scrollPane.getVerticalScrollBar().setUI(new OverlayScrollBarUI(scrollPane, tlm));
-        scrollPane.getHorizontalScrollBar().setUI(new OverlayScrollBarUI(scrollPane, tlm));
-        scrollPane.setLayout(new OverlayScrollPaneLayout(scrollPane, tlm));
+        OverlayScrollPane scrollPane = new OverlayScrollPane(tlm, field);
 
         field.addDefaultSizeListener(preferredSize -> {
             scrollPane.setPreferredSize(preferredSize);

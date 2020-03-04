@@ -1,9 +1,9 @@
 package com.energyxxer.trident.main.window.sections.tools;
 
+import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.modules.FileModuleToken;
-import com.energyxxer.trident.ui.scrollbar.OverlayScrollBarUI;
-import com.energyxxer.trident.ui.scrollbar.OverlayScrollPaneLayout;
+import com.energyxxer.trident.ui.scrollbar.OverlayScrollPane;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.styledcomponents.StyledTextField;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
@@ -52,7 +52,7 @@ public class ConsoleBoard extends ToolBoard {
             console.setBackground(t.getColor(Color.WHITE, "Console.background"));
             console.setSelectionColor(t.getColor(new Color(50, 100, 175), "Console.selection.background","General.textfield.selection.background"));
             console.setSelectedTextColor(t.getColor(Color.BLACK, "Console.selection.foreground","General.textfield.selection.foreground","Console.foreground","General.foreground"));
-            console.setFont(new Font(t.getString("Console.font","Editor.font","default:monospaced"), 0, 12));
+            console.setFont(new Font(t.getString("Console.font","Editor.font","default:monospaced"), Font.PLAIN, Preferences.getModifiedEditorFontSize()));
             console.setForeground(t.getColor(Color.BLACK, "Console.foreground"));
 
             if(console.getStyle("warning") != null) console.removeStyle("warning");
@@ -112,16 +112,7 @@ public class ConsoleBoard extends ToolBoard {
 
         JPanel consoleWrapper = new JPanel(new BorderLayout());
         consoleWrapper.add(console);
-        JScrollPane consoleScrollPane = new JScrollPane(consoleWrapper);
-        consoleScrollPane.getVerticalScrollBar().setUnitIncrement(17);
-        consoleScrollPane.getHorizontalScrollBar().setUnitIncrement(17);
-
-        consoleScrollPane.setLayout(new OverlayScrollPaneLayout(consoleScrollPane, tlm));
-
-        consoleScrollPane.getVerticalScrollBar().setUI(new OverlayScrollBarUI(consoleScrollPane, tlm));
-        consoleScrollPane.getHorizontalScrollBar().setUI(new OverlayScrollBarUI(consoleScrollPane, tlm));
-        consoleScrollPane.getVerticalScrollBar().setOpaque(false);
-        consoleScrollPane.getHorizontalScrollBar().setOpaque(false);
+        OverlayScrollPane consoleScrollPane = new OverlayScrollPane(tlm, consoleWrapper);
 
 
         this.add(consoleScrollPane, BorderLayout.CENTER);

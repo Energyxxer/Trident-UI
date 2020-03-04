@@ -12,17 +12,15 @@ import java.awt.*;
  */
 public class OverlayScrollPaneLayout extends ScrollPaneLayout {
 
-    private int thumbSize = 10;
     private final JScrollPane sp;
+    private final OverlayScrollBarUI verticalUI;
+    private final OverlayScrollBarUI horizontalUI;
 
     public OverlayScrollPaneLayout(JScrollPane sp, ThemeListenerManager tlm) {
         this.sp = sp;
-        tlm.addThemeChangeListener(t -> {
-            thumbSize = t.getInteger(10, "General.scrollbar.thickness");
-        });
 
-        sp.getVerticalScrollBar().setUI(new OverlayScrollBarUI(sp, tlm));
-        sp.getHorizontalScrollBar().setUI(new OverlayScrollBarUI(sp, tlm));
+        sp.getVerticalScrollBar().setUI(verticalUI = new OverlayScrollBarUI(sp, tlm));
+        sp.getHorizontalScrollBar().setUI(horizontalUI = new OverlayScrollBarUI(sp, tlm));
         sp.getVerticalScrollBar().setUnitIncrement(20);
         sp.getHorizontalScrollBar().setUnitIncrement(20);
         sp.getVerticalScrollBar().setOpaque(false);
@@ -64,7 +62,7 @@ public class OverlayScrollPaneLayout extends ScrollPaneLayout {
         if (vsb != null) {
             // vertical scroll bar
             Rectangle vsbR = new Rectangle();
-            vsbR.width = thumbSize;
+            vsbR.width = verticalUI.getThumbSize();
             vsbR.height = availR.height - (hsbNeeded ? vsbR.width : 0);
             vsbR.x = availR.x + availR.width - vsbR.width;
             vsbR.y = availR.y;
@@ -74,7 +72,7 @@ public class OverlayScrollPaneLayout extends ScrollPaneLayout {
         if (hsb != null) {
             // horizontal scroll bar
             Rectangle hsbR = new Rectangle();
-            hsbR.height = thumbSize;
+            hsbR.height = horizontalUI.getThumbSize();
             hsbR.width = availR.width - (vsbNeeded ? hsbR.height : 0);
             hsbR.x = availR.x;
             hsbR.y = availR.y + availR.height - hsbR.height;

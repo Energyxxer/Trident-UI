@@ -1,6 +1,7 @@
 package com.energyxxer.trident.ui.scrollbar;
 
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
+import com.energyxxer.xswing.ScalableGraphics2D;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -31,7 +32,7 @@ public class OverlayScrollBarUI extends BasicScrollBarUI {
         tlm.addThemeChangeListener(t -> {
             thumbColor = t.getColor(new Color(0,0,0,50), "General.scrollbar.color");
             thumbRolloverColor = t.getColor(new Color(0,0,0,100), "General.scrollbar.hover.color");
-            thumbSize = t.getInteger(10, "General.scrollbar.thickness");
+            thumbSize = (int) (t.getInteger(12, "General.scrollbar.thickness") * ScalableGraphics2D.SCALE_FACTOR);
             sp.repaint();
         });
     }
@@ -84,5 +85,13 @@ public class OverlayScrollBarUI extends BasicScrollBarUI {
         jbutton.setBorderPainted(false);
         jbutton.setBorder(BorderFactory.createEmptyBorder());
         return jbutton;
+    }
+
+    public int getThumbSize() {
+        return thumbSize;
+    }
+
+    public void setThumbSize(int thumbSize) {
+        this.thumbSize = thumbSize;
     }
 }
