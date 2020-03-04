@@ -214,10 +214,6 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
                 if(analysis.lexer instanceof LazyLexer) return;
             }
 
-            if(analysis.response == null || analysis.response.matched) {
-                //sd.setCharacterAttributes(0, text.length(), defaultStyle, true);
-            }
-
             for(Token token : analysis.lexer.getStream().tokens) {
                 Style style = TridentEditorComponent.this.getStyle(token.type.toString().toLowerCase());
 
@@ -290,6 +286,14 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
 
                 if((token.value.contains("{") || token.value.contains("[") || token.value.contains("(") || token.value.contains("}") || token.value.contains("]") || token.value.contains(")")) && !(token.type == TridentTokens.BRACE || token.type == JSONLexerProfile.BRACE || token.type == NBTTMTokens.BRACE || token.type == TDNMetaLexerProfile.BRACE)) {
                     sd.setCharacterAttributes(token.loc.index, token.value.length(), getStyle(IndentationManager.NULLIFY_BRACE_STYLE), false);
+                }
+
+                if(token.type == TridentTokens.STRING_LITERAL || token.type == JSONLexerProfile.STRING_LITERAL || token.type == NBTTMTokens.STRING_LITERAL || token.type == TDNMetaLexerProfile.STRING_LITERAL) {
+                    sd.setCharacterAttributes(token.loc.index, token.value.length(), getStyle(AdvancedEditor.STRING_STYLE), false);
+
+                    for(TokenSection section : token.subSections.keySet()) {
+                        sd.setCharacterAttributes(token.loc.index + section.start, section.length, getStyle(AdvancedEditor.STRING_ESCAPE_STYLE), false);
+                    }
                 }
 
                 prevToken = token;

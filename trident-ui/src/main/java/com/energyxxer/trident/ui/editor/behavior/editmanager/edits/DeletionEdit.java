@@ -90,7 +90,7 @@ public class DeletionEdit extends Edit {
                         }
                     }
 
-                    if(deletionAmount == -1 && end-start == 1 && end < result.length() && editor.getIndentationManager().isBalanced() && editor.getIndentationManager().match(result.charAt(start),result.charAt(end))) {
+                    if(deletionAmount == -1 && end-start == 1 && end < result.length() && ((editor.getIndentationManager().isBalanced() && editor.getIndentationManager().match(result.charAt(start),result.charAt(end))) || (result.charAt(start) == '"' && result.charAt(end) == '"'))) {
                         end++;
                     }
                 }

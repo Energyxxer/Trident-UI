@@ -68,9 +68,12 @@ public class InsertionEdit extends Edit {
                 if(valueToWrite.length() == 1 && editor.getIndentationManager().isOpeningBrace(valueToWrite) && editor.getIndentationManager().isBalanced()) {
                     valueToWrite += editor.getIndentationManager().getMatchingBraceChar(valueToWrite);
                     caretOffset--;
-                } else if(valueToWrite.length() == 1 && editor.getIndentationManager().isClosingBrace(valueToWrite) && result.startsWith(valueToWrite,start) && editor.getIndentationManager().isBalanced()) {
+                } else if(valueToWrite.length() == 1 && ((editor.getIndentationManager().isClosingBrace(valueToWrite) && editor.getIndentationManager().isBalanced()) || ("\"".equals(valueToWrite) && !editor.getStyledDocument().getCharacterElement(start).getAttributes().containsAttributes(editor.getStyle(AdvancedEditor.STRING_ESCAPE_STYLE)))) && result.startsWith(valueToWrite,start) ) {
                     valueToWrite = "";
                     caretOffset++;
+                } else if(valueToWrite.length() == 1 && "\"".equals(valueToWrite) && !editor.getStyledDocument().getCharacterElement(start).getAttributes().containsAttributes(editor.getStyle(AdvancedEditor.STRING_STYLE)) && !editor.getStyledDocument().getCharacterElement(start).getAttributes().containsAttributes(editor.getStyle(AdvancedEditor.STRING_ESCAPE_STYLE))) {
+                    valueToWrite += "\"";
+                    caretOffset--;
                 }
 
                 undoIndices.add(start);

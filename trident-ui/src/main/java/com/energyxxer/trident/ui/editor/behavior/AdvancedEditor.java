@@ -25,10 +25,7 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.plaf.ComponentUI;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultEditorKit;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.Document;
+import javax.swing.text.*;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
@@ -44,6 +41,8 @@ import java.util.function.Function;
  */
 public class AdvancedEditor extends JTextPane implements KeyListener, CaretListener, FocusListener, Disposable {
 
+    public static final String STRING_STYLE = "__STRING_STYLE";
+    public static final String STRING_ESCAPE_STYLE = "__STRING_ESCAPE_STYLE";
     private static final float BIAS_POINT = 0.4f;
 
     private static final String WORD_DELIMITERS = "./\\()\"'-:,.;<>~!@#$%^&*|+=[]{}`~?";
@@ -81,6 +80,8 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
     public AdvancedEditor() {
         super(new DefaultStyledDocument());
         this.getDocument().putProperty(DefaultEditorKit.EndOfLineStringProperty, "\n");
+        this.getStyledDocument().addStyle(STRING_STYLE, null);
+        this.getStyledDocument().addStyle(STRING_ESCAPE_STYLE, null);
 
         linePainter = new LinePainter(this);
         this.setCaret(this.caret = new EditorCaret(this));
