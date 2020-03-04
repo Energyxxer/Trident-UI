@@ -65,13 +65,24 @@ public class InsertionEdit extends Edit {
                     }
                 }
                 int caretOffset = 0;
-                if(valueToWrite.length() == 1 && editor.getIndentationManager().isOpeningBrace(valueToWrite) && editor.getIndentationManager().isBalanced()) {
+                if(valueToWrite.length() == 1 && Dot.SMART_KEYS_BRACES.get() && editor.getIndentationManager().isOpeningBrace(valueToWrite) && editor.getIndentationManager().isBalanced()) {
                     valueToWrite += editor.getIndentationManager().getMatchingBraceChar(valueToWrite);
                     caretOffset--;
-                } else if(valueToWrite.length() == 1 && ((editor.getIndentationManager().isClosingBrace(valueToWrite) && editor.getIndentationManager().isBalanced()) || ("\"".equals(valueToWrite) && !editor.getStyledDocument().getCharacterElement(start).getAttributes().containsAttributes(editor.getStyle(AdvancedEditor.STRING_ESCAPE_STYLE)))) && result.startsWith(valueToWrite,start) ) {
+                } else if(valueToWrite.length() == 1 &&
+                        ((
+                                Dot.SMART_KEYS_BRACES.get() &&
+                                editor.getIndentationManager().isClosingBrace(valueToWrite) &&
+                                editor.getIndentationManager().isBalanced()
+                        ) ||
+                        (
+                                Dot.SMART_KEYS_QUOTES.get() &&
+                                "\"'".contains(valueToWrite) &&
+                                !editor.getStyledDocument().getCharacterElement(start).getAttributes().containsAttributes(editor.getStyle(AdvancedEditor.STRING_ESCAPE_STYLE))
+                        )
+                        ) && result.startsWith(valueToWrite,start) ) {
                     valueToWrite = "";
                     caretOffset++;
-                } else if(valueToWrite.length() == 1 && "\"".equals(valueToWrite) && !editor.getStyledDocument().getCharacterElement(start).getAttributes().containsAttributes(editor.getStyle(AdvancedEditor.STRING_STYLE)) && !editor.getStyledDocument().getCharacterElement(start).getAttributes().containsAttributes(editor.getStyle(AdvancedEditor.STRING_ESCAPE_STYLE))) {
+                } else if(valueToWrite.length() == 1 && Dot.SMART_KEYS_QUOTES.get() && "\"'".contains(valueToWrite) && !editor.getStyledDocument().getCharacterElement(start).getAttributes().containsAttributes(editor.getStyle(AdvancedEditor.STRING_STYLE)) && !editor.getStyledDocument().getCharacterElement(start).getAttributes().containsAttributes(editor.getStyle(AdvancedEditor.STRING_ESCAPE_STYLE))) {
                     valueToWrite += "\"";
                     caretOffset--;
                 }

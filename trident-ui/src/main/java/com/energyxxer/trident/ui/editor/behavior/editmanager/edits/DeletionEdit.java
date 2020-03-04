@@ -90,7 +90,22 @@ public class DeletionEdit extends Edit {
                         }
                     }
 
-                    if(deletionAmount == -1 && end-start == 1 && end < result.length() && ((editor.getIndentationManager().isBalanced() && editor.getIndentationManager().match(result.charAt(start),result.charAt(end))) || (result.charAt(start) == '"' && result.charAt(end) == '"'))) {
+                    if(deletionAmount == -1 &&
+                            end-start == 1 &&
+                            end < result.length() &&
+                            (
+                                    (
+                                            Dot.SMART_KEYS_BRACES.get() &&
+                                            editor.getIndentationManager().isBalanced() &&
+                                            editor.getIndentationManager().match(result.charAt(start),result.charAt(end))
+                                    ) ||
+                                    (
+                                            Dot.SMART_KEYS_QUOTES.get() &&
+                                            (result.charAt(start) == '"' || result.charAt(start) == '\'') &&
+                                            result.charAt(end) == result.charAt(start)
+                                    )
+                            )
+                    ) {
                         end++;
                     }
                 }

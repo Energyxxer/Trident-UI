@@ -29,6 +29,8 @@ public class Dot {
 
     public static Preferences.SettingPref<Boolean> SMART_KEYS_HOME = new Preferences.SettingPref<>("settings.editor.smart_keys.home", true, Boolean::parseBoolean);
     public static Preferences.SettingPref<Boolean> SMART_KEYS_INDENT = new Preferences.SettingPref<>("settings.editor.smart_keys.indent", true, Boolean::parseBoolean);
+    public static Preferences.SettingPref<Boolean> SMART_KEYS_BRACES = new Preferences.SettingPref<>("settings.editor.smart_keys.braces", true, Boolean::parseBoolean);
+    public static Preferences.SettingPref<Boolean> SMART_KEYS_QUOTES = new Preferences.SettingPref<>("settings.editor.smart_keys.quotes", false, Boolean::parseBoolean);
 
 
     public Dot(int index, AdvancedEditor component) {

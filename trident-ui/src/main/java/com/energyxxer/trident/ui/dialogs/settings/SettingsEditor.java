@@ -128,6 +128,22 @@ public class SettingsEditor extends JPanel {
 
                 content.add(smartKeysIndent);
             }
+            {
+                StyledCheckBox smartKeysBraces = new StyledCheckBox("Smart Braces","Settings.content");
+                smartKeysBraces.setAlignmentX(Component.LEFT_ALIGNMENT);
+                Settings.addOpenEvent(() -> smartKeysBraces.setSelected(Dot.SMART_KEYS_BRACES.get()));
+                Settings.addApplyEvent(() -> Dot.SMART_KEYS_BRACES.set(smartKeysBraces.isSelected()));
+
+                content.add(smartKeysBraces);
+            }
+            {
+                StyledCheckBox smartKeysQuotes = new StyledCheckBox("Smart Quotes","Settings.content");
+                smartKeysQuotes.setAlignmentX(Component.LEFT_ALIGNMENT);
+                Settings.addOpenEvent(() -> smartKeysQuotes.setSelected(Dot.SMART_KEYS_QUOTES.get()));
+                Settings.addApplyEvent(() -> Dot.SMART_KEYS_QUOTES.set(smartKeysQuotes.isSelected()));
+
+                content.add(smartKeysQuotes);
+            }
         }
     }
 
