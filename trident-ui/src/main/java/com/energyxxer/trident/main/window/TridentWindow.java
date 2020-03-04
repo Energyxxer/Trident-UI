@@ -251,7 +251,12 @@ public class TridentWindow {
 	}
 
 	private static void terminate() {
+		if(!tabManager.confirmSaved()) {
+			return;
+		}
+
 		Debug.log("Terminating...");
+
 		tabManager.saveOpenTabs();
 		projectExplorer.saveExplorerTree();
 		Resources.saveAll();

@@ -184,25 +184,6 @@ public class TabManager {
 		return selectedTab;
 	}
 
-	/*public void renameTab(String oldPath, String newPath) {
-		File newFile = new File(newPath);
-		if (newFile.isFile()) {
-			for(Tab tab : openTabs) {
-				if (tab.path.equals(oldPath)) {
-					tab.path = newPath;
-					tab.updateName();
-				}
-			}
-		} else if (newFile.isDirectory()) {
-			for(Tab tab : openTabs) {
-				if (tab.path.startsWith(oldPath)) {
-					tab.path = newPath + tab.path.substring(oldPath.length());
-					tab.updateName();
-				}
-			}
-		}
-	}*/
-
 	public void saveOpenTabs() {
 		if(openTabSaveKey == null) return;
 		if(!SAVE_OPEN_TABS.get()) return;
@@ -274,5 +255,20 @@ public class TabManager {
 				i--;
 			}
 		}
+	}
+
+	public boolean confirmSaved() {
+		for(Tab tab : openTabs) {
+			if(!tab.isSaved()) {
+			    setSelectedTab(tab);
+				String confirmation = new OptionDialog("Unsaved changes", "'" + tab.getName() + "' has changes; do you want to save them?", new String[] {"Save", "Don't Save", "Cancel"}).result;
+				if("Save".equals(confirmation)) {
+					tab.save();
+				} else if(!"Don't Save".equals(confirmation)) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 }
