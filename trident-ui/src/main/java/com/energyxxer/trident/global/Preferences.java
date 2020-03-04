@@ -8,6 +8,7 @@ import com.energyxxer.trident.ui.theme.change.ThemeChangeListener;
 import com.energyxxer.util.logger.Debug;
 import com.energyxxer.xswing.ScalableGraphics2D;
 
+import java.awt.*;
 import java.io.File;
 import java.util.function.Function;
 import java.util.prefs.BackingStoreException;
@@ -97,12 +98,17 @@ public class Preferences {
     }
 
     public static void setGlobalScaleFactor(double factor) {
-        if(factor > 0.2) {
-            globalScaleFactor = factor;
-            ScalableGraphics2D.SCALE_FACTOR = factor;
-            prefs.put("global_scale_factor", ""+factor);
-            ThemeChangeListener.dispatchThemeChange(TridentWindow.getTheme());
-        }
+
+        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        double min = 0.25;
+        double max = 3 * (gd.getDisplayMode().getHeight() / 1080d);
+
+        factor = Math.max(min, Math.min(factor, max));
+
+        globalScaleFactor = factor;
+        ScalableGraphics2D.SCALE_FACTOR = factor;
+        prefs.put("global_scale_factor", ""+factor);
+        ThemeChangeListener.dispatchThemeChange(TridentWindow.getTheme());
     }
 
     public static double getGlobalScaleFactor() {
