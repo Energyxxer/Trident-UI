@@ -43,9 +43,9 @@ public class TridentUI {
 			"OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n" +
 			"SOFTWARE.\n";
 
-	public static final boolean IS_DEVELOPMENT_VERSION = true;
+	public static final boolean IS_DEVELOPMENT_VERSION = false;
 	public static TridentUI trident;
-	public static final String UI_VERSION = "1.1.2";
+	public static final String UI_VERSION = "1.2.0";
 	public static final String MIXED_VERSION = "u" + UI_VERSION + "c" + TridentCompiler.TRIDENT_LANGUAGE_VERSION + (IS_DEVELOPMENT_VERSION ? "-DEV" : "");
 	public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
