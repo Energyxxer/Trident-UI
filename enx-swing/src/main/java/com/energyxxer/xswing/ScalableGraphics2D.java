@@ -509,6 +509,7 @@ public class ScalableGraphics2D extends Graphics2D {
     }
 
     private void prepareInterpolation(Image img, int drawWidth, int drawHeight, ImageObserver observer) {
+        if(img == null) return;
         this.g.setRenderingHint(
                 RenderingHints.KEY_INTERPOLATION,
                 drawWidth > img.getWidth(observer) ? RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR : RenderingHints.VALUE_INTERPOLATION_BICUBIC
