@@ -49,6 +49,7 @@ import java.util.function.Function;
  */
 public class TridentEditorComponent extends AdvancedEditor implements KeyListener, CaretListener, ActionListener, FocusListener {
 
+    private static final int MAX_HIGHLIGHTED_TOKENS_PER_LINE = 150;
     private TridentEditorModule parent;
 
     private StyledDocument sd;
@@ -214,69 +215,79 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
                 if(analysis.lexer instanceof LazyLexer) return;
             }
 
+            int tokensInLine = 0;
+
             for(Token token : analysis.lexer.getStream().tokens) {
+                boolean shouldPaintStyles = true;
+                if(prevToken != null && prevToken.loc.line != token.loc.line) tokensInLine = 0;
+                tokensInLine++;
+                if(tokensInLine > MAX_HIGHLIGHTED_TOKENS_PER_LINE) {
+                    shouldPaintStyles = false;
+                }
                 Style style = TridentEditorComponent.this.getStyle(token.type.toString().toLowerCase());
 
                 int previousTokenStylesIndex = previousTokenStyles.size();
 
                 int styleStart = token.loc.index;
 
-                if(style != null)
-                    sd.setCharacterAttributes(token.loc.index, token.value.length(), style, true);
-                else
-                    sd.setCharacterAttributes(token.loc.index, token.value.length(), defaultStyle, true);
+                if(shouldPaintStyles) {
+                    if(style != null)
+                        sd.setCharacterAttributes(token.loc.index, token.value.length(), style, true);
+                    else
+                        sd.setCharacterAttributes(token.loc.index, token.value.length(), defaultStyle, true);
 
-                for(Map.Entry<String, Object> entry : token.attributes.entrySet()) {
-                    if(!entry.getValue().equals(true)) continue;
-                    Style attrStyle = TridentEditorComponent.this.getStyle("~" + entry.getKey().toLowerCase());
-                    if(attrStyle == null) continue;
+                    for(Map.Entry<String, Object> entry : token.attributes.entrySet()) {
+                        if(!entry.getValue().equals(true)) continue;
+                        Style attrStyle = TridentEditorComponent.this.getStyle("~" + entry.getKey().toLowerCase());
+                        if(attrStyle == null) continue;
 
-                    if(prevToken != null && previousTokenStyles.contains(entry.getKey().toLowerCase())) {
-                        styleStart = prevToken.loc.index + prevToken.value.length();
+                        if(prevToken != null && previousTokenStyles.contains(entry.getKey().toLowerCase())) {
+                            styleStart = prevToken.loc.index + prevToken.value.length();
+                        }
+                        previousTokenStyles.add(entry.getKey().toLowerCase());
+
+                        sd.setCharacterAttributes(styleStart, token.value.length() + (token.loc.index - styleStart), attrStyle, false);
                     }
-                    previousTokenStyles.add(entry.getKey().toLowerCase());
+                    for(Map.Entry<TokenSection, String> entry : token.subSections.entrySet()) {
+                        TokenSection section = entry.getKey();
+                        Style attrStyle = TridentEditorComponent.this.getStyle("~" + entry.getValue().toLowerCase());
+                        if(attrStyle == null) continue;
 
-                    sd.setCharacterAttributes(styleStart, token.value.length() + (token.loc.index - styleStart), attrStyle, false);
-                }
-                for(Map.Entry<TokenSection, String> entry : token.subSections.entrySet()) {
-                    TokenSection section = entry.getKey();
-                    Style attrStyle = TridentEditorComponent.this.getStyle("~" + entry.getValue().toLowerCase());
-                    if(attrStyle == null) continue;
-
-                    sd.setCharacterAttributes(token.loc.index + section.start, section.length, attrStyle, false);
-                }
-                for(String tag : token.tags) {
-                    Style attrStyle = TridentEditorComponent.this.getStyle("$" + tag.toLowerCase());
-                    if(attrStyle == null) continue;
-
-                    if(prevToken != null && previousTokenStyles.contains(tag.toLowerCase())) {
-                        styleStart = prevToken.loc.index + prevToken.value.length();
+                        sd.setCharacterAttributes(token.loc.index + section.start, section.length, attrStyle, false);
                     }
-                    previousTokenStyles.add(tag.toLowerCase());
+                    for(String tag : token.tags) {
+                        Style attrStyle = TridentEditorComponent.this.getStyle("$" + tag.toLowerCase());
+                        if(attrStyle == null) continue;
 
-                    sd.setCharacterAttributes(styleStart, token.value.length() + (token.loc.index - styleStart), attrStyle, false);
-                }
+                        if(prevToken != null && previousTokenStyles.contains(tag.toLowerCase())) {
+                            styleStart = prevToken.loc.index + prevToken.value.length();
+                        }
+                        previousTokenStyles.add(tag.toLowerCase());
 
-                if(analysis.response != null) {
-                    for (Map.Entry<String, String[]> entry : Collections.synchronizedSet(parent.parserStyles.entrySet())) {
-                        String[] tagList = entry.getValue();
-                        int startIndex = -1;
-                        tgs:
-                        do {
-                            startIndex = indexOf(token.tags, tagList[0], startIndex + 1);
-                            if (startIndex < 0) break;
-                            for (int i = 0; i < tagList.length; i++) {
-                                if (startIndex + i >= token.tags.size() || !tagList[i].equalsIgnoreCase(token.tags.get(startIndex + i)))
-                                    continue tgs;
-                            }
-                            Style attrStyle = TridentEditorComponent.this.getStyle(entry.getKey());
-                            if (attrStyle == null) continue;
-                            if (prevToken != null && previousTokenStyles.contains(entry.getKey())) {
-                                styleStart = prevToken.loc.index + prevToken.value.length();
-                            }
-                            previousTokenStyles.add(entry.getKey());
-                            sd.setCharacterAttributes(styleStart, token.value.length() + (token.loc.index - styleStart), attrStyle, false);
-                        } while (true);
+                        sd.setCharacterAttributes(styleStart, token.value.length() + (token.loc.index - styleStart), attrStyle, false);
+                    }
+
+                    if(analysis.response != null) {
+                        for (Map.Entry<String, String[]> entry : Collections.synchronizedSet(parent.parserStyles.entrySet())) {
+                            String[] tagList = entry.getValue();
+                            int startIndex = -1;
+                            tgs:
+                            do {
+                                startIndex = indexOf(token.tags, tagList[0], startIndex + 1);
+                                if (startIndex < 0) break;
+                                for (int i = 0; i < tagList.length; i++) {
+                                    if (startIndex + i >= token.tags.size() || !tagList[i].equalsIgnoreCase(token.tags.get(startIndex + i)))
+                                        continue tgs;
+                                }
+                                Style attrStyle = TridentEditorComponent.this.getStyle(entry.getKey());
+                                if (attrStyle == null) continue;
+                                if (prevToken != null && previousTokenStyles.contains(entry.getKey())) {
+                                    styleStart = prevToken.loc.index + prevToken.value.length();
+                                }
+                                previousTokenStyles.add(entry.getKey());
+                                sd.setCharacterAttributes(styleStart, token.value.length() + (token.loc.index - styleStart), attrStyle, false);
+                            } while (true);
+                        }
                     }
                 }
                 while(previousTokenStylesIndex > 0) {
