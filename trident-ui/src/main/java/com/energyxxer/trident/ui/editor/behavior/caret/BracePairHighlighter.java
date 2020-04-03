@@ -25,7 +25,7 @@ public class BracePairHighlighter implements Highlighter.HighlightPainter {
             if(prevSeenDot != dot) {
                 prevSeenDot = dot;
                 updateRectangles();
-                editor.repaint();
+                if(prevSeenDot != -1) editor.repaint();
             }
         });
     }
