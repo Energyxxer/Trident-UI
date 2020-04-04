@@ -196,6 +196,13 @@ public class StandardExplorerItem extends ExplorerElement {
 
         g2d.setComposite(oldComposite);
 
+        if(parent != null && (rollover || selected)) {
+            int thickness = master.getStyleNumbers().get("hierarchyGuide.thickness");
+            g.setColor(master.getColors().get("hierarchyGuide.color"));
+            g.fillRect(this.x - master.getIndentPerLevel() + 8 - thickness/2, y + getHeight()/2 - thickness/2, master.getIndentPerLevel()/2 + thickness/2, thickness);
+            g.fillRect(this.x - master.getIndentPerLevel() + 8 - thickness/2, parent.getLastRecordedOffset() + parent.getHeight(), thickness, (y + getHeight()/2 - thickness/2) - (parent.getLastRecordedOffset() + parent.getHeight()));
+        }
+
         if(master.getFlag(ExplorerFlag.DEBUG_WIDTH)) {
             g.setColor(Color.YELLOW);
             g.fillRect(master.getContentWidth()-2, master.getOffsetY(), 2, master.getRowHeight());
@@ -206,10 +213,13 @@ public class StandardExplorerItem extends ExplorerElement {
         master.setContentWidth(Math.max(master.getContentWidth(), x));
         master.renderOffset(this.getHeight());
         master.pushIndentation();
+        lastRecordedOffset = y;
         for(ExplorerElement i : children) {
             i.render(g);
         }
         master.popIndentation();
+
+
     }
 
     public void interact() {

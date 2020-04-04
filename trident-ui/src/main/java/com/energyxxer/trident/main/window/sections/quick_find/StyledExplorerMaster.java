@@ -35,10 +35,10 @@ public class StyledExplorerMaster extends ExplorerMaster implements Disposable {
                 colors.put("item.rollover.background", t.getColor(new Color(0, 0, 0, 0), "Explorer.item.hover.background", "Explorer.item.background"));
                 colors.put("item.rollover.foreground", t.getColor(Color.BLACK, "Explorer.item.hover.foreground", "Explorer.item.foreground", "General.foreground"));
 
-                rowHeight = Math.max(t.getInteger(20, "Explorer.item.height"), 1);
-
                 selectionStyle = t.getString("Explorer.item.selectionStyle", "default:FULL");
                 selectionLineThickness = Math.max(t.getInteger(2, "Explorer.item.selectionLineThickness"), 0);
+
+                styleNumbers.put("hierarchyGuide.thickness", Math.max(t.getInteger(1, "Explorer.hierarchyGuide.thickness"), 0));
 
                 styleNumbers.put("button.border.thickness", Math.max(t.getInteger(1,"Explorer.button.border.thickness"),1));
                 styleNumbers.put("button.rollover.border.thickness", Math.max(t.getInteger(1,"Explorer.button.hover.border.thickness", "Explorer.button.border.thickness"),1));
@@ -49,6 +49,8 @@ public class StyledExplorerMaster extends ExplorerMaster implements Disposable {
                 styleNumbers.put("checkbox.pressed.border.thickness", Math.max(t.getInteger(1,"Explorer.checkbox.pressed.border.thickness", "Explorer.checkbox.hover.border.thickness", "Explorer.checkbox.border.thickness"),1));
 
                 this.setFont(t.getFont("Explorer.item", "General"));
+
+                colors.put("hierarchyGuide.color", t.getColor(Color.GRAY, "Explorer.hierarchyGuide.color"));
 
                 colors.put("button.background", t.getColor(Color.GRAY, "Explorer.button.background"));
                 colors.put("button.rollover.background", t.getColor(Color.GRAY, "Explorer.button.hover.background", "Explorer.button.background"));
@@ -98,10 +100,10 @@ public class StyledExplorerMaster extends ExplorerMaster implements Disposable {
                 colors.put("item.rollover.background", t.getColor(new Color(0, 0, 0, 0), namespace + ".item.hover.background", namespace + ".item.background", "Explorer.item.hover.background", "Explorer.item.background"));
                 colors.put("item.rollover.foreground", t.getColor(Color.BLACK, namespace + ".item.hover.foreground", namespace + ".item.foreground", "Explorer.item.hover.foreground", "Explorer.item.foreground", "General.foreground"));
 
-                rowHeight = Math.max(t.getInteger(20, namespace + ".item.height", "Explorer.item.height"), 1);
-
                 selectionStyle = t.getString(namespace + ".item.selectionStyle", "Explorer.item.selectionStyle", "default:FULL");
                 selectionLineThickness = Math.max(t.getInteger(2, namespace + ".item.selectionLineThickness", "Explorer.item.selectionLineThickness"), 0);
+
+                styleNumbers.put("hierarchyGuide.thickness", Math.max(t.getInteger(1, namespace + ".hierarchyGuide.thickness", "Explorer.hierarchyGuide.thickness"), 0));
 
                 styleNumbers.put("button.border.thickness", Math.max(t.getInteger(1,namespace + ".button.border.thickness", "Explorer.button.border.thickness"),1));
                 styleNumbers.put("button.rollover.border.thickness", Math.max(t.getInteger(1,namespace + ".button.hover.border.thickness", namespace + ".button.border.thickness", "Explorer.button.hover.border.thickness", "Explorer.button.border.thickness"),1));
@@ -112,6 +114,8 @@ public class StyledExplorerMaster extends ExplorerMaster implements Disposable {
                 styleNumbers.put("checkbox.pressed.border.thickness", Math.max(t.getInteger(1,namespace + ".checkbox.pressed.border.thickness", namespace + ".checkbox.hover.border.thickness", namespace + ".checkbox.border.thickness", "Explorer.checkbox.pressed.border.thickness", "Explorer.checkbox.hover.border.thickness", "Explorer.checkbox.border.thickness"),1));
 
                 this.setFont(t.getFont(namespace + ".item", "Explorer.item", "General"));
+
+                colors.put("hierarchyGuide.color", t.getColor(Color.GRAY, namespace + ".hierarchyGuide.color", "Explorer.hierarchyGuide.color"));
 
                 colors.put("button.background", t.getColor(Color.GRAY, namespace + ".button.background", "Explorer.button.background"));
                 colors.put("button.rollover.background", t.getColor(Color.GRAY, namespace + ".button.hover.background", namespace + ".button.background", "Explorer.button.hover.background", "Explorer.button.background"));

@@ -50,6 +50,8 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
     protected int initialIndent = 0;
     protected String selectionStyle = "FULL";
     protected int selectionLineThickness = 2;
+
+
     private int indentation;
 
     private boolean multipleSelectionsEnabled = true;
