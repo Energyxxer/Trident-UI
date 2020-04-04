@@ -16,12 +16,9 @@ public class ProjectUtil {
         return (
                 (associatedProject != null) ?
                         FileCommons.stripExtension(
-                                FileCommons.getRelativePath(
-                                        file,
-                                        associatedProject.getServerDataRoot()
-                                )
-                        ) : "src"
-        ).replace(File.separator,".");
+                                associatedProject.getRootDirectory().toPath().relativize(file.toPath()).toString()
+                        ) : file.getName()
+        ).replace(File.separator,"/");
     }
 
     /**

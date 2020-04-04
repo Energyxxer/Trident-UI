@@ -362,7 +362,6 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
 
     @Override
     public void repaint() {
-        Debug.log("Repaint");
         if(this.getParent() instanceof JViewport && this.getParent().getParent() instanceof JScrollPane) {
             this.getParent().getParent().repaint();
         } else super.repaint();

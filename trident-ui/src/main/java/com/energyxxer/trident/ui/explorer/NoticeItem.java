@@ -1,6 +1,7 @@
 package com.energyxxer.trident.ui.explorer;
 
 import com.energyxxer.enxlex.report.Notice;
+import com.energyxxer.enxlex.report.StackTrace;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.explorer.base.ExplorerFlag;
 import com.energyxxer.trident.ui.explorer.base.ExplorerMaster;
@@ -25,7 +26,7 @@ public class NoticeItem extends ExplorerElement {
     private Notice notice;
 
     private int lineCount = 1;
-    private int x;
+    int x;
 
     public NoticeItem(ExplorerMaster master, Notice notice) {
         super(master);
@@ -34,6 +35,8 @@ public class NoticeItem extends ExplorerElement {
         lineCount = notice.getExtendedMessage().split("\n").length;
 
         this.x = master.getInitialIndent();
+
+        updateChildren();
     }
 
     public NoticeItem(NoticeGroupElement parent, Notice notice) {
@@ -43,6 +46,17 @@ public class NoticeItem extends ExplorerElement {
         lineCount = notice.getExtendedMessage().split("\n").length;
 
         this.x = (parent.indentation + 1) * master.getIndentPerLevel() + master.getInitialIndent();
+
+        updateChildren();
+    }
+
+    private void updateChildren() {
+        children.clear();
+        if(notice.getStackTrace() != null) {
+            for(StackTrace.StackTraceElement elem : notice.getStackTrace().getElements()) {
+                children.add(new NoticeStackTraceItem(this, elem));
+            }
+        }
     }
 
     @Override
