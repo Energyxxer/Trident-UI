@@ -130,4 +130,11 @@ blockstates/*.json = blockstate
 	public static Collection<Project> getLoadedProjects() {
 		return loadedProjects;
 	}
+
+	public static boolean isLoadedProjectRoot(File file) {
+		for(Project project : loadedProjects) {
+			if(project.getRootDirectory().equals(file)) return true;
+		}
+		return false;
+	}
 }

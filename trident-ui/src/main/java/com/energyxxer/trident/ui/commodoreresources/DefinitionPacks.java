@@ -51,6 +51,8 @@ public class DefinitionPacks {
                 }
             }
         }
+
+        Debug.log("Loaded definition packs");
     }
 
     private static void updateLatestKnownVersion(String packName) {

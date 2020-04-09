@@ -40,6 +40,8 @@ public class TridentPlugins {
                 }
             }
         }
+
+        Debug.log("Loaded plugins");
     }
 
     public static Map<String, TridentPlugin> getAliasMap() {

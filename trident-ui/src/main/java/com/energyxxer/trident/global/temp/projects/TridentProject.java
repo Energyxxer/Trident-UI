@@ -74,7 +74,7 @@ public class TridentProject implements Project {
         this.name = name;
         //this.prefix = StringUtil.getInitials(name).toLowerCase();
 
-        Path outFolder = Paths.get(System.getProperty("user.home"), "Trident", "out");
+        Path outFolder = rootPath.resolve("out");
 
         JavaEditionVersion latestVersion = DefinitionPacks.getLatestKnownJavaVersion();
         if(latestVersion == null) latestVersion = new JavaEditionVersion(1, 13, 0);

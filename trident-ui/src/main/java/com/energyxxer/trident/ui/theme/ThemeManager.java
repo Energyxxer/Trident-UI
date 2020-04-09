@@ -90,6 +90,9 @@ public class ThemeManager {
         } else themeDir.mkdirs();
 
         setGUITheme(Preferences.get("theme"));
+
+        Debug.log("Loaded " + (gui_themes.size()) + " GUI themes");
+        Debug.log("Loaded " + (syntax_themes.size()) + " syntax themes");
     }
 
     public static HashMap<String, Theme> getGUIThemes() {

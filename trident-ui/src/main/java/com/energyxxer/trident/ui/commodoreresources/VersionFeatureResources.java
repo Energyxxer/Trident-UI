@@ -26,5 +26,7 @@ public class VersionFeatureResources {
                 }
             }
         }
+
+        Debug.log("Loaded version feature maps");
     }
 }

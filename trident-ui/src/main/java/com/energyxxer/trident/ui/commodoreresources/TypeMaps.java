@@ -47,6 +47,8 @@ public class TypeMaps {
                 }
             }
         }
+
+        Debug.log("Loaded type maps");
     }
 
     private static void loadFromCompound(CompoundInput input, String name) throws IOException {

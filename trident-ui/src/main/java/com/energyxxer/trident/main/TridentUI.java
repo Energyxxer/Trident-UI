@@ -176,6 +176,23 @@ public class TridentUI {
 				Debug.log("\n"+LICENSE);
 			}
 		});
+		ConsoleBoard.registerCommandHandler("exception", new ConsoleBoard.CommandHandler() {
+			@Override
+			public String getDescription() {
+				return "Throws a runtime exception";
+			}
+
+			@Override
+			public void printHelp() {
+				Debug.log();
+				Debug.log("EXCEPTION: Throws a runtime exception");
+			}
+
+			@Override
+			public void handle(String[] args) {
+				throw new RuntimeException();
+			}
+		});
 
 		Debug.log("java path: " + System.getProperty("java.home")
 				+ File.separator + "bin" + File.separator + "java");

@@ -123,6 +123,9 @@ public class FileModuleToken implements ModuleToken, DraggableExplorerModuleToke
         if(overrideIconName != null) return Commons.getIcon(overrideIconName);
         if(file.isDirectory()) {
             if(isProjectRoot) {
+                if(!ProjectManager.isLoadedProjectRoot(file)) {
+                    return Commons.getIcon("project_unloaded");
+                }
                 if(file.toPath().resolve(".cbwproj").toFile().exists()) {
                     return Commons.getIcon("project_cbw");
                 } else {

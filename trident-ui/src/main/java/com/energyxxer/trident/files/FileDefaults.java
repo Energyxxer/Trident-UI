@@ -1,6 +1,7 @@
 package com.energyxxer.trident.files;
 
 import com.energyxxer.trident.util.ResourceReader;
+import com.energyxxer.util.logger.Debug;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +21,8 @@ public class FileDefaults {
         for(String name : indexes) {
             defaults.put(name, ResourceReader.read("/resources/defaults/" + name + ".txt").replace("\t","    "));
         }
+
+        Debug.log("Loaded file defaults");
     }
 
     public static String populateTemplate(String template, HashMap<String, String> variables) {
