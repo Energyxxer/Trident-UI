@@ -2,9 +2,11 @@ package com.energyxxer.trident.main.window.sections;
 
 import com.energyxxer.trident.global.Status;
 import com.energyxxer.trident.main.window.TridentWindow;
+import com.energyxxer.trident.main.window.sections.tools.ConsoleBoard;
 import com.energyxxer.trident.ui.styledcomponents.StyledLabel;
 import com.energyxxer.trident.ui.theme.Theme;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
+import com.energyxxer.util.logger.Debug;
 import com.energyxxer.xswing.ScalableDimension;
 
 import javax.swing.*;
@@ -62,6 +64,27 @@ public class StatusBar extends JPanel implements MouseListener {
         this.add(extension,BorderLayout.EAST);
 
         this.addMouseListener(this);
+
+        ConsoleBoard.registerCommandHandler("focustrack", new ConsoleBoard.CommandHandler() {
+            @Override
+            public String getDescription() {
+                return "Track the active focused component";
+            }
+
+            @Override
+            public void printHelp() {
+                Debug.log();
+                Debug.log("FOCUSTRACK: Tracks the active focused component");
+            }
+
+            @Override
+            public void handle(String[] args) {
+                Timer timer = new Timer(200, a -> {
+                    setStatus("Focused component: " + TridentWindow.jframe.getFocusOwner());
+                });
+                timer.start();
+            }
+        });
     }
 
     public void setStatus(String text) {

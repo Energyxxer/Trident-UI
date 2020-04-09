@@ -75,6 +75,7 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         editor.addKeyListener(this);
         editor.addFocusListener(this);
         this.addKeyListener(this);
+        explorer.addKeyListener(this);
 
         editor.addCharacterDriftListener(h -> {
             if(summary != null) {
@@ -185,13 +186,17 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
 
     @Override
     public void keyTyped(KeyEvent e) {
+        boolean editorNotFocused = TridentWindow.jframe.getFocusOwner() == null;
+        if(editorNotFocused) {
+            editor.requestFocus();
+            if(!e.isConsumed()) editor.keyTyped(e);
+        }
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
         //Debug.log("Pressed");
         if(!this.isVisible() || !anyEnabled) return;
-        if(TridentWindow.jframe.getFocusOwner() == null) editor.requestFocus();
         if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
             this.setVisible(false);
             e.consume();
@@ -219,6 +224,11 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
                 tokens.get(0).onInteract();
             }
             e.consume();
+        }
+        boolean editorNotFocused = TridentWindow.jframe.getFocusOwner() == null;
+        if(editorNotFocused) {
+            editor.requestFocus();
+            if(!e.isConsumed()) editor.keyPressed(e);
         }
 
         Rectangle rect = explorer.getVisibleRect(selectedIndex);
