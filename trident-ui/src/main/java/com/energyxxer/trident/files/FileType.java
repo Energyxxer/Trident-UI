@@ -11,7 +11,7 @@ import java.util.function.Predicate;
  * Created by User on 2/9/2017.
  */
 public enum FileType {
-    TDN(0, "Trident Function", "trident_file", ".tdn", FileDialog::create, (pr, pth) -> pr != null && pth.startsWith(pr + "datapack" + File.separator), str -> str.matches(Function.ALLOWED_PATH_REGEX)),
+    TDN(0, "Trident Function", "trident_file", ".tdn", FunctionDialog::create, (pr, pth) -> pr != null && pth.startsWith(pr + "datapack" + File.separator), str -> str.matches(Function.ALLOWED_PATH_REGEX)),
     MODEL(0, "Model", "model", ".json", FileDialog::create, (pr, pth) -> pr != null && pth.startsWith(pr + "resources" + File.separator)),
     LANG(0, "Language File", "lang", ".json", FileDialog::create, (pr, pth) -> pr != null && pth.startsWith(pr + "resources" + File.separator)),
     FUNCTION(0, "Function", "function", ".mcfunction", FileDialog::create, (pr, pth) -> pr != null && pth.startsWith(pr + "datapack" + File.separator), str -> str.matches(Function.ALLOWED_PATH_REGEX)),
