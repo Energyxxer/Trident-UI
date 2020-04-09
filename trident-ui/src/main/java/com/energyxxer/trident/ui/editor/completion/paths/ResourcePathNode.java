@@ -133,7 +133,7 @@ public class ResourcePathNode extends ExpandableSuggestionToken {
     public void setSkipNamespaces(boolean skipNamespaces) {
         this.skipNamespaces = skipNamespaces;
 
-        this.pathParts = new ArrayList<>(Arrays.asList(this.pathParts.get(0).split("(?<=[:])",2)));
+        if(skipNamespaces) this.pathParts = new ArrayList<>(Arrays.asList(this.pathParts.get(0).split("(?<=[:])",2)));
     }
 
     @Override
@@ -151,7 +151,7 @@ public class ResourcePathNode extends ExpandableSuggestionToken {
             for(int i = 0; i < pathParts.size(); i++) {
                 String part = this.pathParts.get(i);
                 if(i < pathParts.size()-1) {
-                    if(!filter.startsWith(part, filterIndex) && !(i == 0 && skipNamespaces && part.startsWith(filter.substring(filterIndex)))) {
+                    if(!filter.startsWith(part, filterIndex) && !part.contains("_" + filter.substring(filterIndex)) && !(i == 0 && skipNamespaces && part.startsWith(filter.substring(filterIndex)))) {
                         if(!(i == 0 && skipNamespaces)) {
                             enabled = false;
                             break;
@@ -160,7 +160,7 @@ public class ResourcePathNode extends ExpandableSuggestionToken {
                         filterIndex += part.length();
                     }
                 } else {
-                    if(!(skipNamespaces && filterIndex >= filter.length()) && (!part.startsWith(filter.substring(filterIndex)) || (!isLeaf() && part.equals(filter.substring(filterIndex))))) {
+                    if(!(skipNamespaces && filterIndex >= filter.length()) && (!(part.startsWith(filter.substring(filterIndex)) || part.contains("_" + filter.substring(filterIndex))) || (!isLeaf() && part.equals(filter.substring(filterIndex))))) {
                         enabled = false;
                         break;
                     }
