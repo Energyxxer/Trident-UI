@@ -1,6 +1,6 @@
 package com.energyxxer.trident.ui.dialogs.project_properties;
 
-import com.energyxxer.trident.extensions.EJsonObject;
+import com.energyxxer.trident.compiler.util.JsonTraverser;
 import com.energyxxer.trident.global.Resources;
 import com.energyxxer.trident.ui.scrollbar.OverlayScrollPane;
 import com.energyxxer.trident.ui.styledcomponents.StyledCheckBox;
@@ -213,10 +213,10 @@ class ProjectPropertiesGameLogger extends JPanel {
                 if(config.has("game-logger") && config.get("game-logger").isJsonObject()) {
                     JsonObject loggerObj = config.getAsJsonObject("game-logger");
 
-                    compact.setSelected(EJsonObject.getAsBoolean(loggerObj, "compact", false));
-                    timestampEnabled.setSelected(EJsonObject.getAsBoolean(loggerObj, "timestamp-enabled", true));
-                    posEnabled.setSelected(EJsonObject.getAsBoolean(loggerObj, "pos-enabled", false));
-                    lineNumberEnabled.setSelected(EJsonObject.getAsBoolean(loggerObj, "line-number-enabled", false));
+                    compact.setSelected(JsonTraverser.INSTANCE.reset(loggerObj).get("compact").asBoolean(false));
+                    timestampEnabled.setSelected(JsonTraverser.INSTANCE.reset(loggerObj).get("timestamp-enabled").asBoolean(true));
+                    posEnabled.setSelected(JsonTraverser.INSTANCE.reset(loggerObj).get("pos-enabled").asBoolean(false));
+                    lineNumberEnabled.setSelected(JsonTraverser.INSTANCE.reset(loggerObj).get("line-number-enabled").asBoolean(false));
                 }
 
                 updateTextPreview();
