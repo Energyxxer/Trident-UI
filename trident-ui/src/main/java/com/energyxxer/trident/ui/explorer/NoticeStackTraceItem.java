@@ -131,8 +131,6 @@ public class NoticeStackTraceItem extends ExplorerElement {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if(e.getButton() == MouseEvent.BUTTON1) {
-            master.setSelected(this, e);
-        }
+        master.setSelected(this, e);
     }
 }

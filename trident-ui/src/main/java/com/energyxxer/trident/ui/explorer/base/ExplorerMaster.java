@@ -137,7 +137,7 @@ public class ExplorerMaster extends JComponent implements MouseListener, MouseMo
         dragStart = element;
         pressedEvent = e;
         if(element != null) element.mousePressed(e);
-        else if(e.getButton() == MouseEvent.BUTTON1) {
+        else {
             clearSelected();
             repaint();
         }

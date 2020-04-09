@@ -263,15 +263,12 @@ public class StandardExplorerItem extends ExplorerElement {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if(e.getButton() == MouseEvent.BUTTON1) {
-            //x = indentation * master.getIndentPerLevel() + master.getInitialIndent();
-            if(token.isExpandable() && e.getX() >= x && e.getX() <= x + master.getRowHeight()) {
-                if(expanded) collapse();
-                else expand(new ArrayList<>());
-                e.consume();
-            } else {
-                master.setSelected(this, e);
-            }
+        if(token.isExpandable() && e.getButton() == MouseEvent.BUTTON1 && e.getX() >= x && e.getX() <= x + master.getRowHeight()) {
+            if(expanded) collapse();
+            else expand(new ArrayList<>());
+            e.consume();
+        } else {
+            master.setSelected(this, e);
         }
         confirmActivationMenu(e);
         dispatchMouseEvent(e);

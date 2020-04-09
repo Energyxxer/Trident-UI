@@ -183,13 +183,11 @@ public class NoticeGroupElement extends ExplorerElement {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if(e.getButton() == MouseEvent.BUTTON1) {
-            if(e.getX() >= x && e.getX() <= x + 20) {
-                if(expanded) collapse();
-                else expand();
-            } else {
-                master.setSelected(this, e);
-            }
+        if(e.getButton() == MouseEvent.BUTTON1 && e.getX() >= x && e.getX() <= x + 20) {
+            if(expanded) collapse();
+            else expand();
+        } else {
+            master.setSelected(this, e);
         }
     }
 
