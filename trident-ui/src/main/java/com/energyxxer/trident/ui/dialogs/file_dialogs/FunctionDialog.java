@@ -196,10 +196,10 @@ public class FunctionDialog {
 
         File newFile = convertToPath(nameField.getText().trim()).toFile();
         try {
-            boolean successful = newFile.getParentFile().mkdirs() && newFile.createNewFile();
+            boolean successful = (newFile.getParentFile().exists() || newFile.getParentFile().mkdirs()) && newFile.createNewFile();
 
             if (!successful) {
-                Debug.log("File creation unsuccessful", Debug.MessageType.WARN);
+                Debug.log("File creation unsuccessful: " + newFile, Debug.MessageType.WARN);
                 return;
             }
 
