@@ -35,6 +35,8 @@ public class DefinitionUpdateProcess extends AbstractProcess {
 
     public static Preferences.SettingPref<Boolean> CHECK_FOR_DEF_UPDATES_STARTUP = new Preferences.SettingPref<>("settings.behavior.check_def_updates_startup", true, Boolean::new);
 
+    public static final String IP_REGEX = "(?:[0-9]{1,3}\\.){3}[0-9]{1,3}";
+
     public DefinitionUpdateProcess() {
         super("Definition Update");
         initializeThread(this::checkForUpdates);
@@ -193,7 +195,9 @@ public class DefinitionUpdateProcess extends AbstractProcess {
             return null;
         } else {
             // ERROR
-            throw new IOException(inputStreamToString(connection.getErrorStream()));
+            JsonObject errorObj = new Gson().fromJson(new InputStreamReader(connection.getErrorStream()), JsonObject.class);
+            String message = errorObj.get("message").getAsString();
+            throw new IOException(message.replaceAll(IP_REGEX, "[IP REDACTED]"));
         }
     }
 

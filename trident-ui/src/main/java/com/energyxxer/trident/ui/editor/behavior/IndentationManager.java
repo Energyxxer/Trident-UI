@@ -1,5 +1,6 @@
 package com.energyxxer.trident.ui.editor.behavior;
 
+import javax.swing.text.AttributeSet;
 import java.util.ArrayList;
 import java.util.Stack;
 
@@ -32,7 +33,7 @@ public class IndentationManager {
 
         int level = 0;
         for(IndentationChange indent : indents) {
-            if(editor.getStyledDocument().getCharacterElement(indent.index).getAttributes().containsAttributes(editor.getStyle(NULLIFY_BRACE_STYLE))) continue;
+            if(!isRealIndent(indent)) continue;
             if(index <= indent.index) {
                 return level;
             }
@@ -105,19 +106,24 @@ public class IndentationManager {
         while(true) {
 
             if(min >= max) {
-                if(!indents.isEmpty() && indents.get(min).index == index) return min;
+                if(!indents.isEmpty() && indents.get(min).index == index && isRealIndent(indents.get(min))) return min;
                 return -1;
             }
 
             int pivotIndex = (min + max) / 2;
             IndentationChange pivot = indents.get(pivotIndex);
-            if(index == pivot.index) return pivotIndex;
+            if(index == pivot.index && isRealIndent(pivot)) return pivotIndex;
             else if(index < pivot.index) {
                 max = pivotIndex-1;
             } else {
                 min = pivotIndex+1;
             }
         }
+    }
+
+    private boolean isRealIndent(IndentationChange indent) {
+        AttributeSet characterAttributes = editor.getStyledDocument().getCharacterElement(indent.index).getAttributes();
+        return !characterAttributes.containsAttributes(editor.getStyle(NULLIFY_BRACE_STYLE)) && !characterAttributes.containsAttributes(editor.getStyle(AdvancedEditor.STRING_STYLE));
     }
 
     public int getMatchingBraceIndex(int braceCheckIndex) {
@@ -128,7 +134,7 @@ public class IndentationManager {
         int level = 1;
         for(int i = indentIndex + brace.change; i >= 0 && i < indents.size(); i += brace.change) {
             IndentationChange next = indents.get(i);
-            if(editor.getStyledDocument().getCharacterElement(next.index).getAttributes().containsAttributes(editor.getStyle(NULLIFY_BRACE_STYLE))) continue;
+            if(!isRealIndent(next)) continue;
             level += next.change * brace.change;
             if(level == 0) return next.index;
         }

@@ -32,7 +32,7 @@ public class NoticeItem extends ExplorerElement {
         super(master);
         this.notice = notice;
 
-        lineCount = notice.getExtendedMessage().split("\n").length;
+        lineCount = notice.getExtendedMessage().split("\n",-1).length;
 
         this.x = master.getInitialIndent();
 
@@ -43,7 +43,7 @@ public class NoticeItem extends ExplorerElement {
         super(parent.getMaster());
         this.notice = notice;
 
-        lineCount = notice.getExtendedMessage().split("\n").length;
+        lineCount = notice.getExtendedMessage().split("\n",-1).length;
 
         this.x = (parent.indentation + 1) * master.getIndentPerLevel() + master.getInitialIndent();
 

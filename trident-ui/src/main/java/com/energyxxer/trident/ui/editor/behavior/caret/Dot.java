@@ -282,7 +282,7 @@ public class Dot {
         if(other.mark <= newMin || this.mark <= newMin) {
             this.mark = newMin;
             this.index = newMax;
-        } else/* if(other.mark >= newMax || this.mark >= newMax)*/ {
+        } else {
             this.mark = newMax;
             this.index = newMin;
         }

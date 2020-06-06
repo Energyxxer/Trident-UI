@@ -52,7 +52,7 @@ public class DefinitionPacks {
             }
         }
 
-        Debug.log("Loaded definition packs");
+        Debug.log("Loaded definition packs: " + loadedDefinitionPacks);
     }
 
     private static void updateLatestKnownVersion(String packName) {
@@ -123,6 +123,11 @@ public class DefinitionPacks {
 
         Debug.log(loadedDefinitionPacks);
         Debug.log(latestMatch);
+
+        if(latestMatch == null) {
+            Debug.log("Couldn't find a definition pack for version '" + targetVersion + "'");
+            Debug.log("Loaded definition packs: " + loadedDefinitionPacks);
+        }
 
         return latestMatch != null ? new DefinitionPack[] {latestMatch.getValue()} : null;
     }

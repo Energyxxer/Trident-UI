@@ -78,8 +78,6 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
     private Color braceHighlightColor;
 
     public AdvancedEditor() {
-        super(new DefaultStyledDocument());
-        this.getDocument().putProperty(DefaultEditorKit.EndOfLineStringProperty, "\n");
         this.getStyledDocument().addStyle(STRING_STYLE, null);
         this.getStyledDocument().addStyle(STRING_ESCAPE_STYLE, null);
 

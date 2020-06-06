@@ -27,7 +27,7 @@ public class NoticeStackTraceItem extends ExplorerElement {
 
         this.x = (parent.x) + master.getIndentPerLevel();
         this.message = traceElement.toString();
-        this.lineCount = message.split("\n").length;
+        this.lineCount = message.split("\n",-1).length;
     }
 
     @Override

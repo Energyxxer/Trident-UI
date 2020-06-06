@@ -307,6 +307,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
                     }
                 }
 
+
                 prevToken = token;
             }
             previousTokenStyles.clear();
