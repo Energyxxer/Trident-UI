@@ -80,12 +80,12 @@ public class AliasCategoryModule extends JPanel implements DisplayModule, Dispos
                 String left = parts[0].trim();
                 String right = parts[1].trim();
 
-                if(RESOURCE_LOCATION_REGEX.matcher(left).matches() && RESOURCE_LOCATION_REGEX.matcher(right).matches()) {
+                /*if(RESOURCE_LOCATION_REGEX.matcher(left).matches() && RESOURCE_LOCATION_REGEX.matcher(right).matches()) {
                     if(!left.contains(":")) left = "minecraft:" + left;
                     if(!right.contains(":")) right = "minecraft:" + right;
-                    catObj.addProperty(left, right);
-                    any = true;
-                }
+                }*/
+                catObj.addProperty(left, right);
+                any = true;
             }
         }
         if(any) {
