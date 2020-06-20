@@ -278,7 +278,10 @@ public class ActionManager {
                 new ProgramAction(
                         "Show Console", "Open Console Board",
                         KeyMap.requestMapping("open_tool_board_console", identifierToStrokes("c+" + KeyEvent.VK_3 + ";c+" + KeyEvent.VK_NUMPAD3)).setGroupName("Windows"),
-                        () -> TridentWindow.consoleBoard.open()
+                        () -> {
+                            TridentWindow.consoleBoard.open();
+                            TridentWindow.consoleBoard.scrollToBottom();
+                        }
                 ).setIconKey("console")
         );
         actions.put("OPEN_SEARCH_RESULTS",

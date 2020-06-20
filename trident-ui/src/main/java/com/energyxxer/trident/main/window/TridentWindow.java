@@ -15,9 +15,11 @@ import com.energyxxer.trident.main.window.sections.tools.ToolBoardMaster;
 import com.energyxxer.trident.main.window.sections.tools.find.FindBoard;
 import com.energyxxer.trident.main.window.sections.tools.process.ProcessBoard;
 import com.energyxxer.trident.main.window.sections.tools.todo.TodoBoard;
+import com.energyxxer.trident.ui.HintStylizer;
 import com.energyxxer.trident.ui.editor.completion.snippets.SnippetManager;
 import com.energyxxer.trident.ui.explorer.NoticeExplorerMaster;
 import com.energyxxer.trident.ui.explorer.ProjectExplorerMaster;
+import com.energyxxer.trident.ui.misc.ExceptionHint;
 import com.energyxxer.trident.ui.tablist.TabListMaster;
 import com.energyxxer.trident.ui.theme.Theme;
 import com.energyxxer.trident.ui.theme.ThemeManager;
@@ -27,6 +29,8 @@ import com.energyxxer.util.ImageManager;
 import com.energyxxer.util.logger.Debug;
 import com.energyxxer.xswing.OverlayBorderLayout;
 import com.energyxxer.xswing.ScalableDimension;
+import com.energyxxer.xswing.TemporaryConfirmation;
+import com.energyxxer.xswing.hints.Hint;
 import com.energyxxer.xswing.hints.HintManager;
 
 import javax.swing.*;
@@ -72,6 +76,7 @@ public class TridentWindow {
 	public static StatusBar statusBar;
 
 	public static HintManager hintManager = new HintManager(jframe);
+	public static Hint exceptionHint = hintManager.createHint(ExceptionHint::new);
 
 	public static TabManager tabManager;
 	public static TabListMaster tabList;
@@ -238,6 +243,20 @@ public class TridentWindow {
 
 	public static void dismissStatus(Status status) {
 		statusBar.dismissStatus(status);
+	}
+
+	public static void showException(Exception x) {
+    	showException(x.getMessage());
+	}
+
+	public static void showException(String message) {
+		TridentWindow.statusBar.setStatus(new Status(Status.ERROR, message));
+
+		HintStylizer.style(exceptionHint, "error");
+		exceptionHint.setPreferredPos(Hint.LEFT);
+		exceptionHint.setArrowVisible(false);
+		((ExceptionHint) exceptionHint).setText(message + "\nSee console for details");
+		exceptionHint.show(new Point(jframe.getX() + jframe.getWidth() - 15, jframe.getY() + jframe.getHeight() - 53 - 15), new TemporaryConfirmation(10));
 	}
 
     public static void close() {

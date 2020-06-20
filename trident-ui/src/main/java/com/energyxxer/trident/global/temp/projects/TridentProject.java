@@ -12,7 +12,6 @@ import com.energyxxer.trident.compiler.TridentCompiler;
 import com.energyxxer.trident.compiler.TridentProjectWorker;
 import com.energyxxer.trident.compiler.lexer.TridentProductions;
 import com.energyxxer.trident.compiler.util.TridentProjectSummary;
-import com.energyxxer.trident.global.Status;
 import com.energyxxer.trident.main.TridentUI;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.commodoreresources.DefinitionPacks;
@@ -69,8 +68,8 @@ public class TridentProject implements Project {
             try {
                 buildData.populateFromProjectRoot(getRootDirectory());
             } catch (Exception x) {
-                Debug.log(x);
-                TridentWindow.statusBar.setStatus(new Status(Status.ERROR, x.getMessage()));
+                x.printStackTrace();
+                TridentWindow.showException(x);
             }
         }
         return buildData;

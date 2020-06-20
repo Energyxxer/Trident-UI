@@ -38,6 +38,7 @@ public class Hint extends JDialog implements MouseListener, Disposable {
 
     private Constant preferredPos = BELOW;
     private Constant realPos = BELOW;
+    private boolean arrowVisible = true;
     private boolean interactive = false;
 
     private Color background = new Color(60, 63, 65);
@@ -60,48 +61,49 @@ public class Hint extends JDialog implements MouseListener, Disposable {
                 g.setColor(background);
                 g.fillRect(MARGIN, MARGIN, this.getWidth()-2*MARGIN, this.getHeight()-2*MARGIN);
 
-                if(realPos == ABOVE) {
-                    int[] xPoints = new int[] {this.getWidth()/2-ARROW_WIDTH/2+arrowOffset, this.getWidth()/2+arrowOffset, this.getWidth()/2+ARROW_WIDTH/2+arrowOffset};
-                    int[] yPoints = new int[]{this.getHeight()-MARGIN, this.getHeight(), this.getHeight()-MARGIN};
-                    g.setColor(border);
-                    g.fillPolygon(xPoints, yPoints,3);
-                    yPoints[0]--;
-                    yPoints[1] -= 2;
-                    yPoints[2]--;
-                    g.setColor(background);
-                    g.fillPolygon(xPoints, yPoints,3);
-                } else if(realPos == BELOW) {
-                    int[] xPoints = new int[] {this.getWidth()/2-ARROW_WIDTH/2+arrowOffset, this.getWidth()/2+arrowOffset, this.getWidth()/2+ARROW_WIDTH/2+arrowOffset};
-                    int[] yPoints = new int[]{MARGIN, 0, MARGIN};
-                    g.setColor(border);
-                    g.fillPolygon(xPoints, yPoints,3);
-                    yPoints[0]++;
-                    yPoints[1] += 2;
-                    yPoints[2]++;
-                    g.setColor(background);
-                    g.fillPolygon(xPoints, yPoints,3);
-                } else if(realPos == LEFT) {
-                    int[] xPoints = new int[] {this.getWidth()-MARGIN, this.getWidth(), this.getWidth()-MARGIN};
-                    int[] yPoints = new int[]{this.getHeight()/2-ARROW_WIDTH/2+arrowOffset, this.getHeight()/2+arrowOffset, this.getHeight()/2+ARROW_WIDTH/2+arrowOffset};
-                    g.setColor(border);
-                    g.fillPolygon(xPoints, yPoints,3);
-                    xPoints[0]--;
-                    xPoints[1] -= 2;
-                    xPoints[2]--;
-                    g.setColor(background);
-                    g.fillPolygon(xPoints, yPoints,3);
-                } else if(realPos == RIGHT) {
-                    int[] xPoints = new int[] {MARGIN, 0, MARGIN};
-                    int[] yPoints = new int[]{this.getHeight()/2-ARROW_WIDTH/2+arrowOffset, this.getHeight()/2+arrowOffset, this.getHeight()/2+ARROW_WIDTH/2+arrowOffset};
-                    g.setColor(border);
-                    g.fillPolygon(xPoints, yPoints,3);
-                    xPoints[0]++;
-                    xPoints[1] += 2;
-                    xPoints[2]++;
-                    g.setColor(background);
-                    g.fillPolygon(xPoints, yPoints,3);
+                if(arrowVisible) {
+                    if(realPos == ABOVE) {
+                        int[] xPoints = new int[] {this.getWidth()/2-ARROW_WIDTH/2+arrowOffset, this.getWidth()/2+arrowOffset, this.getWidth()/2+ARROW_WIDTH/2+arrowOffset};
+                        int[] yPoints = new int[]{this.getHeight()-MARGIN, this.getHeight(), this.getHeight()-MARGIN};
+                        g.setColor(border);
+                        g.fillPolygon(xPoints, yPoints,3);
+                        yPoints[0]--;
+                        yPoints[1] -= 2;
+                        yPoints[2]--;
+                        g.setColor(background);
+                        g.fillPolygon(xPoints, yPoints,3);
+                    } else if(realPos == BELOW) {
+                        int[] xPoints = new int[] {this.getWidth()/2-ARROW_WIDTH/2+arrowOffset, this.getWidth()/2+arrowOffset, this.getWidth()/2+ARROW_WIDTH/2+arrowOffset};
+                        int[] yPoints = new int[]{MARGIN, 0, MARGIN};
+                        g.setColor(border);
+                        g.fillPolygon(xPoints, yPoints,3);
+                        yPoints[0]++;
+                        yPoints[1] += 2;
+                        yPoints[2]++;
+                        g.setColor(background);
+                        g.fillPolygon(xPoints, yPoints,3);
+                    } else if(realPos == LEFT) {
+                        int[] xPoints = new int[] {this.getWidth()-MARGIN, this.getWidth(), this.getWidth()-MARGIN};
+                        int[] yPoints = new int[]{this.getHeight()/2-ARROW_WIDTH/2+arrowOffset, this.getHeight()/2+arrowOffset, this.getHeight()/2+ARROW_WIDTH/2+arrowOffset};
+                        g.setColor(border);
+                        g.fillPolygon(xPoints, yPoints,3);
+                        xPoints[0]--;
+                        xPoints[1] -= 2;
+                        xPoints[2]--;
+                        g.setColor(background);
+                        g.fillPolygon(xPoints, yPoints,3);
+                    } else if(realPos == RIGHT) {
+                        int[] xPoints = new int[] {MARGIN, 0, MARGIN};
+                        int[] yPoints = new int[]{this.getHeight()/2-ARROW_WIDTH/2+arrowOffset, this.getHeight()/2+arrowOffset, this.getHeight()/2+ARROW_WIDTH/2+arrowOffset};
+                        g.setColor(border);
+                        g.fillPolygon(xPoints, yPoints,3);
+                        xPoints[0]++;
+                        xPoints[1] += 2;
+                        xPoints[2]++;
+                        g.setColor(background);
+                        g.fillPolygon(xPoints, yPoints,3);
+                    }
                 }
-
             }
         });
         this.getContentPane().add(new Padding(MARGIN),BorderLayout.NORTH);
@@ -137,18 +139,20 @@ public class Hint extends JDialog implements MouseListener, Disposable {
 
         Constant current = preferredPos;
 
+        int distance = arrowVisible ? DISTANCE : 0;
+
         Rectangle proposedRect = new Rectangle(0,0,w,h);
         if(current == ABOVE) {
             proposedRect.x = this.x - w/2;
-            proposedRect.y = this.y - DISTANCE - MARGIN - h;
+            proposedRect.y = this.y - distance - MARGIN - h;
         } else if(current == BELOW) {
             proposedRect.x = this.x - w/2;
-            proposedRect.y = this.y + DISTANCE + MARGIN;
+            proposedRect.y = this.y + distance + MARGIN;
         } else if(current == LEFT) {
-            proposedRect.x = this.x - DISTANCE - MARGIN - w;
+            proposedRect.x = this.x - distance - MARGIN - w;
             proposedRect.y = this.y - h/2;
         } else if(current == RIGHT) {
-            proposedRect.x = this.x + DISTANCE + MARGIN;
+            proposedRect.x = this.x + distance + MARGIN;
             proposedRect.y = this.y - h/2;
         }
 
@@ -344,5 +348,13 @@ public class Hint extends JDialog implements MouseListener, Disposable {
         this.visibilityCheck = null;
         this.disposed = true;
         super.dispose();
+    }
+
+    public boolean isArrowVisible() {
+        return arrowVisible;
+    }
+
+    public void setArrowVisible(boolean arrowVisible) {
+        this.arrowVisible = arrowVisible;
     }
 }

@@ -3,7 +3,6 @@ package com.energyxxer.trident.main;
 import com.energyxxer.trident.compiler.TridentCompiler;
 import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.global.Resources;
-import com.energyxxer.trident.global.Status;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.main.window.sections.tools.ConsoleBoard;
@@ -121,7 +120,10 @@ public class TridentUI {
 
 				if(message.startsWith("Exception in thread ")) {
 					Debug.log("", Debug.MessageType.PLAIN);
-					TridentWindow.setStatus(new Status(Status.ERROR, message));
+					int start = message.indexOf(":");
+					if(start == -1) start = 0;
+					else start += 2;
+					TridentWindow.showException(message.substring(start));
 				}
 				//defaultErrStream.println(sb.toString());
 				Debug.log(message, Debug.MessageType.PLAIN);

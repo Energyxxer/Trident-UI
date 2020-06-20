@@ -5,6 +5,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.function.Function;
 
 public class HintManager {
     private final JFrame owner;
@@ -37,8 +38,7 @@ public class HintManager {
                         }
                     } else if(hint.timer == 0) {
                         if(hint.isShowing()) {
-                            double distance = (hint.isInteractive()) ? hint.getDistanceFromPoint(MouseInfo.getPointerInfo().getLocation()) : 0;
-                            if(!hint.isInteractive() || distance >= FADE_DISTANCE) {
+                            if(!hint.isInteractive() || hint.getDistanceFromPoint(MouseInfo.getPointerInfo().getLocation()) >= FADE_DISTANCE) {
                                 if(!hint.shouldContinueShowing()) {
                                     hint.timer = hint.outDelay;
                                 }
@@ -67,6 +67,12 @@ public class HintManager {
 
     public TextHint createTextHint(String text) {
         TextHint newHint = new TextHint(owner, text);
+        this.hints.add(newHint);
+        return newHint;
+    }
+
+    public Hint createHint(Function<JFrame, ? extends Hint> constructor) {
+        Hint newHint = constructor.apply(owner);
         this.hints.add(newHint);
         return newHint;
     }

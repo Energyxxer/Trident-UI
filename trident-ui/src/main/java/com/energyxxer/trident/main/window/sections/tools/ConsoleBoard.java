@@ -260,6 +260,10 @@ public class ConsoleBoard extends ToolBoard {
         commandHandlers.put(commandName, handler);
     }
 
+    public void scrollToBottom() {
+        consoleScrollPane.scrollRectToVisible(new Rectangle(0, consoleScrollPane.getViewport().getHeight()-1, 1, 1));
+    }
+
     public interface CommandHandler {
         String getDescription();
         void printHelp();
