@@ -5,18 +5,19 @@ import com.energyxxer.commodore.util.io.DirectoryCompoundInput;
 import com.energyxxer.commodore.util.io.ZipCompoundInput;
 import com.energyxxer.commodore.versioning.JavaEditionVersion;
 import com.energyxxer.commodore.versioning.ThreeNumberVersion;
+import com.energyxxer.nbtmapper.NBTTypeMapPack;
 import com.energyxxer.util.logger.Debug;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.AbstractMap;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TypeMaps {
-    private static HashMap<String, String[]> loadedTypeMaps = new HashMap<>();
+    private static HashMap<String, NBTTypeMapPack> loadedTypeMaps = new HashMap<>();
 
     public static void loadAll() {
         loadedTypeMaps.clear();
@@ -52,51 +53,20 @@ public class TypeMaps {
     }
 
     private static void loadFromCompound(CompoundInput input, String name) throws IOException {
-        try {
-            input.open();
-            InputStream fileListIS = input.get("");
-            if (fileListIS != null) {
-                try (BufferedReader br = new BufferedReader(new InputStreamReader(fileListIS))) {
-                    String innerFileName;
-                    ArrayList<String> typeMapsInside = new ArrayList<>();
-                    while ((innerFileName = br.readLine()) != null) {
-                        InputStream is = input.get(innerFileName);
-                        if (is != null) {
-                            typeMapsInside.add(readAllText(is));
-                        }
-                    }
-                    loadedTypeMaps.put(name, typeMapsInside.toArray(new String[0]));
-                }
-            }
-        } finally {
-            input.close();
-        }
+        loadedTypeMaps.put(name, NBTTypeMapPack.fromCompound(input));
     }
 
-    private static String readAllText(InputStream is) throws IOException {
-        try(BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-                sb.append('\n');
-            }
-            if(sb.length() > 0) sb.setLength(sb.length()-1);
-            return sb.toString();
-        }
-    }
-
-    public static String[] pickTypeMapsForVersion(ThreeNumberVersion targetVersion) {
+    public static NBTTypeMapPack pickTypeMapsForVersion(ThreeNumberVersion targetVersion) {
         if(targetVersion == null) return null;
 
         String key = targetVersion.getEditionString().toLowerCase().charAt(0) + "_" + targetVersion.getMajor() + "_" + targetVersion.getMinor();
         Pattern vanillaKey = Pattern.compile(targetVersion.getEditionString().toLowerCase().charAt(0) + "_(\\d+)_(\\d+)");
-        String[] typemaps = loadedTypeMaps.get(key);
+        NBTTypeMapPack typemaps = loadedTypeMaps.get(key);
         if(typemaps != null) return typemaps;
 
-        Map.Entry<JavaEditionVersion, String[]> latestMatch = null;
+        Map.Entry<JavaEditionVersion, NBTTypeMapPack> latestMatch = null;
 
-        for(Map.Entry<String, String[]> entry : loadedTypeMaps.entrySet()) {
+        for(Map.Entry<String, NBTTypeMapPack> entry : loadedTypeMaps.entrySet()) {
             Matcher match = vanillaKey.matcher(entry.getKey());
             if(match.matches()) {
                 JavaEditionVersion version = new JavaEditionVersion(Integer.parseInt(match.group(1)), Integer.parseInt(match.group(2)), 0);

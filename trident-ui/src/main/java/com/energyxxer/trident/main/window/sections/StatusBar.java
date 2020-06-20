@@ -92,7 +92,7 @@ public class StatusBar extends JPanel implements MouseListener {
     }
 
     public void setStatus(Status status) {
-
+        Debug.log("Set status: " + status.getMessage());
         Theme t = TridentWindow.getTheme();
 
         statusLabel.setForeground(t.getColor(Color.BLACK, "Status." + status.getType().toLowerCase(),"General.foreground"));

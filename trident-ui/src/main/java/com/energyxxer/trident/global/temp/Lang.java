@@ -42,7 +42,7 @@ public class Lang {
 
     public static final Lang JSON = new Lang("JSON",
             JSONLexerProfile::new,
-            "json", "mcmeta", TridentCompiler.PROJECT_FILE_NAME.substring(1), CrossbowCompiler.PROJECT_FILE_NAME.substring(1)
+            "json", "mcmeta", TridentCompiler.PROJECT_FILE_NAME.substring(1), TridentCompiler.PROJECT_BUILD_FILE_NAME.substring(1), CrossbowCompiler.PROJECT_FILE_NAME.substring(1)
     );
     public static final Lang PROPERTIES = new Lang("PROPERTIES",
             PropertiesLexerProfile::new,

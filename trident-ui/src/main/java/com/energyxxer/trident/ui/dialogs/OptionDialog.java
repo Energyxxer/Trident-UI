@@ -11,6 +11,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  * Created by User on 2/11/2017.
@@ -28,7 +30,7 @@ public class OptionDialog {
         JDialog dialog = new JDialog(TridentWindow.jframe);
 
         JPanel pane = new JPanel(new BorderLayout());
-        pane.setPreferredSize(new ScalableDimension(WIDTH, HEIGHT));
+        //pane.setPreferredSize(new ScalableDimension(WIDTH, HEIGHT));
         tlm.addThemeChangeListener(t ->
                 pane.setBackground(t.getColor(new Color(235, 235, 235), "OptionDialog.background"))
         );
@@ -44,7 +46,13 @@ public class OptionDialog {
 
             StyledLabel label = new StyledLabel(query, "OptionDialog", tlm);
             label.setStyle(Font.BOLD);
-            content.add(label, BorderLayout.CENTER);
+
+            JPanel labelWrapper = new JPanel(new BorderLayout());
+            labelWrapper.setOpaque(false);
+            labelWrapper.add(new Padding(25), BorderLayout.NORTH);
+            labelWrapper.add(label, BorderLayout.CENTER);
+            labelWrapper.add(new Padding(25), BorderLayout.SOUTH);
+            content.add(labelWrapper, BorderLayout.CENTER);
 
             {
                 JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -78,18 +86,23 @@ public class OptionDialog {
         });
 
         dialog.setContentPane(pane);
-        dialog.pack();
 
         dialog.setTitle(title);
 
-        Point center = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
-        center.x -= dialog.getWidth()/2;
-        center.y -= dialog.getHeight()/2;
-
-        dialog.setLocation(center);
-
         dialog.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
 
+        dialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowActivated(WindowEvent e) {
+                Point center = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
+                center.x -= dialog.getWidth()/2;
+                center.y -= dialog.getHeight()/2;
+
+                dialog.setLocation(center);
+            }
+        });
+
+        dialog.pack();
         dialog.setVisible(true);
     }
 }

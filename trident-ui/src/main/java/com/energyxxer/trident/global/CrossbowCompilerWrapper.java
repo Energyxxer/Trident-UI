@@ -5,7 +5,6 @@ import com.energyxxer.crossbow.compiler.CrossbowCompiler;
 import com.energyxxer.trident.global.temp.projects.CrossbowProject;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.commodoreresources.DefinitionPacks;
-import com.energyxxer.trident.ui.commodoreresources.TypeMaps;
 import com.energyxxer.util.out.Console;
 import com.energyxxer.util.processes.AbstractProcess;
 import com.energyxxer.util.processes.CompletionListener;
@@ -22,7 +21,7 @@ public class CrossbowCompilerWrapper extends AbstractProcess {
         compiler = new CrossbowCompiler(project.getRootDirectory());
         compiler.setStartingDefinitionPacks(DefinitionPacks.pickPacksForVersion(project.getTargetVersion()));
         compiler.setStartingFeatureMap(VersionFeatureManager.getFeaturesForVersion(project.getTargetVersion()));
-        compiler.setStartingRawTypeMaps(TypeMaps.pickTypeMapsForVersion(project.getTargetVersion()));
+        //compiler.setStartingRawTypeMaps(new NBTTypeMapPack[] {TypeMaps.pickTypeMapsForVersion(project.getTargetVersion())});
 
         compiler.setDefinitionPackAliases(DefinitionPacks.getAliasMap());
         compiler.setSourceCache(project.getSourceCache());

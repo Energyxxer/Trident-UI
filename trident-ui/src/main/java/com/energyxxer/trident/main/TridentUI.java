@@ -121,7 +121,7 @@ public class TridentUI {
 
 				if(message.startsWith("Exception in thread ")) {
 					Debug.log("", Debug.MessageType.PLAIN);
-					TridentWindow.setStatus(new Status("error", message));
+					TridentWindow.setStatus(new Status(Status.ERROR, message));
 				}
 				//defaultErrStream.println(sb.toString());
 				Debug.log(message, Debug.MessageType.PLAIN);

@@ -2,13 +2,11 @@ package com.energyxxer.trident.global;
 
 import com.energyxxer.crossbow.compiler.util.CrossbowProjectSummarizer;
 import com.energyxxer.enxlex.lexical_analysis.summary.ProjectSummarizer;
-import com.energyxxer.trident.compiler.TridentCompilerResources;
+import com.energyxxer.trident.compiler.TridentBuildConfiguration;
 import com.energyxxer.trident.compiler.util.TridentProjectSummarizer;
 import com.energyxxer.trident.global.temp.projects.CrossbowProject;
 import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.global.temp.projects.TridentProject;
-import com.energyxxer.trident.ui.commodoreresources.DefinitionPacks;
-import com.energyxxer.trident.ui.commodoreresources.TridentPlugins;
 import com.energyxxer.util.logger.Debug;
 import com.energyxxer.util.processes.AbstractProcess;
 
@@ -22,13 +20,11 @@ public class IndexingProcess extends AbstractProcess {
         super("Indexing");
         this.project = project;
         if(project instanceof TridentProject) {
-            TridentCompilerResources resources = new TridentCompilerResources();
-            resources.definitionPacks = DefinitionPacks.pickPacksForVersion(((TridentProject) project).getTargetVersion());
-            resources.definitionPackAliases = DefinitionPacks.getAliasMap();
-            resources.pluginAliases = TridentPlugins.getAliasMap();
+            TridentBuildConfiguration buildConfig = ((TridentProject) project).getBuildConfig();
+
             summarizer = new TridentProjectSummarizer(
                     project.getRootDirectory(),
-                    resources
+                    buildConfig
             );
             summarizer.setSourceCache(project.getSourceCache());
             summarizer.addCompletionListener(() -> {

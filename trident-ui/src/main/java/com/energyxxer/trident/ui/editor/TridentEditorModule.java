@@ -1,5 +1,6 @@
 package com.energyxxer.trident.ui.editor;
 
+import com.energyxxer.trident.compiler.TridentCompiler;
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.global.temp.Lang;
@@ -431,7 +432,8 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
             writer.print(text);
             writer.close();
 
-            if(new File(((FileModuleToken) associatedTab.token).getPath()).getName().equals(".tdnproj")) {
+            String fileName = new File(((FileModuleToken) associatedTab.token).getPath()).getName();
+            if(fileName.equals(TridentCompiler.PROJECT_FILE_NAME) || fileName.equals(TridentCompiler.PROJECT_BUILD_FILE_NAME)) {
                 ProjectManager.loadWorkspace();
             }
 

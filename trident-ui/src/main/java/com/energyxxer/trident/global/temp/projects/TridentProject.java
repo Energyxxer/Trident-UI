@@ -2,17 +2,23 @@ package com.energyxxer.trident.global.temp.projects;
 
 import com.energyxxer.commodore.module.Namespace;
 import com.energyxxer.commodore.versioning.JavaEditionVersion;
+import com.energyxxer.commodore.versioning.compatibility.VersionFeatureManager;
 import com.energyxxer.enxlex.lexical_analysis.summary.ProjectSummary;
 import com.energyxxer.enxlex.pattern_matching.ParsingSignature;
 import com.energyxxer.enxlex.pattern_matching.matching.lazy.LazyTokenPatternMatch;
+import com.energyxxer.nbtmapper.NBTTypeMapPack;
+import com.energyxxer.trident.compiler.TridentBuildConfiguration;
 import com.energyxxer.trident.compiler.TridentCompiler;
-import com.energyxxer.trident.compiler.TridentCompilerResources;
 import com.energyxxer.trident.compiler.TridentProjectWorker;
 import com.energyxxer.trident.compiler.lexer.TridentProductions;
 import com.energyxxer.trident.compiler.util.TridentProjectSummary;
+import com.energyxxer.trident.global.Status;
 import com.energyxxer.trident.main.TridentUI;
+import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.commodoreresources.DefinitionPacks;
 import com.energyxxer.trident.ui.commodoreresources.TridentPlugins;
+import com.energyxxer.trident.ui.commodoreresources.TypeMaps;
+import com.energyxxer.trident.ui.dialogs.OptionDialog;
 import com.energyxxer.util.Lazy;
 import com.energyxxer.util.StringUtil;
 import com.energyxxer.util.logger.Debug;
@@ -37,14 +43,11 @@ public class TridentProject implements Project {
 
     private final Lazy<TridentProductions> productions = new Lazy<>(() -> {
         try {
-            TridentCompilerResources resources = new TridentCompilerResources();
-            resources.definitionPacks = DefinitionPacks.pickPacksForVersion(getTargetVersion());
-            resources.definitionPackAliases = DefinitionPacks.getAliasMap();
-            resources.pluginAliases = TridentPlugins.getAliasMap();
+            TridentBuildConfiguration buildConfig = getBuildConfig();
 
             TridentProjectWorker worker = new TridentProjectWorker(rootDirectory);
             worker.setup.setupProductions = true;
-            worker.setResources(resources);
+            worker.setBuildConfig(buildConfig);
             worker.work();
             return worker.output.productions;
         } catch(IOException x) {
@@ -52,6 +55,25 @@ public class TridentProject implements Project {
             x.printStackTrace();
             return null;
         }
+    });
+
+    private final Lazy<TridentBuildConfiguration> buildConfig = new Lazy<>(() -> {
+        TridentBuildConfiguration buildData = new TridentBuildConfiguration();
+        buildData.defaultDefinitionPacks = DefinitionPacks.pickPacksForVersion(this.getTargetVersion());
+        buildData.definitionPackAliases = DefinitionPacks.getAliasMap();
+        buildData.featureMap = VersionFeatureManager.getFeaturesForVersion(this.getTargetVersion());
+        buildData.pluginAliases = TridentPlugins.getAliasMap();
+        buildData.typeMapPacks = new NBTTypeMapPack[] {TypeMaps.pickTypeMapsForVersion(this.getTargetVersion())};
+
+        if(ensureBuildDataExists()) {
+            try {
+                buildData.populateFromProjectRoot(getRootDirectory());
+            } catch (Exception x) {
+                Debug.log(x);
+                TridentWindow.statusBar.setStatus(new Status(Status.ERROR, x.getMessage()));
+            }
+        }
+        return buildData;
     });
 
     private JsonObject config;
@@ -456,5 +478,67 @@ public class TridentProject implements Project {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    private boolean ensureBuildDataExists() {
+        File buildDataFile = rootDirectory.toPath().resolve(TridentCompiler.PROJECT_BUILD_FILE_NAME).toFile();
+        if(!buildDataFile.exists()) {
+            String confirmation = new OptionDialog("New Project Format", "Project \"" + name + "\" is using an outdated settings format. Update it now?", new String[] {"Update this project", "Update all projects", "Not now"}).result;
+            if(confirmation == null) return false;
+            switch(confirmation) {
+                case "Update this project": {
+                    createBuildDataFromTDNProj();
+                    break;
+                }
+                case "Update all projects": {
+                    for(Project project : ProjectManager.getLoadedProjects()) {
+                        if(project instanceof TridentProject) {
+                            ((TridentProject) project).createBuildDataFromTDNProj();
+                        }
+                    }
+                    break;
+                }
+                default: {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private void createBuildDataFromTDNProj() {
+        File buildDataFile = rootDirectory.toPath().resolve(TridentCompiler.PROJECT_BUILD_FILE_NAME).toFile();
+
+        JsonObject root = new JsonObject();
+
+        root.addProperty("input-resources", "(automatically selected by Trident-UI)");
+
+        JsonObject outputObj = new JsonObject();
+        root.add("output", outputObj);
+
+        JsonObject directoriesObj = new JsonObject();
+        outputObj.add("directories", directoriesObj);
+
+        JsonObject cleanDirectoriesObj = new JsonObject();
+        outputObj.add("clean-directories", cleanDirectoriesObj);
+
+        directoriesObj.add("data-pack", config.get("datapack-output"));
+        directoriesObj.add("resource-pack", config.get("resources-output"));
+        cleanDirectoriesObj.add("data-pack", config.get("clear-datapack-output"));
+        cleanDirectoriesObj.add("resource-pack", config.get("clear-resources-output"));
+
+        outputObj.add("export-comments", config.get("export-comments"));
+        outputObj.add("export-gamelog", config.get("export-gamelog"));
+
+        try(PrintWriter writer = new PrintWriter(buildDataFile, "UTF-8")) {
+            writer.print(new GsonBuilder().setPrettyPrinting().create().toJson(root));
+            Debug.log("Created " + TridentCompiler.PROJECT_BUILD_FILE_NAME + " for \"" + name + "\"");
+        } catch (IOException x) {
+            x.printStackTrace();
+        }
+    }
+
+    public TridentBuildConfiguration getBuildConfig() {
+        return buildConfig.getValue();
     }
 }
