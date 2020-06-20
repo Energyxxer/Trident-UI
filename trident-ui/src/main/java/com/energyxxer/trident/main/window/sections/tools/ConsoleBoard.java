@@ -138,11 +138,11 @@ public class ConsoleBoard extends ToolBoard {
                 if(e.getKeyCode() == KeyEvent.VK_ENTER) {
                     e.consume();
                     String command = inputField.getText();
+                    inputField.setText("");
                     if(!command.isEmpty()) {
                         addToHistory(command);
                         runCommand(command);
                     }
-                    inputField.setText("");
                 } else if(e.getKeyCode() == KeyEvent.VK_UP) {
                     getPreviousCommand();
                 } else if(e.getKeyCode() == KeyEvent.VK_DOWN) {

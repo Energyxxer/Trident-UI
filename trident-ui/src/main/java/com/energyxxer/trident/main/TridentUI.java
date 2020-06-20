@@ -192,7 +192,7 @@ public class TridentUI {
 
 			@Override
 			public void handle(String[] args) {
-				throw new RuntimeException();
+				throw new RuntimeException("Exception triggered via the console");
 			}
 		});
 
