@@ -2,6 +2,7 @@ package com.energyxxer.trident.main;
 
 import com.energyxxer.trident.compiler.TridentCompiler;
 import com.energyxxer.trident.global.Preferences;
+import com.energyxxer.trident.global.ProcessManager;
 import com.energyxxer.trident.global.Resources;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
 import com.energyxxer.trident.main.window.TridentWindow;
@@ -11,6 +12,7 @@ import com.energyxxer.trident.ui.common.ProgramUpdateProcess;
 import com.energyxxer.trident.ui.editor.completion.snippets.SnippetManager;
 import com.energyxxer.util.ImageManager;
 import com.energyxxer.util.logger.Debug;
+import com.energyxxer.util.processes.AbstractProcess;
 
 import javax.swing.*;
 import java.awt.*;

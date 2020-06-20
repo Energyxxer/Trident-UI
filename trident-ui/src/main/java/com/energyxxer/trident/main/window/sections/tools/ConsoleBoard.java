@@ -1,6 +1,7 @@
 package com.energyxxer.trident.main.window.sections.tools;
 
 import com.energyxxer.trident.global.Preferences;
+import com.energyxxer.trident.global.ProcessManager;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.modules.FileModuleToken;
 import com.energyxxer.trident.ui.scrollbar.OverlayScrollPane;
@@ -9,6 +10,7 @@ import com.energyxxer.trident.ui.styledcomponents.StyledTextField;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
 import com.energyxxer.util.logger.Debug;
 import com.energyxxer.util.out.ConsoleOutputStream;
+import com.energyxxer.util.processes.AbstractProcess;
 import com.energyxxer.xswing.ScalableDimension;
 
 import javax.swing.*;
@@ -20,7 +22,10 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,6 +46,8 @@ public class ConsoleBoard extends ToolBoard {
     private String writingCommand = null;
 
     private static HashMap<String, CommandHandler> commandHandlers = new HashMap<>();
+
+    private Process runningProcess = null;
 
     public ConsoleBoard(ToolBoardMaster parent) {
         super(parent);
@@ -139,9 +146,21 @@ public class ConsoleBoard extends ToolBoard {
                     e.consume();
                     String command = inputField.getText();
                     inputField.setText("");
-                    if(!command.isEmpty()) {
+                    if(runningProcess != null && runningProcess.isAlive()) {
                         addToHistory(command);
-                        runCommand(command);
+                        try {
+                            runningProcess.getOutputStream().write((command + System.getProperty("line.separator")).getBytes());
+                            runningProcess.getOutputStream().flush();
+                            scrollToBottom();
+                        } catch (IOException ex) {
+                            TridentWindow.showException(ex);
+                        }
+                    } else {
+                        runningProcess = null;
+                        if(!command.isEmpty()) {
+                            addToHistory(command);
+                            runCommand(command);
+                        }
                     }
                 } else if(e.getKeyCode() == KeyEvent.VK_UP) {
                     getPreviousCommand();
@@ -195,6 +214,59 @@ public class ConsoleBoard extends ToolBoard {
                     } else {
                         Debug.log("Unknown command '" + args[1] + "'");
                     }
+                }
+            }
+        });
+        ConsoleBoard.registerCommandHandler("exec", new ConsoleBoard.CommandHandler() {
+            @Override
+            public String getDescription() {
+                return "Executes a program";
+            }
+
+            @Override
+            public void printHelp() {
+                Debug.log();
+                Debug.log("EXEC: Runs a program");
+            }
+
+            @Override
+            public void handle(String[] args) {
+                String command = String.join(" ", args).substring("exec".length()).trim();
+                ProcessBuilder pb = new ProcessBuilder(command).redirectErrorStream(true);
+
+                try {
+                    ProcessManager.queueProcess(new AbstractProcess("Console Process") {
+
+                        {
+                            initializeThread(this::startProcess);
+                        }
+
+                        private void startProcess() {
+                            try {
+                                Debug.log("Starting process \"" + command + "\"\n");
+                                Process process = pb.start();
+                                TridentWindow.consoleBoard.attachProcess(process);
+
+                                BufferedReader stdInput = new BufferedReader(new
+                                        InputStreamReader(process.getInputStream()));
+
+                                String s = null;
+                                while ((s = stdInput.readLine()) != null) {
+                                    Debug.log(s, Debug.MessageType.PLAIN);
+                                }
+
+                                Debug.log("Process finished with exit code " + process.exitValue(), Debug.MessageType.PLAIN);
+                                TridentWindow.consoleBoard.detachProcess();
+                            } catch(Exception x) {
+                                TridentWindow.showException(x);
+                            }
+
+                            finalizeProcess(true);
+                        }
+
+                    });
+                } catch (Exception x) {
+                    TridentWindow.showException(x);
                 }
             }
         });
@@ -262,6 +334,14 @@ public class ConsoleBoard extends ToolBoard {
 
     public void scrollToBottom() {
         consoleScrollPane.scrollRectToVisible(new Rectangle(0, consoleScrollPane.getViewport().getHeight()-1, 1, 1));
+    }
+
+    public void attachProcess(Process process) {
+        this.runningProcess = process;
+    }
+
+    public void detachProcess() {
+        runningProcess = null;
     }
 
     public interface CommandHandler {
