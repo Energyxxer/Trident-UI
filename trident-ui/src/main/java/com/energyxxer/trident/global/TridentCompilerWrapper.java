@@ -1,6 +1,5 @@
 package com.energyxxer.trident.global;
 
-import com.energyxxer.trident.compiler.TridentBuildConfiguration;
 import com.energyxxer.trident.compiler.TridentCompiler;
 import com.energyxxer.trident.global.temp.projects.TridentProject;
 import com.energyxxer.trident.main.window.TridentWindow;
@@ -18,12 +17,14 @@ public class TridentCompilerWrapper extends AbstractProcess {
         this.project = project;
 
         compiler = new TridentCompiler(project.getRootDirectory());
-        TridentBuildConfiguration buildConfig = project.getBuildConfig();
 
-        compiler.setBuildConfig(buildConfig);
+        compiler.setBuildConfig(project.getBuildConfig());
 
         compiler.setSourceCache(project.getSourceCache());
         compiler.setInResourceCache(project.getResourceCache());
+
+        compiler.addStartListener(p -> TridentWindow.consoleBoard.batchSubmitCommand(project.getPreActions()));
+
         compiler.addCompletionListener((process, success) -> {
             TridentWindow.noticeExplorer.setNotices(compiler.getReport().group());
             if (compiler.getReport().getTotal() > 0) TridentWindow.noticeBoard.open();
@@ -31,6 +32,8 @@ public class TridentCompilerWrapper extends AbstractProcess {
             compiler.getReport().getErrors().forEach(Console.err::println);
             project.updateServerDataCache(compiler.getSourceCache());
             project.updateClientDataCache(compiler.getOutResourceCache());
+
+            TridentWindow.consoleBoard.batchSubmitCommand(project.getPostActions());
         });
     }
 

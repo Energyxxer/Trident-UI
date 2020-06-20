@@ -146,22 +146,7 @@ public class ConsoleBoard extends ToolBoard {
                     e.consume();
                     String command = inputField.getText();
                     inputField.setText("");
-                    if(runningProcess != null && runningProcess.isAlive()) {
-                        addToHistory(command);
-                        try {
-                            runningProcess.getOutputStream().write((command + System.getProperty("line.separator")).getBytes());
-                            runningProcess.getOutputStream().flush();
-                            scrollToBottom();
-                        } catch (IOException ex) {
-                            TridentWindow.showException(ex);
-                        }
-                    } else {
-                        runningProcess = null;
-                        if(!command.isEmpty()) {
-                            addToHistory(command);
-                            runCommand(command);
-                        }
-                    }
+                    submitCommand(command);
                 } else if(e.getKeyCode() == KeyEvent.VK_UP) {
                     getPreviousCommand();
                 } else if(e.getKeyCode() == KeyEvent.VK_DOWN) {
@@ -234,6 +219,8 @@ public class ConsoleBoard extends ToolBoard {
                 String command = String.join(" ", args).substring("exec".length()).trim();
                 ProcessBuilder pb = new ProcessBuilder(command).redirectErrorStream(true);
 
+                TridentWindow.consoleBoard.lock();
+
                 try {
                     ProcessManager.queueProcess(new AbstractProcess("Console Process") {
 
@@ -245,6 +232,8 @@ public class ConsoleBoard extends ToolBoard {
                             try {
                                 Debug.log("Starting process \"" + command + "\"\n");
                                 Process process = pb.start();
+
+                                TridentWindow.consoleBoard.unlock();
                                 TridentWindow.consoleBoard.attachProcess(process);
 
                                 BufferedReader stdInput = new BufferedReader(new
@@ -270,6 +259,69 @@ public class ConsoleBoard extends ToolBoard {
                 }
             }
         });
+    }
+
+    private transient boolean locked = false;
+
+    public void lock() {
+        locked = true;
+    }
+
+    public void unlock() {
+        locked = false;
+    }
+
+    public boolean waitForUnlock() {
+        return locked;
+    }
+
+    public void submitCommand(String command) {
+        if(runningProcess != null && runningProcess.isAlive()) {
+            addToHistory(command);
+            try {
+                runningProcess.getOutputStream().write((command + System.getProperty("line.separator")).getBytes());
+                runningProcess.getOutputStream().flush();
+                scrollToBottom();
+            } catch (IOException ex) {
+                TridentWindow.showException(ex);
+            }
+        } else {
+            runningProcess = null;
+            if(!command.isEmpty()) {
+                addToHistory(command);
+                runCommand(command);
+            }
+        }
+    }
+
+    public void batchSubmitCommand(Iterable<String> commands) {
+        if(commands == null) return;
+        for(String command : commands) {
+            submitCommand(command);
+            while(waitForUnlock()) {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException x) {
+                    TridentWindow.showException(x);
+                    x.printStackTrace();
+                }
+            }
+        }
+
+        if(runningProcess != null) {
+            open();
+            scrollToBottom();
+            TridentWindow.statusBar.setStatus("Waiting for user input...");
+        }
+
+        while(runningProcess != null) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException x) {
+                TridentWindow.showException(x);
+                x.printStackTrace();
+            }
+        }
     }
 
     private void addToHistory(String command) {

@@ -11,6 +11,7 @@ import com.energyxxer.trident.compiler.TridentBuildConfiguration;
 import com.energyxxer.trident.compiler.TridentCompiler;
 import com.energyxxer.trident.compiler.TridentProjectWorker;
 import com.energyxxer.trident.compiler.lexer.TridentProductions;
+import com.energyxxer.trident.compiler.util.JsonTraverser;
 import com.energyxxer.trident.compiler.util.TridentProjectSummary;
 import com.energyxxer.trident.main.TridentUI;
 import com.energyxxer.trident.main.window.TridentWindow;
@@ -27,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,23 +58,50 @@ public class TridentProject implements Project {
         }
     });
 
-    private final Lazy<TridentBuildConfiguration> buildConfig = new Lazy<>(() -> {
-        TridentBuildConfiguration buildData = new TridentBuildConfiguration();
-        buildData.defaultDefinitionPacks = DefinitionPacks.pickPacksForVersion(this.getTargetVersion());
-        buildData.definitionPackAliases = DefinitionPacks.getAliasMap();
-        buildData.featureMap = VersionFeatureManager.getFeaturesForVersion(this.getTargetVersion());
-        buildData.pluginAliases = TridentPlugins.getAliasMap();
-        buildData.typeMapPacks = new NBTTypeMapPack[] {TypeMaps.pickTypeMapsForVersion(this.getTargetVersion())};
+    private ArrayList<String> preActions;
+    private ArrayList<String> postActions;
 
+    private final Lazy<TridentBuildConfiguration> buildConfig = new Lazy<>(() -> {
+        TridentBuildConfiguration buildConfig = new TridentBuildConfiguration();
+        buildConfig.defaultDefinitionPacks = DefinitionPacks.pickPacksForVersion(this.getTargetVersion());
+        buildConfig.definitionPackAliases = DefinitionPacks.getAliasMap();
+        buildConfig.featureMap = VersionFeatureManager.getFeaturesForVersion(this.getTargetVersion());
+        buildConfig.pluginAliases = TridentPlugins.getAliasMap();
+        buildConfig.typeMapPacks = new NBTTypeMapPack[] {TypeMaps.pickTypeMapsForVersion(this.getTargetVersion())};
+
+        JsonObject rawBuildConfig = null;
         if(ensureBuildDataExists()) {
             try {
-                buildData.populateFromProjectRoot(getRootDirectory());
+                rawBuildConfig = buildConfig.populateFromProjectRoot(getRootDirectory());
             } catch (Exception x) {
                 x.printStackTrace();
                 TridentWindow.showException(x);
             }
         }
-        return buildData;
+
+        JsonTraverser traverser = new JsonTraverser(rawBuildConfig);
+
+        preActions = new ArrayList<>();
+        for(JsonElement rawCommand : traverser.reset().get("trident-ui").get("actions").get("pre").iterateAsArray()) {
+            if(rawCommand.isJsonPrimitive() && rawCommand.getAsJsonPrimitive().isString()) {
+                String command = rawCommand.getAsString();
+                if(!command.isEmpty()) {
+                    preActions.add(command);
+                }
+            }
+        }
+
+        postActions = new ArrayList<>();
+        for(JsonElement rawCommand : traverser.reset().get("trident-ui").get("actions").get("post").iterateAsArray()) {
+            if(rawCommand.isJsonPrimitive() && rawCommand.getAsJsonPrimitive().isString()) {
+                String command = rawCommand.getAsString();
+                if(!command.isEmpty()) {
+                    postActions.add(command);
+                }
+            }
+        }
+
+        return buildConfig;
     });
 
     private JsonObject config;
@@ -539,5 +568,13 @@ public class TridentProject implements Project {
 
     public TridentBuildConfiguration getBuildConfig() {
         return buildConfig.getValue();
+    }
+
+    public ArrayList<String> getPreActions() {
+        return preActions;
+    }
+
+    public ArrayList<String> getPostActions() {
+        return postActions;
     }
 }
