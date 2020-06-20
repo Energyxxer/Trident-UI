@@ -80,7 +80,14 @@ public class DeletionEdit extends Edit {
                             } else {
                                 Dot tempDot = new Dot(start, end, editor);
                                 if(smartIndentation && tempDot.isInIndentation()) {
-                                    start = tempDot.getRowStart()-1;
+                                    int suggestedIndentation = editor.getIndentationManager().getSuggestedIndentationLevelAt(start) * 4;
+                                    int actualIndentation = tempDot.getRowContentStart() - tempDot.getRowStart();
+
+                                    if(actualIndentation > suggestedIndentation) {
+                                        start = tempDot.getRowStart() + suggestedIndentation;
+                                    } else {
+                                        start = tempDot.getRowStart()-1;
+                                    }
                                     if(start < 0) start = 0;
                                     end = tempDot.getRowContentStart();
                                 } else {
