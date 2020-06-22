@@ -4,6 +4,7 @@ import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.global.keystrokes.KeyMap;
 import com.energyxxer.trident.global.keystrokes.UserKeyBind;
+import com.energyxxer.trident.main.window.sections.tools.ConsoleBoard;
 import com.energyxxer.trident.ui.editor.behavior.caret.CaretProfile;
 import com.energyxxer.trident.ui.editor.behavior.caret.Dot;
 import com.energyxxer.trident.ui.editor.behavior.caret.EditorCaret;
@@ -32,6 +33,11 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.*;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -329,12 +335,15 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         copyOrCut(false);
     }
 
+    public static boolean richTextCopy = true;
+
     private void copyOrCut(boolean cut) {
         try {
             CaretProfile profile = caret.getProfile();
             if(profile.size() > 2 || profile.getSelectedCharCount() > 0) {
 
-                String[] toCopy = new String[profile.size() / 2];
+                String[] plainText = new String[profile.size() / 2];
+                String[] htmlText = new String[profile.size() / 2];
                 for (int i = 0; i < profile.size() - 1; i += 2) {
                     int start = profile.get(i);
                     int end = profile.get(i + 1);
@@ -346,11 +355,16 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
                     int len = end - start;
 
                     String segment = this.getDocument().getText(start, len);
-                    toCopy[i/2] = segment;
+                    plainText[i/2] = segment;
+                    if(richTextCopy) {
+                        htmlText[i/2] = getRegionAsHTML(start, end);
+                    } else {
+                        htmlText[i/2] = segment;
+                    }
                 }
 
                 Clipboard clipboard = this.getToolkit().getSystemClipboard();
-                clipboard.setContents(new MultiStringSelection(toCopy), null);
+                clipboard.setContents(new MultiStringSelection(plainText, htmlText), null);
             }
 
             if(cut) {
@@ -778,5 +792,177 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
 
     public boolean isDocumentUpToDate() {
         return true;
+    }
+
+    public String getRegionAsHTML(int start, int end) {
+        if(start > end) {
+            int temp = start;
+            start = end;
+            end = temp;
+        }
+
+        try {
+            StringBuilder sb = new StringBuilder();
+            sb.append("<pre style='font-family: \"Consolas\", monospace; font-size: 11pt'>");
+
+            StyledDocument sd = getStyledDocument();
+
+            String s = sd.getText(start, end - start);
+            String[] as = s.replaceAll("\r?\n", "\n").split("(?!^)");
+            Color[] colors = new Color[as.length];
+            byte[] styles = new byte[as.length];
+
+            for(int i = 0; i < as.length; i++) {
+                AttributeSet attributes = sd.getCharacterElement(start+i).getAttributes();
+                colors[i] = (Color) attributes.getAttribute(StyleConstants.ColorConstants.Foreground);
+                if(colors[i] == null) {
+                    colors[i] = getForeground();
+                }
+
+                String styleName = (String) attributes.getAttribute(StyleConstants.CharacterConstants.NameAttribute);
+                Style namedStyle = sd.getStyle(styleName);
+                byte style = 0;
+                if(Boolean.TRUE.equals(namedStyle.getAttribute(StyleConstants.CharacterConstants.Bold))) {
+                    style |= 0b01;
+                }
+                if(Boolean.TRUE.equals(namedStyle.getAttribute(StyleConstants.CharacterConstants.Italic))) {
+                    style |= 0b10;
+                }
+
+                styles[i] = style;
+            }
+
+            Color pc = null;
+            boolean pbold = false;
+            boolean pitalic = false;
+            StringBuilder styleOpens = new StringBuilder();
+            for (int i = 0; i < as.length; i++) {
+                styleOpens.setLength(0);
+                if (colors[i] != pc) {
+                    if (pc != null) {
+                        sb.append("</span>");
+                    }
+                    if (colors[i] != null) {
+                        styleOpens.append("<span style='color: ").append(String.format("#%02x%02x%02x", colors[i].getRed(), colors[i].getGreen(), colors[i].getBlue())).append("'>");
+                    }
+                    pc = colors[i];
+                }
+                boolean bold = (styles[i] & 0b01) != 0;
+                boolean italic = (styles[i] & 0b10) != 0;
+
+                if(bold != pbold) {
+                    if(bold) {
+                        styleOpens.insert(0, "<b>");
+                    } else {
+                        sb.append("</b>");
+                    }
+                    pbold = bold;
+                }
+                if(italic != pitalic) {
+                    if(italic) {
+                        styleOpens.insert(0, "<em>");
+                    } else {
+                        sb.append("</em>");
+                    }
+                    pitalic = italic;
+                }
+
+                sb.append(styleOpens);
+                sb.append(as[i].replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br> "));
+            }
+            if (pc != null) {
+                sb.append("</span>");
+            }
+            if(pbold) {
+                sb.append("</b>");
+            }
+            if(pitalic) {
+                sb.append("</em>");
+            }
+
+            sb.append("</pre>");
+
+            return sb.toString();
+        }
+        catch (BadLocationException ex) {
+            ex.printStackTrace();
+        }
+
+        return "";
+    }
+
+    static {
+        ConsoleBoard.registerCommandHandler("richcopy", new ConsoleBoard.CommandHandler() {
+            @Override
+            public String getDescription() {
+                return "Toggles rich text copying from the editor (experimental)";
+            }
+
+            @Override
+            public void printHelp() {
+                Debug.log();
+                Debug.log("RICHCOPY: Toggles rich text copying from the editor (experimental)");
+            }
+
+            @Override
+            public void handle(String[] args) {
+                richTextCopy = !richTextCopy;
+                Debug.log("Rich text copying is now: " + richTextCopy);
+            }
+        });
+    }
+
+    private static class MyTransferable implements Transferable {
+        private static ArrayList<DataFlavor> MyFlavors = new ArrayList<DataFlavor>();
+        private String plain = null;
+        private String html = null;
+
+        static {
+            try {
+                for (String m : new String[]{"text/plain", "text/html"}) {
+                    MyFlavors.add(new DataFlavor(m + ";class=java.lang.String"));
+                    MyFlavors.add(new DataFlavor(m + ";class=java.io.Reader"));
+                    MyFlavors.add(new DataFlavor(m + ";class=java.io.InputStream;charset=utf-8"));
+                }
+            }
+            catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public MyTransferable(String plain, String html) {
+            this.plain = plain;
+            this.html = html;
+        }
+
+        public DataFlavor[] getTransferDataFlavors() {
+            return MyFlavors.toArray(new DataFlavor[MyFlavors.size()]);
+        }
+
+        public boolean isDataFlavorSupported(DataFlavor flavor) {
+            return MyFlavors.contains(flavor);
+        }
+
+        public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
+            String s = null;
+            if (flavor.getMimeType().contains("text/plain")) {
+                s = plain;
+            }
+            else if (flavor.getMimeType().contains("text/html")) {
+                s = html;
+            }
+            if (s != null) {
+                if (String.class.equals(flavor.getRepresentationClass())) {
+                    return s;
+                }
+                else if (Reader.class.equals(flavor.getRepresentationClass())) {
+                    return new StringReader(s);
+                }
+                else if (InputStream.class.equals(flavor.getRepresentationClass())) {
+                    return new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8));
+                }
+            }
+            throw new UnsupportedFlavorException(flavor);
+        }
     }
 }

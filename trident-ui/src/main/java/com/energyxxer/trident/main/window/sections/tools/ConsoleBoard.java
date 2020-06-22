@@ -47,7 +47,7 @@ public class ConsoleBoard extends ToolBoard {
 
     private static HashMap<String, CommandHandler> commandHandlers = new HashMap<>();
 
-    private Process runningProcess = null;
+    private transient Process runningProcess = null;
 
     public ConsoleBoard(ToolBoardMaster parent) {
         super(parent);
@@ -276,6 +276,7 @@ public class ConsoleBoard extends ToolBoard {
     }
 
     public void submitCommand(String command) {
+        if(command == null) return;
         if(runningProcess != null && runningProcess.isAlive()) {
             addToHistory(command);
             try {
