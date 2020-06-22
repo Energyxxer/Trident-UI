@@ -26,6 +26,7 @@ public class ExpandableSuggestionToken implements SuggestionToken, ModuleToken {
     protected boolean enabled = true;
     protected boolean darkened;
     protected int backspaces = 0;
+    protected int endIndex = -1;
 
     protected ExpandableSuggestionToken() {
 
@@ -98,7 +99,7 @@ public class ExpandableSuggestionToken implements SuggestionToken, ModuleToken {
 
     @Override
     public void onInteract() {
-        parent.submit(StringUtil.repeat("\b", backspaces) + text, suggestion, true);
+        parent.submit(StringUtil.repeat("\b", backspaces) + text, suggestion, true, endIndex);
     }
 
     @Override
@@ -146,8 +147,14 @@ public class ExpandableSuggestionToken implements SuggestionToken, ModuleToken {
             return "entity";
         } else if(tags.contains(TridentSuggestionTags.TAG_COORDINATE)) {
             return "coordinates";
+        } else if(tags.contains(TridentSuggestionTags.TAG_CLASS)) {
+            return "class";
         } else if(tags.contains(TridentSuggestionTags.TAG_VARIABLE)) {
             return "variable";
+        } else if(tags.contains(TridentSuggestionTags.TAG_FIELD)) {
+            return "field";
+        } else if(tags.contains(TridentSuggestionTags.TAG_METHOD)) {
+            return "method";
         } else if(tags.contains(TridentSuggestionTags.TAG_COMMAND)) {
             return "command";
         } else if(tags.contains(TridentSuggestionTags.TAG_MODIFIER)) {
@@ -174,6 +181,14 @@ public class ExpandableSuggestionToken implements SuggestionToken, ModuleToken {
 
     public int getBackspaces() {
         return backspaces;
+    }
+
+    public int getEndIndex() {
+        return endIndex;
+    }
+
+    public void setEndIndex(int endIndex) {
+        this.endIndex = endIndex;
     }
 
     @Override

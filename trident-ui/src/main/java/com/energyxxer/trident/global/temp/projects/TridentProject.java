@@ -143,6 +143,7 @@ public class TridentProject implements Project {
         config.addProperty("strict-nbt", false);
         config.addProperty("strict-text-components", false);
         config.addProperty("anonymous-function-name", "_anonymous*");
+        config.addProperty("using-all-plugins", false);
         JsonObject loggerObj = new JsonObject();
         loggerObj.addProperty("compact", false);
         loggerObj.addProperty("timestamp-enabled", true);

@@ -74,12 +74,19 @@ public class SuggestionExpander {
                         for(SummarySymbol sym : membersVisible) {
                             String text = sym.getName();
                             int backspaces = 0;
-                            if(!TridentLexerProfile.isValidIdentifier(text)) {
-                                text = "[" + CommandUtils.quote(text) + "]";
-                                backspaces = 1;
+                            int endIndex = -1;
+                            if(sym.getSuggestionTags().contains(TridentSuggestionTags.TAG_METHOD)) {
+                                text += "()";
+                                endIndex = text.length()-1;
+                            } else {
+                                if(!TridentLexerProfile.isValidIdentifier(text)) {
+                                    text = "[" + CommandUtils.quote(text) + "]";
+                                    backspaces = 1;
+                                }
                             }
                             ExpandableSuggestionToken token = new ExpandableSuggestionToken(parent, sym.getName(), text, suggestion);
                             token.setBackspaces(backspaces);
+                            token.setEndIndex(endIndex);
                             token.setIconKey(ExpandableSuggestionToken.getIconKeyForTags(sym.getSuggestionTags()));
                             newTokens.add(token);
                         }

@@ -25,12 +25,12 @@ public class TridentPlugins {
             for(File file : files) {
                 TridentPlugin plugin = null;
                 if(file.isDirectory()) {
-                    plugin = new TridentPlugin(new DirectoryCompoundInput(file), file);
                     String packName = file.getName();
+                    plugin = new TridentPlugin(packName, new DirectoryCompoundInput(file), file);
                     loadedPlugins.put(packName, plugin);
                 } else if(file.isFile() && file.getName().endsWith(".zip")) {
-                    plugin = new TridentPlugin(new ZipCompoundInput(file), file);
                     String packName = file.getName().substring(0, file.getName().length() - ".zip".length());
+                    plugin = new TridentPlugin(packName, new ZipCompoundInput(file), file);
                     loadedPlugins.put(packName, plugin);
                 }
                 try {

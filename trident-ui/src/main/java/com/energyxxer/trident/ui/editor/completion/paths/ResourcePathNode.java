@@ -138,7 +138,7 @@ public class ResourcePathNode extends ExpandableSuggestionToken {
 
     @Override
     public void onInteract() {
-        parent.submit(this.text, suggestion, subPaths.isEmpty());
+        parent.submit(this.text, suggestion, subPaths.isEmpty(), -1);
     }
 
     @Override

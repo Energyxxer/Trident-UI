@@ -150,14 +150,13 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         }
     }
 
-    public void submit(String text, Suggestion suggestion, boolean dismiss) {
+    public void submit(String text, Suggestion suggestion, boolean dismiss, int endIndex) {
         if(dismiss) {
             this.setVisible(false);
         } else {
             this.forceLocked = true;
         }
 
-        int endIndex = -1;
         if(suggestion instanceof SnippetSuggestion) {
             text = text.replace("\n", "\n" + StringUtil.repeat("    ", editor.getDocumentIndentationAt(editor.getCaretPosition())));
             endIndex = text.indexOf("$END$");
