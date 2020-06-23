@@ -159,6 +159,12 @@ public class NoticeItem extends ExplorerElement {
 
     @Override
     public void interact() {
+        for(ExplorerElement child : children) {
+            if(child instanceof NoticeStackTraceItem && ((NoticeStackTraceItem) child).canOpen()) {
+                child.interact();
+                return;
+            }
+        }
         TridentWindow.tabManager.openTab(new FileModuleToken(new File(notice.getFilePath())), notice.getLocationIndex(), notice.getLocationLength());
     }
 

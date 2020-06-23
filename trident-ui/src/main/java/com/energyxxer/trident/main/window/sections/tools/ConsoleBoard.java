@@ -133,6 +133,7 @@ public class ConsoleBoard extends ToolBoard {
 
         tlm.addThemeChangeListener(t -> {
             inputField.setPreferredSize(new ScalableDimension(1, 24));
+            inputField.setFont(new Font(t.getString("Console.font","Editor.font","default:monospaced"), Font.PLAIN, Preferences.getModifiedEditorFontSize()));
             fieldPane.setBackground(inputField.getBackground());
             consoleScrollPane.setBackground(console.getBackground());
             consoleScrollPane.setBorder(BorderFactory.createMatteBorder(Math.max(t.getInteger("Console.header.border.thickness"),0), 0, 0, 0, t.getColor(new Color(200, 200, 200), "Console.header.border.color")));

@@ -259,6 +259,14 @@ public class TridentWindow {
 		exceptionHint.show(new Point(jframe.getX() + jframe.getWidth() - 15, jframe.getY() + jframe.getHeight() - 53 - 15), new TemporaryConfirmation(10));
 	}
 
+	public static void showPopupMessage(String message) {
+		HintStylizer.style(exceptionHint, "info");
+		exceptionHint.setPreferredPos(Hint.LEFT);
+		exceptionHint.setArrowVisible(false);
+		((ExceptionHint) exceptionHint).setText(message);
+		exceptionHint.show(new Point(jframe.getX() + jframe.getWidth() - 15, jframe.getY() + jframe.getHeight() - 53 - 15), new TemporaryConfirmation(10));
+	}
+
     public static void close() {
 		jframe.dispatchEvent(new WindowEvent(jframe, WindowEvent.WINDOW_CLOSING));
 	}

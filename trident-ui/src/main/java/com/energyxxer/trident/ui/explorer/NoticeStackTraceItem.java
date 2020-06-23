@@ -124,9 +124,17 @@ public class NoticeStackTraceItem extends ExplorerElement {
         }
     }
 
+    boolean canOpen() {
+        return traceElement.getFileMessage() == null;
+    }
+
     @Override
     public void interact() {
-        TridentWindow.tabManager.openTab(new FileModuleToken(traceElement.getPattern().getFile()), traceElement.getPattern().getStringLocation().index, traceElement.getPattern().getStringBounds().end.index - traceElement.getPattern().getStringBounds().start.index);
+        if(traceElement.getFileMessage() != null) {
+            TridentWindow.showPopupMessage("Cannot view stack trace element:\n" + traceElement.getFileMessage());
+        } else {
+            TridentWindow.tabManager.openTab(new FileModuleToken(traceElement.getPattern().getFile()), traceElement.getPattern().getStringLocation().index, traceElement.getPattern().getStringBounds().end.index - traceElement.getPattern().getStringBounds().start.index);
+        }
     }
 
     @Override
