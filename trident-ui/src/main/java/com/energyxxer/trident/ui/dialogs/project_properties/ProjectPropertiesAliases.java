@@ -118,7 +118,7 @@ class ProjectPropertiesAliases extends JPanel {
                 openCategory("item", false);
                 openCategory("entity", false);
 
-                JsonElement aliasesElem = p.getConfig().get("aliases");
+                JsonElement aliasesElem = p.getProjectConfigJson().get("aliases");
                 if(aliasesElem != null && aliasesElem.isJsonObject()) {
                     for(String category : aliasesElem.getAsJsonObject().keySet()) {
                         openCategory(category);
@@ -137,7 +137,7 @@ class ProjectPropertiesAliases extends JPanel {
                 for(Tab tab : tabManager.openTabs) {
                     tab.module.save();
                 }
-                JsonObject config = p.getConfig();
+                JsonObject config = p.getProjectConfigJson();
                 if(config.has("aliases") && config.get("aliases").isJsonObject() && config.getAsJsonObject("aliases").keySet().isEmpty()) {
                     config.remove("aliases");
                 }

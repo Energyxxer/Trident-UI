@@ -251,11 +251,14 @@ public class TridentWindow {
 
 	public static void showException(String message) {
 		TridentWindow.statusBar.setStatus(new Status(Status.ERROR, message));
+    	showError(message + "\nSee console for details");
+	}
 
+	public static void showError(String message) {
 		HintStylizer.style(exceptionHint, "error");
 		exceptionHint.setPreferredPos(Hint.LEFT);
 		exceptionHint.setArrowVisible(false);
-		((ExceptionHint) exceptionHint).setText(message + "\nSee console for details");
+		((ExceptionHint) exceptionHint).setText(message);
 		exceptionHint.show(new Point(jframe.getX() + jframe.getWidth() - 15, jframe.getY() + jframe.getHeight() - 53 - 15), new TemporaryConfirmation(10));
 	}
 

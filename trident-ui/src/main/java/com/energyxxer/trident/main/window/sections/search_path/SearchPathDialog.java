@@ -1,5 +1,6 @@
 package com.energyxxer.trident.main.window.sections.search_path;
 
+import com.energyxxer.trident.compiler.TridentCompiler;
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.global.temp.projects.Project;
@@ -272,7 +273,7 @@ public class SearchPathDialog extends JDialog implements WindowFocusListener, Ac
         return startFile;
     }
 
-    private static final String[] fileEndings = new String[] {".tdn", ".mcfunction", ".mcmeta", ".json", ".tdnproj", ".txt", ".md", ".gitignore"};
+    private static final String[] fileEndings = new String[] {".tdn", ".mcfunction", ".mcmeta", ".json", TridentCompiler.PROJECT_FILE_NAME, TridentCompiler.PROJECT_BUILD_FILE_NAME, ".txt", ".md", ".gitignore", ".lang", ".vsh", ".fsh", ".glsl", ".shader"};
 
     private boolean shouldRead(File file) {
         if(fileMaskEnabled.isSelected()) {

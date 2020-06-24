@@ -5,7 +5,6 @@ import com.energyxxer.trident.ui.dialogs.ConfirmDialog;
 import com.energyxxer.trident.ui.modules.FileModuleToken;
 import com.energyxxer.trident.util.FileCommons;
 import com.energyxxer.trident.util.ProjectUtil;
-import com.energyxxer.util.logger.Debug;
 
 import java.awt.*;
 import java.io.File;
@@ -110,7 +109,9 @@ public class FileManager {
                 deleteFolder(file);
             } else {
                 boolean success = deleteOrTrashFile(file);
-                if(!success) Debug.log("Couldn't delete file '" + file.getName() + "'", Debug.MessageType.ERROR);
+                if(!success) {
+                    TridentWindow.showError("Couldn't delete file '" + file.getName() + "'");
+                }
             }
         }
         TridentWindow.projectExplorer.refresh();
@@ -127,6 +128,7 @@ public class FileManager {
                     return file.delete();
                 }
             } catch (NoSuchFieldException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                TridentWindow.showException(e);
                 e.printStackTrace();
             }
             return false;
@@ -145,6 +147,7 @@ public class FileManager {
                     return false;
                 }
             } catch (NoSuchFieldException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                TridentWindow.showException(e);
                 e.printStackTrace();
             }
             return false;
@@ -156,7 +159,10 @@ public class FileManager {
                 if (f.isDirectory()) {
                     deleteFolder(f);
                 } else {
-                    FileManager.deleteOrTrashFile(f);
+                    boolean success = FileManager.deleteOrTrashFile(f);
+                    if(!success) {
+                        TridentWindow.showError("Couldn't delete file '" + f.getName() + "'");
+                    }
                 }
             }
         }

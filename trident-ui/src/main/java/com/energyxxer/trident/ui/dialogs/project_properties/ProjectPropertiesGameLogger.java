@@ -199,7 +199,7 @@ class ProjectPropertiesGameLogger extends JPanel {
             lineNumberEnabled.addActionListener(a -> updateTextPreview());
 
             ProjectProperties.addOpenEvent(p -> {
-                JsonObject config = p.getConfig();
+                JsonObject config = p.getProjectConfigJson();
                 doExport.setSelected(true);
                 if(config.has("export-gamelog") && config.get("export-gamelog").isJsonPrimitive() && config.get("export-gamelog").getAsJsonPrimitive().isBoolean()) {
                     doExport.setSelected(config.get("export-gamelog").getAsBoolean());
@@ -223,7 +223,7 @@ class ProjectPropertiesGameLogger extends JPanel {
             });
 
             ProjectProperties.addApplyEvent(p -> {
-                JsonObject config = p.getConfig();
+                JsonObject config = p.getProjectConfigJson();
                 config.addProperty("export-gamelog", doExport.isSelected());
                 JsonObject loggerObj = new JsonObject();
                 config.add("game-logger", loggerObj);

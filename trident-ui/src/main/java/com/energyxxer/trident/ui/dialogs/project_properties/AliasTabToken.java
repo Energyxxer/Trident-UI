@@ -51,7 +51,7 @@ public class AliasTabToken implements ModuleToken {
 
     @Override
     public DisplayModule createModule(Tab tab) {
-        return new AliasCategoryModule(category, ProjectProperties.project.getConfig());
+        return new AliasCategoryModule(category, ProjectProperties.project.getProjectConfigJson());
     }
 
     @Override

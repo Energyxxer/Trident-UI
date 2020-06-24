@@ -174,7 +174,7 @@ public class ProjectPropertiesDefinitions extends JPanel {
                 master.removeAllElements();
                 collectPossiblePacks(p);
 
-                JsonObject config = p.getConfig();
+                JsonObject config = p.getProjectConfigJson();
                 if(config.has("use-definitions") && config.get("use-definitions").isJsonArray()) {
                     JsonArray arr = config.getAsJsonArray("use-definitions");
                     if(arr.size() > 0) {
@@ -202,7 +202,7 @@ public class ProjectPropertiesDefinitions extends JPanel {
                         .map(t -> t.getPackName() == null ? "DEFAULT" : t.getPackName())
                         .collect(Collectors.toList());
 
-                JsonObject config = p.getConfig();
+                JsonObject config = p.getProjectConfigJson();
 
                 if(entries.isEmpty() || (entries.size() == 1 && "DEFAULT".equals(entries.get(0)))) {
                     config.remove("use-definitions");

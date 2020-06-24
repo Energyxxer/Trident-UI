@@ -75,7 +75,6 @@ public class TridentProject implements Project {
                 rawBuildConfig = buildConfig.populateFromProjectRoot(getRootDirectory());
             } catch (Exception x) {
                 x.printStackTrace();
-                TridentWindow.showException(x);
             }
         }
 
@@ -104,7 +103,8 @@ public class TridentProject implements Project {
         return buildConfig;
     });
 
-    private JsonObject config;
+    private JsonObject projectConfigJson;
+    private JsonObject buildConfigJson;
     private JavaEditionVersion targetVersion = null;
     private HashMap<String, ParsingSignature> resourceCache = new HashMap<>();
 
@@ -133,23 +133,38 @@ public class TridentProject implements Project {
         latestVersionArr.add(latestVersion.getMinor());
         latestVersionArr.add(latestVersion.getPatch());
 
-        config = new JsonObject();
-        config.add("target-version", latestVersionArr);
-        config.addProperty("default-namespace", StringUtil.getInitials(name).toLowerCase());
-        config.addProperty("language-level", 1);
-        config.addProperty("datapack-output", outFolder.resolve(name).toString());
-        config.addProperty("resources-output", outFolder.resolve(name + "-resources.zip").toString());
-        config.addProperty("export-comments", true);
-        config.addProperty("strict-nbt", false);
-        config.addProperty("strict-text-components", false);
-        config.addProperty("anonymous-function-name", "_anonymous*");
-        config.addProperty("using-all-plugins", false);
+        projectConfigJson = new JsonObject();
+        projectConfigJson.add("target-version", latestVersionArr);
+        projectConfigJson.addProperty("default-namespace", StringUtil.getInitials(name).toLowerCase());
+        projectConfigJson.addProperty("language-level", 1);
+
+        //these belong in .tdnbuild, will be updated and removed later
+        projectConfigJson.addProperty("datapack-output", outFolder.resolve(name).toString());
+        projectConfigJson.addProperty("resources-output", outFolder.resolve(name + "-resources.zip").toString());
+        projectConfigJson.addProperty("clear-datapack-output", false);
+        projectConfigJson.addProperty("clear-resources-output", false);
+        projectConfigJson.addProperty("export-comments", true);
+        projectConfigJson.addProperty("export-gamelog", true);
+
+        projectConfigJson.addProperty("strict-nbt", false);
+        projectConfigJson.addProperty("strict-text-components", false);
+        projectConfigJson.addProperty("anonymous-function-name", "_anonymous*");
+        projectConfigJson.addProperty("using-all-plugins", false);
         JsonObject loggerObj = new JsonObject();
         loggerObj.addProperty("compact", false);
         loggerObj.addProperty("timestamp-enabled", true);
         loggerObj.addProperty("line-number-enabled", false);
         loggerObj.addProperty("pos-enabled", true);
-        config.add("game-logger", loggerObj);
+        projectConfigJson.add("game-logger", loggerObj);
+
+        createBuildDataFromTDNProj();
+
+        projectConfigJson.remove("datapack-output");
+        projectConfigJson.remove("resources-output");
+        projectConfigJson.remove("export-comments");
+        projectConfigJson.remove("export-gamelog");
+        projectConfigJson.remove("clear-datapack-output");
+        projectConfigJson.remove("clear-resources-output");
     }
 
     public TridentProject(File rootDirectory) {
@@ -158,7 +173,7 @@ public class TridentProject implements Project {
 
         datapackRoot = rootDirectory.toPath().resolve("datapack").toFile();
         resourceRoot = rootDirectory.toPath().resolve("resources").toFile();
-        File config = new File(rootDirectory.getAbsolutePath() + File.separator + TridentCompiler.PROJECT_FILE_NAME);
+        File projectConfigFile = new File(rootDirectory.getAbsolutePath() + File.separator + TridentCompiler.PROJECT_FILE_NAME);
         this.name = rootDirectory.getName();
 
         resourceCacheFile = rootDirectory.toPath().resolve(".tdnui").resolve("resource_cache").toFile();
@@ -179,12 +194,12 @@ public class TridentProject implements Project {
             }
         }
 
-        if(config.exists() && config.isFile()) {
-            try(InputStreamReader isr = new InputStreamReader(new FileInputStream(config), TridentUI.DEFAULT_CHARSET)) {
-                this.config = new Gson().fromJson(isr, JsonObject.class);
+        if(projectConfigFile.exists() && projectConfigFile.isFile()) {
+            try(InputStreamReader isr = new InputStreamReader(new FileInputStream(projectConfigFile), TridentUI.DEFAULT_CHARSET)) {
+                this.projectConfigJson = new Gson().fromJson(isr, JsonObject.class);
 
-                if(this.config.has("target-version") && this.config.get("target-version").isJsonArray()) {
-                    JsonArray arr = this.config.getAsJsonArray("target-version");
+                if(this.projectConfigJson.has("target-version") && this.projectConfigJson.get("target-version").isJsonArray()) {
+                    JsonArray arr = this.projectConfigJson.getAsJsonArray("target-version");
 
                     int major = 1;
                     int minor = 14;
@@ -213,11 +228,22 @@ public class TridentProject implements Project {
 
                     targetVersion = new JavaEditionVersion(major, minor, patch);
                 }
-
-                return;
             } catch (IOException | JsonParseException x) {
                 x.printStackTrace();
             }
+
+            File buildConfigFile = rootDirectory.toPath().resolve(TridentCompiler.PROJECT_BUILD_FILE_NAME).toFile();
+            if(buildConfigFile.exists()) {
+
+                try(InputStreamReader isr = new InputStreamReader(new FileInputStream(buildConfigFile), TridentUI.DEFAULT_CHARSET)) {
+                    this.buildConfigJson = new Gson().fromJson(isr, JsonObject.class);
+                    return;
+                } catch (IOException | JsonParseException x) {
+                    x.printStackTrace();
+                }
+            }
+
+            return;
         }
         this.rootDirectory = null;
         throw new RuntimeException("Invalid configuration file.");
@@ -243,14 +269,31 @@ public class TridentProject implements Project {
     }
 
     public void updateConfig() {
-        File config = new File(rootDirectory.getAbsolutePath() + File.separator + TridentCompiler.PROJECT_FILE_NAME);
-        PrintWriter writer;
+        this.datapackRoot.mkdirs();
+        File projectConfigFile = new File(rootDirectory.getAbsolutePath() + File.separator + TridentCompiler.PROJECT_FILE_NAME);
+        File buildConfigFile = new File(rootDirectory.getAbsolutePath() + File.separator + TridentCompiler.PROJECT_BUILD_FILE_NAME);
+
         try {
-            writer = new PrintWriter(config, "UTF-8");
-            writer.print(new GsonBuilder().setPrettyPrinting().create().toJson(this.config));
-            writer.close();
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+            try(PrintWriter writer = new PrintWriter(projectConfigFile, "UTF-8")) {
+                writer.print(gson.toJson(this.projectConfigJson));
+            } catch (FileNotFoundException | UnsupportedEncodingException x) {
+                x.printStackTrace();
+                TridentWindow.showException(x);
+            }
+
+            if(!projectConfigFile.exists()) projectConfigFile.createNewFile();
+            if(!buildConfigFile.exists()) projectConfigFile.createNewFile();
+
+            try(PrintWriter writer = new PrintWriter(buildConfigFile, "UTF-8")) {
+                writer.print(gson.toJson(this.buildConfigJson));
+            } catch (FileNotFoundException | UnsupportedEncodingException x) {
+                x.printStackTrace();
+                TridentWindow.showException(x);
+            }
         } catch (IOException x) {
-            Debug.log(x.getMessage());
+            x.printStackTrace();
         }
     }
 
@@ -260,14 +303,7 @@ public class TridentProject implements Project {
 
     public void createNew() {
         if(!exists()) {
-            this.datapackRoot.mkdirs();
-            File config = new File(rootDirectory.getAbsolutePath() + File.separator + TridentCompiler.PROJECT_FILE_NAME);
-            try {
-                config.createNewFile();
-                updateConfig();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            updateConfig();
         }
     }
 
@@ -289,12 +325,14 @@ public class TridentProject implements Project {
             resourceCacheFile.createNewFile();
         } catch(IOException x) {
             Debug.log(x.getMessage());
+            TridentWindow.showException(x);
         }
 
         try(PrintWriter writer = new PrintWriter(resourceCacheFile, "UTF-8")) {
             writer.print(new GsonBuilder().setPrettyPrinting().create().toJson(jsonObj));
         } catch (IOException x) {
             Debug.log(x.getMessage());
+            TridentWindow.showException(x);
         }
     }
 
@@ -351,153 +389,153 @@ public class TridentProject implements Project {
             versionArr.add(version.getMajor());
             versionArr.add(version.getMinor());
             versionArr.add(version.getPatch());
-            config.add("target-version", versionArr);
+            projectConfigJson.add("target-version", versionArr);
         } else {
-            config.remove("target-version");
+            projectConfigJson.remove("target-version");
         }
     }
 
     public int getLanguageLevel() {
-        if(config.has("language-level") && config.get("language-level").isJsonPrimitive() && config.get("language-level").getAsJsonPrimitive().isNumber()) {
-            int level = Math.max(1, Math.min(3, config.get("language-level").getAsInt()));
-            config.addProperty("language-level", level);
+        if(projectConfigJson.has("language-level") && projectConfigJson.get("language-level").isJsonPrimitive() && projectConfigJson.get("language-level").getAsJsonPrimitive().isNumber()) {
+            int level = Math.max(1, Math.min(3, projectConfigJson.get("language-level").getAsInt()));
+            projectConfigJson.addProperty("language-level", level);
             return level;
         }
-        config.addProperty("language-level", 1);
+        projectConfigJson.addProperty("language-level", 1);
         return 1;
     }
 
     public void setLanguageLevel(int level) {
-        config.addProperty("language-level", Math.max(1, Math.min(3, level)));
+        projectConfigJson.addProperty("language-level", Math.max(1, Math.min(3, level)));
     }
 
     public String getDefaultNamespace() {
-        if(config.has("default-namespace") && config.get("default-namespace").isJsonPrimitive() && config.get("default-namespace").getAsJsonPrimitive().isString()) {
-            String namespace = config.get("default-namespace").getAsString();
+        if(projectConfigJson.has("default-namespace") && projectConfigJson.get("default-namespace").isJsonPrimitive() && projectConfigJson.get("default-namespace").getAsJsonPrimitive().isString()) {
+            String namespace = projectConfigJson.get("default-namespace").getAsString();
             if(namespace.matches(Namespace.ALLOWED_NAMESPACE_REGEX)) {
                 return namespace;
             }
         }
         String namespace = StringUtil.getInitials(this.getName()).toLowerCase();
-        config.addProperty("default-namespace", namespace);
+        projectConfigJson.addProperty("default-namespace", namespace);
         return namespace;
     }
 
     public void setDefaultNamespace(String namespace) {
         if(namespace.matches(Namespace.ALLOWED_NAMESPACE_REGEX)) {
-            config.addProperty("default-namespace", namespace);
+            projectConfigJson.addProperty("default-namespace", namespace);
         }
     }
 
     public String getAnonymousFunctionName() {
-        if(config.has("anonymous-function-name") && config.get("anonymous-function-name").isJsonPrimitive() && config.get("anonymous-function-name").getAsJsonPrimitive().isString()) {
-            return config.get("anonymous-function-name").getAsString();
+        if(projectConfigJson.has("anonymous-function-name") && projectConfigJson.get("anonymous-function-name").isJsonPrimitive() && projectConfigJson.get("anonymous-function-name").getAsJsonPrimitive().isString()) {
+            return projectConfigJson.get("anonymous-function-name").getAsString();
         }
         String defaultValue = "_anonymous*";
-        config.addProperty("anonymous-function-name", defaultValue);
+        projectConfigJson.addProperty("anonymous-function-name", defaultValue);
         return defaultValue;
     }
 
     public void setAnonymousFunctionName(String value) {
-        config.addProperty("anonymous-function-name", value);
+        projectConfigJson.addProperty("anonymous-function-name", value);
     }
 
     public boolean isStrictNBT() {
-        if(config.has("strict-nbt") && config.get("strict-nbt").isJsonPrimitive() && config.get("strict-nbt").getAsJsonPrimitive().isBoolean()) {
-            return config.get("strict-nbt").getAsBoolean();
+        if(projectConfigJson.has("strict-nbt") && projectConfigJson.get("strict-nbt").isJsonPrimitive() && projectConfigJson.get("strict-nbt").getAsJsonPrimitive().isBoolean()) {
+            return projectConfigJson.get("strict-nbt").getAsBoolean();
         }
-        config.addProperty("strict-nbt", false);
+        projectConfigJson.addProperty("strict-nbt", false);
         return false;
     }
 
     public void setStrictNBT(boolean strict) {
-        config.addProperty("strict-nbt", strict);
+        projectConfigJson.addProperty("strict-nbt", strict);
     }
 
     public boolean isStrictTextComponents() {
-        if(config.has("strict-text-components") && config.get("strict-text-components").isJsonPrimitive() && config.get("strict-text-components").getAsJsonPrimitive().isBoolean()) {
-            return config.get("strict-text-components").getAsBoolean();
+        if(projectConfigJson.has("strict-text-components") && projectConfigJson.get("strict-text-components").isJsonPrimitive() && projectConfigJson.get("strict-text-components").getAsJsonPrimitive().isBoolean()) {
+            return projectConfigJson.get("strict-text-components").getAsBoolean();
         }
-        config.addProperty("strict-text-components", false);
+        projectConfigJson.addProperty("strict-text-components", false);
         return false;
     }
 
     public void setStrictTextComponents(boolean strict) {
-        config.addProperty("strict-text-components", strict);
+        projectConfigJson.addProperty("strict-text-components", strict);
     }
 
     public File getDataOut() {
-        if(config.has("datapack-output") && config.get("datapack-output").isJsonPrimitive() && config.get("datapack-output").getAsJsonPrimitive().isString()) {
-            String path = config.get("datapack-output").getAsString();
+        if(projectConfigJson.has("datapack-output") && projectConfigJson.get("datapack-output").isJsonPrimitive() && projectConfigJson.get("datapack-output").getAsJsonPrimitive().isString()) {
+            String path = projectConfigJson.get("datapack-output").getAsString();
             return TridentCompiler.newFileObject(path, rootDirectory);
         }
-        config.remove("datapack-output");
+        projectConfigJson.remove("datapack-output");
         return null;
     }
 
     public void setDataOut(File file) {
         if(file != null) {
-            config.addProperty("datapack-output", file.getPath());
+            projectConfigJson.addProperty("datapack-output", file.getPath());
         } else {
-            config.remove("datapack-output");
+            projectConfigJson.remove("datapack-output");
         }
     }
 
     public File getResourcesOut() {
-        if(config.has("resources-output") && config.get("resources-output").isJsonPrimitive() && config.get("resources-output").getAsJsonPrimitive().isString()) {
-            String path = config.get("resources-output").getAsString();
+        if(projectConfigJson.has("resources-output") && projectConfigJson.get("resources-output").isJsonPrimitive() && projectConfigJson.get("resources-output").getAsJsonPrimitive().isString()) {
+            String path = projectConfigJson.get("resources-output").getAsString();
             return TridentCompiler.newFileObject(path, rootDirectory);
         }
-        config.remove("resources-output");
+        projectConfigJson.remove("resources-output");
         return null;
     }
 
     public void setResourcesOut(File file) {
         if(file != null) {
-            config.addProperty("resources-output", file.getPath());
+            projectConfigJson.addProperty("resources-output", file.getPath());
         } else {
-            config.remove("resources-output");
+            projectConfigJson.remove("resources-output");
         }
     }
 
     public boolean isExportComments() {
-        if(config.has("export-comments") && config.get("export-comments").isJsonPrimitive() && config.get("export-comments").getAsJsonPrimitive().isBoolean()) {
-            return config.get("export-comments").getAsBoolean();
+        if(projectConfigJson.has("export-comments") && projectConfigJson.get("export-comments").isJsonPrimitive() && projectConfigJson.get("export-comments").getAsJsonPrimitive().isBoolean()) {
+            return projectConfigJson.get("export-comments").getAsBoolean();
         }
-        config.addProperty("export-comments", true);
+        projectConfigJson.addProperty("export-comments", true);
         return true;
     }
 
     public void setExportComments(boolean strict) {
-        config.addProperty("export-comments", strict);
+        projectConfigJson.addProperty("export-comments", strict);
     }
 
     public boolean isClearData() {
-        if(config.has("clear-datapack-output") && config.get("clear-datapack-output").isJsonPrimitive() && config.get("clear-datapack-output").getAsJsonPrimitive().isBoolean()) {
-            return config.get("clear-datapack-output").getAsBoolean();
+        if(projectConfigJson.has("clear-datapack-output") && projectConfigJson.get("clear-datapack-output").isJsonPrimitive() && projectConfigJson.get("clear-datapack-output").getAsJsonPrimitive().isBoolean()) {
+            return projectConfigJson.get("clear-datapack-output").getAsBoolean();
         }
-        config.addProperty("clear-datapack-output", false);
+        projectConfigJson.addProperty("clear-datapack-output", false);
         return false;
     }
 
     public void setClearData(boolean clear) {
-        config.addProperty("clear-datapack-output", clear);
+        projectConfigJson.addProperty("clear-datapack-output", clear);
     }
 
     public boolean isClearResources() {
-        if(config.has("clear-resources-output") && config.get("clear-resources-output").isJsonPrimitive() && config.get("clear-resources-output").getAsJsonPrimitive().isBoolean()) {
-            return config.get("clear-resources-output").getAsBoolean();
+        if(projectConfigJson.has("clear-resources-output") && projectConfigJson.get("clear-resources-output").isJsonPrimitive() && projectConfigJson.get("clear-resources-output").getAsJsonPrimitive().isBoolean()) {
+            return projectConfigJson.get("clear-resources-output").getAsBoolean();
         }
-        config.addProperty("clear-resources-output", false);
+        projectConfigJson.addProperty("clear-resources-output", false);
         return false;
     }
 
     public void setClearResources(boolean clear) {
-        config.addProperty("clear-resources-output", clear);
+        projectConfigJson.addProperty("clear-resources-output", clear);
     }
 
-    public JsonObject getConfig() {
-        return config;
+    public JsonObject getProjectConfigJson() {
+        return projectConfigJson;
     }
 
     @Override
@@ -536,14 +574,12 @@ public class TridentProject implements Project {
     }
 
     private void createBuildDataFromTDNProj() {
-        File buildDataFile = rootDirectory.toPath().resolve(TridentCompiler.PROJECT_BUILD_FILE_NAME).toFile();
+        buildConfigJson = new JsonObject();
 
-        JsonObject root = new JsonObject();
-
-        root.addProperty("input-resources", "(automatically selected by Trident-UI)");
+        buildConfigJson.addProperty("input-resources", "(automatically selected by Trident-UI)");
 
         JsonObject outputObj = new JsonObject();
-        root.add("output", outputObj);
+        buildConfigJson.add("output", outputObj);
 
         JsonObject directoriesObj = new JsonObject();
         outputObj.add("directories", directoriesObj);
@@ -551,20 +587,25 @@ public class TridentProject implements Project {
         JsonObject cleanDirectoriesObj = new JsonObject();
         outputObj.add("clean-directories", cleanDirectoriesObj);
 
-        directoriesObj.add("data-pack", config.get("datapack-output"));
-        directoriesObj.add("resource-pack", config.get("resources-output"));
-        cleanDirectoriesObj.add("data-pack", config.get("clear-datapack-output"));
-        cleanDirectoriesObj.add("resource-pack", config.get("clear-resources-output"));
+        directoriesObj.add("data-pack", projectConfigJson.get("datapack-output"));
+        directoriesObj.add("resource-pack", projectConfigJson.get("resources-output"));
+        cleanDirectoriesObj.add("data-pack", projectConfigJson.get("clear-datapack-output"));
+        cleanDirectoriesObj.add("resource-pack", projectConfigJson.get("clear-resources-output"));
 
-        outputObj.add("export-comments", config.get("export-comments"));
-        outputObj.add("export-gamelog", config.get("export-gamelog"));
+        outputObj.add("export-comments", projectConfigJson.get("export-comments"));
+        outputObj.add("export-gamelog", projectConfigJson.get("export-gamelog"));
 
-        try(PrintWriter writer = new PrintWriter(buildDataFile, "UTF-8")) {
-            writer.print(new GsonBuilder().setPrettyPrinting().create().toJson(root));
-            Debug.log("Created " + TridentCompiler.PROJECT_BUILD_FILE_NAME + " for \"" + name + "\"");
-        } catch (IOException x) {
-            x.printStackTrace();
-        }
+        JsonObject tridentUIObj = new JsonObject();
+        buildConfigJson.add("trident-ui", tridentUIObj);
+
+        JsonObject actionsObj = new JsonObject();
+        tridentUIObj.add("actions", actionsObj);
+
+        actionsObj.add("pre", new JsonArray());
+        actionsObj.add("post", new JsonArray());
+
+        updateConfig();
+        Debug.log("Created " + TridentCompiler.PROJECT_BUILD_FILE_NAME + " for \"" + name + "\"");
     }
 
     public TridentBuildConfiguration getBuildConfig() {

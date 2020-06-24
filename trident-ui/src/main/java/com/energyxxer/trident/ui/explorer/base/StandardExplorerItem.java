@@ -1,5 +1,6 @@
 package com.energyxxer.trident.ui.explorer.base;
 
+import com.energyxxer.trident.compiler.TridentCompiler;
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.explorer.base.elements.ExplorerElement;
@@ -50,7 +51,7 @@ public class StandardExplorerItem extends ExplorerElement {
         if(parent != null) this.setDetailed(parent.detailed);
         this.token = token;
 
-        this.translucent = ((token instanceof FileModuleToken) && (((FileModuleToken) token).getFile().getName().equals(".tdnproj") || ((FileModuleToken) token).getFile().getName().equals(".tdnui")) && FileModuleToken.isProjectRoot(((FileModuleToken) token).getFile().getParentFile()));
+        this.translucent = ((token instanceof FileModuleToken) && (((FileModuleToken) token).getFile().getName().equals(TridentCompiler.PROJECT_FILE_NAME) || ((FileModuleToken) token).getFile().getName().equals(TridentCompiler.PROJECT_BUILD_FILE_NAME) || ((FileModuleToken) token).getFile().getName().equals(".tdnui")) && FileModuleToken.isProjectRoot(((FileModuleToken) token).getFile().getParentFile()));
 
         updateIcon();
 

@@ -174,7 +174,7 @@ public class ProjectPropertiesPlugins extends JPanel {
                 master.removeAllElements();
                 collectPossiblePacks(p);
 
-                JsonObject config = p.getConfig();
+                JsonObject config = p.getProjectConfigJson();
                 if(config.has("use-plugins") && config.get("use-plugins").isJsonArray()) {
                     JsonArray arr = config.getAsJsonArray("use-plugins");
                     if(arr.size() > 0) {
@@ -196,7 +196,7 @@ public class ProjectPropertiesPlugins extends JPanel {
                         .map(ProjectResourceKeyToken::getPackName)
                         .collect(Collectors.toList());
 
-                JsonObject config = p.getConfig();
+                JsonObject config = p.getProjectConfigJson();
 
                 if(entries.isEmpty()) {
                     config.remove("use-plugins");

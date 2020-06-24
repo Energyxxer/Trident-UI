@@ -1,5 +1,6 @@
 package com.energyxxer.trident.ui.modules;
 
+import com.energyxxer.crossbow.compiler.CrossbowCompiler;
 import com.energyxxer.trident.compiler.TridentCompiler;
 import com.energyxxer.trident.files.FileType;
 import com.energyxxer.trident.global.Commons;
@@ -88,8 +89,8 @@ public class FileModuleToken implements ModuleToken, DraggableExplorerModuleToke
 
     public static boolean isProjectRoot(File file) {
         if(!file.isDirectory()) return false;
-        if(file.toPath().resolve(".tdnproj").toFile().exists()) return true;
-        if(file.toPath().resolve(".cbwproj").toFile().exists()) return true;
+        if(file.toPath().resolve(TridentCompiler.PROJECT_FILE_NAME).toFile().exists()) return true;
+        if(file.toPath().resolve(CrossbowCompiler.PROJECT_FILE_NAME).toFile().exists()) return true;
         return false;
     }
 
@@ -171,6 +172,7 @@ public class FileModuleToken implements ModuleToken, DraggableExplorerModuleToke
                 }
                 case ".mcmeta":
                 case TridentCompiler.PROJECT_FILE_NAME:
+                case TridentCompiler.PROJECT_BUILD_FILE_NAME:
                     return Commons.getIcon("meta");
                 case ".nbt":
                     return Commons.getIcon("structure");
@@ -204,7 +206,7 @@ public class FileModuleToken implements ModuleToken, DraggableExplorerModuleToke
                     }
                 }
                 else {
-                    if(!this.isProjectRoot || !subFile.getName().equals(".tdnproj") || TridentWindow.projectExplorer.getFlag(ProjectExplorerMaster.SHOW_PROJECT_FILES)) {
+                    if(!this.isProjectRoot || !(subFile.getName().equals(TridentCompiler.PROJECT_FILE_NAME) || subFile.getName().equals(TridentCompiler.PROJECT_BUILD_FILE_NAME)) || TridentWindow.projectExplorer.getFlag(ProjectExplorerMaster.SHOW_PROJECT_FILES)) {
                         children.add(subToken);
                     }
                 }

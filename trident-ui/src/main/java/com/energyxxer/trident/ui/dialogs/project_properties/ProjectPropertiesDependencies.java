@@ -111,7 +111,7 @@ public class ProjectPropertiesDependencies extends JPanel {
                 preContent.add(new Padding(20));
 
                 preContent.add(new StyledLabel("A project may utilize functions from another Trident project.", "ProjectProperties.content", tlm));
-                preContent.add(new StyledLabel("Select a project from the workspace or the .tdnproj file of the project to depend on.", "ProjectProperties.content", tlm));
+                preContent.add(new StyledLabel("Select a project from the workspace or the " + TridentCompiler.PROJECT_FILE_NAME + " file of the project to depend on.", "ProjectProperties.content", tlm));
                 preContent.add(new Padding(11));
                 preContent.add(new StyledLabel("The projects below will be applied from bottom to top, each", "ProjectProperties.content", tlm));
                 preContent.add(new StyledLabel("overwriting any repeated definitions from those below.", "ProjectProperties.content", tlm));
@@ -145,9 +145,8 @@ public class ProjectPropertiesDependencies extends JPanel {
                         StyledMenuItem item = new StyledMenuItem("Browse...");
 
                         item.addActionListener(aa -> {
-                            FileDialog fd = new FileDialog(ProjectProperties.dialog, "Select .tdnproj file", FileDialog.LOAD);
-                            fd.setFile("*.tdnproj");
-                            //fd.setFilenameFilter((f, name) -> f.getName().equals(".tdnproj"));
+                            FileDialog fd = new FileDialog(ProjectProperties.dialog, "Select " + TridentCompiler.PROJECT_FILE_NAME + " file", FileDialog.LOAD);
+                            fd.setFile("*" + TridentCompiler.PROJECT_FILE_NAME);
                             fd.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
                             fd.setVisible(true);
 
@@ -214,7 +213,7 @@ public class ProjectPropertiesDependencies extends JPanel {
                 master.removeAllElements();
                 updateLoadedProjects(p);
 
-                JsonObject config = p.getConfig();
+                JsonObject config = p.getProjectConfigJson();
                 if(config.has("dependencies") && config.get("dependencies").isJsonArray()) {
                     JsonArray arr = config.getAsJsonArray("dependencies");
                     if(arr.size() > 0) {
@@ -235,7 +234,7 @@ public class ProjectPropertiesDependencies extends JPanel {
                         .map(e -> ((DependencyToken) ((StandardOrderListItem) e).getToken()))
                         .collect(Collectors.toList());
 
-                JsonObject config = p.getConfig();
+                JsonObject config = p.getProjectConfigJson();
                 if(tokens.isEmpty()) {
                     config.remove("dependencies");
                 } else {
