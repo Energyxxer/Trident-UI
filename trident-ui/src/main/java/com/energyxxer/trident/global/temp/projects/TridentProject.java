@@ -19,6 +19,7 @@ import com.energyxxer.trident.ui.commodoreresources.DefinitionPacks;
 import com.energyxxer.trident.ui.commodoreresources.TridentPlugins;
 import com.energyxxer.trident.ui.commodoreresources.TypeMaps;
 import com.energyxxer.trident.ui.dialogs.OptionDialog;
+import com.energyxxer.trident.ui.modules.FileModuleToken;
 import com.energyxxer.util.Lazy;
 import com.energyxxer.util.StringUtil;
 import com.energyxxer.util.logger.Debug;
@@ -302,9 +303,26 @@ public class TridentProject implements Project {
     }
 
     public void createNew() {
-        if(!exists()) {
-            updateConfig();
+        Path defaultFunctionsDir = datapackRoot.toPath().resolve("data").resolve(getDefaultNamespace()).resolve("functions");
+
+        defaultFunctionsDir.toFile().mkdirs();
+
+        File mainFunctionPath = defaultFunctionsDir.resolve("main.tdn").toFile();
+        try {
+            mainFunctionPath.createNewFile();
+
+            try(PrintWriter writer = new PrintWriter(mainFunctionPath, "UTF-8")) {
+                writer.print("@ tag load\n\nsay Hello World!");
+            } catch (IOException x) {
+                Debug.log(x.getMessage());
+                TridentWindow.showException(x);
+            }
+        } catch (IOException x) {
+            x.printStackTrace();
+            TridentWindow.showException(x);
         }
+
+        TridentWindow.tabManager.openTab(new FileModuleToken(mainFunctionPath));
     }
 
     public String getRelativePath(File file) {
