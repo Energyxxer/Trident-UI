@@ -483,73 +483,71 @@ public class TridentProject implements Project {
     }
 
     public File getDataOut() {
-        if(projectConfigJson.has("datapack-output") && projectConfigJson.get("datapack-output").isJsonPrimitive() && projectConfigJson.get("datapack-output").getAsJsonPrimitive().isString()) {
-            String path = projectConfigJson.get("datapack-output").getAsString();
+        String path = JsonTraverser.INSTANCE.reset(buildConfigJson).get("output").get("directories").get("data-pack").asString();
+        if(path != null) {
             return TridentCompiler.newFileObject(path, rootDirectory);
         }
-        projectConfigJson.remove("datapack-output");
         return null;
     }
 
     public void setDataOut(File file) {
+        JsonObject directories = JsonTraverser.INSTANCE.reset(buildConfigJson).createOnTraversal().get("output").get("directories").asJsonObject();
+
         if(file != null) {
-            projectConfigJson.addProperty("datapack-output", file.getPath());
+            directories.addProperty("data-pack", file.getPath());
         } else {
-            projectConfigJson.remove("datapack-output");
+            directories.remove("data-pack");
         }
     }
 
     public File getResourcesOut() {
-        if(projectConfigJson.has("resources-output") && projectConfigJson.get("resources-output").isJsonPrimitive() && projectConfigJson.get("resources-output").getAsJsonPrimitive().isString()) {
-            String path = projectConfigJson.get("resources-output").getAsString();
+        String path = JsonTraverser.INSTANCE.reset(buildConfigJson).get("output").get("directories").get("resource-pack").asString();
+        if(path != null) {
             return TridentCompiler.newFileObject(path, rootDirectory);
         }
-        projectConfigJson.remove("resources-output");
         return null;
     }
 
     public void setResourcesOut(File file) {
+        JsonObject directories = JsonTraverser.INSTANCE.reset(buildConfigJson).createOnTraversal().get("output").get("directories").asJsonObject();
+
         if(file != null) {
-            projectConfigJson.addProperty("resources-output", file.getPath());
+            directories.addProperty("resource-pack", file.getPath());
         } else {
-            projectConfigJson.remove("resources-output");
+            directories.remove("resource-pack");
         }
     }
 
     public boolean isExportComments() {
-        if(projectConfigJson.has("export-comments") && projectConfigJson.get("export-comments").isJsonPrimitive() && projectConfigJson.get("export-comments").getAsJsonPrimitive().isBoolean()) {
-            return projectConfigJson.get("export-comments").getAsBoolean();
-        }
-        projectConfigJson.addProperty("export-comments", true);
-        return true;
+        return JsonTraverser.INSTANCE.reset(buildConfigJson).get("output").get("export-comments").asBoolean(false);
     }
 
-    public void setExportComments(boolean strict) {
-        projectConfigJson.addProperty("export-comments", strict);
+    public void setExportComments(boolean value) {
+        JsonTraverser.INSTANCE.reset(buildConfigJson).createOnTraversal().get("output").asJsonObject().addProperty("export-comments", value);
+    }
+
+    public boolean isExportGamelog() {
+        return JsonTraverser.INSTANCE.reset(buildConfigJson).get("output").get("export-gamelog").asBoolean(true);
+    }
+
+    public void setExportGamelog(boolean value) {
+        JsonTraverser.INSTANCE.reset(buildConfigJson).createOnTraversal().get("output").asJsonObject().addProperty("export-gamelog", value);
     }
 
     public boolean isClearData() {
-        if(projectConfigJson.has("clear-datapack-output") && projectConfigJson.get("clear-datapack-output").isJsonPrimitive() && projectConfigJson.get("clear-datapack-output").getAsJsonPrimitive().isBoolean()) {
-            return projectConfigJson.get("clear-datapack-output").getAsBoolean();
-        }
-        projectConfigJson.addProperty("clear-datapack-output", false);
-        return false;
+        return JsonTraverser.INSTANCE.reset(buildConfigJson).get("output").get("clean-directories").get("data-pack").asBoolean(false);
     }
 
     public void setClearData(boolean clear) {
-        projectConfigJson.addProperty("clear-datapack-output", clear);
+        JsonTraverser.INSTANCE.reset(buildConfigJson).createOnTraversal().get("output").get("clean-directories").asJsonObject().addProperty("data-pack", clear);
     }
 
     public boolean isClearResources() {
-        if(projectConfigJson.has("clear-resources-output") && projectConfigJson.get("clear-resources-output").isJsonPrimitive() && projectConfigJson.get("clear-resources-output").getAsJsonPrimitive().isBoolean()) {
-            return projectConfigJson.get("clear-resources-output").getAsBoolean();
-        }
-        projectConfigJson.addProperty("clear-resources-output", false);
-        return false;
+        return JsonTraverser.INSTANCE.reset(buildConfigJson).get("output").get("clean-directories").get("resource-pack").asBoolean(false);
     }
 
     public void setClearResources(boolean clear) {
-        projectConfigJson.addProperty("clear-resources-output", clear);
+        JsonTraverser.INSTANCE.reset(buildConfigJson).createOnTraversal().get("output").get("clean-directories").asJsonObject().addProperty("resource-pack", clear);
     }
 
     public JsonObject getProjectConfigJson() {

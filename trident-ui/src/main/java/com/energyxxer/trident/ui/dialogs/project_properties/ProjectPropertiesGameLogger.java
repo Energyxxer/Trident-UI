@@ -200,10 +200,7 @@ class ProjectPropertiesGameLogger extends JPanel {
 
             ProjectProperties.addOpenEvent(p -> {
                 JsonObject config = p.getProjectConfigJson();
-                doExport.setSelected(true);
-                if(config.has("export-gamelog") && config.get("export-gamelog").isJsonPrimitive() && config.get("export-gamelog").getAsJsonPrimitive().isBoolean()) {
-                    doExport.setSelected(config.get("export-gamelog").getAsBoolean());
-                }
+                doExport.setSelected(p.isExportGamelog());
 
                 compact.setSelected(false);
                 timestampEnabled.setSelected(true);
@@ -223,8 +220,9 @@ class ProjectPropertiesGameLogger extends JPanel {
             });
 
             ProjectProperties.addApplyEvent(p -> {
+                p.setExportGamelog(doExport.isSelected());
+
                 JsonObject config = p.getProjectConfigJson();
-                config.addProperty("export-gamelog", doExport.isSelected());
                 JsonObject loggerObj = new JsonObject();
                 config.add("game-logger", loggerObj);
 

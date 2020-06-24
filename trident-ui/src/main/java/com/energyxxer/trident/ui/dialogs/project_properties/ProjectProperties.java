@@ -125,7 +125,7 @@ public class ProjectProperties {
 					}
 				});
 
-				cancel.addActionListener(e -> {cancel();});
+				cancel.addActionListener(e -> cancel());
 			}
 
 			{
