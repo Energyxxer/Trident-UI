@@ -2,7 +2,6 @@ package com.energyxxer.trident.main;
 
 import com.energyxxer.trident.compiler.TridentCompiler;
 import com.energyxxer.trident.global.Preferences;
-import com.energyxxer.trident.global.ProcessManager;
 import com.energyxxer.trident.global.Resources;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
 import com.energyxxer.trident.main.window.TridentWindow;
@@ -12,7 +11,6 @@ import com.energyxxer.trident.ui.common.ProgramUpdateProcess;
 import com.energyxxer.trident.ui.editor.completion.snippets.SnippetManager;
 import com.energyxxer.util.ImageManager;
 import com.energyxxer.util.logger.Debug;
-import com.energyxxer.util.processes.AbstractProcess;
 
 import javax.swing.*;
 import java.awt.*;
@@ -46,7 +44,7 @@ public class TridentUI {
 
 	public static final boolean IS_DEVELOPMENT_VERSION = true;
 	public static TridentUI trident;
-	public static final String UI_VERSION = "1.2.2";
+	public static final String UI_VERSION = "1.3.0";
 	public static final String MIXED_VERSION = "u" + UI_VERSION + "c" + TridentCompiler.TRIDENT_LANGUAGE_VERSION + (IS_DEVELOPMENT_VERSION ? "-DEV" : "");
 	public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
