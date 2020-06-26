@@ -83,7 +83,7 @@ public class InsertionEdit extends Edit {
                     valueToWrite = "";
                     caretOffset++;
                 } else if(valueToWrite.length() == 1 && Dot.SMART_KEYS_QUOTES.get() && "\"'".contains(valueToWrite) && !editor.getStyledDocument().getCharacterElement(start).getAttributes().containsAttributes(editor.getStyle(AdvancedEditor.STRING_STYLE)) && !editor.getStyledDocument().getCharacterElement(start).getAttributes().containsAttributes(editor.getStyle(AdvancedEditor.STRING_ESCAPE_STYLE))) {
-                    valueToWrite += "\"";
+                    valueToWrite += valueToWrite;
                     caretOffset--;
                 }
 
