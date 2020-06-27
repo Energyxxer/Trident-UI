@@ -1,6 +1,7 @@
 package com.energyxxer.trident.ui.editor.behavior;
 
 import javax.swing.text.AttributeSet;
+import javax.swing.text.Style;
 import java.util.ArrayList;
 import java.util.Stack;
 
@@ -44,20 +45,21 @@ public class IndentationManager {
 
     private void populate() {
         if(!dirty) return;
+        bracesSeen.empty();
         for(int i = 0; i < text.length(); i++) {
             char c = text.charAt(i);
             int openingIndex = openingChars.indexOf(c);
             int closingIndex = closingChars.indexOf(c);
 
             if(openingIndex >= 0) {
-                bracesSeen.push(openingIndex);
+                //bracesSeen.push(openingIndex);
                 indents.add(new IndentationChange(i, +1));
             } else if(closingIndex >= 0) {
-                int matchingBraceIndex = closingIndex;
+                /*int matchingBraceIndex = closingIndex;
                 if(!bracesSeen.isEmpty()) {
                     matchingBraceIndex = bracesSeen.pop();
-                }
-                if(matchingBraceIndex == closingIndex) indents.add(new IndentationChange(i, -1));
+                }*/
+                indents.add(new IndentationChange(i, -1));
             }
         }
         dirty = false;
@@ -122,6 +124,8 @@ public class IndentationManager {
     }
 
     private boolean isRealIndent(IndentationChange indent) {
+        Style logicalStyle = editor.getStyledDocument().getLogicalStyle(indent.index);
+
         AttributeSet characterAttributes = editor.getStyledDocument().getCharacterElement(indent.index).getAttributes();
         return !characterAttributes.containsAttributes(editor.getStyle(NULLIFY_BRACE_STYLE)) && !characterAttributes.containsAttributes(editor.getStyle(AdvancedEditor.STRING_STYLE));
     }
