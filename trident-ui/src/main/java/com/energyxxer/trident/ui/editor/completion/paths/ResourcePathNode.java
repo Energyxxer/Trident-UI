@@ -1,8 +1,8 @@
 package com.energyxxer.trident.ui.editor.completion.paths;
 
 import com.energyxxer.enxlex.suggestions.Suggestion;
-import com.energyxxer.trident.ui.editor.completion.SuggestionDialog;
 import com.energyxxer.trident.ui.editor.completion.ExpandableSuggestionToken;
+import com.energyxxer.trident.ui.editor.completion.SuggestionDialog;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -149,6 +149,9 @@ public class ResourcePathNode extends ExpandableSuggestionToken {
             this.enabled = true;
             int filterIndex = 0;
             for(int i = 0; i < pathParts.size(); i++) {
+                if(filterIndex > filter.length()) {
+                    break;
+                }
                 String part = this.pathParts.get(i);
                 if(i < pathParts.size()-1) {
                     if(!filter.startsWith(part, filterIndex) && !part.contains("_" + filter.substring(filterIndex)) && !(i == 0 && skipNamespaces && part.startsWith(filter.substring(filterIndex)))) {
