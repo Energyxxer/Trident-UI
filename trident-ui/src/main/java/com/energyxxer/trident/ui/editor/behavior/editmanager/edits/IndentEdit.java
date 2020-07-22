@@ -65,7 +65,7 @@ public class IndentEdit extends Edit {
 
                 boolean firstLineOfSelection = true;
 
-                for(int l = start; l < end + thisSelectionCharacterDrift; previousL = l, l = new Dot(l, editor).getPositionBelow()) {
+                for(int l = start; l < end + thisSelectionCharacterDrift; previousL = l, l = new Dot(l, editor).getRowEnd()+1) {
                     if(l == previousL) {
                         if(firstLineOfSelection) {
                             firstLineOfSelection = false;
