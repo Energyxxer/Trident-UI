@@ -28,7 +28,7 @@ public class TridentUI {
 			"of this software and associated documentation files (the \"Software\"), to deal\n" +
 			"in the Software without restriction, including without limitation the rights\n" +
 			"to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n" +
-			"copies of the Software, and to permit persons to whom the S1oftware is\n" +
+			"copies of the Software, and to permit persons to whom the Software is\n" +
 			"furnished to do so, subject to the following conditions:\n" +
 			"\n" +
 			"The above copyright notice and this permission notice shall be included in all\n" +
