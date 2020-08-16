@@ -22,13 +22,13 @@ import java.nio.charset.StandardCharsets;
 public class TridentUI {
 	public static final String LICENSE = "MIT License\n" +
 			"\n" +
-			"Copyright (c) 2020 Energyxxer\n" +
+			"Copyright (c) 2020 Daniel Cepeda (Energyxxer)\n" +
 			"\n" +
 			"Permission is hereby granted, free of charge, to any person obtaining a copy\n" +
 			"of this software and associated documentation files (the \"Software\"), to deal\n" +
 			"in the Software without restriction, including without limitation the rights\n" +
 			"to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n" +
-			"copies of the Software, and to permit persons to whom the Software is\n" +
+			"copies of the Software, and to permit persons to whom the S1oftware is\n" +
 			"furnished to do so, subject to the following conditions:\n" +
 			"\n" +
 			"The above copyright notice and this permission notice shall be included in all\n" +
@@ -42,9 +42,9 @@ public class TridentUI {
 			"OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n" +
 			"SOFTWARE.\n";
 
-	public static final boolean IS_DEVELOPMENT_VERSION = true;
+	public static final boolean IS_DEVELOPMENT_VERSION = false;
 	public static TridentUI trident;
-	public static final String UI_VERSION = "1.3.0";
+	public static final String UI_VERSION = "1.3.1";
 	public static final String MIXED_VERSION = "u" + UI_VERSION + "c" + TridentCompiler.TRIDENT_LANGUAGE_VERSION + (IS_DEVELOPMENT_VERSION ? "-DEV" : "");
 	public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
