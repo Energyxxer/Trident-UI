@@ -2,12 +2,10 @@ package com.energyxxer.trident.global;
 
 import com.energyxxer.commodore.module.CommandModule;
 import com.energyxxer.commodore.standard.StandardDefinitionPacks;
-import com.energyxxer.crossbow.compiler.out.BedrockModule;
-import com.energyxxer.enxlex.pattern_matching.matching.lazy.LazyTokenPatternMatch;
-import com.energyxxer.trident.global.temp.projects.CrossbowProject;
+import com.energyxxer.enxlex.report.Report;
+import com.energyxxer.enxlex.report.Reported;
 import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
-import com.energyxxer.trident.global.temp.projects.TridentProject;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.modules.FileModuleToken;
@@ -16,6 +14,8 @@ import com.energyxxer.trident.ui.theme.change.ThemeChangeListener;
 import com.energyxxer.util.ImageManager;
 import com.energyxxer.util.Lazy;
 import com.energyxxer.util.logger.Debug;
+import com.energyxxer.util.out.Console;
+import com.energyxxer.util.processes.AbstractProcess;
 import com.energyxxer.xswing.ScalableGraphics2D;
 
 import java.awt.*;
@@ -42,7 +42,7 @@ public class Commons {
         return defaultModule;
     });
 
-    private static Lazy<BedrockModule> defaultBedrockModule = new Lazy<> (() -> {
+    /*private static Lazy<BedrockModule> defaultBedrockModule = new Lazy<> (() -> {
         BedrockModule defaultModule = new BedrockModule("Default Module");
         try {
             StandardDefinitionPacks.MINECRAFT_BEDROCK_LATEST_RELEASE.load();
@@ -51,7 +51,7 @@ public class Commons {
             Debug.log(x.toString(), Debug.MessageType.ERROR);
         }
         return defaultModule;
-    });
+    });*/
 
     static {
         ThemeChangeListener.addThemeChangeListener(t -> {
@@ -147,8 +147,23 @@ public class Commons {
     }
 
     public static void compile(Project project) {
-        if(project instanceof TridentProject) ProcessManager.queueProcess(new TridentCompilerWrapper((TridentProject) project));
-        if(project instanceof CrossbowProject) ProcessManager.queueProcess(new CrossbowCompilerWrapper((CrossbowProject) project));
+        AbstractProcess process = project.createBuildProcess();
+        process.addStartListener(p -> TridentWindow.consoleBoard.batchSubmitCommand(project.getPreActions()));
+        if(process instanceof Reported) {
+            Report report = ((Reported) process).getReport();
+            process.addCompletionListener((p, success) -> {
+                TridentWindow.noticeExplorer.setNotices(report.group());
+                if (report.getTotal() > 0) TridentWindow.noticeBoard.open();
+                report.getWarnings().forEach(Console.warn::println);
+                report.getErrors().forEach(Console.err::println);
+            });
+        }
+        process.addCompletionListener((p, success) -> {
+            TridentWindow.consoleBoard.batchSubmitCommand(project.getPostActions());
+        });
+
+
+        ProcessManager.queueProcess(process);
     }
 
     public static void indexActive() {
@@ -163,25 +178,9 @@ public class Commons {
         return defaultModule.getValue();
     }
 
-    public static BedrockModule getDefaultBedrockModule() {
+    /*public static BedrockModule getDefaultBedrockModule() {
         return defaultBedrockModule.getValue();
-    }
-
-    public static LazyTokenPatternMatch getActiveTridentProductions() {
-        Project activeProject = getActiveProject();
-        if(activeProject != null) {
-            return activeProject.getFileStructure();
-        }
-        return null;
-    }
-
-    public static LazyTokenPatternMatch getActiveCrossbowProductions() {
-        Project activeProject = getActiveProject();
-        if(activeProject != null) {
-            return activeProject.getFileStructure();
-        }
-        return null;
-    }
+    }*/
 
     public static Image getProjectIcon() {
         return Commons.getIcon("project");

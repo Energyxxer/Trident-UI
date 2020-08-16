@@ -3,6 +3,7 @@ package com.energyxxer.trident.global.temp.projects;
 import com.energyxxer.commodore.module.Namespace;
 import com.energyxxer.commodore.versioning.JavaEditionVersion;
 import com.energyxxer.commodore.versioning.compatibility.VersionFeatureManager;
+import com.energyxxer.enxlex.lexical_analysis.summary.ProjectSummarizer;
 import com.energyxxer.enxlex.lexical_analysis.summary.ProjectSummary;
 import com.energyxxer.enxlex.pattern_matching.ParsingSignature;
 import com.energyxxer.enxlex.pattern_matching.matching.lazy.LazyTokenPatternMatch;
@@ -12,7 +13,10 @@ import com.energyxxer.trident.compiler.TridentCompiler;
 import com.energyxxer.trident.compiler.TridentProjectWorker;
 import com.energyxxer.trident.compiler.lexer.TridentProductions;
 import com.energyxxer.trident.compiler.util.JsonTraverser;
+import com.energyxxer.trident.compiler.util.TridentProjectSummarizer;
 import com.energyxxer.trident.compiler.util.TridentProjectSummary;
+import com.energyxxer.trident.global.Commons;
+import com.energyxxer.trident.langinterface.ProjectType;
 import com.energyxxer.trident.main.TridentUI;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.commodoreresources.DefinitionPacks;
@@ -23,9 +27,11 @@ import com.energyxxer.trident.ui.modules.FileModuleToken;
 import com.energyxxer.util.Lazy;
 import com.energyxxer.util.StringUtil;
 import com.energyxxer.util.logger.Debug;
+import com.energyxxer.util.processes.AbstractProcess;
 import com.google.gson.*;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,6 +41,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TridentProject implements Project {
+    public static final ProjectType PROJECT_TYPE = new ProjectType("Trident Project") {
+        @Override
+        public boolean isProjectRoot(File file) {
+            return file.toPath().resolve(TridentCompiler.PROJECT_FILE_NAME).toFile().exists();
+        }
+
+        @Override
+        public Image getIconForRoot(File file) {
+            return Commons.getIcon("project");
+        }
+
+        @Override
+        public Project createProjectFromRoot(File file) {
+            return new TridentProject(file);
+        }
+    };
 
     private File rootDirectory;
     public final long instantiationTime;
@@ -628,11 +650,78 @@ public class TridentProject implements Project {
         return buildConfig.getValue();
     }
 
-    public ArrayList<String> getPreActions() {
+    @Override
+    public Iterable<String> getPreActions() {
         return preActions;
     }
 
-    public ArrayList<String> getPostActions() {
+    @Override
+    public Iterable<String> getPostActions() {
         return postActions;
+    }
+
+    public ProjectType getProjectType() {
+        return TridentProject.PROJECT_TYPE;
+    }
+
+    @Override
+    public ProjectSummarizer createProjectSummarizer() {
+        TridentBuildConfiguration buildConfig = this.getBuildConfig();
+
+        ProjectSummarizer summarizer = new TridentProjectSummarizer(
+                this.getRootDirectory(),
+                buildConfig
+        );
+        summarizer.setSourceCache(this.getSourceCache());
+        summarizer.addCompletionListener(() -> {
+            this.updateServerDataCache(summarizer.getSourceCache());
+            this.updateSummary(summarizer.getSummary());
+        });
+        return summarizer;
+    }
+
+    @Override
+    public Image getIconForFile(File file) {
+        if(file.isDirectory()) {
+            if(PROJECT_TYPE.isProjectRoot(file.getParentFile())) {
+                if(file.getName().equals("datapack")) return Commons.getIcon("data");
+                if(file.getName().equals("resources")) return Commons.getIcon("resources");
+            }
+        } else {
+            String extension = "";
+            if(file.getName().lastIndexOf(".") >= 0) {
+                extension = file.getName().substring(file.getName().lastIndexOf("."));
+            }
+            switch(extension) {
+                case ".json": {
+                    if(file.getName().equals("sounds.json"))
+                        return Commons.getIcon("sound_config");
+                    else if(file.getParentFile().getName().equals("blockstates"))
+                        return Commons.getIcon("blockstate");
+                    else if(file.getParentFile().getName().equals("lang"))
+                        return Commons.getIcon("lang");
+                    break;
+                }
+                case ".mcmeta":
+                case TridentCompiler.PROJECT_FILE_NAME:
+                case TridentCompiler.PROJECT_BUILD_FILE_NAME:
+                    return Commons.getIcon("meta");
+                case ".nbt":
+                    return Commons.getIcon("structure");
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public AbstractProcess createBuildProcess() {
+        TridentCompiler compiler = new TridentCompiler(this.getRootDirectory());
+
+        compiler.setBuildConfig(this.getBuildConfig());
+
+        compiler.setSourceCache(this.getSourceCache());
+        compiler.setInResourceCache(this.getResourceCache());
+
+        return compiler;
     }
 }

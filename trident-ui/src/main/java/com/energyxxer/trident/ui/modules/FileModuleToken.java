@@ -1,13 +1,14 @@
 package com.energyxxer.trident.ui.modules;
 
-import com.energyxxer.crossbow.compiler.CrossbowCompiler;
 import com.energyxxer.trident.compiler.TridentCompiler;
 import com.energyxxer.trident.files.FileType;
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.FileManager;
 import com.energyxxer.trident.global.Preferences;
+import com.energyxxer.trident.global.temp.Lang;
 import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
+import com.energyxxer.trident.langinterface.ProjectType;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.common.MenuItems;
@@ -84,14 +85,7 @@ public class FileModuleToken implements ModuleToken, DraggableExplorerModuleToke
             subTitle = "(" + file.getParentFile().toPath().toString() + ")";
         }
 
-        this.isProjectRoot = isProjectRoot(file);
-    }
-
-    public static boolean isProjectRoot(File file) {
-        if(!file.isDirectory()) return false;
-        if(file.toPath().resolve(TridentCompiler.PROJECT_FILE_NAME).toFile().exists()) return true;
-        if(file.toPath().resolve(CrossbowCompiler.PROJECT_FILE_NAME).toFile().exists()) return true;
-        return false;
+        this.isProjectRoot = ProjectType.isAnyProjectRoot(file);
     }
 
     @Override
@@ -122,19 +116,26 @@ public class FileModuleToken implements ModuleToken, DraggableExplorerModuleToke
     @Override
     public Image getIcon() {
         if(overrideIconName != null) return Commons.getIcon(overrideIconName);
+        Project associatedProject = ProjectManager.getAssociatedProject(file);
+        if(associatedProject != null) {
+            Image iconFromProject = associatedProject.getIconForFile(file);
+            if(iconFromProject != null) return iconFromProject;
+        }
+        Lang associatedLang = Lang.getLangForFile(file.getPath());
+        if(associatedLang != null) {
+            Image iconFromLang = associatedLang.getIconForFile(file);
+            if(iconFromLang != null) return iconFromLang;
+        }
+
         if(file.isDirectory()) {
             if(isProjectRoot) {
                 if(!ProjectManager.isLoadedProjectRoot(file)) {
                     return Commons.getIcon("project_unloaded");
                 }
-                if(file.toPath().resolve(".cbwproj").toFile().exists()) {
-                    return Commons.getIcon("project_cbw");
-                } else {
-                    return Commons.getIcon("project");
+                ProjectType projectType = ProjectType.getProjectTypeForRoot(file);
+                if(projectType != null) {
+                    return projectType.getIconForRoot(file);
                 }
-            } else if(isProjectRoot(file.getParentFile())) {
-                if(file.getName().equals("datapack")) return Commons.getIcon("data");
-                if(file.getName().equals("resources")) return Commons.getIcon("resources");
             }
             return Commons.getIcon("folder");
         } else {
@@ -151,32 +152,15 @@ public class FileModuleToken implements ModuleToken, DraggableExplorerModuleToke
                 }
             }
             switch(extension) {
-                case ".tdn":
-                    return Commons.getIcon("trident_file");
-                case ".cbw":
-                    return Commons.getIcon("crossbow_file");
-                case ".mcfunction":
-                    return Commons.getIcon("function");
                 case ".mp3":
                 case ".ogg":
+                case ".fsb":
                     return Commons.getIcon("audio");
                 case ".json": {
-                    if(file.getName().equals("sounds.json"))
-                        return Commons.getIcon("sound_config");
-                    else if(file.getParentFile().getName().equals("blockstates"))
-                        return Commons.getIcon("blockstate");
-                    else if(file.getParentFile().getName().equals("lang"))
-                        return Commons.getIcon("lang");
-                    else
-                        return Commons.getIcon("json");
+                    return Commons.getIcon("json");
                 }
-                case ".mcmeta":
-                case TridentCompiler.PROJECT_FILE_NAME:
-                case TridentCompiler.PROJECT_BUILD_FILE_NAME:
-                    return Commons.getIcon("meta");
-                case ".nbt":
-                    return Commons.getIcon("structure");
                 case ".png":
+                case ".tga":
                     return Commons.getIcon("image");
                 default: return Commons.getIcon("file");
             }

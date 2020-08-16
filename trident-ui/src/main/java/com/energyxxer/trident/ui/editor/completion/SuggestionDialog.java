@@ -251,6 +251,10 @@ public class SuggestionDialog extends JDialog implements KeyListener, FocusListe
         locked = false;
     }
 
+    public TridentEditorComponent getEditor() {
+        return editor;
+    }
+
     @Override
     public void setVisible(boolean b) {
         super.setVisible(b);

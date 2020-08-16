@@ -1,7 +1,7 @@
 package com.energyxxer.trident.global.temp.projects;
 
-import com.energyxxer.crossbow.compiler.CrossbowCompiler;
 import com.energyxxer.trident.compiler.TridentCompiler;
+import com.energyxxer.trident.langinterface.ProjectType;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -24,16 +24,12 @@ public class ProjectManager {
 
 		for(File file : fileList) {
 			if(file.isDirectory()) {
-				if(file.toPath().resolve(TridentCompiler.PROJECT_FILE_NAME).toFile().exists()) {
+				ProjectType projectType = ProjectType.getProjectTypeForRoot(file);
+
+				if(projectType != null) {
 					try {
-						loadedProjects.add(new TridentProject(new File(file.getAbsolutePath())));
-					} catch(RuntimeException x) {
-						x.printStackTrace();
-					}
-				} else if(file.toPath().resolve(CrossbowCompiler.PROJECT_FILE_NAME).toFile().exists()) {
-					try {
-						loadedProjects.add(new CrossbowProject(new File(file.getAbsolutePath())));
-					} catch(RuntimeException x) {
+						loadedProjects.add(projectType.createProjectFromRoot(new File(file.getAbsolutePath())));
+					} catch (RuntimeException x) {
 						x.printStackTrace();
 					}
 				}

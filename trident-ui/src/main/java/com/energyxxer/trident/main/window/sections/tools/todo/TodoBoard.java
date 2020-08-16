@@ -1,13 +1,9 @@
 package com.energyxxer.trident.main.window.sections.tools.todo;
 
-import com.energyxxer.crossbow.compiler.util.CrossbowProjectSummary;
 import com.energyxxer.enxlex.lexical_analysis.summary.Todo;
 import com.energyxxer.enxlex.lexical_analysis.token.TokenSection;
-import com.energyxxer.trident.compiler.util.TridentProjectSummary;
-import com.energyxxer.trident.global.temp.projects.CrossbowProject;
 import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
-import com.energyxxer.trident.global.temp.projects.TridentProject;
 import com.energyxxer.trident.main.window.sections.quick_find.StyledExplorerMaster;
 import com.energyxxer.trident.main.window.sections.tools.ToolBoard;
 import com.energyxxer.trident.main.window.sections.tools.ToolBoardMaster;
@@ -96,9 +92,7 @@ public class TodoBoard extends ToolBoard {
         explorer.clear();
         for(Project project : ProjectManager.getLoadedProjects()) {
             if(project.getSummary() != null) {
-                Collection<Todo> todos = null;
-                if(project instanceof TridentProject) todos = ((TridentProjectSummary) project.getSummary()).getTodos();
-                else if(project instanceof CrossbowProject) todos = ((CrossbowProjectSummary) project.getSummary()).getTodos();
+                Collection<Todo> todos = project.getSummary().getTodos();
 
                 if(todos == null || todos.isEmpty()) return;
 

@@ -3,6 +3,7 @@ package com.energyxxer.trident.main;
 import com.energyxxer.trident.compiler.TridentCompiler;
 import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.global.Resources;
+import com.energyxxer.trident.global.temp.TridentLang;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.main.window.sections.tools.ConsoleBoard;
@@ -77,6 +78,7 @@ public class TridentUI {
 
 		SwingUtilities.invokeLater(TridentUI::showSplash);
 		Resources.load();
+		TridentLang.load(); //load the class to register the language
 		SwingUtilities.invokeLater(TridentUI::start);
 	}
 

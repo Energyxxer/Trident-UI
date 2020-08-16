@@ -1,8 +1,6 @@
 package com.energyxxer.trident.global.temp;
 
 import com.energyxxer.commodore.standard.StandardDefinitionPacks;
-import com.energyxxer.crossbow.compiler.CrossbowCompiler;
-import com.energyxxer.crossbow.compiler.lexer.CrossbowLexerProfile;
 import com.energyxxer.enxlex.lexical_analysis.EagerLexer;
 import com.energyxxer.enxlex.lexical_analysis.LazyLexer;
 import com.energyxxer.enxlex.lexical_analysis.Lexer;
@@ -16,11 +14,11 @@ import com.energyxxer.enxlex.pattern_matching.matching.TokenPatternMatch;
 import com.energyxxer.enxlex.pattern_matching.matching.lazy.LazyTokenPatternMatch;
 import com.energyxxer.enxlex.report.Notice;
 import com.energyxxer.enxlex.report.NoticeType;
+import com.energyxxer.enxlex.suggestions.ComplexSuggestion;
 import com.energyxxer.enxlex.suggestions.SuggestionModule;
 import com.energyxxer.nbtmapper.parser.NBTTMLexerProfile;
 import com.energyxxer.nbtmapper.parser.NBTTMProductions;
 import com.energyxxer.trident.compiler.TridentCompiler;
-import com.energyxxer.trident.compiler.lexer.TridentLexerProfile;
 import com.energyxxer.trident.compiler.lexer.syntaxlang.TDNMetaLexerProfile;
 import com.energyxxer.trident.compiler.lexer.syntaxlang.TDNMetaProductions;
 import com.energyxxer.trident.global.Commons;
@@ -28,10 +26,15 @@ import com.energyxxer.trident.global.temp.lang_defaults.parsing.MCFunctionProduc
 import com.energyxxer.trident.global.temp.lang_defaults.presets.JSONLexerProfile;
 import com.energyxxer.trident.global.temp.lang_defaults.presets.MCFunctionLexerProfile;
 import com.energyxxer.trident.global.temp.lang_defaults.presets.PropertiesLexerProfile;
+import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.ui.dialogs.settings.SnippetLexerProfile;
+import com.energyxxer.trident.ui.editor.completion.SuggestionDialog;
+import com.energyxxer.trident.ui.editor.completion.SuggestionToken;
 import com.energyxxer.util.Factory;
 
+import java.awt.*;
 import java.io.File;
+import java.util.List;
 import java.util.*;
 
 /**
@@ -42,8 +45,12 @@ public class Lang {
 
     public static final Lang JSON = new Lang("JSON",
             JSONLexerProfile::new,
-            "json", "mcmeta", TridentCompiler.PROJECT_FILE_NAME.substring(1), TridentCompiler.PROJECT_BUILD_FILE_NAME.substring(1), CrossbowCompiler.PROJECT_FILE_NAME.substring(1)
-    );
+            "json", "mcmeta", TridentCompiler.PROJECT_FILE_NAME.substring(1), TridentCompiler.PROJECT_BUILD_FILE_NAME.substring(1)
+    ) {
+        {
+            setIconName("json");
+        }
+    };
     public static final Lang PROPERTIES = new Lang("PROPERTIES",
             PropertiesLexerProfile::new,
             "properties", "lang"
@@ -52,22 +59,18 @@ public class Lang {
             MCFunctionLexerProfile::new,
             () -> MCFunctionProductions.FILE,
             "mcfunction"
-    ) {{this.putProperty("line_comment_marker","#");}};
-    public static final Lang TRIDENT = new Lang("TRIDENT",
-            TridentLexerProfile.INSTANCE::getValue,
-            Commons::getActiveTridentProductions,
-            "tdn"
-    ) {{this.putProperty("line_comment_marker","#");}};
+    ) {
+        {
+            this.putProperty("line_comment_marker","#");
+            this.setIconName("function");
+        }
+    };
+    //public static final Lang TRIDENT = TridentLang.INSTANCE;
     public static final Lang TRIDENT_META = new Lang("TRIDENT_META",
             TDNMetaLexerProfile::new,
             () -> TDNMetaProductions.FILE,
             "tdnmeta"
     ) {{this.putProperty("line_comment_marker","//");}};
-    public static final Lang CROSSBOW = new Lang("CROSSBOW",
-            CrossbowLexerProfile.INSTANCE::getValue,
-            Commons::getActiveCrossbowProductions,
-            "cbw"
-    ) {{this.putProperty("line_comment_marker","#");}};
     public static final Lang NBTTM = new Lang("NBTTM",
             () -> new NBTTMLexerProfile(StandardDefinitionPacks.MINECRAFT_JAVA_LATEST_SNAPSHOT),
             () -> NBTTMProductions.FILE,
@@ -80,22 +83,28 @@ public class Lang {
     private final Factory<GeneralTokenPatternMatch> parserProduction;
     private final List<String> extensions;
     private final HashMap<String, String> properties = new HashMap<>();
+    private String iconName;
 
-    Lang(String name, Factory<LexerProfile> factory, String... extensions) {
+    public Lang(String name, Factory<LexerProfile> factory, String... extensions) {
         this(name, factory, null, extensions);
     }
 
-    Lang(String name, Factory<LexerProfile> factory, Factory<GeneralTokenPatternMatch> parserProduction, String... extensions) {
+    public Lang(String name, Factory<LexerProfile> factory, Factory<GeneralTokenPatternMatch> parserProduction, String... extensions) {
         this.name = name;
         this.factory = factory;
         this.parserProduction = parserProduction;
-        this.extensions = Arrays.asList(extensions);
+        this.extensions = new ArrayList<>();
+        this.extensions.addAll(Arrays.asList(extensions));
 
         registeredLanguages.add(this);
     }
 
     public List<String> getExtensions() {
         return extensions;
+    }
+
+    public void addExtension(String extension) {
+        extensions.add(extension);
     }
 
     public LexerProfile createProfile() {
@@ -116,6 +125,14 @@ public class Lang {
             }
         }
         return null;
+    }
+
+    public String getIconName() {
+        return iconName;
+    }
+
+    protected void setIconName(String iconName) {
+        this.iconName = iconName;
     }
 
     public LangAnalysisResponse analyze(File file, String text, SuggestionModule suggestionModule, SummaryModule summaryModule) {
@@ -180,6 +197,26 @@ public class Lang {
 
     public void putProperty(String key, String value) {
         properties.put(key, value);
+    }
+
+    public boolean usesSuggestionModule() {
+        return false;
+    }
+
+    public SummaryModule createSummaryModule() {
+        return null;
+    }
+
+    public void joinToProjectSummary(SummaryModule summaryModule, File file, Project project) {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean expandSuggestion(ComplexSuggestion suggestion, ArrayList<SuggestionToken> tokens, SuggestionDialog dialog, SuggestionModule suggestionModule) {
+        return false;
+    }
+
+    public Image getIconForFile(File file) {
+        return (iconName != null) ? Commons.getIcon(iconName) : null;
     }
 
     public static class LangAnalysisResponse {
