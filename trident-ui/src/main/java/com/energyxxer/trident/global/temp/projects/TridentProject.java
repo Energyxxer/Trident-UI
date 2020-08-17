@@ -6,7 +6,7 @@ import com.energyxxer.commodore.versioning.compatibility.VersionFeatureManager;
 import com.energyxxer.enxlex.lexical_analysis.summary.ProjectSummarizer;
 import com.energyxxer.enxlex.lexical_analysis.summary.ProjectSummary;
 import com.energyxxer.enxlex.pattern_matching.ParsingSignature;
-import com.energyxxer.enxlex.pattern_matching.matching.lazy.LazyTokenPatternMatch;
+import com.energyxxer.enxlex.pattern_matching.matching.TokenPatternMatch;
 import com.energyxxer.nbtmapper.NBTTypeMapPack;
 import com.energyxxer.trident.compiler.TridentBuildConfiguration;
 import com.energyxxer.trident.compiler.TridentCompiler;
@@ -272,7 +272,7 @@ public class TridentProject implements Project {
         throw new RuntimeException("Invalid configuration file.");
     }
 
-    public LazyTokenPatternMatch getFileStructure() {
+    public TokenPatternMatch getFileStructure() {
         return productions.getValue().FILE;
     }
 

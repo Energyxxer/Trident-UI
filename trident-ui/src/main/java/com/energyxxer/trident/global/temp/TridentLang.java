@@ -38,6 +38,7 @@ public class TridentLang extends Lang {
 
     private TridentLang() {
         super("TRIDENT",
+                true,
                 TridentLexerProfile.INSTANCE::getValue,
                 () -> {
                     Project activeProject = Commons.getActiveProject();

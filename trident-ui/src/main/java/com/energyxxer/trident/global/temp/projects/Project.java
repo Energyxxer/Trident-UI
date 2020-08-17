@@ -4,7 +4,7 @@ import com.energyxxer.commodore.versioning.Version;
 import com.energyxxer.enxlex.lexical_analysis.summary.ProjectSummarizer;
 import com.energyxxer.enxlex.lexical_analysis.summary.ProjectSummary;
 import com.energyxxer.enxlex.pattern_matching.ParsingSignature;
-import com.energyxxer.enxlex.pattern_matching.matching.lazy.LazyTokenPatternMatch;
+import com.energyxxer.enxlex.pattern_matching.matching.TokenPatternMatch;
 import com.energyxxer.trident.langinterface.ProjectType;
 import com.energyxxer.util.processes.AbstractProcess;
 
@@ -13,7 +13,7 @@ import java.io.File;
 import java.util.HashMap;
 
 public interface Project {
-	LazyTokenPatternMatch getFileStructure();
+	TokenPatternMatch getFileStructure();
 	ProjectSummary getSummary();
 	File getRootDirectory();
 	HashMap<String, ParsingSignature> getSourceCache();

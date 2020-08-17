@@ -2,7 +2,6 @@ package com.energyxxer.trident.ui.editor.inspector;
 
 import com.energyxxer.enxlex.lexical_analysis.token.Token;
 import com.energyxxer.enxlex.lexical_analysis.token.TokenStream;
-import com.energyxxer.enxlex.pattern_matching.structures.TokenPattern;
 import com.energyxxer.enxlex.report.Notice;
 import com.energyxxer.trident.compiler.lexer.TridentTokens;
 import com.energyxxer.trident.main.window.TridentWindow;
@@ -49,13 +48,6 @@ public class Inspector implements Highlighter.HighlightPainter, MouseMotionListe
 
     public void inspect(TokenStream ts) {
         items.clear();
-
-        for(InspectionStructureMatch inspect : InspectionStructures.getAll()) {
-            ArrayList<TokenPattern<?>> matches = ts.search(inspect);
-            for(TokenPattern<?> match : matches) {
-                items.add(new InspectionItem(inspect.type, inspect.name, match.getStringBounds()));
-            }
-        }
 
         for(Token token : ts.tokens) {
             if(token.type == TridentTokens.COMMENT && token.subSections.containsValue("deprecated_syntax")) {

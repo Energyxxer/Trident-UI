@@ -9,9 +9,7 @@ import com.energyxxer.enxlex.lexical_analysis.summary.SummaryModule;
 import com.energyxxer.enxlex.lexical_analysis.token.Token;
 import com.energyxxer.enxlex.lexical_analysis.token.TokenStream;
 import com.energyxxer.enxlex.pattern_matching.TokenMatchResponse;
-import com.energyxxer.enxlex.pattern_matching.matching.GeneralTokenPatternMatch;
 import com.energyxxer.enxlex.pattern_matching.matching.TokenPatternMatch;
-import com.energyxxer.enxlex.pattern_matching.matching.lazy.LazyTokenPatternMatch;
 import com.energyxxer.enxlex.report.Notice;
 import com.energyxxer.enxlex.report.NoticeType;
 import com.energyxxer.enxlex.suggestions.ComplexSuggestion;
@@ -44,6 +42,7 @@ public class Lang {
     private static final ArrayList<Lang> registeredLanguages = new ArrayList<>();
 
     public static final Lang JSON = new Lang("JSON",
+            false,
             JSONLexerProfile::new,
             "json", "mcmeta", TridentCompiler.PROJECT_FILE_NAME.substring(1), TridentCompiler.PROJECT_BUILD_FILE_NAME.substring(1)
     ) {
@@ -52,10 +51,12 @@ public class Lang {
         }
     };
     public static final Lang PROPERTIES = new Lang("PROPERTIES",
+            false,
             PropertiesLexerProfile::new,
             "properties", "lang"
     ) {{this.putProperty("line_comment_marker","#");}};
     public static final Lang MCFUNCTION = new Lang("MCFUNCTION",
+            true,
             MCFunctionLexerProfile::new,
             () -> MCFunctionProductions.FILE,
             "mcfunction"
@@ -67,31 +68,37 @@ public class Lang {
     };
     //public static final Lang TRIDENT = TridentLang.INSTANCE;
     public static final Lang TRIDENT_META = new Lang("TRIDENT_META",
+            false,
             TDNMetaLexerProfile::new,
             () -> TDNMetaProductions.FILE,
             "tdnmeta"
     ) {{this.putProperty("line_comment_marker","//");}};
     public static final Lang NBTTM = new Lang("NBTTM",
+            true,
             () -> new NBTTMLexerProfile(StandardDefinitionPacks.MINECRAFT_JAVA_LATEST_SNAPSHOT),
             () -> NBTTMProductions.FILE,
             "nbttm"
     ) {{this.putProperty("line_comment_marker","#");}};
-    public static final Lang SNIPPET = new Lang("SNIPPET", SnippetLexerProfile::new);
+    public static final Lang SNIPPET = new Lang("SNIPPET",
+            false,
+            SnippetLexerProfile::new);
 
     private final String name;
-    private final Factory<LexerProfile> factory;
-    private final Factory<GeneralTokenPatternMatch> parserProduction;
+    private final boolean lazy;
+    private final Factory<LexerProfile> lexerProfileFactory;
+    private final Factory<TokenPatternMatch> parserProduction;
     private final List<String> extensions;
     private final HashMap<String, String> properties = new HashMap<>();
     private String iconName;
 
-    public Lang(String name, Factory<LexerProfile> factory, String... extensions) {
-        this(name, factory, null, extensions);
+    public Lang(String name, boolean lazy, Factory<LexerProfile> lexerProfileFactory, String... extensions) {
+        this(name, lazy, lexerProfileFactory, null, extensions);
     }
 
-    public Lang(String name, Factory<LexerProfile> factory, Factory<GeneralTokenPatternMatch> parserProduction, String... extensions) {
+    public Lang(String name, boolean lazy, Factory<LexerProfile> lexerProfileFactory, Factory<TokenPatternMatch> parserProduction, String... extensions) {
         this.name = name;
-        this.factory = factory;
+        this.lazy = lazy;
+        this.lexerProfileFactory = lexerProfileFactory;
         this.parserProduction = parserProduction;
         this.extensions = new ArrayList<>();
         this.extensions.addAll(Arrays.asList(extensions));
@@ -108,10 +115,10 @@ public class Lang {
     }
 
     public LexerProfile createProfile() {
-        return factory.createInstance();
+        return lexerProfileFactory.createInstance();
     }
 
-    public Factory<GeneralTokenPatternMatch> getParserProduction() {
+    public Factory<TokenPatternMatch> getParserProduction() {
         return parserProduction;
     }
 
@@ -136,42 +143,31 @@ public class Lang {
     }
 
     public LangAnalysisResponse analyze(File file, String text, SuggestionModule suggestionModule, SummaryModule summaryModule) {
-        GeneralTokenPatternMatch patternMatch = (parserProduction != null) ? parserProduction.createInstance() : null;
+        TokenPatternMatch patternMatch = (parserProduction != null) ? parserProduction.createInstance() : null;
 
-        Lexer lexer;
+        Lexer lexer = this.lazy ? new LazyLexer(new TokenStream(true), patternMatch) : new EagerLexer(new TokenStream(true));
         TokenMatchResponse response = null;
         ArrayList<Notice> notices = new ArrayList<>();
         ArrayList<Token> tokens;
 
-        if(patternMatch instanceof LazyTokenPatternMatch) {
-            lexer = new LazyLexer(new TokenStream(true), (LazyTokenPatternMatch) patternMatch);
-            lexer.setSummaryModule(summaryModule);
-            if(suggestionModule != null) {
-                lexer.setSuggestionModule(suggestionModule);
-            }
-            ((LazyLexer)lexer).tokenizeParse(file, text, createProfile());
-            notices.addAll(lexer.getNotices());
 
-            tokens = new ArrayList<>(lexer.getStream().tokens);
-            tokens.remove(0);
+        lexer.setSummaryModule(summaryModule);
+        if(suggestionModule != null) {
+            lexer.setSuggestionModule(suggestionModule);
+        }
+        lexer.start(file, text, createProfile());
+        notices.addAll(lexer.getNotices());
 
+        tokens = new ArrayList<>(lexer.getStream().tokens);
+        tokens.remove(0);
+
+        if(lexer instanceof LazyLexer) {
             response = ((LazyLexer) lexer).getMatchResponse();
         } else {
-            lexer = new EagerLexer(new TokenStream(true));
-            lexer.setSummaryModule(summaryModule);
-            if(suggestionModule != null) {
-                lexer.setSuggestionModule(suggestionModule);
-            }
-            ((EagerLexer)lexer).tokenize(file, text, createProfile());
-            notices.addAll(lexer.getNotices());
-
-            tokens = new ArrayList<>(lexer.getStream().tokens);
-            tokens.remove(0);
             tokens.removeIf(token -> !token.type.isSignificant());
 
             if(patternMatch != null) {
-
-                response = ((TokenPatternMatch) patternMatch).match(tokens);
+                response = patternMatch.match(0, lexer);
 
                 if(response != null && !response.matched) {
                     notices.add(new Notice(NoticeType.ERROR, response.getErrorMessage(), response.faultyToken));
