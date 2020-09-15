@@ -6,7 +6,6 @@ import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.global.temp.Lang;
 import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
-import com.energyxxer.trident.global.temp.projects.TridentProject;
 import com.energyxxer.trident.main.TridentUI;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.main.window.sections.editor_search.FindAndReplaceBar;
@@ -40,6 +39,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 
 /**
  * Display module for the main text editor of the program.
@@ -253,7 +253,7 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
                 style = editorComponent.addStyle(name, null);
                 this.styles.add(name);
                 if(name.startsWith("$") && name.contains(".")) {
-                    parserStyles.put(name, name.substring(1).toUpperCase().split("\\."));
+                    parserStyles.put(name, name.substring(1).toUpperCase(Locale.ENGLISH).split("\\."));
                 }
             }
             switch(value.substring(value.lastIndexOf(".")+1)) {
@@ -421,14 +421,14 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
             writer = new PrintWriter(file, "UTF-8");
 
             String text = getText();
-            if(!text.endsWith("\n")) {
+            /*if(!text.endsWith("\n")) {
                 text = text.concat("\n");
                 try {
                     editorComponent.getDocument().insertString(text.length()-1,"\n",null);
                 } catch(BadLocationException e) {
                     e.printStackTrace();
                 }
-            }
+            }*/
             writer.print(text);
             writer.close();
 
@@ -454,10 +454,8 @@ public class TridentEditorModule extends JPanel implements DisplayModule, Undoab
     @Override
     public void onSelect() {
         Project project = ProjectManager.getAssociatedProject(file);
-        if(project instanceof TridentProject) {
-            if(((TridentProject) project).instantiationTime >= highlightTime) {
-                editorComponent.highlight();
-            }
+        if(project != null && project.getInstantiationTime() >= highlightTime) {
+            editorComponent.highlight();
         }
     }
 

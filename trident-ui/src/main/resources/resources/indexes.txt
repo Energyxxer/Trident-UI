@@ -10,6 +10,9 @@ Syntax Themes:
 -MCFunction Syntax Dark
 -Trident Syntax Dark
 -Trident Meta Syntax Dark
--Crossbow Syntax Dark
 -NBTTM Syntax Dark
 -Snippet Syntax Dark
+-Crossbow Syntax Dark
+-Crossbow Script Syntax Dark
+-MoLang Syntax Dark
+-MoreLang Syntax Dark

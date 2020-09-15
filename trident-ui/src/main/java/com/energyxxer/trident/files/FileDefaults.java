@@ -4,6 +4,7 @@ import com.energyxxer.trident.util.ResourceReader;
 import com.energyxxer.util.logger.Debug;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -27,7 +28,7 @@ public class FileDefaults {
 
     public static String populateTemplate(String template, HashMap<String, String> variables) {
         for(Map.Entry<String, String> variable : variables.entrySet()) {
-            String pattern = Pattern.compile("\\$" + variable.getKey().toUpperCase() + "\\$", Pattern.CASE_INSENSITIVE).toString();
+            String pattern = Pattern.compile("\\$" + variable.getKey().toUpperCase(Locale.ENGLISH) + "\\$", Pattern.CASE_INSENSITIVE).toString();
             template = template.replaceAll(pattern, variable.getValue());
         }
         return template;

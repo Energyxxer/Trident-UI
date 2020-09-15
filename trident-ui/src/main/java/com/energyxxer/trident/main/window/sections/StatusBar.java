@@ -16,6 +16,7 @@ import javax.swing.border.MatteBorder;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Locale;
 
 /**
  * Created by User on 12/15/2016.
@@ -94,8 +95,8 @@ public class StatusBar extends JPanel implements MouseListener {
     public void setStatus(Status status) {
         Theme t = TridentWindow.getTheme();
 
-        statusLabel.setForeground(t.getColor(Color.BLACK, "Status." + status.getType().toLowerCase(),"General.foreground"));
-        statusLabel.setIconName(status.getType().toLowerCase());
+        statusLabel.setForeground(t.getColor(Color.BLACK, "Status." + status.getType().toLowerCase(Locale.ENGLISH),"General.foreground"));
+        statusLabel.setIconName(status.getType().toLowerCase(Locale.ENGLISH));
         statusLabel.setText(status.getMessage());
 
         setProgress(status.getProgress());

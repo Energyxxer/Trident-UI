@@ -25,7 +25,6 @@ public interface Project {
 	void updateClientDataCache(HashMap<String, ParsingSignature> sourceCache);
 	void updateSummary(ProjectSummary summary);
 	void updateConfig();
-	void createNew();
     Version getTargetVersion();
     Image getIconForFile(File file);
 
@@ -36,4 +35,6 @@ public interface Project {
 	ProjectSummarizer createProjectSummarizer();
 
 	AbstractProcess createBuildProcess();
+
+	long getInstantiationTime();
 }

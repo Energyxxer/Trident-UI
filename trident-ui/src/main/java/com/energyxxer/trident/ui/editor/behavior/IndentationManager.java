@@ -1,17 +1,17 @@
 package com.energyxxer.trident.ui.editor.behavior;
 
 import javax.swing.text.AttributeSet;
-import javax.swing.text.Style;
 import java.util.ArrayList;
 import java.util.Stack;
+import java.util.regex.Pattern;
 
 public class IndentationManager {
     public static final String NULLIFY_BRACE_STYLE = "__INDENTATION_CANCEL";
     protected final AdvancedEditor editor;
     protected boolean dirty = false;
     protected String text;
-    private final String openingChars = "{[(";
-    private final String closingChars = "}])";
+    private String openingChars = "{[(";
+    private String closingChars = "}])";
 
     protected ArrayList<IndentationChange> indents = new ArrayList<>();
     private Stack<Integer> bracesSeen = new Stack<>();
@@ -20,6 +20,8 @@ public class IndentationManager {
         this.editor = editor;
 
         editor.getStyledDocument().addStyle(NULLIFY_BRACE_STYLE, null);
+
+        setBraceSet("{[(","}])");
     }
 
     public void textChanged(String newText) {
@@ -102,6 +104,14 @@ public class IndentationManager {
         return isOpeningBrace(ch) || isClosingBrace(ch);
     }
 
+    public void setBraceSet(String openingBraces, String closingBraces) {
+        this.openingChars = openingBraces;
+        this.closingChars = closingBraces;
+        textChanged(editor.getText());
+
+        braceMatcher = Pattern.compile("[" + Pattern.quote(openingBraces + closingBraces) + "]");
+    }
+
     private int binarySearchBraceIndex(int index) {
         int min = 0;
         int max = indents.size()-1;
@@ -124,8 +134,6 @@ public class IndentationManager {
     }
 
     private boolean isRealIndent(IndentationChange indent) {
-        Style logicalStyle = editor.getStyledDocument().getLogicalStyle(indent.index);
-
         AttributeSet characterAttributes = editor.getStyledDocument().getCharacterElement(indent.index).getAttributes();
         return !characterAttributes.containsAttributes(editor.getStyle(NULLIFY_BRACE_STYLE)) && !characterAttributes.containsAttributes(editor.getStyle(AdvancedEditor.STRING_STYLE));
     }
@@ -143,6 +151,12 @@ public class IndentationManager {
             if(level == 0) return next.index;
         }
         return -1;
+    }
+
+    private Pattern braceMatcher;
+
+    public Pattern getBraceMatcher() {
+        return braceMatcher;
     }
 
     private static class IndentationChange {

@@ -92,8 +92,8 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
         addDot(bufferedDot);
 
         try {
-            c.getHighlighter().addHighlight(0,0,new EditorSelectionPainter(this));
-            c.getHighlighter().addHighlight(0,0,new BracePairHighlighter(editor, this));
+            c.getHighlighter().addHighlight(0,0, new EditorSelectionPainter(this));
+            c.getHighlighter().addHighlight(0,0, new BracePairHighlighter(editor, this));
         } catch(BadLocationException x) {
             Debug.log(x.getMessage(), Debug.MessageType.ERROR);
         }
@@ -121,6 +121,8 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
         readjustRect();
         editor.repaint();
         this.fireStateChanged();
+
+        dotsShouldntBeEmpty();
     }
 
     public void setPosition(int pos) {
@@ -334,9 +336,7 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
         if(dragSelectMode == RECTANGLE) return dots.get(Math.min(rectangleDotCursorIndex, dots.size()-1)).index;
         int upperBound = dots.size()-1;
         if(dragSelectMode == CHAR) upperBound = rectangleDotsStartIndex -1;
-        if(dots.isEmpty()) {
-            boolean a;
-        }
+        dotsShouldntBeEmpty();
         return dots.get(Math.min(upperBound, dots.size()-1)).index;
     }
 
@@ -737,5 +737,11 @@ public class EditorCaret extends DefaultCaret implements DropTargetListener {
         super.deinstall(c);
         flasher.stop();
         flasher.removeActionListener(flasherHandler);
+    }
+
+    private void dotsShouldntBeEmpty() {
+        if(dots.isEmpty()) {
+            Debug.log("Dots are empty!");
+        }
     }
 }

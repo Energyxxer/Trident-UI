@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by User on 12/13/2016.
@@ -133,7 +134,7 @@ public class ThemeManager {
     }
 
     public static Theme getSyntaxForGUITheme(Lang lang, Theme guiTheme) {
-        String s = guiTheme.getString("Syntax." + lang.toString().toLowerCase());
+        String s = guiTheme.getString("Syntax." + lang.toString().toLowerCase(Locale.ENGLISH));
         return getSyntaxTheme(s);
     }
 

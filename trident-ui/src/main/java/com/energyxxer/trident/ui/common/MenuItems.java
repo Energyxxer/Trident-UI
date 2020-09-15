@@ -2,7 +2,9 @@ package com.energyxxer.trident.ui.common;
 
 import com.energyxxer.trident.files.FileType;
 import com.energyxxer.trident.global.Commons;
+import com.energyxxer.trident.langinterface.ProjectType;
 import com.energyxxer.trident.main.window.TridentWindow;
+import com.energyxxer.trident.ui.dialogs.file_dialogs.ProjectDialog;
 import com.energyxxer.trident.ui.modules.FileModuleToken;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenu;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenuItem;
@@ -19,11 +21,13 @@ public class MenuItems {
 		// --------------------------------------------------
 
 		{
-			StyledMenuItem item = new StyledMenuItem(FileType.PROJECT.name, FileType.PROJECT.icon);
-			item.addActionListener(e -> {
-				FileType.PROJECT.create(null);
-			});
-			newMenu.add(item);
+			for(ProjectType projectType : ProjectType.values()) {
+				StyledMenuItem item = new StyledMenuItem(projectType.getName(), projectType.getDefaultProjectIconName());
+				item.addActionListener(e -> {
+					ProjectDialog.create(projectType);
+				});
+				newMenu.add(item);
+			}
 		}
 
 		// --------------------------------------------------

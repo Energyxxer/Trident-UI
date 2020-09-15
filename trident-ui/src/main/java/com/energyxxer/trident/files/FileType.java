@@ -5,7 +5,6 @@ import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.dialogs.file_dialogs.FileDialog;
 import com.energyxxer.trident.ui.dialogs.file_dialogs.FolderDialog;
 import com.energyxxer.trident.ui.dialogs.file_dialogs.FunctionDialog;
-import com.energyxxer.trident.ui.dialogs.file_dialogs.ProjectDialog;
 import com.energyxxer.trident.ui.styledcomponents.StyledMenuItem;
 
 import java.io.File;
@@ -24,7 +23,7 @@ public enum FileType {
     JSON(1, "JSON File", "json", ".json", FileDialog::create, (pr, pth) -> true),
     FILE(2, "File", "file", "", FileDialog::create, (pr, pth) -> true),
     FOLDER(2, "Folder", "folder", null, FolderDialog::create, (pr, pth) -> true),
-    PROJECT(3, "Project", "project", null, ProjectDialog::create, (pr, pth) -> true),
+    PROJECT(3, "Project", "project", null, (a, b) -> {TridentWindow.showException("FileType.create() was called on FileType.PROJECT");}, (pr, pth) -> true),
     DATA_ROOT(4, "Data Pack Root", "data", null, (type, dest) -> {
         Paths.get(dest).resolve("datapack").toFile().mkdirs();
         TridentWindow.projectExplorer.refresh();

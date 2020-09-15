@@ -113,6 +113,11 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
 
         //this.setOpaque(false);
         this.addFocusListener(this);
+
+        Lang lang = parent.getLanguage();
+        if(lang != null) {
+            lang.onEditorAdd(this, this.getCaret());
+        }
     }
 
     @Override
@@ -156,29 +161,37 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
 
     private Status errorStatus = new Status();
 
-    private void highlightSyntax() {
+    private void startSyntaxHighlighting() {
         if(parent.syntax == null) return;
 
-        Style defaultStyle = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
+        try {
+            String text = getText();
 
-        String text = getText();
-        //Debug.log(text);
+            Lang lang = parent.getLanguage();
+            if (lang == null) return;
+            Project project = parent.file != null ? ProjectManager.getAssociatedProject(parent.file) : null;
 
-        Lang lang = parent.getLanguage();
-        if(lang == null) return;
-        Project project = parent.file != null ? ProjectManager.getAssociatedProject(parent.file) : null;
+            SuggestionModule suggestionModule = (SHOW_SUGGESTIONS.get() && project != null && lang.usesSuggestionModule()) ? new SuggestionModule(this.getCaretWordPosition(), this.getCaretPosition()) : null;
+            SummaryModule summaryModule = project != null ? lang.createSummaryModule() : null;
 
-        SuggestionModule suggestionModule = (SHOW_SUGGESTIONS.get() && project != null && lang.usesSuggestionModule()) ? new SuggestionModule(this.getCaretWordPosition(), this.getCaretPosition()) : null;
-        SummaryModule summaryModule = project != null ? lang.createSummaryModule() : null;
+            File file = parent.getFileForAnalyzer();
+            Lang.LangAnalysisResponse analysis = file != null ? lang.analyze(file, text, suggestionModule, summaryModule) : null;
+            if (analysis == null) return;
 
-        File file = parent.getFileForAnalyzer();
-        Lang.LangAnalysisResponse analysis = file != null ? lang.analyze(file, text, suggestionModule, summaryModule) : null;
-        if(analysis == null) return;
+            SwingUtilities.invokeLater(() -> performTokenStyling(analysis, project, lang));
+        } catch(Exception x) {
+            x.printStackTrace();
+            TridentWindow.showException(x);
+        }
+    }
 
-        SwingUtilities.invokeLater(() -> {
+    private void performTokenStyling(Lang.LangAnalysisResponse analysis, Project project, Lang lang) {
+        try {
+            Style defaultStyle = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
+
             if(analysis.response != null) suggestionBox.setSummary(analysis.lexer.getSummaryModule(), analysis.response.matched);
             if(analysis.lexer.getSuggestionModule() != null) {
-                if(project != null) {
+                if(project != null && analysis.lexer.getSummaryModule() != null) {
                     lang.joinToProjectSummary(analysis.lexer.getSummaryModule(), parent.file, project);
                 }
                 suggestionBox.showSuggestions(analysis.lexer.getSuggestionModule());
@@ -208,7 +221,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
                 if(tokensInLine > MAX_HIGHLIGHTED_TOKENS_PER_LINE) {
                     shouldPaintStyles = false;
                 }
-                Style style = TridentEditorComponent.this.getStyle(token.type.toString().toLowerCase());
+                Style style = TridentEditorComponent.this.getStyle(token.type.toString().toLowerCase(Locale.ENGLISH));
 
                 int previousTokenStylesIndex = previousTokenStyles.size();
 
@@ -222,31 +235,31 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
 
                     for(Map.Entry<String, Object> entry : token.attributes.entrySet()) {
                         if(!entry.getValue().equals(true)) continue;
-                        Style attrStyle = TridentEditorComponent.this.getStyle("~" + entry.getKey().toLowerCase());
+                        Style attrStyle = TridentEditorComponent.this.getStyle("~" + entry.getKey().toLowerCase(Locale.ENGLISH));
                         if(attrStyle == null) continue;
 
-                        if(prevToken != null && previousTokenStyles.contains(entry.getKey().toLowerCase())) {
+                        if(prevToken != null && previousTokenStyles.contains(entry.getKey().toLowerCase(Locale.ENGLISH))) {
                             styleStart = prevToken.loc.index + prevToken.value.length();
                         }
-                        previousTokenStyles.add(entry.getKey().toLowerCase());
+                        previousTokenStyles.add(entry.getKey().toLowerCase(Locale.ENGLISH));
 
                         sd.setCharacterAttributes(styleStart, token.value.length() + (token.loc.index - styleStart), attrStyle, false);
                     }
                     for(Map.Entry<TokenSection, String> entry : token.subSections.entrySet()) {
                         TokenSection section = entry.getKey();
-                        Style attrStyle = TridentEditorComponent.this.getStyle("~" + entry.getValue().toLowerCase());
+                        Style attrStyle = TridentEditorComponent.this.getStyle("~" + entry.getValue().toLowerCase(Locale.ENGLISH));
                         if(attrStyle == null) continue;
 
                         sd.setCharacterAttributes(token.loc.index + section.start, section.length, attrStyle, false);
                     }
                     for(String tag : token.tags) {
-                        Style attrStyle = TridentEditorComponent.this.getStyle("$" + tag.toLowerCase());
+                        Style attrStyle = TridentEditorComponent.this.getStyle("$" + tag.toLowerCase(Locale.ENGLISH));
                         if(attrStyle == null) continue;
 
-                        if(prevToken != null && previousTokenStyles.contains(tag.toLowerCase())) {
+                        if(prevToken != null && previousTokenStyles.contains(tag.toLowerCase(Locale.ENGLISH))) {
                             styleStart = prevToken.loc.index + prevToken.value.length();
                         }
-                        previousTokenStyles.add(tag.toLowerCase());
+                        previousTokenStyles.add(tag.toLowerCase(Locale.ENGLISH));
 
                         sd.setCharacterAttributes(styleStart, token.value.length() + (token.loc.index - styleStart), attrStyle, false);
                     }
@@ -279,7 +292,7 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
                     previousTokenStylesIndex--;
                 }
 
-                if((token.value.contains("{") || token.value.contains("[") || token.value.contains("(") || token.value.contains("}") || token.value.contains("]") || token.value.contains(")")) && !(token.type == TridentTokens.BRACE || token.type == JSONLexerProfile.BRACE || token.type == NBTTMTokens.BRACE || token.type == TDNMetaLexerProfile.BRACE)) {
+                if(getIndentationManager().getBraceMatcher().matcher(token.value).find() && !lang.isBraceToken(token)) {
                     sd.setCharacterAttributes(token.loc.index, token.value.length(), getStyle(IndentationManager.NULLIFY_BRACE_STYLE), false);
                 }
 
@@ -298,8 +311,10 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
 
             if(analysis.response == null || analysis.response.matched) TridentWindow.dismissStatus(errorStatus);
 
-            //sd.setCharacterAttributes(81, 119, getStyle("do_not_display"), true);
-        });
+        } catch(Exception x) {
+            x.printStackTrace();
+            TridentWindow.showException(x);
+        }
     }
 
     private static <T> int indexOf(ArrayList<T> arr, T value, int fromIndex) {
@@ -324,11 +339,20 @@ public class TridentEditorComponent extends AdvancedEditor implements KeyListene
             highlightingThread = new Thread(new SwingWorker<Object, Object>() {
                 @Override
                 protected Object doInBackground() {
-                    highlightSyntax();
+                    startSyntaxHighlighting();
                     return null;
                 }
             },"Text Highlighter");
-            //highlightingThread = new Thread(this::highlightSyntax,"Text Highlighter");
+            highlightingThread.setUncaughtExceptionHandler((t, e) -> {
+                if(e instanceof ThreadDeath) return;
+                e.printStackTrace();
+                if(e instanceof Exception) {
+                    TridentWindow.showException((Exception) e);
+                } else {
+                    TridentWindow.showException(e.getMessage());
+                }
+            });
+            //highlightingThread = new Thread(this::startSyntaxHighlighting,"Text Highlighter");
             highlightingThread.start();
 
             Project project = ProjectManager.getAssociatedProject(parent.file);

@@ -1,6 +1,5 @@
 package com.energyxxer.trident.main.window.actions;
 
-import com.energyxxer.trident.files.FileType;
 import com.energyxxer.trident.global.Commons;
 import com.energyxxer.trident.global.Resources;
 import com.energyxxer.trident.global.keystrokes.KeyMap;
@@ -9,6 +8,7 @@ import com.energyxxer.trident.global.keystrokes.UserKeyBind;
 import com.energyxxer.trident.global.keystrokes.UserMapping;
 import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.global.temp.projects.TridentProject;
+import com.energyxxer.trident.langinterface.ProjectType;
 import com.energyxxer.trident.main.WorkspaceDialog;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.main.window.sections.AboutPane;
@@ -20,7 +20,7 @@ import com.energyxxer.trident.ui.commodoreresources.DefinitionUpdateProcess;
 import com.energyxxer.trident.ui.commodoreresources.TridentPlugins;
 import com.energyxxer.trident.ui.common.ProgramUpdateProcess;
 import com.energyxxer.trident.ui.dialogs.KeyStrokeDialog;
-import com.energyxxer.trident.ui.dialogs.project_properties.ProjectProperties;
+import com.energyxxer.trident.ui.dialogs.file_dialogs.ProjectDialog;
 import com.energyxxer.trident.ui.dialogs.settings.Settings;
 import com.energyxxer.util.logger.Debug;
 
@@ -137,7 +137,7 @@ public class ActionManager {
                     KeyMap.requestMapping("open_project_properties", identifierToStrokes("sa+S")).setGroupName("Windows"),
                     () -> {
                         Project selectedProject = Commons.getActiveProject();
-                        if(selectedProject instanceof TridentProject) ProjectProperties.show((TridentProject) selectedProject);
+                        selectedProject.getProjectType().showProjectPropertiesDialog(selectedProject);
                     }
                 ).setIconKey("project_properties")
         );
@@ -226,13 +226,15 @@ public class ActionManager {
                     "delete"
                 ).setGlobalUsage(false)
         );
-        actions.put("NEW_PROJECT",
-                new ProgramAction(
-                        "New Project", "Create new Trident project",
-                        KeyMap.requestMapping("new_project").setGroupName("Projects"),
-                        () -> FileType.PROJECT.create(null)
-                ).setIconKey("project")
-        );
+        for(ProjectType type : ProjectType.values()) {
+            actions.put("NEW_PROJECT_" + type.getCode(),
+                    new ProgramAction(
+                            "New " + type.getName(), "Create new " + type.getName(),
+                            KeyMap.requestMapping("new_project_" + type.getCode().toLowerCase(Locale.ENGLISH)).setGroupName("Projects"),
+                            () -> ProjectDialog.create(type)
+                    ).setIconKey(type.getDefaultProjectIconName())
+            );
+        }
         actions.put("SETTINGS",
                 new ProgramAction(
                         "Settings", "Configure Trident UI",

@@ -1,9 +1,9 @@
 package com.energyxxer.trident.global.temp.projects;
 
-import com.energyxxer.trident.compiler.TridentCompiler;
 import com.energyxxer.trident.langinterface.ProjectType;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -46,60 +46,9 @@ public class ProjectManager {
 		}
 		return null;
 	}
-	
-	public static String getIconFor(File file) {
-		Project project = getAssociatedProject(file);
-		String filename = file.getName();
-		if(file.isFile()) {
-			if(filename.endsWith(".json")) {
-				if(filename.equals("sounds.json")) {
-					return "sound_config";
-				} else if(file.getParentFile().getName().equals("blockstates")) {
-					return "blockstate";
-				} else return "model";
-			} else if(filename.endsWith(".lang")) {
-				return "lang";
-			} else if(filename.endsWith(".mcmeta") || filename.endsWith(TridentCompiler.PROJECT_FILE_NAME)) {
-				return "meta";
-			} else if(filename.endsWith(".ogg")) {
-				return "audio";
-			} else if(filename.endsWith(".nbt")) {
-				return "structure";
-			} else if(filename.endsWith(".mcfunction")) {
-				return "function";
-			} else if(filename.endsWith(".tdn")) {
-				return "trident_file";
-			}
-			//TODO: Make this extension-to-icon mapping data-driven by the selected UI theme.
 
-            /*
-sounds.json = sound_config
-blockstates/*.json = blockstate
-*.json = model
-*.lang = lang
-*.mcmeta = meta
-*.ogg = audio
-*.nbt = structure
-            */
-		} else {
-			//Check for file roots
-			if(project != null) {
-				if(file.getParentFile().equals(project.getRootDirectory())) {
-					switch(filename) {
-						case "src":
-						case "resources":
-						case "data":
-							return filename;
-					}
-				}
-			}
-		}
-		return null;
-	}
-	
-	public static void create(String name) {
-		Project p = new TridentProject(name);
-		p.createNew();
+	public static void create(String name, ProjectType type) {
+		Project p = type.createNew(Paths.get(ProjectManager.getWorkspaceDir()).resolve(name));
 		loadedProjects.add(p);
 	}
 	

@@ -1,11 +1,10 @@
 package com.energyxxer.trident.ui.explorer;
 
-import com.energyxxer.trident.global.Commons;
-import com.energyxxer.trident.global.temp.projects.ProjectManager;
+import com.energyxxer.enxlex.report.Notice;
 import com.energyxxer.trident.ui.explorer.base.ExplorerFlag;
 import com.energyxxer.trident.ui.explorer.base.ExplorerMaster;
 import com.energyxxer.trident.ui.explorer.base.elements.ExplorerElement;
-import com.energyxxer.enxlex.report.Notice;
+import com.energyxxer.trident.ui.modules.FileModuleToken;
 import com.energyxxer.trident.ui.modules.ModuleToken;
 
 import java.awt.*;
@@ -33,11 +32,7 @@ public class NoticeGroupElement extends ExplorerElement {
         this.notices = notices;
 
         if(notices.size() > 0 && notices.get(0).getFilePath() != null) {
-            String iconName = ProjectManager.getIconFor(new File(notices.get(0).getFilePath()));
-            if (iconName == null) {
-                iconName = "file";
-            }
-            this.icon = Commons.getIcon(iconName);
+            this.icon = new FileModuleToken(new File(notices.get(0).getFilePath())).getIcon();
         }
 
         this.x = master.getInitialIndent() + (indentation * master.getIndentPerLevel());

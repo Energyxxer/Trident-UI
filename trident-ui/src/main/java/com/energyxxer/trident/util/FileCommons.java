@@ -10,6 +10,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,7 +29,7 @@ public class FileCommons {
                 boolean confirmed = true;
                 if(destinationFile.toFile().exists() && !(subFoldersConfirmed && mergeDirectories)) {
                     String action = mergeDirectories ? "Merge them" : "Replace it";
-                    confirmed = new ConfirmDialog(action.replaceFirst("\\s.+","") + " existing", "<html>" + (file.isDirectory() ? "Folder" : "File") + " '" + file.getName() + "' already exists in the destination. <br>Would you like to " + action.toLowerCase() + "?</html>").result;
+                    confirmed = new ConfirmDialog(action.replaceFirst("\\s.+","") + " existing", "<html>" + (file.isDirectory() ? "Folder" : "File") + " '" + file.getName() + "' already exists in the destination. <br>Would you like to " + action.toLowerCase(Locale.ENGLISH) + "?</html>").result;
                 }
                 if(confirmed) {
                     if(mergeDirectories) {

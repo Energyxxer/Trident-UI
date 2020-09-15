@@ -98,8 +98,8 @@ public class DefinitionPacks {
     public static DefinitionPack[] pickPacksForVersion(ThreeNumberVersion targetVersion) {
         if(targetVersion == null) return null;
 
-        String key = "minecraft_" + targetVersion.getEditionString().toLowerCase().charAt(0) + "_" + targetVersion.getMajor() + "_" + targetVersion.getMinor();
-        Pattern vanillaKey = Pattern.compile("minecraft_" + targetVersion.getEditionString().toLowerCase().charAt(0) + "_1_(\\d+)");
+        String key = "minecraft_" + targetVersion.getEditionString().toLowerCase(Locale.ENGLISH).charAt(0) + "_" + targetVersion.getMajor() + "_" + targetVersion.getMinor();
+        Pattern vanillaKey = Pattern.compile("minecraft_" + targetVersion.getEditionString().toLowerCase(Locale.ENGLISH).charAt(0) + "_1_(\\d+)");
         DefinitionPack pack = loadedDefinitionPacks.get(key);
         Debug.log("key: " + key);
         if(pack != null) return new DefinitionPack[] {pack};

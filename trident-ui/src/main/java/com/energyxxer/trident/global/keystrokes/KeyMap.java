@@ -8,6 +8,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import static com.energyxxer.xswing.KeyInputUtils.*;
 
@@ -114,7 +115,7 @@ public class KeyMap {
             if(keyCodeSegment.charAt(0) >= '1' && keyCodeSegment.charAt(0) <= '9') {
                 keyCode = Integer.parseInt(keyCodeSegment);
             } else {
-                keyCode = keyCodeSegment.toUpperCase().charAt(0);
+                keyCode = keyCodeSegment.toUpperCase(Locale.ENGLISH).charAt(0);
             }
             //noinspection MagicConstant
             return new SimpleMapping(KeyStroke.getKeyStroke(keyCode, modifiers));

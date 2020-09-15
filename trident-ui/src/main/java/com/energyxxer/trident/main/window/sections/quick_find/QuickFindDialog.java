@@ -22,6 +22,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.util.Date;
+import java.util.Locale;
 
 public class QuickFindDialog extends JDialog implements WindowFocusListener, ActionListener {
 
@@ -143,7 +144,7 @@ public class QuickFindDialog extends JDialog implements WindowFocusListener, Act
         recentFilesCategory.clear();
         filesCategory.clear();
         actionsCategory.clear();
-        String query = this.field.getText().toLowerCase();
+        String query = this.field.getText().toLowerCase(Locale.ENGLISH);
         if(query.isEmpty()) {
             for(File file : FileModuleToken.recentFiles) {
                 StandardExplorerItem item = new StandardExplorerItem(new FileModuleToken(file), explorer, null);
@@ -172,8 +173,8 @@ public class QuickFindDialog extends JDialog implements WindowFocusListener, Act
             searchInFile(query, startFile);
 
             for(ProgramAction action : ActionManager.getAllActions().values()) {
-                if(action.getDescription().toLowerCase().contains(query)
-                || action.getDisplayName().toLowerCase().contains(query)) {
+                if(action.getDescription().toLowerCase(Locale.ENGLISH).contains(query)
+                || action.getDisplayName().toLowerCase(Locale.ENGLISH).contains(query)) {
                     StandardExplorerItem item = new StandardExplorerItem(action, explorer, null);
                     item.setDetailed(true);
                     actionsCategory.addElement(item);
@@ -190,7 +191,7 @@ public class QuickFindDialog extends JDialog implements WindowFocusListener, Act
             File[] files = file.listFiles();
             if(files != null) {
                 for(File child : files) {
-                    if(child.getName().toLowerCase().contains(query)) {
+                    if(child.getName().toLowerCase(Locale.ENGLISH).contains(query)) {
                         addFileResult(child);
                     }
                     if(child.isDirectory()) searchInFile(query, child);

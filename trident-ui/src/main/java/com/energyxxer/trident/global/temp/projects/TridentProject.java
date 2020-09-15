@@ -23,6 +23,7 @@ import com.energyxxer.trident.ui.commodoreresources.DefinitionPacks;
 import com.energyxxer.trident.ui.commodoreresources.TridentPlugins;
 import com.energyxxer.trident.ui.commodoreresources.TypeMaps;
 import com.energyxxer.trident.ui.dialogs.OptionDialog;
+import com.energyxxer.trident.ui.dialogs.project_properties.ProjectProperties;
 import com.energyxxer.trident.ui.modules.FileModuleToken;
 import com.energyxxer.util.Lazy;
 import com.energyxxer.util.StringUtil;
@@ -34,14 +35,10 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.*;
 import java.io.*;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class TridentProject implements Project {
-    public static final ProjectType PROJECT_TYPE = new ProjectType("Trident Project") {
+    public static final ProjectType PROJECT_TYPE = new ProjectType("TRIDENT", "Trident Project") {
         @Override
         public boolean isProjectRoot(File file) {
             return file.toPath().resolve(TridentCompiler.PROJECT_FILE_NAME).toFile().exists();
@@ -53,8 +50,21 @@ public class TridentProject implements Project {
         }
 
         @Override
+        public String getDefaultProjectIconName() {return "project";}
+
+        @Override
         public Project createProjectFromRoot(File file) {
             return new TridentProject(file);
+        }
+
+        @Override
+        public Project createNew(Path rootPath) {
+            return new TridentProject(rootPath).createNew();
+        }
+
+        @Override
+        public void showProjectPropertiesDialog(Project project) {
+            ProjectProperties.show((TridentProject) project);
         }
     };
 
@@ -135,17 +145,16 @@ public class TridentProject implements Project {
 
     private TridentProjectSummary summary = null;
 
-    public TridentProject(String name) {
+    public TridentProject(Path rootPath) {
         instantiationTime = System.currentTimeMillis();
-        Path rootPath = Paths.get(ProjectManager.getWorkspaceDir()).resolve(name);
         this.rootDirectory = rootPath.toFile();
 
         datapackRoot = rootPath.resolve("datapack").toFile();
         resourceRoot = rootPath.resolve("resources").toFile();
         resourceCacheFile = rootDirectory.toPath().resolve(".tdnui").resolve("resource_cache").toFile();
 
-        this.name = name;
-        //this.prefix = StringUtil.getInitials(name).toLowerCase();
+        this.name = rootPath.getFileName().toString();
+        //this.prefix = StringUtil.getInitials(name).toLowerCase(Locale.ENGLISH);
 
         Path outFolder = rootPath.resolve("out");
 
@@ -158,7 +167,7 @@ public class TridentProject implements Project {
 
         projectConfigJson = new JsonObject();
         projectConfigJson.add("target-version", latestVersionArr);
-        projectConfigJson.addProperty("default-namespace", StringUtil.getInitials(name).toLowerCase());
+        projectConfigJson.addProperty("default-namespace", StringUtil.getInitials(name).toLowerCase(Locale.ENGLISH));
         projectConfigJson.addProperty("language-level", 1);
 
         //these belong in .tdnbuild, will be updated and removed later
@@ -324,7 +333,7 @@ public class TridentProject implements Project {
         return rootDirectory != null && rootDirectory.exists();
     }
 
-    public void createNew() {
+    private TridentProject createNew() {
         Path defaultFunctionsDir = datapackRoot.toPath().resolve("data").resolve(getDefaultNamespace()).resolve("functions");
 
         defaultFunctionsDir.toFile().mkdirs();
@@ -345,6 +354,8 @@ public class TridentProject implements Project {
         }
 
         TridentWindow.tabManager.openTab(new FileModuleToken(mainFunctionPath));
+
+        return this;
     }
 
     public String getRelativePath(File file) {
@@ -456,7 +467,7 @@ public class TridentProject implements Project {
                 return namespace;
             }
         }
-        String namespace = StringUtil.getInitials(this.getName()).toLowerCase();
+        String namespace = StringUtil.getInitials(this.getName()).toLowerCase(Locale.ENGLISH);
         projectConfigJson.addProperty("default-namespace", namespace);
         return namespace;
     }
@@ -723,5 +734,10 @@ public class TridentProject implements Project {
         compiler.setInResourceCache(this.getResourceCache());
 
         return compiler;
+    }
+
+    @Override
+    public long getInstantiationTime() {
+        return instantiationTime;
     }
 }

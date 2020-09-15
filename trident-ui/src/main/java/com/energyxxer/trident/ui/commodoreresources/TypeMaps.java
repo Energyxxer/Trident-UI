@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -59,8 +60,8 @@ public class TypeMaps {
     public static NBTTypeMapPack pickTypeMapsForVersion(ThreeNumberVersion targetVersion) {
         if(targetVersion == null) return null;
 
-        String key = targetVersion.getEditionString().toLowerCase().charAt(0) + "_" + targetVersion.getMajor() + "_" + targetVersion.getMinor();
-        Pattern vanillaKey = Pattern.compile(targetVersion.getEditionString().toLowerCase().charAt(0) + "_(\\d+)_(\\d+)");
+        String key = targetVersion.getEditionString().toLowerCase(Locale.ENGLISH).charAt(0) + "_" + targetVersion.getMajor() + "_" + targetVersion.getMinor();
+        Pattern vanillaKey = Pattern.compile(targetVersion.getEditionString().toLowerCase(Locale.ENGLISH).charAt(0) + "_(\\d+)_(\\d+)");
         NBTTypeMapPack typemaps = loadedTypeMaps.get(key);
         if(typemaps != null) return typemaps;
 

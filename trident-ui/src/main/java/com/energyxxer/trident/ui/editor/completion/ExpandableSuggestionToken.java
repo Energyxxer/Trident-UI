@@ -1,10 +1,12 @@
 package com.energyxxer.trident.ui.editor.completion;
 
+import com.energyxxer.enxlex.suggestions.LiteralSuggestion;
 import com.energyxxer.enxlex.suggestions.Suggestion;
-import com.energyxxer.trident.compiler.lexer.TridentSuggestionTags;
 import com.energyxxer.trident.global.Commons;
+import com.energyxxer.trident.global.temp.Lang;
 import com.energyxxer.trident.ui.Tab;
 import com.energyxxer.trident.ui.display.DisplayModule;
+import com.energyxxer.trident.ui.editor.TridentEditorModule;
 import com.energyxxer.trident.ui.modules.ModuleToken;
 import com.energyxxer.trident.ui.styledcomponents.StyledPopupMenu;
 import com.energyxxer.util.StringUtil;
@@ -12,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.util.Collection;
+import java.util.Locale;
 
 public class ExpandableSuggestionToken implements SuggestionToken, ModuleToken {
 
@@ -28,6 +31,8 @@ public class ExpandableSuggestionToken implements SuggestionToken, ModuleToken {
     protected int backspaces = 0;
     protected int endIndex = -1;
 
+    protected boolean caseSensitive = true;
+
     protected ExpandableSuggestionToken() {
 
     }
@@ -42,10 +47,19 @@ public class ExpandableSuggestionToken implements SuggestionToken, ModuleToken {
         this.preview = preview;
         this.text = text;
 
-        iconKey = getIconKeyForTags(suggestion.getTags());
+        TridentEditorModule editorModule = parent.getEditor().getParentModule();
+        Lang lang = editorModule != null ? editorModule.getLanguage() : null;
+
+        if(lang != null) {
+            iconKey = lang.getIconKeyForSuggestionTags(suggestion.getTags());
+        }
 
         if(suggestion instanceof SnippetSuggestion) {
             description = "  " + ((SnippetSuggestion) suggestion).getDescription();
+        }
+
+        if(suggestion instanceof LiteralSuggestion) {
+            this.caseSensitive = ((LiteralSuggestion) suggestion).isCaseSensitive();
         }
     }
 
@@ -87,6 +101,14 @@ public class ExpandableSuggestionToken implements SuggestionToken, ModuleToken {
         return false;
     }
 
+    public boolean isCaseSensitive() {
+        return caseSensitive;
+    }
+
+    public void setCaseSensitive(boolean caseSensitive) {
+        this.caseSensitive = caseSensitive;
+    }
+
     @Override
     public boolean isModuleSource() {
         return false;
@@ -123,48 +145,11 @@ public class ExpandableSuggestionToken implements SuggestionToken, ModuleToken {
     }
 
     public void setEnabledFilter(String filter) {
-        enabled = filter.isEmpty() || this.preview.startsWith(filter);
+        enabled = filter.isEmpty() || (caseSensitive ? this.preview.startsWith(filter) : this.preview.toLowerCase(Locale.ENGLISH).startsWith(filter.toLowerCase(Locale.ENGLISH)));
     }
 
     public boolean isEnabled() {
         return enabled;
-    }
-
-    public static String getIconKeyForTags(Collection<String> tags) {
-        if(tags.contains(TridentSuggestionTags.TAG_OBJECTIVE)) {
-            return "objective";
-        } else if(tags.contains(TridentSuggestionTags.TAG_ENTITY_COMPONENT)) {
-            return "feature";
-        } else if(tags.contains(TridentSuggestionTags.TAG_CUSTOM_ENTITY)) {
-            return "custom_entity";
-        } else if(tags.contains(TridentSuggestionTags.TAG_ENTITY_EVENT)) {
-            return "entity_event";
-        } else if(tags.contains(TridentSuggestionTags.TAG_CUSTOM_ITEM)) {
-            return "custom_item";
-        } else if(tags.contains(TridentSuggestionTags.TAG_ITEM)) {
-            return "item";
-        } else if(tags.contains(TridentSuggestionTags.TAG_ENTITY)) {
-            return "entity";
-        } else if(tags.contains(TridentSuggestionTags.TAG_COORDINATE)) {
-            return "coordinates";
-        } else if(tags.contains(TridentSuggestionTags.TAG_CLASS)) {
-            return "class";
-        } else if(tags.contains(TridentSuggestionTags.TAG_VARIABLE)) {
-            return "variable";
-        } else if(tags.contains(TridentSuggestionTags.TAG_FIELD)) {
-            return "field";
-        } else if(tags.contains(TridentSuggestionTags.TAG_METHOD)) {
-            return "method";
-        } else if(tags.contains(TridentSuggestionTags.TAG_COMMAND)) {
-            return "command";
-        } else if(tags.contains(TridentSuggestionTags.TAG_MODIFIER)) {
-            return "modifier";
-        } else if(tags.contains(TridentSuggestionTags.TAG_INSTRUCTION)) {
-            return "instruction";
-        } else if(tags.contains(SnippetSuggestion.TAG_SNIPPET)) {
-            return "snippet";
-        }
-        return null;
     }
 
     public void setDarkened(boolean darkened) {

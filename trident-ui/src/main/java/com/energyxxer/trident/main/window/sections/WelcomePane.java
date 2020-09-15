@@ -1,9 +1,10 @@
 package com.energyxxer.trident.main.window.sections;
 
-import com.energyxxer.trident.files.FileType;
 import com.energyxxer.trident.global.Preferences;
+import com.energyxxer.trident.global.temp.projects.TridentProject;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.ToolbarButton;
+import com.energyxxer.trident.ui.dialogs.file_dialogs.ProjectDialog;
 import com.energyxxer.trident.ui.dialogs.settings.Settings;
 import com.energyxxer.trident.ui.misc.TipScreen;
 import com.energyxxer.trident.ui.theme.change.ThemeListenerManager;
@@ -46,8 +47,8 @@ public class WelcomePane extends JPanel {
         {
             ToolbarButton button = new ToolbarButton("project", tlm);
             button.setText("New Project");
-            button.setHintText("Create a new project");
-            button.addActionListener(e -> FileType.PROJECT.create(null));
+            button.setHintText("Create a new Trident Project");
+            button.addActionListener(e -> ProjectDialog.create(TridentProject.PROJECT_TYPE));
             JPanel wrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT));
             wrapper.setOpaque(false);
             wrapper.add(button);

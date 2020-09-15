@@ -92,6 +92,10 @@ public class Inspector implements Highlighter.HighlightPainter, MouseMotionListe
                             rectangle.width = c.getWidth();
                         }
 
+                        if(rectangle.width == 0) {
+                            rectangle.width = c.getFont().getSize();
+                        }
+
                         if (item.type.line) {
                             for (int x = rectangle.x; x < rectangle.x + rectangle.width; x += 4) {
                                 g.drawLine(x, rectangle.y + rectangle.height, x + 2, rectangle.y + rectangle.height - 2);
@@ -121,7 +125,7 @@ public class Inspector implements Highlighter.HighlightPainter, MouseMotionListe
         }
         int index = editor.viewToModel(e.getPoint());
         for(InspectionItem item : items) {
-            if(index >= item.bounds.start.index && index < item.bounds.end.index) {
+            if(index >= item.bounds.start.index && (index < item.bounds.end.index || (item.bounds.start.index == item.bounds.end.index && index <= item.bounds.end.index))) {
                 if(rolloverItem != item) {
                     rolloverItem = item;
                     if(!hint.isShowing()) {

@@ -16,6 +16,7 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.Locale;
 
 import static com.energyxxer.trident.ui.editor.behavior.AdvancedEditor.isPlatformControlDown;
 
@@ -99,7 +100,7 @@ public class NoticeItem extends ExplorerElement {
         //File Icon
         {
             int margin = ((master.getRowHeight() - 16) / 2);
-            g.drawImage(master.getAssetMap().get(notice.getType().name().toLowerCase()),x,y + margin,16, 16,null);
+            g.drawImage(master.getAssetMap().get(notice.getType().name().toLowerCase(Locale.ENGLISH)),x,y + margin,16, 16,null);
         }
         x += 25;
 

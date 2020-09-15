@@ -1,8 +1,8 @@
 package com.energyxxer.trident.ui.dialogs.file_dialogs;
 
-import com.energyxxer.trident.files.FileType;
 import com.energyxxer.trident.global.Preferences;
 import com.energyxxer.trident.global.temp.projects.ProjectManager;
+import com.energyxxer.trident.langinterface.ProjectType;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.styledcomponents.StyledButton;
 import com.energyxxer.trident.ui.styledcomponents.StyledIcon;
@@ -43,6 +43,8 @@ public class ProjectDialog {
 
     private static ThemeListenerManager tlm = new ThemeListenerManager();
 
+    private static StyledIcon icon;
+
     static {
         pane = new JPanel(new BorderLayout());
         pane.setPreferredSize(new ScalableDimension(WIDTH, HEIGHT));
@@ -56,7 +58,7 @@ public class ProjectDialog {
         iconPanel.setPreferredSize(new ScalableDimension(73, 48));
         iconPanel.add(new Padding(25), BorderLayout.WEST);
         iconPanel.setBorder(new EmptyBorder(0, 0, 0, 2));
-        iconPanel.add(new StyledIcon("project", 48, 48, Image.SCALE_SMOOTH, tlm));
+        iconPanel.add(icon = new StyledIcon("project", 48, 48, Image.SCALE_SMOOTH, tlm));
         pane.add(iconPanel, BorderLayout.WEST);
         //</editor-fold>
 
@@ -154,8 +156,6 @@ public class ProjectDialog {
         dialog.pack();
         dialog.setResizable(false);
 
-        dialog.setTitle("Create New Project");
-
         dialog.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
     }
 
@@ -163,7 +163,7 @@ public class ProjectDialog {
         if(!valid) return;
         String name = nameField.getText().trim();
 
-        ProjectManager.create(name);
+        ProjectManager.create(name, targetProjectType);
 
         TridentWindow.projectExplorer.refresh();
 
@@ -199,7 +199,10 @@ public class ProjectDialog {
         okButton.setEnabled(valid);
     }
 
-    public static void create(FileType type, String destination) {
+    private static ProjectType targetProjectType;
+
+    public static void create(ProjectType projectType) {
+        targetProjectType = projectType;
         nameField.setText("");
         validateInput();
 
@@ -209,6 +212,8 @@ public class ProjectDialog {
 
         dialog.setLocation(center);
 
+        dialog.setTitle("Create New " + targetProjectType.getName());
+        icon.setIconName(targetProjectType.getDefaultProjectIconName());
         dialog.setVisible(true);
     }
 

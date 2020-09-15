@@ -7,12 +7,14 @@ import com.energyxxer.commodore.types.defaults.FunctionReference;
 import com.energyxxer.commodore.types.defaults.ItemType;
 import com.energyxxer.enxlex.lexical_analysis.summary.ProjectSummary;
 import com.energyxxer.enxlex.lexical_analysis.summary.SummaryModule;
+import com.energyxxer.enxlex.lexical_analysis.token.Token;
 import com.energyxxer.enxlex.suggestions.ComplexSuggestion;
 import com.energyxxer.enxlex.suggestions.Suggestion;
 import com.energyxxer.enxlex.suggestions.SuggestionModule;
 import com.energyxxer.trident.compiler.TridentUtil;
 import com.energyxxer.trident.compiler.lexer.TridentLexerProfile;
 import com.energyxxer.trident.compiler.lexer.TridentSuggestionTags;
+import com.energyxxer.trident.compiler.lexer.TridentTokens;
 import com.energyxxer.trident.compiler.lexer.summaries.SummarySymbol;
 import com.energyxxer.trident.compiler.lexer.summaries.TridentSummaryModule;
 import com.energyxxer.trident.compiler.util.TridentProjectSummary;
@@ -21,6 +23,7 @@ import com.energyxxer.trident.global.temp.projects.Project;
 import com.energyxxer.trident.global.temp.projects.TridentProject;
 import com.energyxxer.trident.langinterface.ProjectType;
 import com.energyxxer.trident.ui.editor.completion.ExpandableSuggestionToken;
+import com.energyxxer.trident.ui.editor.completion.SnippetSuggestion;
 import com.energyxxer.trident.ui.editor.completion.SuggestionDialog;
 import com.energyxxer.trident.ui.editor.completion.SuggestionToken;
 import com.energyxxer.trident.ui.editor.completion.paths.ResourcePathExpander;
@@ -78,6 +81,11 @@ public class TridentLang extends Lang {
     }
 
     @Override
+    public boolean isBraceToken(Token token) {
+        return token.type == TridentTokens.BRACE;
+    }
+
+    @Override
     public boolean expandSuggestion(ComplexSuggestion suggestion, ArrayList<SuggestionToken> tokens, SuggestionDialog dialog, SuggestionModule suggestionModule) {
         switch(suggestion.getKey()) {
             case TridentSuggestionTags
@@ -85,7 +93,7 @@ public class TridentLang extends Lang {
                 if(dialog.getLastSuccessfulSummary() != null) {
                     for(SummarySymbol sym : ((TridentSummaryModule) dialog.getLastSuccessfulSummary()).getSymbolsVisibleAt(suggestionModule.getSuggestionIndex())) {
                         ExpandableSuggestionToken token = new ExpandableSuggestionToken(dialog, sym.getName(), suggestion);
-                        token.setIconKey(ExpandableSuggestionToken.getIconKeyForTags(sym.getSuggestionTags()));
+                        token.setIconKey(TridentLang.INSTANCE.getIconKeyForSuggestionTags(sym.getSuggestionTags()));
                         tokens.add(0, token);
                         if(sym.getParentFileSummary() != dialog.getLastSuccessfulSummary()) {
                             token.setDarkened(true);
@@ -115,7 +123,7 @@ public class TridentLang extends Lang {
                         ExpandableSuggestionToken token = new ExpandableSuggestionToken(dialog, sym.getName(), text, suggestion);
                         token.setBackspaces(backspaces);
                         token.setEndIndex(endIndex);
-                        token.setIconKey(ExpandableSuggestionToken.getIconKeyForTags(sym.getSuggestionTags()));
+                        token.setIconKey(TridentLang.INSTANCE.getIconKeyForSuggestionTags(sym.getSuggestionTags()));
                         newTokens.add(token);
                     }
                     tokens.addAll(0, newTokens);
@@ -171,7 +179,7 @@ public class TridentLang extends Lang {
                     for(SummarySymbol sym : ((TridentSummaryModule) dialog.getSummary()).getSymbolsVisibleAt(suggestionModule.getSuggestionIndex())) {
                         if(sym.getSuggestionTags().contains(TridentSuggestionTags.TAG_CUSTOM_ITEM)) {
                             ExpandableSuggestionToken token = new ExpandableSuggestionToken(dialog, "$" + sym.getName(), suggestion);
-                            token.setIconKey(ExpandableSuggestionToken.getIconKeyForTags(sym.getSuggestionTags()));
+                            token.setIconKey(TridentLang.INSTANCE.getIconKeyForSuggestionTags(sym.getSuggestionTags()));
                             tokens.add(0, token);
                             if(sym.getParentFileSummary() != dialog.getSummary()) {
                                 token.setDarkened(true);
@@ -197,7 +205,7 @@ public class TridentLang extends Lang {
                     for(SummarySymbol sym : ((TridentSummaryModule) dialog.getSummary()).getSymbolsVisibleAt(suggestionModule.getSuggestionIndex())) {
                         if(sym.getSuggestionTags().contains(TridentSuggestionTags.TAG_CUSTOM_ENTITY) && !sym.getSuggestionTags().contains(TridentSuggestionTags.TAG_ENTITY_COMPONENT)) {
                             ExpandableSuggestionToken token = new ExpandableSuggestionToken(dialog, "$" + sym.getName(), suggestion);
-                            token.setIconKey(ExpandableSuggestionToken.getIconKeyForTags(sym.getSuggestionTags()));
+                            token.setIconKey(TridentLang.INSTANCE.getIconKeyForSuggestionTags(sym.getSuggestionTags()));
                             tokens.add(0, token);
                             if(sym.getParentFileSummary() != dialog.getSummary()) {
                                 token.setDarkened(true);
@@ -259,5 +267,43 @@ public class TridentLang extends Lang {
             nodes.forEach(n -> {if(n.isLeaf()) n.setIconKey(leafIcon);});
             tokens.addAll(0, nodes);
         }
+    }
+
+    @Override
+    public String getIconKeyForSuggestionTags(Collection<String> tags) {
+        if(tags.contains(TridentSuggestionTags.TAG_OBJECTIVE)) {
+            return "objective";
+        } else if(tags.contains(TridentSuggestionTags.TAG_ENTITY_COMPONENT)) {
+            return "feature";
+        } else if(tags.contains(TridentSuggestionTags.TAG_CUSTOM_ENTITY)) {
+            return "custom_entity";
+        } else if(tags.contains(TridentSuggestionTags.TAG_ENTITY_EVENT)) {
+            return "entity_event";
+        } else if(tags.contains(TridentSuggestionTags.TAG_CUSTOM_ITEM)) {
+            return "custom_item";
+        } else if(tags.contains(TridentSuggestionTags.TAG_ITEM)) {
+            return "item";
+        } else if(tags.contains(TridentSuggestionTags.TAG_ENTITY)) {
+            return "entity";
+        } else if(tags.contains(TridentSuggestionTags.TAG_COORDINATE)) {
+            return "coordinates";
+        } else if(tags.contains(TridentSuggestionTags.TAG_CLASS)) {
+            return "class";
+        } else if(tags.contains(TridentSuggestionTags.TAG_VARIABLE)) {
+            return "variable";
+        } else if(tags.contains(TridentSuggestionTags.TAG_FIELD)) {
+            return "field";
+        } else if(tags.contains(TridentSuggestionTags.TAG_METHOD)) {
+            return "method";
+        } else if(tags.contains(TridentSuggestionTags.TAG_COMMAND)) {
+            return "command";
+        } else if(tags.contains(TridentSuggestionTags.TAG_MODIFIER)) {
+            return "modifier";
+        } else if(tags.contains(TridentSuggestionTags.TAG_INSTRUCTION)) {
+            return "instruction";
+        } else if(tags.contains(SnippetSuggestion.TAG_SNIPPET)) {
+            return "snippet";
+        }
+        return null;
     }
 }

@@ -16,6 +16,7 @@ import com.energyxxer.enxlex.suggestions.ComplexSuggestion;
 import com.energyxxer.enxlex.suggestions.SuggestionModule;
 import com.energyxxer.nbtmapper.parser.NBTTMLexerProfile;
 import com.energyxxer.nbtmapper.parser.NBTTMProductions;
+import com.energyxxer.nbtmapper.parser.NBTTMTokens;
 import com.energyxxer.trident.compiler.TridentCompiler;
 import com.energyxxer.trident.compiler.lexer.syntaxlang.TDNMetaLexerProfile;
 import com.energyxxer.trident.compiler.lexer.syntaxlang.TDNMetaProductions;
@@ -25,7 +26,10 @@ import com.energyxxer.trident.global.temp.lang_defaults.presets.JSONLexerProfile
 import com.energyxxer.trident.global.temp.lang_defaults.presets.MCFunctionLexerProfile;
 import com.energyxxer.trident.global.temp.lang_defaults.presets.PropertiesLexerProfile;
 import com.energyxxer.trident.global.temp.projects.Project;
+import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.ui.dialogs.settings.SnippetLexerProfile;
+import com.energyxxer.trident.ui.editor.behavior.AdvancedEditor;
+import com.energyxxer.trident.ui.editor.behavior.caret.EditorCaret;
 import com.energyxxer.trident.ui.editor.completion.SuggestionDialog;
 import com.energyxxer.trident.ui.editor.completion.SuggestionToken;
 import com.energyxxer.util.Factory;
@@ -48,6 +52,11 @@ public class Lang {
     ) {
         {
             setIconName("json");
+        }
+
+        @Override
+        public boolean isBraceToken(Token token) {
+            return token.type == JSONLexerProfile.BRACE;
         }
     };
     public static final Lang PROPERTIES = new Lang("PROPERTIES",
@@ -72,13 +81,31 @@ public class Lang {
             TDNMetaLexerProfile::new,
             () -> TDNMetaProductions.FILE,
             "tdnmeta"
-    ) {{this.putProperty("line_comment_marker","//");}};
+    ) {
+        {
+            this.putProperty("line_comment_marker","//");
+        }
+
+        @Override
+        public boolean isBraceToken(Token token) {
+            return token.type == TDNMetaLexerProfile.BRACE;
+        }
+    };
     public static final Lang NBTTM = new Lang("NBTTM",
             true,
             () -> new NBTTMLexerProfile(StandardDefinitionPacks.MINECRAFT_JAVA_LATEST_SNAPSHOT),
             () -> NBTTMProductions.FILE,
             "nbttm"
-    ) {{this.putProperty("line_comment_marker","#");}};
+    ) {
+        {
+            this.putProperty("line_comment_marker","#");
+        }
+
+        @Override
+        public boolean isBraceToken(Token token) {
+            return token.type == NBTTMTokens.BRACE;
+        }
+    };
     public static final Lang SNIPPET = new Lang("SNIPPET",
             false,
             SnippetLexerProfile::new);
@@ -144,30 +171,40 @@ public class Lang {
 
     public LangAnalysisResponse analyze(File file, String text, SuggestionModule suggestionModule, SummaryModule summaryModule) {
         TokenPatternMatch patternMatch = (parserProduction != null) ? parserProduction.createInstance() : null;
+        if(patternMatch == null) {
+            return null;
+        }
 
         Lexer lexer = this.lazy ? new LazyLexer(new TokenStream(true), patternMatch) : new EagerLexer(new TokenStream(true));
         TokenMatchResponse response = null;
         ArrayList<Notice> notices = new ArrayList<>();
-        ArrayList<Token> tokens;
 
 
         lexer.setSummaryModule(summaryModule);
         if(suggestionModule != null) {
             lexer.setSuggestionModule(suggestionModule);
+            suggestionModule.setLexer(lexer);
         }
         lexer.start(file, text, createProfile());
-        notices.addAll(lexer.getNotices());
 
-        tokens = new ArrayList<>(lexer.getStream().tokens);
-        tokens.remove(0);
+        lexer.getStream().tokens.remove(0);
 
         if(lexer instanceof LazyLexer) {
             response = ((LazyLexer) lexer).getMatchResponse();
+            notices.addAll(lexer.getNotices());
         } else {
-            tokens.removeIf(token -> !token.type.isSignificant());
+            lexer.getStream().tokens.removeIf(token -> !token.type.isSignificant());
 
             if(patternMatch != null) {
-                response = patternMatch.match(0, lexer);
+                try {
+                    response = patternMatch.match(0, lexer);
+                    notices.addAll(lexer.getNotices());
+                } catch(Exception x) {
+                    notices.addAll(lexer.getNotices());
+                    TridentWindow.showException(x);
+                    x.printStackTrace();
+                    return new LangAnalysisResponse(lexer, null, lexer.getStream().tokens, notices);
+                }
 
                 if(response != null && !response.matched) {
                     notices.add(new Notice(NoticeType.ERROR, response.getErrorMessage(), response.faultyToken));
@@ -213,6 +250,18 @@ public class Lang {
 
     public Image getIconForFile(File file) {
         return (iconName != null) ? Commons.getIcon(iconName) : null;
+    }
+
+    public boolean isBraceToken(Token token) {
+        return false;
+    }
+
+    public void onEditorAdd(AdvancedEditor editor, EditorCaret caret) {
+
+    }
+
+    public String getIconKeyForSuggestionTags(Collection<String> tags) {
+        return null;
     }
 
     public static class LangAnalysisResponse {

@@ -65,7 +65,7 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
     private LinePainter linePainter;
 
     private final StringLocationCache viewLineCache = new StringLocationCache();
-    private final IndentationManager indentationManager = new IndentationManager(this);
+    private final IndentationManager indentationManager;
 
     private SuggestionInterface suggestionInterface;
 
@@ -91,6 +91,8 @@ public class AdvancedEditor extends JTextPane implements KeyListener, CaretListe
         this.setCaret(this.caret = new EditorCaret(this));
         this.addKeyListener(this);
         this.addFocusListener(this);
+
+        indentationManager = new IndentationManager(this);
 
         this.getDocument().addDocumentListener((UnifiedDocumentListener) e -> {
             if(e.getType() == DocumentEvent.EventType.CHANGE) return;

@@ -19,8 +19,8 @@ public class SnippetLexerProfile extends LexerProfile {
         LexerContext endContext = new LexerContext() {
 
             @Override
-            public ScannerContextResponse analyze(String str, LexerProfile profile) {
-                if(str.startsWith("$END$")) return new ScannerContextResponse(true, "$END$", END_MARKER);
+            public ScannerContextResponse analyze(String str, int startIndex, LexerProfile profile) {
+                if(str.startsWith("$END$", startIndex)) return new ScannerContextResponse(true, "$END$", END_MARKER);
                 else return new ScannerContextResponse(false);
             }
 

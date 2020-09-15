@@ -4,6 +4,7 @@ import com.energyxxer.trident.global.temp.projects.Project;
 
 import java.awt.*;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,14 +12,23 @@ import java.util.HashMap;
 public abstract class ProjectType {
     private static final ArrayList<ProjectType> registeredProjectTypes = new ArrayList<>();
 
+    private final String code;
     private final String name;
     private final HashMap<String, String> properties = new HashMap<>();
-    private String iconName;
 
-    public ProjectType(String name) {
+    public ProjectType(String code, String name) {
+        this.code = code;
         this.name = name;
 
         registeredProjectTypes.add(this);
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public static Collection<ProjectType> values() {
@@ -39,5 +49,11 @@ public abstract class ProjectType {
 
     public abstract Image getIconForRoot(File file);
 
+    public abstract String getDefaultProjectIconName();
+
     public abstract Project createProjectFromRoot(File file);
+
+    public abstract Project createNew(Path rootPath);
+
+    public abstract void showProjectPropertiesDialog(Project project);
 }

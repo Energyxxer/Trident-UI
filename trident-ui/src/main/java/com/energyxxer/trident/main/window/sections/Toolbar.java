@@ -1,6 +1,7 @@
 package com.energyxxer.trident.main.window.sections;
 
 import com.energyxxer.trident.global.temp.projects.Project;
+import com.energyxxer.trident.langinterface.ProjectType;
 import com.energyxxer.trident.main.window.TridentWindow;
 import com.energyxxer.trident.main.window.actions.ActionManager;
 import com.energyxxer.trident.main.window.actions.ProgramAction;
@@ -28,7 +29,7 @@ public class Toolbar extends JPanel {
     public void setActiveProject(Project project) {
         if(project != null) {
             projectLabel.setText(project.getName());
-            projectLabel.setIconName("project");
+            projectLabel.setIconName(project.getProjectType().getDefaultProjectIconName());
         } else {
             projectLabel.setText("");
             projectLabel.setIconName(null);
@@ -87,8 +88,8 @@ public class Toolbar extends JPanel {
 
         buttonBar.add(new ToolbarSeparator(tlm));
 
-        {
-            buttonBar.add(createButtonForAction("NEW_PROJECT"));
+        for(ProjectType type : ProjectType.values()) {
+            buttonBar.add(createButtonForAction("NEW_PROJECT_" + type.getCode()));
         }
 
         {
