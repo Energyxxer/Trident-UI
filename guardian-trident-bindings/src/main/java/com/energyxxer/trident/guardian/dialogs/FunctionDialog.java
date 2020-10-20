@@ -1,15 +1,15 @@
 package com.energyxxer.trident.guardian.dialogs;
 
-import com.energyxxer.guardian.main.window.GuardianWindow;
-import com.energyxxer.guardian.ui.modules.FileModuleToken;
-import com.energyxxer.guardian.ui.theme.change.ThemeListenerManager;
-import com.energyxxer.trident.compiler.TridentUtil;
 import com.energyxxer.guardian.files.FileType;
 import com.energyxxer.guardian.global.temp.projects.ProjectManager;
+import com.energyxxer.guardian.main.window.GuardianWindow;
+import com.energyxxer.guardian.ui.modules.FileModuleToken;
 import com.energyxxer.guardian.ui.styledcomponents.StyledButton;
 import com.energyxxer.guardian.ui.styledcomponents.StyledIcon;
 import com.energyxxer.guardian.ui.styledcomponents.StyledLabel;
 import com.energyxxer.guardian.ui.styledcomponents.StyledTextField;
+import com.energyxxer.guardian.ui.theme.change.ThemeListenerManager;
+import com.energyxxer.trident.compiler.ResourceLocation;
 import com.energyxxer.trident.guardian.GuardianTridentBindings;
 import com.energyxxer.util.logger.Debug;
 import com.energyxxer.xswing.Padding;
@@ -47,7 +47,7 @@ public class FunctionDialog {
     private static StyledButton okButton;
 
     private static boolean valid = false;
-    private static TridentUtil.ResourceLocation resourceLocation = null;
+    private static ResourceLocation resourceLocation = null;
 
     private static String destination;
 
@@ -241,7 +241,7 @@ public class FunctionDialog {
 
         Path out;
         if(isResourceLocation) {
-            resourceLocation = TridentUtil.ResourceLocation.createStrict(in);
+            resourceLocation = ResourceLocation.createStrict(in);
             if(resourceLocation == null) throw new InvalidFunctionException("Illegal characters in function name");
             while(resourceLocation.body.contains("//")) {
                 resourceLocation.body = resourceLocation.body.replace("//", "/");
@@ -252,7 +252,7 @@ public class FunctionDialog {
             out = Paths.get(destination).resolve(in.replace("/", File.separator));
             Path relToDatapack = ProjectManager.getAssociatedProject(new File(destination)).getServerDataRoot().toPath().relativize(out);
             if(relToDatapack.getNameCount() <= 3 || !relToDatapack.getName(0).toString().equals("data") || !relToDatapack.getName(2).toString().equals("functions")) throw new InvalidFunctionException("Not inside a namespace/functions directory");
-            resourceLocation = TridentUtil.ResourceLocation.createStrict(relToDatapack.getName(1) + ":" + relToDatapack.subpath(3, relToDatapack.getNameCount()).toString().replace(File.separatorChar, '/'));
+            resourceLocation = ResourceLocation.createStrict(relToDatapack.getName(1) + ":" + relToDatapack.subpath(3, relToDatapack.getNameCount()).toString().replace(File.separatorChar, '/'));
             if(resourceLocation == null) throw new InvalidFunctionException("Illegal characters in function name");
             resourceLocation.body = resourceLocation.body.substring(0, resourceLocation.body.length()-GuardianTridentBindings.TRIDENT_FILE_TYPE.extension.length());
         }
@@ -327,7 +327,7 @@ public class FunctionDialog {
         }
     }
 
-    private static void displayLocation(TridentUtil.ResourceLocation message) {
+    private static void displayLocation(ResourceLocation message) {
         if(message == null) {
             locationLabel.setText(" ");
             dialog.pack();

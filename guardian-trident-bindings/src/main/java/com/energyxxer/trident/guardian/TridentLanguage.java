@@ -29,6 +29,7 @@ import com.energyxxer.guardian.ui.editor.completion.snippets.SnippetManager;
 import com.energyxxer.guardian.ui.editor.highlighters.AssociatedSymbolHighlighter;
 import com.energyxxer.guardian.ui.editor.inspector.InspectionItem;
 import com.energyxxer.guardian.ui.editor.inspector.InspectionType;
+import com.energyxxer.prismarine.summaries.PrismarineSummaryModule;
 import com.energyxxer.prismarine.summaries.SummarySymbol;
 import com.energyxxer.trident.compiler.ResourceLocation;
 import com.energyxxer.trident.compiler.lexer.TridentLexerProfile;
@@ -102,13 +103,13 @@ public class TridentLanguage extends Lang {
     }
 
     @Override
-    public SummaryModule createSummaryModule() {
+    public PrismarineSummaryModule createSummaryModule() {
         return new TridentSummaryModule();
     }
 
     @Override
     public void joinToProjectSummary(SummaryModule summaryModule, File file, Project project) {
-        ((TridentSummaryModule) summaryModule).setParentSummary((TridentProjectSummary) project.getSummary());
+        ((TridentSummaryModule) summaryModule).setParentSummary(project.getSummary());
         if(project.getSummary() != null) {
             ((TridentSummaryModule) summaryModule).setFileLocation(((TridentProject)project).getSummary().getLocationForFile(file));
         }
@@ -143,11 +144,18 @@ public class TridentLanguage extends Lang {
                     .IDENTIFIER_EXISTING: {
                 if(dialog.getLastSuccessfulSummary() != null) {
                     for(SummarySymbol sym : ((TridentSummaryModule) dialog.getLastSuccessfulSummary()).getSymbolsVisibleAt(suggestionModule.getSuggestionIndex())) {
-                        ExpandableSuggestionToken token = new ExpandableSuggestionToken(dialog, sym.getName(), suggestion);
+                        String text = sym.getName();
+                        ExpandableSuggestionToken token = new ExpandableSuggestionToken(dialog, text, text, suggestion);
+
+                        if(sym.getType() != null) {
+                            token.setDescription(sym.getType().getName());
+                        }
+
                         token.setIconKey(TridentLanguage.INSTANCE.getIconKeyForSuggestionTags(sym.getSuggestionTags()));
+
                         tokens.add(0, token);
                         if(sym.getParentFileSummary() != dialog.getLastSuccessfulSummary()) {
-                            token.setDarkened(true);
+                            token.setAlpha(0.6f);
                         }
                     }
                 }
@@ -205,7 +213,7 @@ public class TridentLanguage extends Lang {
                             token.setIconKey(TridentLanguage.INSTANCE.getIconKeyForSuggestionTags(sym.getSuggestionTags()));
                             tokens.add(0, token);
                             if(sym.getParentFileSummary() != dialog.getSummary()) {
-                                token.setDarkened(true);
+                                token.setAlpha(0.6f);
                             }
                         }
                     }
@@ -231,7 +239,7 @@ public class TridentLanguage extends Lang {
                             token.setIconKey(TridentLanguage.INSTANCE.getIconKeyForSuggestionTags(sym.getSuggestionTags()));
                             tokens.add(0, token);
                             if(sym.getParentFileSummary() != dialog.getSummary()) {
-                                token.setDarkened(true);
+                                token.setAlpha(0.6f);
                             }
                         }
                     }
