@@ -20,7 +20,7 @@ import com.energyxxer.guardian.ui.dialogs.OptionDialog;
 import com.energyxxer.guardian.ui.editor.EditorModule;
 import com.energyxxer.guardian.ui.editor.completion.SuggestionDialog;
 import com.energyxxer.guardian.ui.modules.FileModuleToken;
-import com.energyxxer.nbtmapper.NBTTypeMapPack;
+import com.energyxxer.nbtmapper.packs.NBTTypeMapPack;
 import com.energyxxer.prismarine.PrismarineCompiler;
 import com.energyxxer.prismarine.PrismarineProductions;
 import com.energyxxer.prismarine.in.ProjectReader;
@@ -238,7 +238,7 @@ public class TridentProject implements Project {
             try(InputStreamReader isr = new InputStreamReader(new FileInputStream(resourceCacheFile), Guardian.DEFAULT_CHARSET)) {
                 JsonObject jsonObject = new Gson().fromJson(isr, JsonObject.class);
                 if(jsonObject != null) {
-                    cache = new ProjectReader(null, null);
+                    cache = new ProjectReader(null);
                     for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
                         try {
                             Path relativePath = Paths.get(entry.getKey().replace('/',File.separatorChar));
