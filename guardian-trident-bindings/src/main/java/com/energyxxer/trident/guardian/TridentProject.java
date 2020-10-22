@@ -669,6 +669,7 @@ public class TridentProject implements Project {
                 this.getRootDirectory()
         );
         summarizer.getWorker().output.put(SetupBuildConfigTask.INSTANCE, this.getBuildConfig());
+        summarizer.getWorker().output.put(SetupPropertiesTask.INSTANCE, this.getProjectConfigJson());
         summarizer.setCachedReader(getCache());
 
         summarizer.addCompletionListener(() -> {
