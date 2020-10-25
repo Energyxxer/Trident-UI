@@ -138,6 +138,10 @@ public class TridentLanguage extends Lang {
         }
     }
 
+    private boolean shouldDarkenSymbol(SummarySymbol symbol, PrismarineSummaryModule lastSuccessfulSummary) {
+        return symbol.getParentFileSummary() != null && symbol.getParentFileSummary().getFileLocation() != null && !symbol.getParentFileSummary().getFileLocation().equals(lastSuccessfulSummary.getFileLocation());
+    }
+
     @Override
     public void expandSymbolSuggestion(SymbolSuggestion suggestion, ArrayList<SuggestionToken> tokens, SuggestionDialog dialog, SuggestionModule suggestionModule) {
         if(dialog.getLastSuccessfulSummary() != null) {
@@ -162,7 +166,7 @@ public class TridentLanguage extends Lang {
             token.setIconKey(TridentLanguage.INSTANCE.getIconKeyForSuggestionTags(sym.getSuggestionTags()));
 
             tokens.add(0, token);
-            if (sym.getParentFileSummary() != dialog.getLastSuccessfulSummary()) {
+            if (shouldDarkenSymbol(sym, dialog.getLastSuccessfulSummary())) {
                 token.setAlpha(0.6f);
             }
         }
@@ -174,7 +178,7 @@ public class TridentLanguage extends Lang {
             case TridentSuggestionTags
                     .IDENTIFIER_EXISTING: {
                 if(dialog.getLastSuccessfulSummary() != null) {
-                    for(SummarySymbol sym : ((TridentSummaryModule) dialog.getLastSuccessfulSummary()).getSymbolsVisibleAt(suggestionModule.getSuggestionIndex())) {
+                    for(SummarySymbol sym : dialog.getLastSuccessfulSummary().getSymbolsVisibleAt(suggestionModule.getSuggestionIndex())) {
                         expandSymbolSuggestion(new SymbolSuggestion(sym), tokens, dialog, suggestionModule);
                     }
                 }
@@ -226,12 +230,12 @@ public class TridentLanguage extends Lang {
                             dialog, suggestion, tokens,
                             s -> ((TridentProjectSummary) s).getTypes().get(ItemType.CATEGORY),
                             "item", true);
-                    for(SummarySymbol sym : ((TridentSummaryModule) dialog.getSummary()).getSymbolsVisibleAt(suggestionModule.getSuggestionIndex())) {
+                    for(SummarySymbol sym : dialog.getSummary().getSymbolsVisibleAt(suggestionModule.getSuggestionIndex())) {
                         if(sym.getSuggestionTags().contains(TridentSuggestionTags.TAG_CUSTOM_ITEM)) {
                             ExpandableSuggestionToken token = new ExpandableSuggestionToken(dialog, "$" + sym.getName(), suggestion);
                             token.setIconKey(TridentLanguage.INSTANCE.getIconKeyForSuggestionTags(sym.getSuggestionTags()));
                             tokens.add(0, token);
-                            if(sym.getParentFileSummary() != dialog.getSummary()) {
+                            if(shouldDarkenSymbol(sym, dialog.getSummary())) {
                                 token.setAlpha(0.6f);
                             }
                         }
@@ -252,12 +256,12 @@ public class TridentLanguage extends Lang {
                             dialog, suggestion, tokens,
                             s -> ((TridentProjectSummary) s).getTypes().get(EntityType.CATEGORY),
                             "entity", true);
-                    for(SummarySymbol sym : ((TridentSummaryModule) dialog.getSummary()).getSymbolsVisibleAt(suggestionModule.getSuggestionIndex())) {
+                    for(SummarySymbol sym : dialog.getSummary().getSymbolsVisibleAt(suggestionModule.getSuggestionIndex())) {
                         if(sym.getSuggestionTags().contains(TridentSuggestionTags.TAG_CUSTOM_ENTITY) && !sym.getSuggestionTags().contains(TridentSuggestionTags.TAG_ENTITY_COMPONENT)) {
                             ExpandableSuggestionToken token = new ExpandableSuggestionToken(dialog, "$" + sym.getName(), suggestion);
                             token.setIconKey(TridentLanguage.INSTANCE.getIconKeyForSuggestionTags(sym.getSuggestionTags()));
                             tokens.add(0, token);
-                            if(sym.getParentFileSummary() != dialog.getSummary()) {
+                            if(shouldDarkenSymbol(sym, dialog.getSummary())) {
                                 token.setAlpha(0.6f);
                             }
                         }

@@ -150,7 +150,7 @@ public class ProjectPropertiesDefinitions extends JPanel {
                 openProjectBtn.addActionListener(e -> {
                     File dir = new File(ProjectProperties.project.getRootDirectory().getPath() + File.separator + "defpacks" + File.separator);
                     dir.mkdir();
-                    Commons.openInExplorer(dir.getPath());
+                    Commons.openInSystemExplorer(dir.getPath());
                 });
                 controls.add(openProjectBtn);
 
@@ -161,7 +161,7 @@ public class ProjectPropertiesDefinitions extends JPanel {
                 openIdePacksBtn.addActionListener(e -> {
                     File dir = Guardian.core.getDefinitionPacksDir();
                     dir.mkdir();
-                    Commons.openInExplorer(dir.getPath());
+                    Commons.openInSystemExplorer(dir.getPath());
                 });
                 controls.add(openIdePacksBtn);
 

@@ -114,7 +114,7 @@ public class ProjectResourceKeyToken implements CompoundActionModuleToken {
                     if(!fileToShow.isDirectory()) {
                         fileToShow = new File(fileToShow.getPath() + ".zip");
                     }
-                    Commons.showInExplorer(fileToShow.getPath());
+                    Commons.showInSystemExplorer(fileToShow.getPath());
                 }
             });
         }

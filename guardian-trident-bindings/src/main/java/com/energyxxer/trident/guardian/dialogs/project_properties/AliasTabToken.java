@@ -4,7 +4,6 @@ import com.energyxxer.guardian.ui.Tab;
 import com.energyxxer.guardian.ui.display.DisplayModule;
 import com.energyxxer.guardian.ui.modules.ModuleToken;
 import com.energyxxer.guardian.ui.styledcomponents.StyledPopupMenu;
-import com.energyxxer.util.logger.Debug;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -52,11 +51,6 @@ public class AliasTabToken implements ModuleToken {
     @Override
     public DisplayModule createModule(Tab tab) {
         return new AliasCategoryModule(category, ProjectProperties.project.getProjectConfigJson());
-    }
-
-    @Override
-    public void onInteract() {
-        Debug.log("Interact");
     }
 
     @Override

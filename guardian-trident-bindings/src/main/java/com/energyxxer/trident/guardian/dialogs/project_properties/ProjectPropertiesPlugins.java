@@ -151,7 +151,7 @@ public class ProjectPropertiesPlugins extends JPanel {
                 openProjectBtn.addActionListener(e -> {
                     File dir = new File(ProjectProperties.project.getRootDirectory().getPath() + File.separator + "plugins" + File.separator);
                     dir.mkdir();
-                    Commons.openInExplorer(dir.getPath());
+                    Commons.openInSystemExplorer(dir.getPath());
                 });
                 controls.add(openProjectBtn);
 
@@ -162,7 +162,7 @@ public class ProjectPropertiesPlugins extends JPanel {
                 openIdePacksBtn.addActionListener(e -> {
                     File dir = TridentPluginLoader.INSTANCE.getPluginsDirectory();
                     dir.mkdir();
-                    Commons.openInExplorer(dir.getPath());
+                    Commons.openInSystemExplorer(dir.getPath());
                 });
                 controls.add(openIdePacksBtn);
 

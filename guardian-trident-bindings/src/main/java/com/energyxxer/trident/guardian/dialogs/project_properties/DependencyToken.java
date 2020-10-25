@@ -118,7 +118,7 @@ public class DependencyToken implements CompoundActionModuleToken {
 
             @Override
             public void perform() {
-                Commons.openInExplorer(root.getPath());
+                Commons.openInSystemExplorer(root.getPath());
             }
         });
 
