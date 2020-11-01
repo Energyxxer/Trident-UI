@@ -7,7 +7,6 @@ import com.energyxxer.commodore.types.defaults.ItemType;
 import com.energyxxer.enxlex.lexical_analysis.summary.ProjectSummary;
 import com.energyxxer.enxlex.lexical_analysis.summary.SummaryModule;
 import com.energyxxer.enxlex.lexical_analysis.token.Token;
-import com.energyxxer.enxlex.lexical_analysis.token.TokenStream;
 import com.energyxxer.enxlex.suggestions.ComplexSuggestion;
 import com.energyxxer.enxlex.suggestions.Suggestion;
 import com.energyxxer.enxlex.suggestions.SuggestionModule;
@@ -27,8 +26,6 @@ import com.energyxxer.guardian.ui.editor.completion.snippets.Snippet;
 import com.energyxxer.guardian.ui.editor.completion.snippets.SnippetContext;
 import com.energyxxer.guardian.ui.editor.completion.snippets.SnippetManager;
 import com.energyxxer.guardian.ui.editor.highlighters.AssociatedSymbolHighlighter;
-import com.energyxxer.guardian.ui.editor.inspector.InspectionItem;
-import com.energyxxer.guardian.ui.editor.inspector.InspectionType;
 import com.energyxxer.prismarine.summaries.PrismarineSummaryModule;
 import com.energyxxer.prismarine.summaries.SummarySymbol;
 import com.energyxxer.prismarine.summaries.SymbolSuggestion;
@@ -124,18 +121,6 @@ public class TridentLanguage extends Lang {
     @Override
     public boolean isStringToken(Token token) {
         return token.type == TridentTokens.STRING_LITERAL;
-    }
-
-    @Override
-    public void inspect(TokenStream stream, ArrayList<InspectionItem> items) {
-        for(Token token : stream.tokens) {
-            if(token.type == TridentTokens.COMMENT && token.subSections.containsValue("deprecated_syntax")) {
-                items.add(new InspectionItem(InspectionType.WARNING, "Changed syntax, use @ instead of #:", token.getStringBounds()));
-            }
-            if(token.type == TridentTokens.KEYWORD && token.value.equals("tdndebug")) {
-                items.add(new InspectionItem(InspectionType.WARNING, "Debug feature deprecated for removal; use the 'log' instruction instead instead", token.getStringBounds()));
-            }
-        }
     }
 
     private boolean shouldDarkenSymbol(SummarySymbol symbol, PrismarineSummaryModule lastSuccessfulSummary) {

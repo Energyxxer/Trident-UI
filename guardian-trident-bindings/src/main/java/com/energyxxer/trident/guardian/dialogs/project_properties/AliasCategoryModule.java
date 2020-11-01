@@ -103,7 +103,11 @@ public class AliasCategoryModule extends JPanel implements DisplayModule, Dispos
 
     @Override
     public void focus() {
+    }
 
+    @Override
+    public boolean moduleHasFocus() {
+        return editorModule.hasFocus();
     }
 
     @Override
