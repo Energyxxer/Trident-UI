@@ -12,20 +12,16 @@ import com.energyxxer.guardian.global.temp.projects.ProjectManager;
 import com.energyxxer.guardian.langinterface.ProjectType;
 import com.energyxxer.guardian.main.Guardian;
 import com.energyxxer.guardian.main.window.GuardianWindow;
-import com.energyxxer.guardian.ui.Tab;
 import com.energyxxer.guardian.ui.commodoreresources.DefinitionPacks;
 import com.energyxxer.guardian.ui.commodoreresources.Plugins;
 import com.energyxxer.guardian.ui.commodoreresources.TypeMaps;
 import com.energyxxer.guardian.ui.dialogs.OptionDialog;
-import com.energyxxer.guardian.ui.editor.EditorModule;
-import com.energyxxer.guardian.ui.editor.completion.SuggestionDialog;
 import com.energyxxer.guardian.ui.modules.FileModuleToken;
 import com.energyxxer.nbtmapper.packs.NBTTypeMapPack;
 import com.energyxxer.prismarine.PrismarineCompiler;
 import com.energyxxer.prismarine.PrismarineProductions;
 import com.energyxxer.prismarine.in.ProjectReader;
 import com.energyxxer.prismarine.summaries.PrismarineProjectSummarizer;
-import com.energyxxer.prismarine.summaries.PrismarineSummaryModule;
 import com.energyxxer.prismarine.util.JsonTraverser;
 import com.energyxxer.prismarine.worker.PrismarineProjectWorker;
 import com.energyxxer.prismarine.worker.tasks.SetupProductionsTask;
@@ -671,20 +667,6 @@ public class TridentProject implements Project {
         summarizer.getWorker().output.put(SetupBuildConfigTask.INSTANCE, this.getBuildConfig());
         summarizer.getWorker().output.put(SetupPropertiesTask.INSTANCE, this.getProjectConfigJson());
         summarizer.setCachedReader(getCache());
-
-        summarizer.addCompletionListener(() -> {
-            this.updateSummary(summarizer.getSummary());
-            for(Tab tab : GuardianWindow.tabManager.openTabs) {
-                if(tab.isSaved() && tab.module instanceof EditorModule) {
-                    File tabFile = ((EditorModule) tab.module).getFileForAnalyzer();
-                    PrismarineSummaryModule fileSummary = summary.getSummaryForFile(tabFile);
-                    if(fileSummary != null) {
-                        Debug.log("Updated file summary for tab " + tab.getName());
-                        ((SuggestionDialog) ((EditorModule) tab.module).editorComponent.getSuggestionInterface()).setSummary(fileSummary, true);
-                    }
-                }
-            }
-        });
         return summarizer;
     }
 
