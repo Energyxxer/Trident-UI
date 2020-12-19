@@ -666,7 +666,8 @@ public class TridentProject implements Project {
         );
         summarizer.getWorker().output.put(SetupBuildConfigTask.INSTANCE, this.getBuildConfig());
         summarizer.getWorker().output.put(SetupPropertiesTask.INSTANCE, this.getProjectConfigJson());
-        summarizer.setCachedReader(getCache());
+        if(cache != null) cache.startCache();
+        summarizer.setCachedReader(cache);
         return summarizer;
     }
 
@@ -708,8 +709,8 @@ public class TridentProject implements Project {
         PrismarineCompiler compiler = new PrismarineProjectWorker(TridentSuiteConfiguration.INSTANCE, this.getRootDirectory()).createCompiler();
 
         compiler.getWorker().output.put(SetupBuildConfigTask.INSTANCE, this.getBuildConfig());
-        compiler.setCachedReader(getCache());
-
+        if(cache != null) cache.startCache();
+        compiler.setCachedReader(cache);
 
         compiler.addCompletionListener((p, success) -> {
             if(success) {
