@@ -741,9 +741,7 @@ public class TridentProject implements Project {
 
         JsonObject jsonObj = new JsonObject();
         for(ProjectReader.Result results : cache.getResults()) {
-            if(results.isSkippableIfNotChanged()) {
-                jsonObj.addProperty(results.getRelativePath().toString().replace(File.separatorChar,'/'), results.getHashCode());
-            }
+            jsonObj.addProperty(results.getRelativePath().toString().replace(File.separatorChar,'/'), results.getHashCode());
         }
 
         try {
