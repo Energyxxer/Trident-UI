@@ -125,6 +125,28 @@ public class TridentProject implements Project {
         buildConfig.pluginAliases = Plugins.getAliasMap(TridentSuiteConfiguration.INSTANCE);
         buildConfig.typeMapPacks = new NBTTypeMapPack[] {TypeMaps.pickTypeMapsForVersion(this.getTargetVersion())};
 
+        StringBuilder errorSB = null;
+        if(buildConfig.defaultDefinitionPacks == null) {
+            errorSB = new StringBuilder();
+            errorSB.append("\n  * Definition Packs");
+        }
+        if(buildConfig.featureMap == null) {
+            if(errorSB == null) errorSB = new StringBuilder();
+            errorSB.append("\n  * Feature Maps");
+        }
+        if(buildConfig.typeMapPacks[0] == null) {
+            if(errorSB == null) errorSB = new StringBuilder();
+            errorSB.append("\n  * Type Maps");
+            buildConfig.typeMapPacks = new NBTTypeMapPack[0];
+        }
+
+        if(errorSB != null) {
+            errorSB.insert(0, "The following resources couldn't be obtained for " + this.getTargetVersion() + ":");
+            errorSB.append("\nCompilation may not work as intended.\n\nCheck for definition updates.");
+            Debug.log(errorSB.toString(), Debug.MessageType.ERROR);
+            GuardianWindow.showError(errorSB.toString());
+        }
+
         JsonObject rawBuildConfig = null;
         if(ensureBuildDataExists()) {
             try {
