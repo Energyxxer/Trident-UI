@@ -184,7 +184,8 @@ public class TridentProject implements Project {
     private JsonObject projectConfigJson;
     private JsonObject buildConfigJson;
     private JavaEditionVersion targetVersion = null;
-    private ProjectReader cache = null;
+    private ProjectReader compilerCache = null;
+    private ProjectReader summaryCache = null;
 
     private TridentProjectSummary summary = null;
 
@@ -256,12 +257,12 @@ public class TridentProject implements Project {
             try(InputStreamReader isr = new InputStreamReader(new FileInputStream(resourceCacheFile), Guardian.DEFAULT_CHARSET)) {
                 JsonObject jsonObject = new Gson().fromJson(isr, JsonObject.class);
                 if(jsonObject != null) {
-                    cache = new ProjectReader(null);
+                    compilerCache = new ProjectReader(null);
                     for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
                         try {
                             Path relativePath = Paths.get(entry.getKey().replace('/',File.separatorChar));
                             int hashCode = entry.getValue().getAsInt();
-                            cache.putResultHash(relativePath, hashCode);
+                            compilerCache.putResultHash(relativePath, hashCode);
                         } catch (NumberFormatException | UnsupportedOperationException | InvalidPathException x) {
                             x.printStackTrace();
                         }
@@ -688,8 +689,11 @@ public class TridentProject implements Project {
         );
         summarizer.getWorker().output.put(SetupBuildConfigTask.INSTANCE, this.getBuildConfig());
         summarizer.getWorker().output.put(SetupPropertiesTask.INSTANCE, this.getProjectConfigJson());
-        if(cache != null) cache.startCache();
-        summarizer.setCachedReader(cache);
+        if(summaryCache != null) summaryCache.startCache();
+        summarizer.setCachedReader(summaryCache);
+
+        summarizer.addCompletionListener(() -> summaryCache = summarizer.getProjectReader());
+
         return summarizer;
     }
 
@@ -731,8 +735,8 @@ public class TridentProject implements Project {
         PrismarineCompiler compiler = new PrismarineProjectWorker(TridentSuiteConfiguration.INSTANCE, this.getRootDirectory()).createCompiler();
 
         compiler.getWorker().output.put(SetupBuildConfigTask.INSTANCE, this.getBuildConfig());
-        if(cache != null) cache.startCache();
-        compiler.setCachedReader(cache);
+        if(compilerCache != null) compilerCache.startCache();
+        compiler.setCachedReader(compilerCache);
 
         compiler.addCompletionListener((p, success) -> {
             if(success) {
@@ -750,19 +754,19 @@ public class TridentProject implements Project {
 
     @Override
     public void clearPersistentCache() {
-        cache = null;
+        compilerCache = null;
         Debug.log("Persistent cache for project '" + getName() + "' cleared.");
     }
 
-    public ProjectReader getCache() {
-        return cache;
+    public ProjectReader getCompilerCache() {
+        return compilerCache;
     }
 
     public void updateCache(ProjectReader projectReader) {
-        cache = projectReader;
+        compilerCache = projectReader;
 
         JsonObject jsonObj = new JsonObject();
-        for(ProjectReader.Result results : cache.getResults()) {
+        for(ProjectReader.Result results : compilerCache.getResults()) {
             jsonObj.addProperty(results.getRelativePath().toString().replace(File.separatorChar,'/'), results.getHashCode());
         }
 
