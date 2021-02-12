@@ -116,6 +116,8 @@ public class TridentProject implements Project {
 
     private ArrayList<String> preActions;
     private ArrayList<String> postActions;
+    private ArrayList<String> postSuccessActions;
+    private ArrayList<String> postFailureActions;
 
     private final Lazy<TridentBuildConfiguration> buildConfig = new Lazy<>(() -> {
         TridentBuildConfiguration buildConfig = new TridentBuildConfiguration();
@@ -174,6 +176,26 @@ public class TridentProject implements Project {
                 String command = rawCommand.getAsString();
                 if(!command.isEmpty()) {
                     postActions.add(command);
+                }
+            }
+        }
+
+        postSuccessActions = new ArrayList<>();
+        for(JsonElement rawCommand : traverser.reset().get("trident-ui").get("actions").get("post-success").iterateAsArray()) {
+            if(rawCommand.isJsonPrimitive() && rawCommand.getAsJsonPrimitive().isString()) {
+                String command = rawCommand.getAsString();
+                if(!command.isEmpty()) {
+                    postSuccessActions.add(command);
+                }
+            }
+        }
+
+        postFailureActions = new ArrayList<>();
+        for(JsonElement rawCommand : traverser.reset().get("trident-ui").get("actions").get("post-failure").iterateAsArray()) {
+            if(rawCommand.isJsonPrimitive() && rawCommand.getAsJsonPrimitive().isString()) {
+                String command = rawCommand.getAsString();
+                if(!command.isEmpty()) {
+                    postFailureActions.add(command);
                 }
             }
         }
@@ -675,6 +697,16 @@ public class TridentProject implements Project {
     @Override
     public Iterable<String> getPostActions() {
         return postActions;
+    }
+
+    @Override
+    public ArrayList<String> getPostSuccessActions() {
+        return postSuccessActions;
+    }
+
+    @Override
+    public ArrayList<String> getPostFailureActions() {
+        return postFailureActions;
     }
 
     public ProjectType getProjectType() {
