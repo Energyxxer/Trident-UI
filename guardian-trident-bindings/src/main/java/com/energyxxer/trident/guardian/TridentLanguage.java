@@ -136,7 +136,7 @@ public class TridentLanguage extends Lang {
             int endIndex = 0;
             String preview = text;
 
-            if (sym.getSuggestionTags().contains(TridentSuggestionTags.TAG_METHOD)) {
+            if (sym.hasSuggestionTag(TridentSuggestionTags.TAG_METHOD)) {
                 text += "()";
                 endIndex = -1;
             }
@@ -216,7 +216,7 @@ public class TridentLanguage extends Lang {
                             s -> ((TridentProjectSummary) s).getTypes().get(ItemType.CATEGORY),
                             "item", true);
                     for(SummarySymbol sym : dialog.getSummary().getSymbolsVisibleAt(suggestionModule.getSuggestionIndex())) {
-                        if(sym.getSuggestionTags().contains(TridentSuggestionTags.TAG_CUSTOM_ITEM)) {
+                        if(sym.hasSuggestionTag(TridentSuggestionTags.TAG_CUSTOM_ITEM)) {
                             ExpandableSuggestionToken token = new ExpandableSuggestionToken(dialog, "$" + sym.getName(), suggestion);
                             token.setIconKey(TridentLanguage.INSTANCE.getIconKeyForSuggestionTags(sym.getSuggestionTags()));
                             tokens.add(0, token);
@@ -242,7 +242,7 @@ public class TridentLanguage extends Lang {
                             s -> ((TridentProjectSummary) s).getTypes().get(EntityType.CATEGORY),
                             "entity", true);
                     for(SummarySymbol sym : dialog.getSummary().getSymbolsVisibleAt(suggestionModule.getSuggestionIndex())) {
-                        if(sym.getSuggestionTags().contains(TridentSuggestionTags.TAG_CUSTOM_ENTITY) && !sym.getSuggestionTags().contains(TridentSuggestionTags.TAG_ENTITY_COMPONENT)) {
+                        if(sym.hasSuggestionTag(TridentSuggestionTags.TAG_CUSTOM_ENTITY) && !sym.hasSuggestionTag(TridentSuggestionTags.TAG_ENTITY_COMPONENT)) {
                             ExpandableSuggestionToken token = new ExpandableSuggestionToken(dialog, "$" + sym.getName(), suggestion);
                             token.setIconKey(TridentLanguage.INSTANCE.getIconKeyForSuggestionTags(sym.getSuggestionTags()));
                             tokens.add(0, token);
@@ -319,6 +319,7 @@ public class TridentLanguage extends Lang {
 
     @Override
     public String getIconKeyForSuggestionTags(Collection<String> tags) {
+        if(tags == null) return null;
         if(tags.contains(TridentSuggestionTags.TAG_OBJECTIVE)) {
             return "objective";
         } else if(tags.contains(TridentSuggestionTags.TAG_ENTITY_COMPONENT)) {
