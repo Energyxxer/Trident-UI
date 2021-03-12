@@ -29,8 +29,8 @@ import static com.energyxxer.guardian.util.NetworkUtil.retrieveStreamForURLAuth;
 
 public class TridentGuardianCore extends GuardianCore {
 
-    public static final boolean IS_DEVELOPMENT_VERSION = true;
-    public static ThreeNumberVersion UI_VERSION = new ThreeNumberVersion(1,3,1);
+    public static final boolean IS_DEVELOPMENT_VERSION = false;
+    public static ThreeNumberVersion UI_VERSION = new ThreeNumberVersion(1,4,0);
     public static final String MIXED_VERSION = "u" + UI_VERSION + "c" + Trident.TRIDENT_LANGUAGE_VERSION + (IS_DEVELOPMENT_VERSION ? "-DEV" : "");
 
     private static final Pattern MIXED_VERSION_REGEX = Pattern.compile("u(\\d+)\\.(\\d+)\\.(\\d+)c(\\d+)\\.(\\d+)\\.(\\d+)(-.+)?");
