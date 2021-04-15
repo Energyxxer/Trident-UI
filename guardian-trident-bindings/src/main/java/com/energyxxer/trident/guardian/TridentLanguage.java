@@ -277,7 +277,7 @@ public class TridentLanguage extends Lang {
             case TridentSuggestionTags.CONTEXT_ITEM_BODY:
             case TridentSuggestionTags.CONTEXT_CLASS_BODY:
             case TridentSuggestionTags.CONTEXT_INTERPOLATION_VALUE: {
-                suggestionModule.getSuggestions().addAll(SnippetManager.createSuggestionsForTag(suggestion.getKey()));
+                SnippetManager.createSuggestionsForTag(suggestion.getKey(), suggestionModule.getSuggestions());
                 break;
             }
 
