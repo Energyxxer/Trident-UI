@@ -130,6 +130,7 @@ public class TridentLanguage extends Lang {
     @Override
     public void expandSymbolSuggestion(SymbolSuggestion suggestion, ArrayList<SuggestionToken> tokens, SuggestionDialog dialog, SuggestionModule suggestionModule) {
         if(dialog.getLastSuccessfulSummary() != null) {
+            PrismarineSummaryModule fs = dialog.getLastSuccessfulSummary();
             SummarySymbol sym = suggestion.getSymbol();
 
             String text = sym.getName();
@@ -144,8 +145,8 @@ public class TridentLanguage extends Lang {
             ExpandableSuggestionToken token = new ExpandableSuggestionToken(dialog, preview, text, suggestion);
             token.setEndIndex(text.length() + endIndex);
 
-            if (sym.getType() != null) {
-                token.setDescription(sym.getType().getName());
+            if (sym.getType(fs) != null) {
+                token.setDescription(sym.getType(fs).getName());
             }
 
             token.setIconKey(TridentLanguage.INSTANCE.getIconKeyForSuggestionTags(sym.getSuggestionTags()));

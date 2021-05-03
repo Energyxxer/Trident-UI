@@ -71,7 +71,7 @@ public class TridentProject implements Project {
         public String getDefaultProjectIconName() {return "project_tdn";}
 
         @Override
-        public Project createProjectFromRoot(File file) {
+        public Project createProjectFromRoot(File file) throws Exception {
             return new TridentProject(file);
         }
 
@@ -110,6 +110,7 @@ public class TridentProject implements Project {
         } catch(Exception x) {
             Debug.log("Exception while creating module: " + x.toString(), Debug.MessageType.ERROR);
             x.printStackTrace();
+            GuardianWindow.showException(x);
             return null;
         }
     });
@@ -265,7 +266,7 @@ public class TridentProject implements Project {
         projectConfigJson.remove("clear-resources-output");
     }
 
-    public TridentProject(File rootDirectory) {
+    public TridentProject(File rootDirectory) throws Exception {
         instantiationTime = System.currentTimeMillis();
         this.rootDirectory = rootDirectory;
 
@@ -290,8 +291,6 @@ public class TridentProject implements Project {
                         }
                     }
                 }
-            } catch (IOException | JsonParseException x) {
-                x.printStackTrace();
             }
         }
 
@@ -329,8 +328,6 @@ public class TridentProject implements Project {
 
                     targetVersion = new JavaEditionVersion(major, minor, patch);
                 }
-            } catch (IOException | JsonParseException x) {
-                x.printStackTrace();
             }
 
             File buildConfigFile = rootDirectory.toPath().resolve(Trident.PROJECT_BUILD_FILE_NAME).toFile();
@@ -339,8 +336,6 @@ public class TridentProject implements Project {
                 try(InputStreamReader isr = new InputStreamReader(new FileInputStream(buildConfigFile), Guardian.DEFAULT_CHARSET)) {
                     this.buildConfigJson = new Gson().fromJson(isr, JsonObject.class);
                     return;
-                } catch (IOException | JsonParseException x) {
-                    x.printStackTrace();
                 }
             }
 
@@ -351,7 +346,8 @@ public class TridentProject implements Project {
     }
 
     public TokenPatternMatch getFileStructure() {
-        return productions.getValue().FILE;
+        PrismarineProductions productions = this.productions.getValue();
+        return productions != null ? productions.FILE : null;
     }
 
     public void rename(String name) throws IOException {
@@ -724,7 +720,9 @@ public class TridentProject implements Project {
         if(summaryCache != null) summaryCache.startCache();
         summarizer.setCachedReader(summaryCache);
 
-        summarizer.addCompletionListener(() -> summaryCache = summarizer.getProjectReader());
+        summarizer.addCompletionListener(() -> {
+            if(summarizer.getWalker() != null) summaryCache = summarizer.getWalker().getReader();
+        });
 
         return summarizer;
     }
