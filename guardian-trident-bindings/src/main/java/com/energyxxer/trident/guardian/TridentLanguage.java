@@ -107,6 +107,9 @@ public class TridentLanguage extends Lang {
 
     @Override
     public void joinToProjectSummary(SummaryModule summaryModule, File file, Project project) {
+        if(project.getSummary() != null) {
+            project.getSummary().incrementGeneration();
+        }
         ((TridentSummaryModule) summaryModule).setParentSummary(project.getSummary());
         if(project.getSummary() != null) {
             ((TridentSummaryModule) summaryModule).setFileLocation(((TridentProject)project).getSummary().getLocationForFile(file));
