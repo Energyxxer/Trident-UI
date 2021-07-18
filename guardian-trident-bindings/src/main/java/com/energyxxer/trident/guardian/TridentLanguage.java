@@ -362,18 +362,18 @@ public class TridentLanguage extends Lang {
 
     @Override
     public void addDefaultSnippets(ArrayList<Snippet> snippets) {
-        snippets.add(new Snippet("dee", "define entity $END$ {\n}", "Defines a custom entity").setContextEnabled(ENTRY));
-        snippets.add(new Snippet("deec", "define entity component $END$ {\n}", "Defines an entity component").setContextEnabled(ENTRY));
-        snippets.add(new Snippet("dei", "define item $END$ {\n}", "Defines a custom item").setContextEnabled(ENTRY));
-        snippets.add(new Snippet("dec", "define class $END$ {\n}", "Defines a custom class").setContextEnabled(ENTRY));
-        snippets.add(new Snippet("deo", "define objective $END$", "Defines a scoreboard objective").setContextEnabled(ENTRY));
+        snippets.add(new Snippet("dee", "define entity $NAME$ $BASE$ {\n    $END$\n}", "Defines a custom entity").setContextEnabled(ENTRY));
+        snippets.add(new Snippet("deec", "define entity component $NAME$ {\n    $END$\n}", "Defines an entity component").setContextEnabled(ENTRY));
+        snippets.add(new Snippet("dei", "define item $NAME$ $BASE$ {\n    $END$\n}", "Defines a custom item").setContextEnabled(ENTRY));
+        snippets.add(new Snippet("dec", "define class $NAME$ {\n    $END$\n}", "Defines a custom class").setContextEnabled(ENTRY));
+        snippets.add(new Snippet("deo", "define objective $NAME$$END$", "Defines a scoreboard objective").setContextEnabled(ENTRY));
         snippets.add(new Snippet("scoo", "scoreboard players operation $END$", "scoreboard players operation").setContextEnabled(COMMAND));
-        snippets.add(new Snippet("dheal", "default health $END$", "Sets a custom entity's default health").setContextEnabled(ENTITY_BODY));
-        snippets.add(new Snippet("dname", "default name $END$", "Sets a custom entity/item's default name").setContextEnabled(ENTITY_BODY).setContextEnabled(ITEM_BODY));
+        snippets.add(new Snippet("dheal", "default health $HEALTH$$END$", "Sets a custom entity's default health").setContextEnabled(ENTITY_BODY));
+        snippets.add(new Snippet("dname", "default name $NAME$$END$", "Sets a custom entity/item's default name").setContextEnabled(ENTITY_BODY).setContextEnabled(ITEM_BODY));
         snippets.add(new Snippet("dnbt", "default nbt {$END$}", "Sets a custom entity/item's default NBT").setContextEnabled(ENTITY_BODY).setContextEnabled(ITEM_BODY));
         snippets.add(new Snippet("dlore", "default lore [$END$]", "Sets a custom item's default lore").setContextEnabled(ITEM_BODY));
         snippets.add(new Snippet("tickf", "ticking function {\n    $END$\n}", "Creates an entity ticking function").setContextEnabled(ENTITY_BODY));
 
-        snippets.add(new Snippet("asat", "as $END$ at @s", "as <entity> at @s").setContextEnabled(MODIFIER));
+        snippets.add(new Snippet("asat", "as $ENTITY$ at @s $END$", "as <entity> at @s").setContextEnabled(MODIFIER));
     }
 }
