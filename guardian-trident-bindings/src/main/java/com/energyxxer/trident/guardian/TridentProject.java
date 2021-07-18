@@ -232,6 +232,8 @@ public class TridentProject implements Project {
         latestVersionArr.add(latestVersion.getMinor());
         latestVersionArr.add(latestVersion.getPatch());
 
+        targetVersion = latestVersion;
+
         projectConfigJson = new JsonObject();
         projectConfigJson.add("target-version", latestVersionArr);
         projectConfigJson.addProperty("default-namespace", StringUtil.getInitials(name).toLowerCase(Locale.ENGLISH));
