@@ -257,13 +257,6 @@ public class TridentProject implements Project {
         projectConfigJson.add("game-logger", loggerObj);
 
         createBuildDataFromTDNProj();
-
-        projectConfigJson.remove("datapack-output");
-        projectConfigJson.remove("resources-output");
-        projectConfigJson.remove("export-comments");
-        projectConfigJson.remove("export-gamelog");
-        projectConfigJson.remove("clear-datapack-output");
-        projectConfigJson.remove("clear-resources-output");
     }
 
     public TridentProject(File rootDirectory) throws Exception {
@@ -676,6 +669,13 @@ public class TridentProject implements Project {
 
         actionsObj.add("pre", new JsonArray());
         actionsObj.add("post", new JsonArray());
+
+        projectConfigJson.remove("datapack-output");
+        projectConfigJson.remove("resources-output");
+        projectConfigJson.remove("export-comments");
+        projectConfigJson.remove("export-gamelog");
+        projectConfigJson.remove("clear-datapack-output");
+        projectConfigJson.remove("clear-resources-output");
 
         updateConfig();
         Debug.log("Created " + Trident.PROJECT_BUILD_FILE_NAME + " for \"" + name + "\"");
