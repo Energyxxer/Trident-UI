@@ -7,6 +7,7 @@ import com.energyxxer.guardian.main.window.GuardianWindow;
 import com.energyxxer.guardian.ui.commodoreresources.Plugins;
 import com.energyxxer.guardian.ui.dialogs.file_dialogs.FileDialog;
 import com.energyxxer.guardian.ui.theme.ThemeManager;
+import com.energyxxer.prismarine.plugins.syntax.PrismarineMetaLexerProfile;
 import com.energyxxer.trident.Trident;
 import com.energyxxer.trident.guardian.dialogs.FunctionDialog;
 
@@ -31,6 +32,8 @@ public class GuardianTridentBindings {
         Lang.JSON.addExtension(Trident.PROJECT_FILE_NAME.substring(1));
         Lang.JSON.addExtension(Trident.PROJECT_BUILD_FILE_NAME.substring(1));
         Lang.PRISMARINE_SYNTAX.addExtension("tdnmeta");
+        PrismarineMetaLexerProfile.functionNames.add("storeVar");
+        PrismarineMetaLexerProfile.functionNames.add("storeFlat");
 
         ThemeManager.registerSyntaxThemeFromJar("Trident Syntax Dark");
         ThemeManager.registerSyntaxThemeFromJar("NBTTM Syntax Dark");
