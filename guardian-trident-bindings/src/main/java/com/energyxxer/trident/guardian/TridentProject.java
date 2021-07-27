@@ -535,7 +535,7 @@ public class TridentProject implements Project {
     }
 
     public File getDataOut() {
-        String path = JsonTraverser.INSTANCE.reset(buildConfigJson).get("output").get("directories").get("data-pack").asString();
+        String path = JsonTraverser.getThreadInstance().reset(buildConfigJson).get("output").get("directories").get("data-pack").asString();
         if(path != null) {
             return newFileObject(path, rootDirectory);
         }
@@ -543,7 +543,7 @@ public class TridentProject implements Project {
     }
 
     public void setDataOut(File file) {
-        JsonObject directories = JsonTraverser.INSTANCE.reset(buildConfigJson).createOnTraversal().get("output").get("directories").asJsonObject();
+        JsonObject directories = JsonTraverser.getThreadInstance().reset(buildConfigJson).createOnTraversal().get("output").get("directories").asJsonObject();
 
         if(file != null) {
             directories.addProperty("data-pack", file.getPath());
@@ -553,7 +553,7 @@ public class TridentProject implements Project {
     }
 
     public File getResourcesOut() {
-        String path = JsonTraverser.INSTANCE.reset(buildConfigJson).get("output").get("directories").get("resource-pack").asString();
+        String path = JsonTraverser.getThreadInstance().reset(buildConfigJson).get("output").get("directories").get("resource-pack").asString();
         if(path != null) {
             return newFileObject(path, rootDirectory);
         }
@@ -561,7 +561,7 @@ public class TridentProject implements Project {
     }
 
     public void setResourcesOut(File file) {
-        JsonObject directories = JsonTraverser.INSTANCE.reset(buildConfigJson).createOnTraversal().get("output").get("directories").asJsonObject();
+        JsonObject directories = JsonTraverser.getThreadInstance().reset(buildConfigJson).createOnTraversal().get("output").get("directories").asJsonObject();
 
         if(file != null) {
             directories.addProperty("resource-pack", file.getPath());
@@ -571,35 +571,35 @@ public class TridentProject implements Project {
     }
 
     public boolean isExportComments() {
-        return JsonTraverser.INSTANCE.reset(buildConfigJson).get("output").get("export-comments").asBoolean(false);
+        return JsonTraverser.getThreadInstance().reset(buildConfigJson).get("output").get("export-comments").asBoolean(false);
     }
 
     public void setExportComments(boolean value) {
-        JsonTraverser.INSTANCE.reset(buildConfigJson).createOnTraversal().get("output").asJsonObject().addProperty("export-comments", value);
+        JsonTraverser.getThreadInstance().reset(buildConfigJson).createOnTraversal().get("output").asJsonObject().addProperty("export-comments", value);
     }
 
     public boolean isExportGamelog() {
-        return JsonTraverser.INSTANCE.reset(buildConfigJson).get("output").get("export-gamelog").asBoolean(true);
+        return JsonTraverser.getThreadInstance().reset(buildConfigJson).get("output").get("export-gamelog").asBoolean(true);
     }
 
     public void setExportGamelog(boolean value) {
-        JsonTraverser.INSTANCE.reset(buildConfigJson).createOnTraversal().get("output").asJsonObject().addProperty("export-gamelog", value);
+        JsonTraverser.getThreadInstance().reset(buildConfigJson).createOnTraversal().get("output").asJsonObject().addProperty("export-gamelog", value);
     }
 
     public boolean isClearData() {
-        return JsonTraverser.INSTANCE.reset(buildConfigJson).get("output").get("clean-directories").get("data-pack").asBoolean(false);
+        return JsonTraverser.getThreadInstance().reset(buildConfigJson).get("output").get("clean-directories").get("data-pack").asBoolean(false);
     }
 
     public void setClearData(boolean clear) {
-        JsonTraverser.INSTANCE.reset(buildConfigJson).createOnTraversal().get("output").get("clean-directories").asJsonObject().addProperty("data-pack", clear);
+        JsonTraverser.getThreadInstance().reset(buildConfigJson).createOnTraversal().get("output").get("clean-directories").asJsonObject().addProperty("data-pack", clear);
     }
 
     public boolean isClearResources() {
-        return JsonTraverser.INSTANCE.reset(buildConfigJson).get("output").get("clean-directories").get("resource-pack").asBoolean(false);
+        return JsonTraverser.getThreadInstance().reset(buildConfigJson).get("output").get("clean-directories").get("resource-pack").asBoolean(false);
     }
 
     public void setClearResources(boolean clear) {
-        JsonTraverser.INSTANCE.reset(buildConfigJson).createOnTraversal().get("output").get("clean-directories").asJsonObject().addProperty("resource-pack", clear);
+        JsonTraverser.getThreadInstance().reset(buildConfigJson).createOnTraversal().get("output").get("clean-directories").asJsonObject().addProperty("resource-pack", clear);
     }
 
     public JsonObject getProjectConfigJson() {

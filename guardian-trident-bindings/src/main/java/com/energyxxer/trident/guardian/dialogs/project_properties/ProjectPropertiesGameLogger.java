@@ -210,10 +210,10 @@ class ProjectPropertiesGameLogger extends JPanel {
                 if(config.has("game-logger") && config.get("game-logger").isJsonObject()) {
                     JsonObject loggerObj = config.getAsJsonObject("game-logger");
 
-                    compact.setSelected(JsonTraverser.INSTANCE.reset(loggerObj).get("compact").asBoolean(false));
-                    timestampEnabled.setSelected(JsonTraverser.INSTANCE.reset(loggerObj).get("timestamp-enabled").asBoolean(true));
-                    posEnabled.setSelected(JsonTraverser.INSTANCE.reset(loggerObj).get("pos-enabled").asBoolean(false));
-                    lineNumberEnabled.setSelected(JsonTraverser.INSTANCE.reset(loggerObj).get("line-number-enabled").asBoolean(false));
+                    compact.setSelected(JsonTraverser.getThreadInstance().reset(loggerObj).get("compact").asBoolean(false));
+                    timestampEnabled.setSelected(JsonTraverser.getThreadInstance().reset(loggerObj).get("timestamp-enabled").asBoolean(true));
+                    posEnabled.setSelected(JsonTraverser.getThreadInstance().reset(loggerObj).get("pos-enabled").asBoolean(false));
+                    lineNumberEnabled.setSelected(JsonTraverser.getThreadInstance().reset(loggerObj).get("line-number-enabled").asBoolean(false));
                 }
 
                 updateTextPreview();
