@@ -275,7 +275,7 @@ public class TridentProject implements Project {
             try(InputStreamReader isr = new InputStreamReader(new FileInputStream(resourceCacheFile), Guardian.DEFAULT_CHARSET)) {
                 JsonObject jsonObject = new Gson().fromJson(isr, JsonObject.class);
                 if(jsonObject != null) {
-                    compilerCache = new ProjectReader(null);
+                    compilerCache = new ProjectReader();
                     for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
                         try {
                             Path relativePath = Paths.get(entry.getKey().replace('/',File.separatorChar));
