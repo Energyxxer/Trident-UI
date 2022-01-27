@@ -104,4 +104,9 @@ public class TridentGuardianCore extends GuardianCore {
         }
         return null;
     }
+
+    @Override
+    public URI getDocumentationURI() throws URISyntaxException {
+        return new URI("https://docs.google.com/document/d/1w_3ILt8-8s1VG-qv7cLLdIrTJTtbQvj2klh2xTnxQVw/edit?usp=sharing");
+    }
 }
