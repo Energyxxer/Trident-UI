@@ -291,7 +291,12 @@ public class TridentProject implements Project {
 
         if(projectConfigFile.exists() && projectConfigFile.isFile()) {
             try(InputStreamReader isr = new InputStreamReader(new FileInputStream(projectConfigFile), Guardian.DEFAULT_CHARSET)) {
-                this.projectConfigJson = new Gson().fromJson(isr, JsonObject.class);
+                try {
+                    this.projectConfigJson = new Gson().fromJson(isr, JsonObject.class);
+                } catch (JsonIOException | JsonSyntaxException x) {
+                    GuardianWindow.showError("JSON Error in " + projectConfigFile + ": " + x.getMessage());
+                    this.projectConfigJson = new JsonObject();
+                }
 
                 if(this.projectConfigJson.has("target-version") && this.projectConfigJson.get("target-version").isJsonArray()) {
                     JsonArray arr = this.projectConfigJson.getAsJsonArray("target-version");
@@ -326,10 +331,15 @@ public class TridentProject implements Project {
             }
 
             File buildConfigFile = rootDirectory.toPath().resolve(Trident.PROJECT_BUILD_FILE_NAME).toFile();
-            if(buildConfigFile.exists()) {
+            if(buildConfigFile.exists() && buildConfigFile.isFile()) {
 
                 try(InputStreamReader isr = new InputStreamReader(new FileInputStream(buildConfigFile), Guardian.DEFAULT_CHARSET)) {
-                    this.buildConfigJson = new Gson().fromJson(isr, JsonObject.class);
+                    try {
+                        this.buildConfigJson = new Gson().fromJson(isr, JsonObject.class);
+                    } catch (JsonIOException | JsonSyntaxException x) {
+                        GuardianWindow.showError("JSON Error in " + buildConfigFile + ": " + x.getMessage());
+                        this.buildConfigJson = new JsonObject();
+                    }
                     return;
                 }
             }
