@@ -16,7 +16,6 @@ class ProjectPropertiesGameLogger extends JPanel {
 
     private ThemeListenerManager tlm = new ThemeListenerManager();
 
-    private final StyledCheckBox doExport;
     private final StyledCheckBox compact;
     private final StyledCheckBox timestampEnabled;
     private final StyledCheckBox posEnabled;
@@ -74,27 +73,6 @@ class ProjectPropertiesGameLogger extends JPanel {
                 padding.setMaximumSize(new ScalableDimension(1,20));
                 content.add(padding);
             }
-
-            //region Export
-            {
-                doExport = new StyledCheckBox("Output Game Log Commands","ProjectProperties.content");
-                doExport.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-                content.add(doExport);
-                content.add(new StyledLabel("         If disabled, gamelog commands will not generate an output.", "ProjectProperties.content", tlm));
-                content.add(new StyledLabel("         The gamelog command requires Language Level 3.", "ProjectProperties.content", tlm));
-            }
-
-            {
-                JPanel margin = new JPanel();
-                margin.setMinimumSize(new ScalableDimension(200,45));
-                margin.setMaximumSize(new ScalableDimension(200,45));
-                margin.setOpaque(false);
-                margin.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-                content.add(margin);
-            }
-            //endregion
 
             //region Compact
             {
@@ -200,7 +178,6 @@ class ProjectPropertiesGameLogger extends JPanel {
 
             ProjectProperties.addOpenEvent(p -> {
                 JsonObject config = p.getProjectConfigJson();
-                doExport.setSelected(p.isExportGamelog());
 
                 compact.setSelected(false);
                 timestampEnabled.setSelected(true);
@@ -220,8 +197,6 @@ class ProjectPropertiesGameLogger extends JPanel {
             });
 
             ProjectProperties.addApplyEvent(p -> {
-                p.setExportGamelog(doExport.isSelected());
-
                 JsonObject config = p.getProjectConfigJson();
                 JsonObject loggerObj = new JsonObject();
                 config.add("game-logger", loggerObj);

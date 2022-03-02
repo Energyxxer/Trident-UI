@@ -54,7 +54,7 @@ public class ProjectProperties {
 			ComponentResizer resizer = new ComponentResizer(sidebar);
 			resizer.setResizable(false, false, false, true);
 
-			String[] sections = new String[] { "General", "Output", "Definitions", "Type Aliases", "Dependencies", "Game Logger", "Plugins" };
+			String[] sections = new String[] { "General", "Definitions", "Type Aliases", "Dependencies", "Game Logger", "Plugins" };
 
 			StyledList<String> navigator = new StyledList<>(sections, "ProjectProperties");
 			sidebar.setBackground(navigator.getBackground());
@@ -86,7 +86,6 @@ public class ProjectProperties {
 		JPanel contentGeneral = new ProjectPropertiesGeneral();
 
 		sectionPanes.put("General", contentGeneral);
-		sectionPanes.put("Output", new ProjectPropertiesOutput());
 		sectionPanes.put("Definitions", new ProjectPropertiesDefinitions());
 		sectionPanes.put("Type Aliases", new ProjectPropertiesAliases());
 		sectionPanes.put("Dependencies", new ProjectPropertiesDependencies());

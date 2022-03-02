@@ -2,6 +2,7 @@ package com.energyxxer.trident.guardian.dialogs.project_properties;
 
 import com.energyxxer.guardian.global.Commons;
 import com.energyxxer.guardian.global.Preferences;
+import com.energyxxer.guardian.main.Guardian;
 import com.energyxxer.guardian.ui.modules.ModuleToken;
 import com.energyxxer.guardian.ui.orderlist.*;
 import com.energyxxer.guardian.ui.styledcomponents.StyledPopupMenu;
@@ -38,6 +39,8 @@ public class DependencyToken implements CompoundActionModuleToken {
 
         if(project.getRootDirectory().toPath().startsWith(Preferences.getWorkspace().toPath())) {
             this.dependencyPath = "$PROJECT_DIR$" + File.separator + ".." + File.separator + project.getRootDirectory().getName();
+        } else if(project.getRootDirectory().toPath().startsWith(Guardian.core.getGlobalLibrariesDir().toPath())) {
+            this.dependencyPath = "$LIBRARIES$" + File.separator + project.getRootDirectory().getName();
         } else {
             this.dependencyPath = project.getRootDirectory().getAbsolutePath();
         }

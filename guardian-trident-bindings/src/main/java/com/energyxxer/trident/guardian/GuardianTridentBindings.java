@@ -1,6 +1,7 @@
 package com.energyxxer.trident.guardian;
 
 import com.energyxxer.commodore.functionlogic.functions.Function;
+import com.energyxxer.guardian.GuardianBinding;
 import com.energyxxer.guardian.files.FileType;
 import com.energyxxer.guardian.global.temp.Lang;
 import com.energyxxer.guardian.main.window.GuardianWindow;
@@ -13,7 +14,7 @@ import com.energyxxer.trident.guardian.dialogs.FunctionDialog;
 import java.io.File;
 import java.nio.file.Paths;
 
-public class GuardianTridentBindings {
+public class GuardianTridentBindings implements GuardianBinding {
 
     public static FileType TRIDENT_FILE_TYPE;
 
@@ -25,7 +26,7 @@ public class GuardianTridentBindings {
     public static FileType DATA_ROOT_FILE_TYPE;
     public static FileType RESOURCES_ROOT_FILE_TYPE;
 
-    public static void setup() {
+    public void setup() {
         TridentLanguage.load();
         NBTTMLanguage.load();
         Lang.JSON.addExtension(Trident.PROJECT_FILE_NAME.substring(1));
@@ -90,5 +91,10 @@ public class GuardianTridentBindings {
             Paths.get(dest).resolve("resources").toFile().mkdirs();
             GuardianWindow.projectExplorer.refresh();
         }, (pr, pth) -> pth.equals(pr) && TridentProject.PROJECT_TYPE.isProjectRoot(new File(pr)) && !Paths.get(pr).resolve("resources").toFile().exists());
+    }
+
+    @Override
+    public boolean usesJavaEditionDefinitions() {
+        return true;
     }
 }

@@ -44,11 +44,6 @@ public class TridentGuardianCore extends GuardianCore {
     }
 
     @Override
-    public boolean usesJavaEditionDefinitions() {
-        return true;
-    }
-
-    @Override
     public String getDisplayedVersion() {
         return MIXED_VERSION;
     }

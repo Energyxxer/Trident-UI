@@ -7,6 +7,7 @@ import com.energyxxer.enxlex.lexical_analysis.summary.ProjectSummarizer;
 import com.energyxxer.enxlex.lexical_analysis.summary.ProjectSummary;
 import com.energyxxer.enxlex.pattern_matching.matching.TokenPatternMatch;
 import com.energyxxer.guardian.global.Commons;
+import com.energyxxer.guardian.global.temp.projects.BuildConfiguration;
 import com.energyxxer.guardian.global.temp.projects.Project;
 import com.energyxxer.guardian.global.temp.projects.ProjectManager;
 import com.energyxxer.guardian.langinterface.ProjectType;
@@ -16,6 +17,9 @@ import com.energyxxer.guardian.ui.commodoreresources.DefinitionPacks;
 import com.energyxxer.guardian.ui.commodoreresources.Plugins;
 import com.energyxxer.guardian.ui.commodoreresources.TypeMaps;
 import com.energyxxer.guardian.ui.dialogs.OptionDialog;
+import com.energyxxer.guardian.ui.dialogs.build_configs.BuildConfigTab;
+import com.energyxxer.guardian.ui.dialogs.build_configs.BuildConfigTabDisplayModuleEntry;
+import com.energyxxer.guardian.ui.dialogs.build_configs.JsonProperty;
 import com.energyxxer.guardian.ui.modules.FileModuleToken;
 import com.energyxxer.nbtmapper.packs.NBTTypeMapPack;
 import com.energyxxer.prismarine.PrismarineCompiler;
@@ -40,6 +44,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -50,7 +55,7 @@ import java.util.Map;
 
 import static com.energyxxer.prismarine.PrismarineCompiler.newFileObject;
 
-public class TridentProject implements Project {
+public class TridentProject implements Project<TridentBuildConfiguration> {
     public static final ProjectType PROJECT_TYPE = new ProjectType("TRIDENT", "Trident Project") {
         @Override
         public boolean isProjectRoot(File file) {
@@ -96,7 +101,7 @@ public class TridentProject implements Project {
     private final Lazy<PrismarineProductions> productions = new Lazy<>(() -> {
         try {
             PrismarineProjectWorker worker = new PrismarineProjectWorker(TridentSuiteConfiguration.INSTANCE, rootDirectory);
-            worker.output.put(SetupBuildConfigTask.INSTANCE, getBuildConfig());
+            worker.output.put(SetupBuildConfigTask.INSTANCE, getTridentBuildConfig());
             worker.setup.addTasks(
                     SetupModuleTask.INSTANCE,
                     SetupDependenciesTask.INSTANCE,
@@ -115,12 +120,10 @@ public class TridentProject implements Project {
         }
     });
 
-    private ArrayList<String> preActions;
-    private ArrayList<String> postActions;
-    private ArrayList<String> postSuccessActions;
-    private ArrayList<String> postFailureActions;
+    private ArrayList<BuildConfiguration<TridentBuildConfiguration>> buildConfigs;
 
-    private final Lazy<TridentBuildConfiguration> buildConfig = new Lazy<>(() -> {
+    @Override
+    public TridentBuildConfiguration parseBuildConfig(JsonObject root, File file) throws IOException {
         TridentBuildConfiguration buildConfig = new TridentBuildConfiguration();
         buildConfig.defaultDefinitionPacks = DefinitionPacks.pickPacksForVersion(this.getTargetVersion());
         buildConfig.definitionPackAliases = DefinitionPacks.getAliasMap();
@@ -150,68 +153,19 @@ public class TridentProject implements Project {
             GuardianWindow.showError(errorSB.toString());
         }
 
-        JsonObject rawBuildConfig = null;
-        if(ensureBuildDataExists()) {
-            try {
-                rawBuildConfig = buildConfig.populateFromProjectRoot(getRootDirectory());
-            } catch (Exception x) {
-                x.printStackTrace();
-            }
-        }
-
-        JsonTraverser traverser = new JsonTraverser(rawBuildConfig);
-
-        preActions = new ArrayList<>();
-        for(JsonElement rawCommand : traverser.reset().get("trident-ui").get("actions").get("pre").iterateAsArray()) {
-            if(rawCommand.isJsonPrimitive() && rawCommand.getAsJsonPrimitive().isString()) {
-                String command = rawCommand.getAsString();
-                if(!command.isEmpty()) {
-                    preActions.add(command);
-                }
-            }
-        }
-
-        postActions = new ArrayList<>();
-        for(JsonElement rawCommand : traverser.reset().get("trident-ui").get("actions").get("post").iterateAsArray()) {
-            if(rawCommand.isJsonPrimitive() && rawCommand.getAsJsonPrimitive().isString()) {
-                String command = rawCommand.getAsString();
-                if(!command.isEmpty()) {
-                    postActions.add(command);
-                }
-            }
-        }
-
-        postSuccessActions = new ArrayList<>();
-        for(JsonElement rawCommand : traverser.reset().get("trident-ui").get("actions").get("post-success").iterateAsArray()) {
-            if(rawCommand.isJsonPrimitive() && rawCommand.getAsJsonPrimitive().isString()) {
-                String command = rawCommand.getAsString();
-                if(!command.isEmpty()) {
-                    postSuccessActions.add(command);
-                }
-            }
-        }
-
-        postFailureActions = new ArrayList<>();
-        for(JsonElement rawCommand : traverser.reset().get("trident-ui").get("actions").get("post-failure").iterateAsArray()) {
-            if(rawCommand.isJsonPrimitive() && rawCommand.getAsJsonPrimitive().isString()) {
-                String command = rawCommand.getAsString();
-                if(!command.isEmpty()) {
-                    postFailureActions.add(command);
-                }
-            }
-        }
+        buildConfig.populateFromJson(root, file);
 
         return buildConfig;
-    });
+    }
 
     private JsonObject projectConfigJson;
-    private JsonObject buildConfigJson;
     private JavaEditionVersion targetVersion = null;
     private ProjectReader compilerCache = null;
     private ProjectReader summaryCache = null;
 
     private TridentProjectSummary summary = null;
 
+    //NEW PROJECT
     public TridentProject(Path rootPath) {
         instantiationTime = System.currentTimeMillis();
         this.rootDirectory = rootPath.toFile();
@@ -222,6 +176,8 @@ public class TridentProject implements Project {
 
         this.name = rootPath.getFileName().toString();
         //this.prefix = StringUtil.getInitials(name).toLowerCase(Locale.ENGLISH);
+
+        this.buildConfigs = new ArrayList<>();
 
         Path outFolder = rootPath.resolve("out");
 
@@ -259,8 +215,11 @@ public class TridentProject implements Project {
         projectConfigJson.add("game-logger", loggerObj);
 
         createBuildDataFromTDNProj();
+
+        migrateLegacyBuildConfigFile();
     }
 
+    //EXISTING PROJECT
     public TridentProject(File rootDirectory) throws Exception {
         instantiationTime = System.currentTimeMillis();
         this.rootDirectory = rootDirectory;
@@ -269,6 +228,8 @@ public class TridentProject implements Project {
         resourceRoot = rootDirectory.toPath().resolve("resources").toFile();
         File projectConfigFile = new File(rootDirectory.getAbsolutePath() + File.separator + Trident.PROJECT_FILE_NAME);
         this.name = rootDirectory.getName();
+
+        this.buildConfigs = listAllConfigs();
 
         resourceCacheFile = rootDirectory.toPath().resolve(".tdnui").resolve("resource_cache").toFile();
         if(resourceCacheFile.exists() && resourceCacheFile.isFile()) {
@@ -330,19 +291,7 @@ public class TridentProject implements Project {
                 }
             }
 
-            File buildConfigFile = rootDirectory.toPath().resolve(Trident.PROJECT_BUILD_FILE_NAME).toFile();
-            if(buildConfigFile.exists() && buildConfigFile.isFile()) {
-
-                try(InputStreamReader isr = new InputStreamReader(new FileInputStream(buildConfigFile), Guardian.DEFAULT_CHARSET)) {
-                    try {
-                        this.buildConfigJson = new Gson().fromJson(isr, JsonObject.class);
-                    } catch (JsonIOException | JsonSyntaxException x) {
-                        GuardianWindow.showError("JSON Error in " + buildConfigFile + ": " + x.getMessage());
-                        this.buildConfigJson = new JsonObject();
-                    }
-                    return;
-                }
-            }
+            migrateLegacyBuildConfigFile();
 
             return;
         }
@@ -370,10 +319,23 @@ public class TridentProject implements Project {
         return !Arrays.asList("src","resources","data").contains(file.getName());
     }
 
+    private void migrateLegacyBuildConfigFile() {
+        getBuildDirectory().mkdirs();
+        File legacyBuildConfigFile = rootDirectory.toPath().resolve(Trident.PROJECT_BUILD_FILE_NAME).toFile();
+        if(legacyBuildConfigFile.exists() && legacyBuildConfigFile.isFile()) {
+            try {
+                Files.move(legacyBuildConfigFile.toPath(), getBuildDirectory().toPath().resolve(".build"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            refreshBuildConfigs();
+        }
+    }
+
     public void updateConfig() {
         this.datapackRoot.mkdirs();
         File projectConfigFile = new File(rootDirectory.getAbsolutePath() + File.separator + Trident.PROJECT_FILE_NAME);
-        File buildConfigFile = new File(rootDirectory.getAbsolutePath() + File.separator + Trident.PROJECT_BUILD_FILE_NAME);
+        migrateLegacyBuildConfigFile();
 
         try {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -386,14 +348,6 @@ public class TridentProject implements Project {
             }
 
             if(!projectConfigFile.exists()) projectConfigFile.createNewFile();
-            if(!buildConfigFile.exists()) projectConfigFile.createNewFile();
-
-            try(PrintWriter writer = new PrintWriter(buildConfigFile, "UTF-8")) {
-                writer.print(gson.toJson(this.buildConfigJson));
-            } catch (FileNotFoundException | UnsupportedEncodingException x) {
-                x.printStackTrace();
-                GuardianWindow.showException(x);
-            }
         } catch (IOException x) {
             x.printStackTrace();
         }
@@ -544,74 +498,6 @@ public class TridentProject implements Project {
         projectConfigJson.addProperty("strict-text-components", strict);
     }
 
-    public File getDataOut() {
-        String path = JsonTraverser.getThreadInstance().reset(buildConfigJson).get("output").get("directories").get("data-pack").asString();
-        if(path != null) {
-            return newFileObject(path, rootDirectory);
-        }
-        return null;
-    }
-
-    public void setDataOut(File file) {
-        JsonObject directories = JsonTraverser.getThreadInstance().reset(buildConfigJson).createOnTraversal().get("output").get("directories").asJsonObject();
-
-        if(file != null) {
-            directories.addProperty("data-pack", file.getPath());
-        } else {
-            directories.remove("data-pack");
-        }
-    }
-
-    public File getResourcesOut() {
-        String path = JsonTraverser.getThreadInstance().reset(buildConfigJson).get("output").get("directories").get("resource-pack").asString();
-        if(path != null) {
-            return newFileObject(path, rootDirectory);
-        }
-        return null;
-    }
-
-    public void setResourcesOut(File file) {
-        JsonObject directories = JsonTraverser.getThreadInstance().reset(buildConfigJson).createOnTraversal().get("output").get("directories").asJsonObject();
-
-        if(file != null) {
-            directories.addProperty("resource-pack", file.getPath());
-        } else {
-            directories.remove("resource-pack");
-        }
-    }
-
-    public boolean isExportComments() {
-        return JsonTraverser.getThreadInstance().reset(buildConfigJson).get("output").get("export-comments").asBoolean(false);
-    }
-
-    public void setExportComments(boolean value) {
-        JsonTraverser.getThreadInstance().reset(buildConfigJson).createOnTraversal().get("output").asJsonObject().addProperty("export-comments", value);
-    }
-
-    public boolean isExportGamelog() {
-        return JsonTraverser.getThreadInstance().reset(buildConfigJson).get("output").get("export-gamelog").asBoolean(true);
-    }
-
-    public void setExportGamelog(boolean value) {
-        JsonTraverser.getThreadInstance().reset(buildConfigJson).createOnTraversal().get("output").asJsonObject().addProperty("export-gamelog", value);
-    }
-
-    public boolean isClearData() {
-        return JsonTraverser.getThreadInstance().reset(buildConfigJson).get("output").get("clean-directories").get("data-pack").asBoolean(false);
-    }
-
-    public void setClearData(boolean clear) {
-        JsonTraverser.getThreadInstance().reset(buildConfigJson).createOnTraversal().get("output").get("clean-directories").asJsonObject().addProperty("data-pack", clear);
-    }
-
-    public boolean isClearResources() {
-        return JsonTraverser.getThreadInstance().reset(buildConfigJson).get("output").get("clean-directories").get("resource-pack").asBoolean(false);
-    }
-
-    public void setClearResources(boolean clear) {
-        JsonTraverser.getThreadInstance().reset(buildConfigJson).createOnTraversal().get("output").get("clean-directories").asJsonObject().addProperty("resource-pack", clear);
-    }
-
     public JsonObject getProjectConfigJson() {
         return projectConfigJson;
     }
@@ -652,7 +538,7 @@ public class TridentProject implements Project {
     }
 
     private void createBuildDataFromTDNProj() {
-        buildConfigJson = new JsonObject();
+        JsonObject buildConfigJson = new JsonObject();
 
         buildConfigJson.addProperty("input-resources", "(automatically selected by Trident-UI)");
 
@@ -693,28 +579,99 @@ public class TridentProject implements Project {
         Debug.log("Created " + Trident.PROJECT_BUILD_FILE_NAME + " for \"" + name + "\"");
     }
 
-    public TridentBuildConfiguration getBuildConfig() {
-        return buildConfig.getValue();
+    public TridentBuildConfiguration getTridentBuildConfig() {
+        return getBuildConfig().get(this);
     }
 
     @Override
-    public Iterable<String> getPreActions() {
-        return preActions;
+    public ArrayList<BuildConfiguration<TridentBuildConfiguration>> getAllBuildConfigs() {
+        return buildConfigs;
     }
 
     @Override
-    public Iterable<String> getPostActions() {
-        return postActions;
+    public Iterable<? extends BuildConfigTab> getBuildConfigTabs() {
+        ArrayList<BuildConfigTab> tabs = new ArrayList<>();
+        {
+            BuildConfigTab tab = new BuildConfigTab("Output");
+            tab.addEntry(new BuildConfigTabDisplayModuleEntry.FileField<JsonTraverser>(
+                            "Data Pack Output",
+                            "Where to store the data pack compilation result.\nMay be a directory or a zip file.",
+                            "Select Data Pack Output..."
+                    )
+                    .setProperty(new JsonProperty.JsonStringProperty(
+                            "output.directories.data-pack",
+                            getRootDirectory().toPath().resolve("out").resolve("datapack").toString()
+                    ))
+            );
+            tab.addEntry(new BuildConfigTabDisplayModuleEntry.CheckboxField<JsonTraverser>(
+                            "Delete data pack output before compiling",
+                            null
+                    )
+                    .setProperty(new JsonProperty.JsonBooleanProperty(
+                            "output.clean-directories.data-pack",
+                            false
+                    ))
+            );
+            tab.addEntry(new BuildConfigTabDisplayModuleEntry.Spacing(15));
+            tab.addEntry(new BuildConfigTabDisplayModuleEntry.FileField<JsonTraverser>(
+                            "Resource Pack Output",
+                            "Where to store the resource pack compilation result, if applicable.\nMay be a directory or a zip file.",
+                            "Select Resource Pack Output..."
+                    )
+                    .setProperty(new JsonProperty.JsonStringProperty(
+                            "output.directories.resource-pack",
+                            getRootDirectory().toPath().resolve("out").resolve("resources.zip").toString()
+                    ))
+            );
+            tab.addEntry(
+                    new BuildConfigTabDisplayModuleEntry.CheckboxField<JsonTraverser>(
+                            "Delete resource pack output before compiling",
+                            null
+                    )
+                    .setProperty(new JsonProperty.JsonBooleanProperty(
+                            "output.clean-directories.resource-pack",
+                            false
+                    ))
+            );
+            tab.addEntry(new BuildConfigTabDisplayModuleEntry.Spacing(15));
+            tab.addEntry(
+                    new BuildConfigTabDisplayModuleEntry.CheckboxField<JsonTraverser>(
+                            "Export comments",
+                            "If enabled, comments in Trident functions will be exported."
+                    )
+                    .setProperty(new JsonProperty.JsonBooleanProperty(
+                            "output.export-comments",
+                            false
+                    ))
+            );
+            tab.addEntry(new BuildConfigTabDisplayModuleEntry.Spacing(15));
+            tab.addEntry(
+                    new BuildConfigTabDisplayModuleEntry.CheckboxField<JsonTraverser>(
+                            "Output Game Log Commands",
+                            "If disabled, gamelog commands will not generate an output.\nThe gamelog command requires Language Level 3."
+                    )
+                    .setProperty(new JsonProperty.JsonBooleanProperty(
+                            "output.export-gamelog",
+                            false
+                    ))
+            );
+            tabs.add(tab);
+        }
+        parseUserBuildConfigTabs(tabs, true);
+        return tabs;
     }
 
     @Override
-    public ArrayList<String> getPostSuccessActions() {
-        return postSuccessActions;
+    public void refreshBuildConfigs() {
+        buildConfigs.clear();
+        buildConfigs = listAllConfigs();
     }
 
+    private final BuildConfiguration<TridentBuildConfiguration> defaultBuildConfig = new BuildConfiguration<>();
+
     @Override
-    public ArrayList<String> getPostFailureActions() {
-        return postFailureActions;
+    public BuildConfiguration<TridentBuildConfiguration> getDefaultBuildConfig() {
+        return defaultBuildConfig;
     }
 
     public ProjectType getProjectType() {
@@ -727,7 +684,7 @@ public class TridentProject implements Project {
                 TridentSuiteConfiguration.INSTANCE,
                 this.getRootDirectory()
         );
-        summarizer.getWorker().output.put(SetupBuildConfigTask.INSTANCE, this.getBuildConfig());
+        summarizer.getWorker().output.put(SetupBuildConfigTask.INSTANCE, this.getTridentBuildConfig());
         summarizer.getWorker().output.put(SetupPropertiesTask.INSTANCE, this.getProjectConfigJson());
         if(summaryCache != null) summaryCache.startCache();
         summarizer.setCachedReader(summaryCache);
@@ -774,9 +731,13 @@ public class TridentProject implements Project {
 
     @Override
     public PrismarineCompiler createProjectCompiler() {
+        BuildConfiguration<TridentBuildConfiguration> buildConfig = this.getBuildConfig();
+        if(buildConfig.isFallback()) {
+            throw new IllegalStateException("No Build Configuration selected");
+        }
         PrismarineCompiler compiler = new PrismarineProjectWorker(TridentSuiteConfiguration.INSTANCE, this.getRootDirectory()).createCompiler();
 
-        compiler.getWorker().output.put(SetupBuildConfigTask.INSTANCE, this.getBuildConfig());
+        compiler.getWorker().output.put(SetupBuildConfigTask.INSTANCE, buildConfig.get(this));
         if(compilerCache != null) compilerCache.startCache();
         compiler.setCachedReader(compilerCache);
 
@@ -826,5 +787,40 @@ public class TridentProject implements Project {
             Debug.log(x.getMessage());
             GuardianWindow.showException(x);
         }
+    }
+
+    @Override
+    public ArrayList<Project> getLoadedDependencies(ArrayList<Project> list, boolean recursively) {
+        if(list.contains(this)) return list;
+        if(projectConfigJson.has("dependencies") && projectConfigJson.get("dependencies").isJsonArray()) {
+            JsonArray arr = projectConfigJson.getAsJsonArray("dependencies");
+            if(arr.size() > 0) {
+                for(JsonElement elem : arr) {
+                    if(elem.isJsonObject()) {
+                        JsonObject obj = elem.getAsJsonObject();
+
+                        //region Load from dependency
+                        if(obj.has("path") && obj.get("path").isJsonPrimitive() && obj.get("path").getAsJsonPrimitive().isString()) {
+
+                            if(obj.has("mode") && obj.get("mode").isJsonPrimitive() && obj.get("mode").getAsJsonPrimitive().isString()) {
+                                if(!obj.get("mode").getAsString().equals("combine")) continue;
+                            }
+
+                            String path = obj.get("path").getAsString();
+                            File dependencyRoot = newFileObject(path, getRootDirectory());
+                            if(ProjectManager.isLoadedProjectRoot(dependencyRoot)) {
+                                Project dependencyProject = ProjectManager.getAssociatedProject(dependencyRoot);
+                                list.add(dependencyProject);
+                                if(recursively) {
+                                    dependencyProject.getLoadedDependencies(list, true);
+                                }
+                            }
+                        }
+                        //endregion
+                    }
+                }
+            }
+        }
+        return list;
     }
 }

@@ -170,6 +170,40 @@ class ProjectPropertiesGeneral extends JPanel {
             }
             //endregion
 
+
+            //region Anonymous Function Name
+            {
+                StyledLabel label = new StyledLabel("Anonymous Function Name:", "ProjectProperties.content", tlm);
+                label.setStyle(Font.BOLD);
+                content.add(label);
+            }
+            {
+                StyledLabel label = new StyledLabel("Name used for anonymous functions. The number of the anonymous function will replace asterisks (*)", "ProjectProperties.content", tlm);
+                content.add(label);
+            }
+            {
+                StyledTextField namespaceField = new StyledTextField("You shouldn't be able to see this*","ProjectProperties.content", tlm);
+                namespaceField.setPreferredSize(new ScalableDimension(300,25));
+                namespaceField.setMaximumSize(new ScalableDimension(200,25));
+                namespaceField.setAlignmentX(Component.LEFT_ALIGNMENT);
+                ProjectProperties.addOpenEvent(p -> namespaceField.setText(p.getAnonymousFunctionName()));
+                ProjectProperties.addApplyEvent(p -> p.setAnonymousFunctionName(namespaceField.getText()));
+
+                content.add(namespaceField);
+            }
+
+            {
+                JPanel margin = new JPanel();
+                margin.setMinimumSize(new ScalableDimension(200,15));
+                margin.setMaximumSize(new ScalableDimension(200,15));
+                margin.setOpaque(false);
+                margin.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+                content.add(margin);
+            }
+            //endregion
+
+
             //region Strict NBT
             {
                 StyledCheckBox strictNBT = new StyledCheckBox("Strict NBT","ProjectProperties.content");
