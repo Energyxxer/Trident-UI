@@ -2,10 +2,14 @@ package com.energyxxer.trident.guardian.dialogs.project_properties;
 
 import com.energyxxer.guardian.main.window.GuardianWindow;
 import com.energyxxer.guardian.main.window.actions.ActionManager;
+import com.energyxxer.guardian.ui.scrollbar.OverlayScrollPane;
 import com.energyxxer.guardian.ui.styledcomponents.Padding;
 import com.energyxxer.guardian.ui.styledcomponents.StyledButton;
 import com.energyxxer.guardian.ui.styledcomponents.StyledList;
 import com.energyxxer.guardian.ui.theme.change.ThemeListenerManager;
+import com.energyxxer.guardian.ui.user_configs.ConfigTab;
+import com.energyxxer.guardian.ui.user_configs.ConfigTabDisplayModule;
+import com.energyxxer.prismarine.util.JsonTraverser;
 import com.energyxxer.trident.guardian.TridentProject;
 import com.energyxxer.util.ImageManager;
 import com.energyxxer.xswing.ComponentResizer;
@@ -20,7 +24,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.function.Consumer;
 
 public class ProjectProperties {
@@ -33,20 +36,50 @@ public class ProjectProperties {
 	private static ArrayList<Consumer<TridentProject>> applyEvents = new ArrayList<>();
 	private static ArrayList<Runnable> closeEvents = new ArrayList<>();
 
+	private static StyledList<SettingsTab> navigator;
+	private static ArrayList<SettingsTab> tabs = new ArrayList<>();
+	private static JPanel contentPane;
 	private static JPanel currentSection;
 
 	private static ThemeListenerManager tlm = new ThemeListenerManager();
 
 	static {
-		
+
+		JPanel contentGeneral = new ProjectPropertiesGeneral();
+
+		tabs.add(new SettingsTab("General", contentGeneral));
+		tabs.add(new SettingsTab("Definitions", new ProjectPropertiesDefinitions()));
+		tabs.add(new SettingsTab("Type Aliases", new ProjectPropertiesAliases()));
+		tabs.add(new SettingsTab("Dependencies", new ProjectPropertiesDependencies()));
+		tabs.add(new SettingsTab("Game Logger", new ProjectPropertiesGameLogger()));
+		tabs.add(new SettingsTab("Plugins", new ProjectPropertiesPlugins()));
+
+		addOpenEvent(p -> {
+			JsonTraverser traverser = new JsonTraverser(p.getProjectConfigJson());
+
+			for(SettingsTab tab : tabs) {
+				if(tab.component instanceof ConfigTabDisplayModule) {
+					((ConfigTabDisplayModule) tab.component).open(traverser);
+				}
+			}
+		});
+		addApplyEvent(p -> {
+			JsonTraverser traverser = new JsonTraverser(p.getProjectConfigJson()).createOnTraversal();
+
+			for(SettingsTab tab : tabs) {
+				if(tab.component instanceof ConfigTabDisplayModule) {
+					((ConfigTabDisplayModule) tab.component).apply(traverser);
+				}
+			}
+		});
+
 		JPanel pane = new JPanel(new OverlayBorderLayout());
 		//JButton okay = new JButton("OK");
 		//JButton cancel = new JButton("Cancel");
 		
 		pane.setPreferredSize(new ScalableDimension(900,600));
 
-		JPanel contentPane = new JPanel(new BorderLayout());
-		HashMap<String, JPanel> sectionPanes = new HashMap<>();
+		contentPane = new JPanel(new BorderLayout());
 
 		{
 			JPanel sidebar = new OverlayBorderPanel(new BorderLayout(), new Insets(0, 0, 0, ComponentResizer.DIST));
@@ -54,27 +87,23 @@ public class ProjectProperties {
 			ComponentResizer resizer = new ComponentResizer(sidebar);
 			resizer.setResizable(false, false, false, true);
 
-			String[] sections = new String[] { "General", "Definitions", "Type Aliases", "Dependencies", "Game Logger", "Plugins" };
-
-			StyledList<String> navigator = new StyledList<>(sections, "ProjectProperties");
+			navigator = new StyledList<>(tabs.toArray(new SettingsTab[0]), "ProjectProperties");
 			sidebar.setBackground(navigator.getBackground());
 			sidebar.setOpaque(false);
 
 			navigator.addListSelectionListener(o -> {
-				contentPane.remove(currentSection);
-				currentSection = sectionPanes.get(sections[o.getFirstIndex()]);
-				contentPane.add(currentSection, BorderLayout.CENTER);
-				contentPane.repaint();
+				changeTab(((SettingsTab) o.getSource()));
 			});
 
-			sidebar.add(navigator, BorderLayout.CENTER);
+			OverlayScrollPane scrollPane = new OverlayScrollPane(tlm, navigator);
+			sidebar.add(scrollPane, BorderLayout.CENTER);
 
 			pane.add(sidebar, BorderLayout.WEST);
 
 			tlm.addThemeChangeListener(t -> {
 				sidebar.setMinimumSize(new ScalableDimension(25, 1));
 				sidebar.setMaximumSize(new ScalableDimension(400, 1));
-				navigator.setPreferredSize(new ScalableDimension(200,500));
+				sidebar.setPreferredSize(new ScalableDimension(200,500));
 				pane.setBackground(t.getColor(new Color(235, 235, 235), "ProjectProperties.background"));
 				contentPane.setBackground(t.getColor(new Color(235, 235, 235), "ProjectProperties.content.background"));
 				sidebar.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 0, ComponentResizer.DIST), BorderFactory.createMatteBorder(0, 0, 0, Math.max(t.getInteger(1,"ProjectProperties.content.border.thickness"),0), t.getColor(new Color(200, 200, 200), "ProjectProperties.content.border.color"))));
@@ -82,15 +111,6 @@ public class ProjectProperties {
 		}
 
 		pane.add(contentPane, BorderLayout.CENTER);
-
-		JPanel contentGeneral = new ProjectPropertiesGeneral();
-
-		sectionPanes.put("General", contentGeneral);
-		sectionPanes.put("Definitions", new ProjectPropertiesDefinitions());
-		sectionPanes.put("Type Aliases", new ProjectPropertiesAliases());
-		sectionPanes.put("Dependencies", new ProjectPropertiesDependencies());
-		sectionPanes.put("Game Logger", new ProjectPropertiesGameLogger());
-		sectionPanes.put("Plugins", new ProjectPropertiesPlugins());
 
 		contentPane.add(contentGeneral, BorderLayout.CENTER);
 		currentSection = contentGeneral;
@@ -164,13 +184,38 @@ public class ProjectProperties {
 		dialog.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
 	}
 
+	private static void changeTab(SettingsTab tab) {
+		contentPane.remove(currentSection);
+		currentSection = tab.component;
+		contentPane.add(currentSection, BorderLayout.CENTER);
+		contentPane.revalidate();
+		contentPane.repaint();
+	}
+
+
 	private static void cancel() {
 		dialog.setVisible(false);
 		closeEvents.forEach(Runnable::run);
 	}
 
+	private static void removeAllUserTabs() {
+		while(tabs.size() > 6) {
+			tabs.remove(tabs.size()-1);
+		}
+	}
+
+
 	public static void show(TridentProject p) {
 		project = p;
+		removeAllUserTabs();
+
+		for(ConfigTab tab : project.getProjectConfigTabs()) {
+			tabs.add(new SettingsTab(tab.getTitle(), ((JPanel) tab.createModule(null))));
+		}
+		navigator.setOptions(tabs.toArray(new SettingsTab[0]));
+		navigator.setSelectedOptionIndex(0);
+		changeTab(tabs.get(0));
+
 		openEvents.forEach(e -> e.accept(p));
 
 		dialog.setVisible(true);
@@ -187,4 +232,19 @@ public class ProjectProperties {
     public static void addCloseEvent(Runnable r) {
 		closeEvents.add(r);
     }
+
+	private static class SettingsTab {
+		public final String name;
+		public final JPanel component;
+
+		public SettingsTab(String name, JPanel component) {
+			this.name = name;
+			this.component = component;
+		}
+
+		@Override
+		public String toString() {
+			return name;
+		}
+	}
 }

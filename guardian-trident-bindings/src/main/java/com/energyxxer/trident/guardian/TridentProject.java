@@ -17,10 +17,10 @@ import com.energyxxer.guardian.ui.commodoreresources.DefinitionPacks;
 import com.energyxxer.guardian.ui.commodoreresources.Plugins;
 import com.energyxxer.guardian.ui.commodoreresources.TypeMaps;
 import com.energyxxer.guardian.ui.dialogs.OptionDialog;
-import com.energyxxer.guardian.ui.dialogs.build_configs.BuildConfigTab;
-import com.energyxxer.guardian.ui.dialogs.build_configs.BuildConfigTabDisplayModuleEntry;
 import com.energyxxer.guardian.ui.dialogs.build_configs.JsonProperty;
 import com.energyxxer.guardian.ui.modules.FileModuleToken;
+import com.energyxxer.guardian.ui.user_configs.ConfigTab;
+import com.energyxxer.guardian.ui.user_configs.ConfigTabDisplayModuleEntry;
 import com.energyxxer.nbtmapper.packs.NBTTypeMapPack;
 import com.energyxxer.prismarine.PrismarineCompiler;
 import com.energyxxer.prismarine.PrismarineProductions;
@@ -153,7 +153,7 @@ public class TridentProject implements Project<TridentBuildConfiguration> {
             GuardianWindow.showError(errorSB.toString());
         }
 
-        buildConfig.populateFromJson(root, file);
+        buildConfig.populateFromJson(root, rootDirectory);
 
         return buildConfig;
     }
@@ -589,11 +589,11 @@ public class TridentProject implements Project<TridentBuildConfiguration> {
     }
 
     @Override
-    public Iterable<? extends BuildConfigTab> getBuildConfigTabs() {
-        ArrayList<BuildConfigTab> tabs = new ArrayList<>();
+    public Iterable<? extends ConfigTab> getBuildConfigTabs() {
+        ArrayList<ConfigTab> tabs = new ArrayList<>();
         {
-            BuildConfigTab tab = new BuildConfigTab("Output");
-            tab.addEntry(new BuildConfigTabDisplayModuleEntry.FileField<JsonTraverser>(
+            ConfigTab tab = new ConfigTab("Output", this);
+            tab.addEntry(new ConfigTabDisplayModuleEntry.FileField<JsonTraverser>(
                             "Data Pack Output",
                             "Where to store the data pack compilation result.\nMay be a directory or a zip file.",
                             "Select Data Pack Output..."
@@ -603,7 +603,7 @@ public class TridentProject implements Project<TridentBuildConfiguration> {
                             getRootDirectory().toPath().resolve("out").resolve("datapack").toString()
                     ))
             );
-            tab.addEntry(new BuildConfigTabDisplayModuleEntry.CheckboxField<JsonTraverser>(
+            tab.addEntry(new ConfigTabDisplayModuleEntry.CheckboxField<JsonTraverser>(
                             "Delete data pack output before compiling",
                             null
                     )
@@ -612,8 +612,8 @@ public class TridentProject implements Project<TridentBuildConfiguration> {
                             false
                     ))
             );
-            tab.addEntry(new BuildConfigTabDisplayModuleEntry.Spacing(15));
-            tab.addEntry(new BuildConfigTabDisplayModuleEntry.FileField<JsonTraverser>(
+            tab.addEntry(new ConfigTabDisplayModuleEntry.Spacing(15));
+            tab.addEntry(new ConfigTabDisplayModuleEntry.FileField<JsonTraverser>(
                             "Resource Pack Output",
                             "Where to store the resource pack compilation result, if applicable.\nMay be a directory or a zip file.",
                             "Select Resource Pack Output..."
@@ -624,7 +624,7 @@ public class TridentProject implements Project<TridentBuildConfiguration> {
                     ))
             );
             tab.addEntry(
-                    new BuildConfigTabDisplayModuleEntry.CheckboxField<JsonTraverser>(
+                    new ConfigTabDisplayModuleEntry.CheckboxField<JsonTraverser>(
                             "Delete resource pack output before compiling",
                             null
                     )
@@ -633,9 +633,9 @@ public class TridentProject implements Project<TridentBuildConfiguration> {
                             false
                     ))
             );
-            tab.addEntry(new BuildConfigTabDisplayModuleEntry.Spacing(15));
+            tab.addEntry(new ConfigTabDisplayModuleEntry.Spacing(15));
             tab.addEntry(
-                    new BuildConfigTabDisplayModuleEntry.CheckboxField<JsonTraverser>(
+                    new ConfigTabDisplayModuleEntry.CheckboxField<JsonTraverser>(
                             "Export comments",
                             "If enabled, comments in Trident functions will be exported."
                     )
@@ -644,9 +644,9 @@ public class TridentProject implements Project<TridentBuildConfiguration> {
                             false
                     ))
             );
-            tab.addEntry(new BuildConfigTabDisplayModuleEntry.Spacing(15));
+            tab.addEntry(new ConfigTabDisplayModuleEntry.Spacing(15));
             tab.addEntry(
-                    new BuildConfigTabDisplayModuleEntry.CheckboxField<JsonTraverser>(
+                    new ConfigTabDisplayModuleEntry.CheckboxField<JsonTraverser>(
                             "Output Game Log Commands",
                             "If disabled, gamelog commands will not generate an output.\nThe gamelog command requires Language Level 3."
                     )
@@ -658,6 +658,13 @@ public class TridentProject implements Project<TridentBuildConfiguration> {
             tabs.add(tab);
         }
         parseUserBuildConfigTabs(tabs, true);
+        return tabs;
+    }
+
+    @Override
+    public Iterable<? extends ConfigTab> getProjectConfigTabs() {
+        ArrayList<ConfigTab> tabs = new ArrayList<>();
+        parseUserProjectConfigTabs(tabs, true);
         return tabs;
     }
 
@@ -810,9 +817,11 @@ public class TridentProject implements Project<TridentBuildConfiguration> {
                             File dependencyRoot = newFileObject(path, getRootDirectory());
                             if(ProjectManager.isLoadedProjectRoot(dependencyRoot)) {
                                 Project dependencyProject = ProjectManager.getAssociatedProject(dependencyRoot);
-                                list.add(dependencyProject);
-                                if(recursively) {
-                                    dependencyProject.getLoadedDependencies(list, true);
+                                if(!recursively || !list.contains(dependencyProject)) {
+                                    list.add(dependencyProject);
+                                    if(recursively) {
+                                        dependencyProject.getLoadedDependencies(list, true);
+                                    }
                                 }
                             }
                         }
