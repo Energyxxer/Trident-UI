@@ -290,6 +290,14 @@ public class TridentLanguage extends Lang {
                 tokens.add(new ExpandableSuggestionToken(dialog, "false", suggestion));
                 break;
             }
+            default: {
+                if(suggestion.getKey().startsWith(TridentSuggestionTags.__TAG_TEMPLATE)) {
+                    collectResourceLocationSuggestions(
+                            dialog, suggestion, tokens,
+                            s -> ((TridentProjectSummary) s).getTags().get(suggestion.getKey().substring(TridentSuggestionTags.__TAG_TEMPLATE.length())),
+                            "block_tag");
+                }
+            }
         }
     }
 
