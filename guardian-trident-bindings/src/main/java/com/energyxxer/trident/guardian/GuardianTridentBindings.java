@@ -3,6 +3,7 @@ package com.energyxxer.trident.guardian;
 import com.energyxxer.commodore.functionlogic.functions.Function;
 import com.energyxxer.guardian.GuardianBinding;
 import com.energyxxer.guardian.files.FileType;
+import com.energyxxer.guardian.global.Commons;
 import com.energyxxer.guardian.global.temp.Lang;
 import com.energyxxer.guardian.main.window.GuardianWindow;
 import com.energyxxer.guardian.ui.commodoreresources.Plugins;
@@ -10,9 +11,13 @@ import com.energyxxer.guardian.ui.dialogs.file_dialogs.FileDialog;
 import com.energyxxer.guardian.ui.theme.ThemeManager;
 import com.energyxxer.trident.Trident;
 import com.energyxxer.trident.guardian.dialogs.FunctionDialog;
+import com.energyxxer.trident.guardian.settings.SettingsCompiler;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.nio.file.Paths;
+import java.util.HashMap;
 
 public class GuardianTridentBindings implements GuardianBinding {
 
@@ -91,10 +96,43 @@ public class GuardianTridentBindings implements GuardianBinding {
             Paths.get(dest).resolve("resources").toFile().mkdirs();
             GuardianWindow.projectExplorer.refresh();
         }, (pr, pth) -> pth.equals(pr) && TridentProject.PROJECT_TYPE.isProjectRoot(new File(pr)) && !Paths.get(pr).resolve("resources").toFile().exists());
+
+        SettingsCompiler.load();
     }
 
     @Override
     public boolean usesJavaEditionDefinitions() {
         return true;
+    }
+
+    @Override
+    public void setupSettingsSections(HashMap<String, JPanel> sectionPanes) {
+        sectionPanes.put("Compiler", new SettingsCompiler());
+    }
+
+    @Override
+    public Image getIconForFile(File file) {
+        String extension = "";
+        if(file.getName().lastIndexOf('.') >= 0) {
+            extension = file.getName().substring(file.getName().lastIndexOf('.'));
+        }
+        switch(extension) {
+            case ".json": {
+                if(file.getName().equals("sounds.json"))
+                    return Commons.getIcon("sound_config");
+                else if(file.getParentFile().getName().equals("blockstates"))
+                    return Commons.getIcon("blockstate");
+                else if(file.getParentFile().getName().equals("lang"))
+                    return Commons.getIcon("lang");
+                break;
+            }
+            case ".mcmeta":
+            case Trident.PROJECT_FILE_NAME:
+            case Trident.PROJECT_BUILD_FILE_NAME:
+                return Commons.getIcon("meta");
+            case ".nbt":
+                return Commons.getIcon("structure");
+        }
+        return null;
     }
 }

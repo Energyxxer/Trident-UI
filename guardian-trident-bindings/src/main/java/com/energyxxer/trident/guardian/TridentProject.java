@@ -710,28 +710,6 @@ public class TridentProject implements Project<TridentBuildConfiguration> {
                 if(file.getName().equals("datapack")) return Commons.getIcon("data");
                 if(file.getName().equals("resources")) return Commons.getIcon("resources");
             }
-        } else {
-            String extension = "";
-            if(file.getName().lastIndexOf(".") >= 0) {
-                extension = file.getName().substring(file.getName().lastIndexOf("."));
-            }
-            switch(extension) {
-                case ".json": {
-                    if(file.getName().equals("sounds.json"))
-                        return Commons.getIcon("sound_config");
-                    else if(file.getParentFile().getName().equals("blockstates"))
-                        return Commons.getIcon("blockstate");
-                    else if(file.getParentFile().getName().equals("lang"))
-                        return Commons.getIcon("lang");
-                    break;
-                }
-                case ".mcmeta":
-                case Trident.PROJECT_FILE_NAME:
-                case Trident.PROJECT_BUILD_FILE_NAME:
-                    return Commons.getIcon("meta");
-                case ".nbt":
-                    return Commons.getIcon("structure");
-            }
         }
         return null;
     }
@@ -797,7 +775,7 @@ public class TridentProject implements Project<TridentBuildConfiguration> {
     }
 
     @Override
-    public ArrayList<Project> getLoadedDependencies(ArrayList<Project> list, boolean recursively) {
+    public ArrayList<Project<?>> getLoadedDependencies(ArrayList<Project<?>> list, boolean recursively) {
         if(list.contains(this)) return list;
         if(projectConfigJson.has("dependencies") && projectConfigJson.get("dependencies").isJsonArray()) {
             JsonArray arr = projectConfigJson.getAsJsonArray("dependencies");
